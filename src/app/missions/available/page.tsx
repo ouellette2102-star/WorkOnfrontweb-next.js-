@@ -1,16 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { getAvailableMissions } from "@/lib/missions-api";
 import type { Mission } from "@/types/mission";
 import { MissionCard } from "@/components/missions/mission-card";
+import { ReserveMissionButton } from "@/components/missions/reserve-mission-button";
 
 export default function AvailableMissionsPage() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const loadMissions = useCallback(async () => {
+    if (!isLoaded || !isSignedIn) return;
+
+    try {
+      setIsLoading(true);
+      const token = await getToken();
+      if (!token) {
+        setError("Impossible de récupérer le token");
+        return;
+      }
+
+      const data = await getAvailableMissions(token);
+      setMissions(data);
+      setError(null);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erreur lors du chargement des missions",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoaded, isSignedIn, getToken]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -20,35 +46,14 @@ export default function AvailableMissionsPage() {
       return;
     }
 
-    const loadMissions = async () => {
-      try {
-        setIsLoading(true);
-        const token = await getToken();
-        if (!token) {
-          setError("Impossible de récupérer le token");
-          return;
-        }
-
-        const data = await getAvailableMissions(token);
-        setMissions(data);
-        setError(null);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Erreur lors du chargement des missions",
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadMissions();
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [isLoaded, isSignedIn, loadMissions]);
 
-  const handleSelectMission = (mission: Mission) => {
-    console.log("Mission sélectionnée:", mission);
-    // TODO: Navigation vers la page de détails
+  const handleReservationSuccess = (updatedMission: Mission) => {
+    // Mise à jour optimiste de la liste
+    setMissions((prev) =>
+      prev.map((m) => (m.id === updatedMission.id ? updatedMission : m)),
+    );
   };
 
   return (
@@ -95,13 +100,18 @@ export default function AvailableMissionsPage() {
         )}
 
         {!isLoading && !error && missions.length > 0 && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             {missions.map((mission) => (
-              <MissionCard
+              <div
                 key={mission.id}
-                mission={mission}
-                onSelect={handleSelectMission}
-              />
+                className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur"
+              >
+                <MissionCard mission={mission} />
+                <ReserveMissionButton
+                  mission={mission}
+                  onSuccess={handleReservationSuccess}
+                />
+              </div>
             ))}
           </div>
         )}

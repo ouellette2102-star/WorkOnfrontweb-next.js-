@@ -3,7 +3,6 @@ import { MissionsService } from './missions.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { MissionStatus } from '@prisma/client';
-import { PublicMissionStatus } from './dto/update-mission-status.dto';
 
 const mockPrismaService = {
   employer: {
@@ -135,10 +134,10 @@ describe('MissionsService', () => {
       });
 
       const result = await service.updateMissionStatus('user-1', 'mission-1', {
-        status: PublicMissionStatus.DONE,
+        status: MissionStatus.COMPLETED,
       });
 
-      expect(result.status).toBe(PublicMissionStatus.DONE);
+      expect(result.status).toBe(MissionStatus.COMPLETED);
     });
 
     it("rejette si la mission n'appartient pas à l'employeur", async () => {
@@ -160,7 +159,7 @@ describe('MissionsService', () => {
 
       await expect(
         service.updateMissionStatus('user-1', 'mission-1', {
-          status: PublicMissionStatus.DONE,
+          status: MissionStatus.COMPLETED,
         }),
       ).rejects.toThrow(ForbiddenException);
     });

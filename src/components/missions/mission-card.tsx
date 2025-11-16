@@ -8,7 +8,7 @@ type MissionCardProps = {
 };
 
 const statusLabels: Record<string, string> = {
-  CREATED: "Créée",
+  CREATED: "Disponible",
   RESERVED: "Réservée",
   IN_PROGRESS: "En cours",
   COMPLETED: "Terminée",
@@ -16,9 +16,9 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  CREATED: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  CREATED: "bg-green-500/10 text-green-400 border-green-500/20",
   RESERVED: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  IN_PROGRESS: "bg-green-500/10 text-green-400 border-green-500/20",
+  IN_PROGRESS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   COMPLETED: "bg-gray-500/10 text-gray-400 border-gray-500/20",
   CANCELLED: "bg-red-500/10 text-red-400 border-red-500/20",
 };

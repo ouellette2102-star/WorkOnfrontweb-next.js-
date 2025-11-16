@@ -1,6 +1,12 @@
 /**
  * Types pour les missions WorkOn
  * Alignés avec le backend NestJS + Prisma
+ * 
+ * CREATED: Mission créée, en attente de worker
+ * RESERVED: Un worker a réservé la mission
+ * IN_PROGRESS: Mission en cours d'exécution
+ * COMPLETED: Mission terminée avec succès
+ * CANCELLED: Mission annulée par l'employeur
  */
 
 export enum MissionStatus {
@@ -49,4 +55,6 @@ export type ListMissionsFilters = {
 export type UpdateMissionStatusPayload = {
   status: MissionStatus;
 };
+
+export type ReserveMissionResponse = Mission;
 

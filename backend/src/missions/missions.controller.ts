@@ -46,6 +46,13 @@ export class MissionsController {
     return this.missionsService.getAvailableMissionsForWorker(req.user.sub, filters);
   }
 
+  @Post(':id/reserve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.WORKER)
+  reserveMission(@Request() req: any, @Param('id') missionId: string) {
+    return this.missionsService.reserveMission(req.user.sub, missionId);
+  }
+
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.EMPLOYER)

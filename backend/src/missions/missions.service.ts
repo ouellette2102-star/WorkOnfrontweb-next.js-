@@ -8,10 +8,7 @@ import { MissionStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { ListAvailableMissionsDto } from './dto/list-available-missions.dto';
-import {
-  PublicMissionStatus,
-  UpdateMissionStatusDto,
-} from './dto/update-mission-status.dto';
+import { UpdateMissionStatusDto } from './dto/update-mission-status.dto';
 
 type MissionSelect = {
   id: true;
@@ -24,8 +21,12 @@ type MissionSelect = {
   startsAt: true;
   endsAt: true;
   status: true;
-  createdAt: true;
   employerId: true;
+  workerId: true;
+  priceCents: true;
+  currency: true;
+  createdAt: true;
+  updatedAt: true;
 };
 
 type MissionRecord = Prisma.MissionGetPayload<{ select: MissionSelect }>;
@@ -41,8 +42,12 @@ const missionSelect: MissionSelect = {
   startsAt: true,
   endsAt: true,
   status: true,
-  createdAt: true,
   employerId: true,
+  workerId: true,
+  priceCents: true,
+  currency: true,
+  createdAt: true,
+  updatedAt: true,
 };
 
 export interface MissionResponse {
@@ -55,8 +60,13 @@ export interface MissionResponse {
   hourlyRate: number | null;
   startsAt: string | null;
   endsAt: string | null;
-  status: PublicMissionStatus;
+  status: MissionStatus;
+  employerId: string;
+  workerId: string | null;
+  priceCents: number;
+  currency: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 @Injectable()
@@ -171,15 +181,90 @@ export class MissionsService {
       throw new ForbiddenException('Impossible de modifier une mission qui ne vous appartient pas');
     }
 
-    const prismaStatus = this.mapPublicToPrismaStatus(dto.status);
+    // Valider la transition de statut
+    this.validateStatusTransition(mission.status, dto.status);
 
     const updated = await this.prisma.mission.update({
       where: { id: missionId },
-      data: { status: prismaStatus },
+      data: { status: dto.status },
       select: missionSelect,
     });
 
     return this.mapToResponse(updated);
+  }
+
+  async reserveMission(
+    userId: string,
+    missionId: string,
+  ): Promise<MissionResponse> {
+    // Vérifier que l'utilisateur est un worker
+    const worker = await this.prisma.worker.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!worker) {
+      throw new ForbiddenException('Seuls les workers peuvent réserver des missions');
+    }
+
+    // Récupérer la mission
+    const mission = await this.prisma.mission.findUnique({
+      where: { id: missionId },
+      select: missionSelect,
+    });
+
+    if (!mission) {
+      throw new NotFoundException('Mission introuvable');
+    }
+
+    // Vérifier que la mission est disponible
+    if (mission.status !== MissionStatus.CREATED) {
+      throw new BadRequestException(
+        'Cette mission ne peut plus être réservée (statut actuel: ' +
+          mission.status +
+          ')',
+      );
+    }
+
+    // Réserver la mission (atomique)
+    const updated = await this.prisma.mission.update({
+      where: {
+        id: missionId,
+        status: MissionStatus.CREATED, // Double check atomique
+      },
+      data: {
+        status: MissionStatus.RESERVED,
+        workerId: worker.id,
+        reservedUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h de réservation
+      },
+      select: missionSelect,
+    });
+
+    return this.mapToResponse(updated);
+  }
+
+  private validateStatusTransition(
+    currentStatus: MissionStatus,
+    newStatus: MissionStatus,
+  ): void {
+    const validTransitions: Record<MissionStatus, MissionStatus[]> = {
+      [MissionStatus.CREATED]: [MissionStatus.CANCELLED],
+      [MissionStatus.RESERVED]: [
+        MissionStatus.IN_PROGRESS,
+        MissionStatus.CANCELLED,
+      ],
+      [MissionStatus.IN_PROGRESS]: [MissionStatus.COMPLETED],
+      [MissionStatus.COMPLETED]: [],
+      [MissionStatus.CANCELLED]: [],
+    };
+
+    const allowedTransitions = validTransitions[currentStatus] || [];
+
+    if (!allowedTransitions.includes(newStatus)) {
+      throw new BadRequestException(
+        `Transition invalide: ${currentStatus} -> ${newStatus}`,
+      );
+    }
   }
 
   private mapToResponse(mission: MissionRecord): MissionResponse {
@@ -193,40 +278,14 @@ export class MissionsService {
       hourlyRate: mission.hourlyRate ?? null,
       startsAt: mission.startsAt ? mission.startsAt.toISOString() : null,
       endsAt: mission.endsAt ? mission.endsAt.toISOString() : null,
-      status: this.mapPrismaToPublicStatus(mission.status),
+      status: mission.status,
+      employerId: mission.employerId,
+      workerId: mission.workerId ?? null,
+      priceCents: mission.priceCents,
+      currency: mission.currency,
       createdAt: mission.createdAt.toISOString(),
+      updatedAt: mission.updatedAt.toISOString(),
     };
-  }
-
-  private mapPrismaToPublicStatus(status: MissionStatus): PublicMissionStatus {
-    switch (status) {
-      case MissionStatus.CREATED:
-        return PublicMissionStatus.OPEN;
-      case MissionStatus.RESERVED:
-      case MissionStatus.IN_PROGRESS:
-        return PublicMissionStatus.ASSIGNED;
-      case MissionStatus.COMPLETED:
-        return PublicMissionStatus.DONE;
-      case MissionStatus.CANCELLED:
-        return PublicMissionStatus.CANCELLED;
-      default:
-        return PublicMissionStatus.OPEN;
-    }
-  }
-
-  private mapPublicToPrismaStatus(status: PublicMissionStatus): MissionStatus {
-    switch (status) {
-      case PublicMissionStatus.OPEN:
-        return MissionStatus.CREATED;
-      case PublicMissionStatus.ASSIGNED:
-        return MissionStatus.IN_PROGRESS;
-      case PublicMissionStatus.DONE:
-        return MissionStatus.COMPLETED;
-      case PublicMissionStatus.CANCELLED:
-        return MissionStatus.CANCELLED;
-      default:
-        throw new BadRequestException('Statut de mission non pris en charge');
-    }
   }
 
   private buildLocation(dto: CreateMissionDto): Prisma.InputJsonValue {

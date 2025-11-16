@@ -117,3 +117,16 @@ export async function updateMissionStatus(
   );
 }
 
+/**
+ * Réserver une mission (WORKER uniquement)
+ * Attache le worker courant à la mission et change le statut de CREATED -> RESERVED
+ */
+export async function reserveMission(
+  token: string,
+  missionId: string,
+): Promise<Mission> {
+  return authenticatedRequest<Mission>(`/missions/${missionId}/reserve`, token, {
+    method: "POST",
+  });
+}
+
