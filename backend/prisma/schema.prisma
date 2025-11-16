@@ -128,6 +128,7 @@ model Mission {
   messages      Message[]
   notifications Notification[]
   timeLogs      MissionTimeLog[]
+  photos        MissionPhoto[]
 
   @@index([employerId])
   @@index([workerId])
@@ -257,4 +258,19 @@ model MissionTimeLog {
 
   @@index([missionId, createdAt])
   @@map("mission_time_logs")
+}
+
+// Table des photos attachées aux missions
+model MissionPhoto {
+  id        String   @id @default(uuid())
+  missionId String
+  userId    String // Clerk user ID de celui qui upload (worker ou employer)
+  url       String // URL complète pour accéder à la photo
+  createdAt DateTime @default(now())
+
+  // Relations
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@map("mission_photos")
 }

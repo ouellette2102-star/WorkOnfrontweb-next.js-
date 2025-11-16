@@ -8,6 +8,7 @@ import { MissionCard } from "@/components/missions/mission-card";
 import { ReserveMissionButton } from "@/components/missions/reserve-mission-button";
 import { MissionActions } from "@/components/missions/mission-actions";
 import { MissionTimeTracking } from "@/components/missions/mission-time-tracking";
+import { MissionPhotos } from "@/components/missions/mission-photos";
 
 export default function AvailableMissionsPage() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
@@ -111,6 +112,7 @@ export default function AvailableMissionsPage() {
                 <MissionCard mission={mission} />
                 <MissionActions mission={mission} />
                 <MissionTimeTracking mission={mission} />
+                <MissionPhotos mission={mission} />
                 <ReserveMissionButton
                   mission={mission}
                   onSuccess={handleReservationSuccess}

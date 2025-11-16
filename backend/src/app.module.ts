@@ -16,6 +16,7 @@ import { ProfileModule } from './profile/profile.module';
 import { MessagesModule } from './messages';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.module';
+import { MissionPhotosModule } from './mission-photos/mission-photos.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.mod
     MessagesModule,
     NotificationsModule,
     MissionTimeLogsModule,
+    MissionPhotosModule,
   ],
   controllers: [AppController],
   providers: [
