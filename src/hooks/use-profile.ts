@@ -110,4 +110,3 @@ export function useProfile(): UseProfileState {
     refetch: loadProfile,
   };
 }
-

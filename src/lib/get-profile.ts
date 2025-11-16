@@ -1,13 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 
 /**
- * URL de base de l'API backend WorkOn.
- * On la force en dur pour éviter tous les problèmes de NEXT_PUBLIC_API_URL / Invalid URL.
+ * Type simplifié du profil pour usage côté serveur (SSR).
+ * Utilise les mêmes types que workon-api.ts pour la cohérence.
  */
-const API_BASE_URL = "http://localhost:3001/api/v1";
-const PROFILE_ENDPOINT = `${API_BASE_URL}/profile/me`;
-
-type ProfileSnapshot = {
+export type ProfileSnapshot = {
   primaryRole: string;
   fullName?: string;
   phone?: string;
@@ -51,7 +48,9 @@ async function getSessionToken(): Promise<string | null> {
 }
 
 /**
- * Va chercher le profil courant dans le backend WorkOn
+ * Va chercher le profil courant dans le backend WorkOn.
+ * Cette fonction est conçue pour être appelée côté serveur (Server Components, Server Actions).
+ * Pour les appels client, utiliser plutôt le hook useProfile() qui s'appuie sur workon-api.ts.
  */
 export async function getCurrentProfile(
   clerkId: string | undefined | null,
@@ -64,12 +63,17 @@ export async function getCurrentProfile(
 
   if (!token) {
     console.error(
-      "[WorkOn] Aucun token Clerk disponible pour l’appel /profile/me",
+      "[WorkOn] Aucun token Clerk disponible pour l'appel /profile/me",
     );
     return null;
   }
 
-  const response = await fetch(PROFILE_ENDPOINT, {
+  // Utilise la même base URL que workon-api.ts pour la cohérence
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
+    "http://localhost:3001/api/v1";
+
+  const response = await fetch(`${API_BASE_URL}/profile/me`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -79,6 +83,10 @@ export async function getCurrentProfile(
   });
 
   if (!response.ok) {
+    console.error("[WorkOn] Erreur lors de la récupération du profil", {
+      status: response.status,
+      clerkId,
+    });
     return null;
   }
 

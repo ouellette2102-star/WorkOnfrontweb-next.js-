@@ -29,4 +29,3 @@ export class ProfileController {
     return this.profileService.updateProfile(req.user.sub, dto);
   }
 }
-
