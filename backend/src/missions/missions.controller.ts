@@ -18,7 +18,7 @@ import { ListAvailableMissionsDto } from './dto/list-available-missions.dto';
 import { UpdateMissionStatusDto } from './dto/update-mission-status.dto';
 import { UserRole } from '@prisma/client';
 
-@Controller('api/v1/missions')
+@Controller('missions')
 export class MissionsController {
   constructor(private readonly missionsService: MissionsService) {}
 
@@ -57,4 +57,3 @@ export class MissionsController {
     return this.missionsService.updateMissionStatus(req.user.sub, missionId, dto);
   }
 }
-
