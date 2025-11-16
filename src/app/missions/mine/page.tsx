@@ -7,6 +7,7 @@ import { getMyMissions } from "@/lib/missions-api";
 import type { Mission } from "@/types/mission";
 import { MissionCard } from "@/components/missions/mission-card";
 import { MissionStatusActions } from "@/components/missions/mission-status-actions";
+import { MissionActions } from "@/components/missions/mission-actions";
 import { Button } from "@/components/ui/button";
 
 export default function MyMissionsPage() {
@@ -123,6 +124,7 @@ export default function MyMissionsPage() {
                 className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur"
               >
                 <MissionCard mission={mission} />
+                <MissionActions mission={mission} />
                 <MissionStatusActions
                   mission={mission}
                   onSuccess={handleStatusUpdateSuccess}

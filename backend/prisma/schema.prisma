@@ -30,6 +30,11 @@ enum PaymentStatus {
   FAILED
 }
 
+enum MessageSenderRole {
+  WORKER
+  EMPLOYER
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -109,6 +114,7 @@ model Mission {
   worker    Worker?    @relation(fields: [workerId], references: [id], onDelete: SetNull)
   payments  Payment[]
   contracts Contract[]
+  messages  Message[]
 
   @@index([employerId])
   @@index([workerId])
@@ -117,6 +123,21 @@ model Mission {
   // Index composite pour recherche géographique (si supporté par PostgreSQL)
   @@index([status, createdAt])
   @@map("missions")
+}
+
+model Message {
+  id         String            @id @default(cuid())
+  missionId  String
+  senderId   String // Clerk user ID
+  senderRole MessageSenderRole
+  content    String // Contenu du message (non vide)
+  createdAt  DateTime          @default(now())
+
+  // Relations
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId, createdAt])
+  @@map("messages")
 }
 
 model Payment {

@@ -6,6 +6,7 @@ import { getAvailableMissions } from "@/lib/missions-api";
 import type { Mission } from "@/types/mission";
 import { MissionCard } from "@/components/missions/mission-card";
 import { ReserveMissionButton } from "@/components/missions/reserve-mission-button";
+import { MissionActions } from "@/components/missions/mission-actions";
 
 export default function AvailableMissionsPage() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
@@ -107,6 +108,7 @@ export default function AvailableMissionsPage() {
                 className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur"
               >
                 <MissionCard mission={mission} />
+                <MissionActions mission={mission} />
                 <ReserveMissionButton
                   mission={mission}
                   onSuccess={handleReservationSuccess}

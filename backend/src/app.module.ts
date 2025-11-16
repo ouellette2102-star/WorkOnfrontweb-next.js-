@@ -13,6 +13,7 @@ import { ContractsModule } from './contracts/contracts.module';
 import { AdminModule } from './admin/admin.module';
 import { LoggerModule } from './logger/logger.module';
 import { ProfileModule } from './profile/profile.module';
+import { MessagesModule } from './messages';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { ProfileModule } from './profile/profile.module';
     LoggerModule,
     AuthModule,
     MissionsModule,
+    MessagesModule,
     PaymentsModule,
     ContractsModule,
     AdminModule,
