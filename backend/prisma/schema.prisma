@@ -35,6 +35,11 @@ enum MessageSenderRole {
   EMPLOYER
 }
 
+enum NotificationType {
+  NEW_MESSAGE
+  MISSION_STATUS_CHANGED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -110,11 +115,12 @@ model Mission {
   updatedAt     DateTime      @updatedAt
 
   // Relations
-  employer  Employer   @relation(fields: [employerId], references: [id], onDelete: Restrict)
-  worker    Worker?    @relation(fields: [workerId], references: [id], onDelete: SetNull)
-  payments  Payment[]
-  contracts Contract[]
-  messages  Message[]
+  employer      Employer       @relation(fields: [employerId], references: [id], onDelete: Restrict)
+  worker        Worker?        @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  payments      Payment[]
+  contracts     Contract[]
+  messages      Message[]
+  notifications Notification[]
 
   @@index([employerId])
   @@index([workerId])
@@ -134,7 +140,8 @@ model Message {
   createdAt  DateTime          @default(now())
 
   // Relations
-  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  mission       Mission        @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  notifications Notification[]
 
   @@index([missionId, createdAt])
   @@map("messages")
@@ -205,4 +212,26 @@ model ReconciliationJob {
   @@index([status])
   @@index([startedAt])
   @@map("reconciliation_jobs")
+}
+
+// Table de notifications pour les utilisateurs
+model Notification {
+  id           String           @id @default(cuid())
+  userId       String // Clerk user ID du destinataire
+  type         NotificationType
+  missionId    String
+  messageId    String? // Optionnel, pour les notifications NEW_MESSAGE
+  statusBefore String? // Statut avant (pour MISSION_STATUS_CHANGED)
+  statusAfter  String? // Statut après (pour MISSION_STATUS_CHANGED)
+  isRead       Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  readAt       DateTime?
+
+  // Relations
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  message Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, isRead])
+  @@map("notifications")
 }

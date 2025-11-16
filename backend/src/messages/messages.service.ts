@@ -3,10 +3,13 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { MessageSenderRole, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 export interface MessageResponse {
   id: string;
@@ -19,7 +22,11 @@ export interface MessageResponse {
 
 @Injectable()
 export class MessagesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   /**
    * Vérifie que l'utilisateur a le droit d'accéder au chat de cette mission
@@ -136,7 +143,27 @@ export class MessagesService {
     // Vérifier que la mission a bien un worker assigné (pas de chat si CREATED)
     const mission = await this.prisma.mission.findUnique({
       where: { id: missionId },
-      select: { workerId: true },
+      select: {
+        workerId: true,
+        employer: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+        worker: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!mission || !mission.workerId) {
@@ -161,6 +188,20 @@ export class MessagesService {
         createdAt: true,
       },
     });
+
+    // Créer une notification pour le destinataire
+    const receiverClerkId =
+      senderRole === MessageSenderRole.EMPLOYER
+        ? mission.worker?.user.clerkId
+        : mission.employer.user.clerkId;
+
+    if (receiverClerkId) {
+      await this.notificationsService.createForNewMessage(
+        missionId,
+        message.id,
+        receiverClerkId,
+      );
+    }
 
     return {
       id: message.id,

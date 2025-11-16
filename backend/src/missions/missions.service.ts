@@ -3,12 +3,15 @@ import {
   ForbiddenException,
   NotFoundException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { MissionStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { ListAvailableMissionsDto } from './dto/list-available-missions.dto';
 import { UpdateMissionStatusDto } from './dto/update-mission-status.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 type MissionSelect = {
   id: true;
@@ -71,7 +74,11 @@ export interface MissionResponse {
 
 @Injectable()
 export class MissionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async createMissionForEmployer(
     userId: string,
@@ -161,7 +168,14 @@ export class MissionsService {
   ): Promise<MissionResponse> {
     const employer = await this.prisma.employer.findUnique({
       where: { userId },
-      select: { id: true },
+      select: {
+        id: true,
+        user: {
+          select: {
+            clerkId: true,
+          },
+        },
+      },
     });
 
     if (!employer) {
@@ -170,7 +184,18 @@ export class MissionsService {
 
     const mission = await this.prisma.mission.findUnique({
       where: { id: missionId },
-      select: missionSelect,
+      select: {
+        ...missionSelect,
+        worker: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!mission) {
@@ -184,11 +209,24 @@ export class MissionsService {
     // Valider la transition de statut
     this.validateStatusTransition(mission.status, dto.status);
 
+    const oldStatus = mission.status;
+    const newStatus = dto.status;
+
     const updated = await this.prisma.mission.update({
       where: { id: missionId },
-      data: { status: dto.status },
+      data: { status: newStatus },
       select: missionSelect,
     });
+
+    // Créer une notification pour le worker (si assigné)
+    if (mission.worker?.user.clerkId) {
+      await this.notificationsService.createForMissionStatusChange(
+        missionId,
+        oldStatus,
+        newStatus,
+        mission.worker.user.clerkId,
+      );
+    }
 
     return this.mapToResponse(updated);
   }

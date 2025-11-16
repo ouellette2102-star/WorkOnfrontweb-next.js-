@@ -14,6 +14,7 @@ import { AdminModule } from './admin/admin.module';
 import { LoggerModule } from './logger/logger.module';
 import { ProfileModule } from './profile/profile.module';
 import { MessagesModule } from './messages';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -90,11 +91,12 @@ import { MessagesModule } from './messages';
     LoggerModule,
     AuthModule,
     MissionsModule,
-    MessagesModule,
     PaymentsModule,
     ContractsModule,
     AdminModule,
     ProfileModule,
+    MessagesModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

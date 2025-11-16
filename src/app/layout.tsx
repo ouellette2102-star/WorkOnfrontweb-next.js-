@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs";
 import { Providers } from "@/components/providers";
+import { NotificationBadge } from "@/components/notifications/notification-badge";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -53,8 +54,9 @@ export default function RootLayout({
         >
           <SignedIn>
             <div className="pointer-events-none fixed right-4 top-3 z-50 flex items-center justify-end">
-              <div className="pointer-events-auto inline-flex items-center gap-3 rounded-full border border-white/15 bg-black/60 px-4 py-2 shadow-lg shadow-black/40 backdrop-blur">
-                <span className="hidden text-sm text-white/70 md:inline">
+              <div className="pointer-events-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/60 px-2 py-2 shadow-lg shadow-black/40 backdrop-blur">
+                <NotificationBadge />
+                <span className="hidden text-sm text-white/70 md:inline px-2">
                   Mon espace
                 </span>
                 <UserButton
