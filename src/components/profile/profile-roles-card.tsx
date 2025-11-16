@@ -1,0 +1,156 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useProfile } from "@/hooks/use-profile";
+import type { PrimaryRole } from "@/lib/workon-api";
+
+const ROLE_OPTIONS: Array<{
+  key: PrimaryRole;
+  label: string;
+  description: string;
+}> = [
+  {
+    key: "WORKER",
+    label: "Travailleur",
+    description: "Tu réalises des missions, tu partages ton portfolio et tu reçois des paiements.",
+  },
+  {
+    key: "EMPLOYER",
+    label: "Employeur",
+    description: "Tu postes des missions, tu sélectionnes des talents et tu suis leur avancement.",
+  },
+  {
+    key: "CLIENT_RESIDENTIAL",
+    label: "Client résidentiel",
+    description: "Tu cherches des pros pour ta maison (plomberie, électricité, entretien...).",
+  },
+  {
+    key: "ADMIN",
+    label: "Administrateur",
+    description: "Accès complet WorkOn pour superviser les opérations et les équipes.",
+  },
+];
+
+export function ProfileRolesCard() {
+  const { profile, isLoading, error, updateRole } = useProfile();
+  const [selectedRole, setSelectedRole] = useState<PrimaryRole | null>(null);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setSelectedRole(profile.primaryRole);
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!selectedRole) return;
+    setIsSubmitting(true);
+    setStatus("idle");
+    setStatusMessage(null);
+    try {
+      await updateRole(selectedRole);
+      setStatus("success");
+      setStatusMessage("Rôle principal mis à jour ✨");
+    } catch (err) {
+      setStatus("error");
+      setStatusMessage(
+        err instanceof Error ? err.message : "Impossible de mettre à jour ton rôle.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading && !profile) {
+    return (
+      <section className="rounded-3xl border border-white/10 bg-neutral-900/80 p-8">
+        <p className="text-sm uppercase tracking-[0.4em] text-white/40">Profil</p>
+        <h2 className="mt-2 text-2xl font-semibold">Chargement du profil...</h2>
+        <p className="mt-4 text-white/60">Nous synchronisons ton compte WorkOn.</p>
+      </section>
+    );
+  }
+
+  if (error && !profile) {
+    return (
+      <section className="rounded-3xl border border-red-900/40 bg-red-950/30 p-8">
+        <h2 className="text-xl font-semibold text-red-400">Impossible de charger le profil</h2>
+        <p className="mt-2 text-sm text-red-200">{error}</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-3xl border border-white/10 bg-neutral-900/80 p-8 shadow-2xl shadow-black/30">
+      <p className="text-sm uppercase tracking-[0.4em] text-red-500">Ton rôle WorkOn</p>
+      <h2 className="mt-4 text-2xl font-semibold">Sélectionne ton espace principal</h2>
+      <p className="mt-3 text-white/70">
+        Tu peux activer plusieurs espaces en parallèle (Worker, Employer, Client).
+        Choisis simplement celui que tu veux voir en priorité dans le dashboard.
+      </p>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        {ROLE_OPTIONS.map((option) => {
+          const isSelected = option.key === selectedRole;
+          return (
+            <button
+              key={option.key}
+              type="button"
+              onClick={() => setSelectedRole(option.key)}
+              className={`rounded-2xl border px-4 py-5 text-left transition ${
+                isSelected
+                  ? "border-red-500 bg-red-500/10"
+                  : "border-white/10 bg-white/5 hover:border-red-500/40"
+              }`}
+            >
+              <p className="text-xs uppercase tracking-[0.3em] text-white/40">{option.label}</p>
+              <h3 className="mt-2 text-lg font-semibold">{option.label}</h3>
+              <p className="mt-2 text-sm text-white/70">{option.description}</p>
+              {isSelected ? (
+                <span className="mt-3 inline-flex rounded-full bg-red-600/20 px-3 py-1 text-xs text-red-200">
+                  Rôle principal
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 flex items-center gap-4">
+        <button
+          type="button"
+          disabled={!selectedRole || isSubmitting}
+          onClick={handleSave}
+          className="rounded-full bg-red-600 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-red-500 disabled:opacity-60"
+        >
+          {isSubmitting ? "Enregistrement..." : "Sauvegarder mon rôle"}
+        </button>
+        {statusMessage ? (
+          <p
+            className={`text-sm ${
+              status === "success" ? "text-green-400" : "text-red-400"
+            }`}
+          >
+            {statusMessage}
+          </p>
+        ) : null}
+      </div>
+
+      {profile ? (
+        <div className="mt-8 rounded-2xl border border-white/5 bg-neutral-900/60 p-4 text-sm text-white/70">
+          <p className="font-semibold text-white">Accès actifs :</p>
+          <ul className="mt-2 space-y-1">
+            <li>• Travailleurs : {profile.isWorker ? "✅ actif" : "—"}</li>
+            <li>• Employeurs : {profile.isEmployer ? "✅ actif" : "—"}</li>
+            <li>
+              • Clients résidentiels : {profile.isClientResidential ? "✅ actif" : "—"}
+            </li>
+          </ul>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+

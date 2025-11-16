@@ -1,0 +1,187 @@
+// Backend WorkOn - Schema Prisma
+// Production-ready avec contraintes et indexes optimisés
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  EMPLOYER
+  WORKER
+  ADMIN
+}
+
+enum MissionStatus {
+  CREATED
+  RESERVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  clerkId   String?  @unique
+  name      String
+  role      UserRole @default(WORKER)
+  profile   Json? // Profil flexible (avatar, bio, etc.)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  employer Employer?
+  worker   Worker?
+
+  @@index([email])
+  @@index([clerkId])
+  @@index([role])
+  @@index([active])
+  @@map("users")
+}
+
+model Employer {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  companyName String
+  billingInfo Json? // Informations de facturation (adresse, TVQ/TPS, etc.)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  missions Mission[]
+
+  @@index([userId])
+  @@map("employers")
+}
+
+model Worker {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  skills    Json // Array de compétences [{name, level, verified}]
+  rating    Float    @default(0.0)
+  badges    String[] @default([]) // Badges obtenus
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  missions Mission[]
+
+  @@index([userId])
+  @@index([rating])
+  @@map("workers")
+}
+
+model Mission {
+  id            String        @id @default(cuid())
+  title         String
+  description   String?
+  category      String?
+  city          String?
+  address       String?
+  hourlyRate    Float?
+  startsAt      DateTime?
+  endsAt        DateTime?
+  employerId    String
+  workerId      String? // Nullable jusqu'à acceptation
+  status        MissionStatus @default(CREATED)
+  location      Json // {lat: number, lng: number}
+  reservedUntil DateTime? // Timestamp de réservation (pour atomicité)
+  priceCents    Int // Prix en centimes
+  currency      String        @default("CAD")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  employer  Employer   @relation(fields: [employerId], references: [id], onDelete: Restrict)
+  worker    Worker?    @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  payments  Payment[]
+  contracts Contract[]
+
+  @@index([employerId])
+  @@index([workerId])
+  @@index([status])
+  @@index([reservedUntil])
+  // Index composite pour recherche géographique (si supporté par PostgreSQL)
+  @@index([status, createdAt])
+  @@map("missions")
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  missionId             String
+  stripePaymentIntentId String?       @unique
+  amountCents           Int
+  currency              String        @default("CAD")
+  status                PaymentStatus @default(PENDING)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Restrict)
+
+  @@index([missionId])
+  @@index([status])
+  @@index([stripePaymentIntentId])
+  @@map("payments")
+}
+
+model Contract {
+  id               String   @id @default(cuid())
+  missionId        String
+  signedByWorker   Boolean  @default(false)
+  signedByEmployer Boolean  @default(false)
+  contractUrl      String? // URL du contrat stocké (S3, etc.)
+  signatureNonce   String   @unique // Nonce pour éviter les signatures dupliquées
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@index([signatureNonce])
+  @@map("contracts")
+}
+
+// Table pour idempotence des webhooks Stripe
+model WebhookEvent {
+  id            String    @id @default(cuid())
+  stripeEventId String    @unique
+  eventType     String
+  processed     Boolean   @default(false)
+  processedAt   DateTime?
+  errorMessage  String?
+  retryCount    Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  @@index([stripeEventId])
+  @@index([processed])
+  @@index([eventType])
+  @@map("webhook_events")
+}
+
+// Table pour jobs de réconciliation (admin)
+model ReconciliationJob {
+  id          String    @id @default(cuid())
+  status      String // PENDING, PROCESSING, COMPLETED, FAILED
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  result      Json? // Résultats de la réconciliation
+  error       String?
+  createdBy   String? // User ID de l'admin qui a lancé le job
+
+  @@index([status])
+  @@index([startedAt])
+  @@map("reconciliation_jobs")
+}
