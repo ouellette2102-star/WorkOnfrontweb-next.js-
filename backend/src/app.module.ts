@@ -15,6 +15,7 @@ import { LoggerModule } from './logger/logger.module';
 import { ProfileModule } from './profile/profile.module';
 import { MessagesModule } from './messages';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.module';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     ProfileModule,
     MessagesModule,
     NotificationsModule,
+    MissionTimeLogsModule,
   ],
   controllers: [AppController],
   providers: [

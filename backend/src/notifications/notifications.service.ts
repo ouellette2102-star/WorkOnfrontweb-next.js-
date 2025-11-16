@@ -62,6 +62,24 @@ export class NotificationsService {
   }
 
   /**
+   * Créer une notification pour un événement de temps (CHECK_IN / CHECK_OUT)
+   */
+  async createForMissionTimeEvent(
+    missionId: string,
+    eventType: 'CHECK_IN' | 'CHECK_OUT',
+    receiverUserId: string,
+  ): Promise<void> {
+    await this.prisma.notification.create({
+      data: {
+        userId: receiverUserId,
+        type: NotificationType.MISSION_TIME_EVENT,
+        missionId,
+        statusBefore: eventType, // On réutilise ce champ pour stocker le type d'événement
+      },
+    });
+  }
+
+  /**
    * Récupérer les notifications d'un utilisateur
    */
   async getNotifications(

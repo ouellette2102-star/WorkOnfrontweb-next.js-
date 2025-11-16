@@ -100,6 +100,15 @@ export default function NotificationsPage() {
       return `Statut de la mission "${missionTitle}" mis à jour : ${notification.statusBefore} → ${notification.statusAfter}.`;
     }
 
+    if (notification.type === NotificationType.MISSION_TIME_EVENT) {
+      const eventType = notification.statusBefore; // On réutilise ce champ
+      if (eventType === "CHECK_IN") {
+        return `Le travailleur s'est enregistré sur la mission "${missionTitle}".`;
+      } else if (eventType === "CHECK_OUT") {
+        return `Le travailleur a quitté la mission "${missionTitle}".`;
+      }
+    }
+
     return "Notification";
   };
 
@@ -111,6 +120,8 @@ export default function NotificationsPage() {
         return "bg-blue-600";
       case NotificationType.MISSION_STATUS_CHANGED:
         return "bg-purple-600";
+      case NotificationType.MISSION_TIME_EVENT:
+        return "bg-green-600";
       default:
         return "bg-gray-600";
     }
@@ -124,6 +135,8 @@ export default function NotificationsPage() {
         return "Message";
       case NotificationType.MISSION_STATUS_CHANGED:
         return "Statut";
+      case NotificationType.MISSION_TIME_EVENT:
+        return "Temps";
       default:
         return "Info";
     }

@@ -5,6 +5,7 @@
 export enum NotificationType {
   NEW_MESSAGE = "NEW_MESSAGE",
   MISSION_STATUS_CHANGED = "MISSION_STATUS_CHANGED",
+  MISSION_TIME_EVENT = "MISSION_TIME_EVENT",
 }
 
 export type Notification = {
