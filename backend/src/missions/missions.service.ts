@@ -133,6 +133,41 @@ export class MissionsService {
     return missions.map((mission) => this.mapToResponse(mission));
   }
 
+  /**
+   * Récupérer une mission par ID (authentifié uniquement)
+   * L'utilisateur doit être soit l'employeur, soit le worker assigné
+   */
+  async getMissionById(userId: string, missionId: string): Promise<MissionResponse> {
+    const mission = await this.prisma.mission.findUnique({
+      where: { id: missionId },
+      select: missionSelect,
+    });
+
+    if (!mission) {
+      throw new NotFoundException('Mission introuvable');
+    }
+
+    // Vérifier que l'utilisateur a accès à cette mission
+    const employer = await this.prisma.employer.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    const worker = await this.prisma.worker.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    const isEmployer = employer && mission.employerId === employer.id;
+    const isWorker = worker && mission.workerId === worker.id;
+
+    if (!isEmployer && !isWorker) {
+      throw new ForbiddenException("Vous n'avez pas accès à cette mission");
+    }
+
+    return this.mapToResponse(mission);
+  }
+
   async getAvailableMissionsForWorker(
     userId: string,
     filters: ListAvailableMissionsDto,

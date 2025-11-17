@@ -47,19 +47,22 @@ enum MissionTimeLogType {
 }
 
 model User {
-  id          String    @id @default(cuid())
-  email       String    @unique
-  clerkId     String?   @unique
-  name        String
-  role        UserRole  @default(WORKER)
-  primaryRole UserRole? // Rôle principal choisi par l'utilisateur (onboarding)
-  fullName    String? // Nom complet pour l'onboarding
-  phone       String? // Téléphone
-  city        String? // Ville
-  profile     Json? // Profil flexible (avatar, bio, etc.)
-  active      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  email           String    @unique
+  clerkId         String?   @unique
+  name            String
+  role            UserRole  @default(WORKER)
+  primaryRole     UserRole? // Rôle principal choisi par l'utilisateur (onboarding)
+  fullName        String? // Nom complet pour l'onboarding
+  phone           String? // Téléphone
+  city            String? // Ville
+  profile         Json? // Profil flexible (avatar, bio, etc.)
+  active          Boolean   @default(true)
+  // Stripe Connect (pour Workers)
+  stripeAccountId String? // ID du compte Stripe Connect (acct_xxx)
+  stripeOnboarded Boolean   @default(false) // True si onboarding Stripe complet
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
   employer Employer?
@@ -70,6 +73,7 @@ model User {
   @@index([role])
   @@index([primaryRole])
   @@index([active])
+  @@index([stripeAccountId])
   @@map("users")
 }
 
@@ -126,8 +130,8 @@ model Mission {
   updatedAt     DateTime      @updatedAt
 
   // Relations
-  employer      Employer          @relation(fields: [employerId], references: [id], onDelete: Restrict)
-  worker        Worker?           @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  employer      Employer         @relation(fields: [employerId], references: [id], onDelete: Restrict)
+  worker        Worker?          @relation(fields: [workerId], references: [id], onDelete: SetNull)
   payments      Payment[]
   contracts     Contract[]
   messages      Message[]
@@ -164,9 +168,12 @@ model Payment {
   id                    String        @id @default(cuid())
   missionId             String
   stripePaymentIntentId String?       @unique
-  amountCents           Int
+  amountCents           Int // Montant total en centimes
+  feeCents              Int // Frais WorkOn en centimes (12%)
   currency              String        @default("CAD")
   status                PaymentStatus @default(PENDING)
+  stripeAccountId       String? // Compte Stripe Connect du worker destinataire
+  metadata              Json? // Métadonnées additionnelles
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
 
@@ -175,6 +182,7 @@ model Payment {
   @@index([missionId])
   @@index([status])
   @@index([stripePaymentIntentId])
+  @@index([stripeAccountId])
   @@map("payments")
 }
 
@@ -241,7 +249,7 @@ model Notification {
   readAt       DateTime?
 
   // Relations
-  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  mission Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
   message Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
@@ -251,12 +259,12 @@ model Notification {
 
 // Table de suivi du temps de travail sur les missions
 model MissionTimeLog {
-  id        String              @id @default(cuid())
+  id        String             @id @default(cuid())
   missionId String
   userId    String // Clerk user ID du worker
   type      MissionTimeLogType
   note      String? // Commentaire optionnel
-  createdAt DateTime            @default(now())
+  createdAt DateTime           @default(now())
 
   // Relations
   mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)

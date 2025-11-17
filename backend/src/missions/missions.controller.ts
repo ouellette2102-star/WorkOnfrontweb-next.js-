@@ -64,6 +64,12 @@ export class MissionsController {
     return this.missionsService.getMissionFeed(req.user.sub, filters);
   }
 
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  getMissionById(@Request() req: any, @Param('id') missionId: string) {
+    return this.missionsService.getMissionById(req.user.sub, missionId);
+  }
+
   @Post(':id/reserve')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.WORKER)

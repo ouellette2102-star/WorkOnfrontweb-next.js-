@@ -1,0 +1,93 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { getOnboardingStatus } from "@/lib/stripe-api";
+import { Button } from "@/components/ui/button";
+
+export default function StripeOnboardingReturnPage() {
+  const router = useRouter();
+  const { getToken, isLoaded } = useAuth();
+  const [isChecking, setIsChecking] = useState(true);
+  const [isOnboarded, setIsOnboarded] = useState(false);
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      if (!isLoaded) return;
+
+      try {
+        const token = await getToken();
+        if (!token) {
+          router.push("/sign-in");
+          return;
+        }
+
+        const status = await getOnboardingStatus(token);
+        setIsOnboarded(status.onboarded);
+      } catch (error) {
+        console.error("Erreur lors de la vérification:", error);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    // Vérifier après un court délai pour laisser Stripe mettre à jour
+    const timer = setTimeout(checkStatus, 2000);
+    return () => clearTimeout(timer);
+  }, [isLoaded, getToken, router]);
+
+  if (isChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
+        <div className="text-center">
+          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"></div>
+          <p className="text-white/70">Vérification de votre onboarding...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+      <div className="max-w-md rounded-3xl border border-white/10 bg-neutral-900/70 p-8 text-center backdrop-blur">
+        {isOnboarded ? (
+          <>
+            <div className="mb-4 text-6xl">🎉</div>
+            <h1 className="mb-3 text-3xl font-bold text-white">
+              Onboarding complété !
+            </h1>
+            <p className="mb-6 text-white/70">
+              Votre compte Stripe Connect est maintenant actif. Vous pouvez
+              recevoir des paiements pour vos missions complétées.
+            </p>
+            <Button
+              onClick={() => router.push("/worker/payments")}
+              className="rounded-xl bg-green-600 px-8 py-3 text-lg font-semibold text-white hover:bg-green-500"
+            >
+              Voir mes paiements
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="mb-4 text-6xl">⚠️</div>
+            <h1 className="mb-3 text-3xl font-bold text-white">
+              Onboarding incomplet
+            </h1>
+            <p className="mb-6 text-white/70">
+              Il semble que votre onboarding Stripe n'est pas encore terminé.
+              Veuillez compléter toutes les étapes requises.
+            </p>
+            <Button
+              onClick={() => router.push("/worker/payments")}
+              className="rounded-xl bg-red-600 px-8 py-3 text-lg font-semibold text-white hover:bg-red-500"
+            >
+              Reprendre l'onboarding
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+

@@ -17,6 +17,7 @@ import { MessagesModule } from './messages';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.module';
 import { MissionPhotosModule } from './mission-photos/mission-photos.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ import { MissionPhotosModule } from './mission-photos/mission-photos.module';
     NotificationsModule,
     MissionTimeLogsModule,
     MissionPhotosModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [

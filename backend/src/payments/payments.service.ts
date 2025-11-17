@@ -118,11 +118,13 @@ export class PaymentsService {
     });
 
     // Créer l'enregistrement Payment dans la DB
+    const feeCents = Math.ceil(mission.priceCents * 0.12); // 12% de frais
     const payment = await this.prisma.payment.create({
       data: {
         missionId: mission.id,
         stripePaymentIntentId: paymentIntent.id,
         amountCents: mission.priceCents,
+        feeCents,
         currency: mission.currency,
         status: PaymentStatus.PENDING,
       },

@@ -111,6 +111,18 @@ export async function getAvailableMissions(
 }
 
 /**
+ * Récupérer une mission par ID
+ */
+export async function getMissionById(
+  token: string,
+  missionId: string,
+): Promise<Mission> {
+  return authenticatedRequest<Mission>(`/missions/${missionId}`, token, {
+    method: "GET",
+  });
+}
+
+/**
  * Mettre à jour le statut d'une mission (EMPLOYER uniquement)
  */
 export async function updateMissionStatus(
