@@ -1,17 +1,17 @@
-import { auth } from "@clerk/nextjs/server";
 import type { MissionPhoto } from "@/types/mission-photo";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
+  "http://localhost:3001/api/v1";
 
 /**
  * Récupérer toutes les photos d'une mission
+ * @param token - Token Clerk obtenu côté client via useAuth().getToken()
  */
 export async function getMissionPhotos(
-  missionId: string
+  missionId: string,
+  token: string
 ): Promise<MissionPhoto[]> {
-  const { getToken } = await auth();
-  const token = await getToken();
-
   if (!token) {
     throw new Error("Token d'authentification introuvable");
   }
@@ -39,14 +39,13 @@ export async function getMissionPhotos(
 
 /**
  * Uploader une photo pour une mission
+ * @param token - Token Clerk obtenu côté client via useAuth().getToken()
  */
 export async function uploadMissionPhoto(
   missionId: string,
-  file: File
+  file: File,
+  token: string
 ): Promise<MissionPhoto> {
-  const { getToken } = await auth();
-  const token = await getToken();
-
   if (!token) {
     throw new Error("Token d'authentification introuvable");
   }
@@ -75,14 +74,13 @@ export async function uploadMissionPhoto(
 
 /**
  * Supprimer une photo d'une mission
+ * @param token - Token Clerk obtenu côté client via useAuth().getToken()
  */
 export async function deleteMissionPhoto(
   missionId: string,
-  photoId: string
+  photoId: string,
+  token: string
 ): Promise<void> {
-  const { getToken } = await auth();
-  const token = await getToken();
-
   if (!token) {
     throw new Error("Token d'authentification introuvable");
   }

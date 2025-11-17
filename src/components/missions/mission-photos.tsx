@@ -20,7 +20,7 @@ type MissionPhotosProps = {
 };
 
 export function MissionPhotos({ mission }: MissionPhotosProps) {
-  const { userId, isLoaded, isSignedIn } = useAuth();
+  const { userId, isLoaded, isSignedIn, getToken } = useAuth();
   const [photos, setPhotos] = useState<MissionPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,12 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
 
     try {
       setIsLoading(true);
-      const fetchedPhotos = await getMissionPhotos(mission.id);
+      const token = await getToken();
+      if (!token) {
+        setError("Token d'authentification introuvable");
+        return;
+      }
+      const fetchedPhotos = await getMissionPhotos(mission.id, token);
       setPhotos(fetchedPhotos);
       setError(null);
     } catch (err) {
@@ -49,7 +54,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoaded, isSignedIn, mission.id]);
+  }, [isLoaded, isSignedIn, getToken, mission.id]);
 
   useEffect(() => {
     loadPhotos();
@@ -77,7 +82,12 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
     try {
       setIsUploading(true);
       setError(null);
-      await uploadMissionPhoto(mission.id, file);
+      const token = await getToken();
+      if (!token) {
+        setError("Token d'authentification introuvable");
+        return;
+      }
+      await uploadMissionPhoto(mission.id, file, token);
       await loadPhotos();
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -95,7 +105,12 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
     if (!confirm("Voulez-vous vraiment supprimer cette photo ?")) return;
 
     try {
-      await deleteMissionPhoto(mission.id, photoId);
+      const token = await getToken();
+      if (!token) {
+        setError("Token d'authentification introuvable");
+        return;
+      }
+      await deleteMissionPhoto(mission.id, photoId, token);
       await loadPhotos();
       setSelectedPhoto(null);
     } catch (err) {
