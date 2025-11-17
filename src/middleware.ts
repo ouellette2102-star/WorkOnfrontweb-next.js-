@@ -22,7 +22,7 @@ const isWorkerRoute = createRouteMatcher([
 // Routes employer (auth + rôle EMPLOYER requis)
 const isEmployerRoute = createRouteMatcher([
   "/employer(.*)",
-  "/missions/create(.*)",
+  "/missions/new(.*)",
   "/missions/mine(.*)",
 ]);
 

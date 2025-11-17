@@ -20,7 +20,7 @@ export default async function EmployerDashboardPage() {
 
         {/* Actions rapides */}
         <div className="mb-8 grid gap-4 md:grid-cols-4">
-          <Link href="/missions/create">
+          <Link href="/missions/new">
             <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">➕</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
