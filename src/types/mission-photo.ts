@@ -3,6 +3,8 @@ export type MissionPhoto = {
   missionId: string;
   userId: string;
   url: string;
+  description?: string;
+  uploadedAt: string;
   createdAt: string;
 };
 

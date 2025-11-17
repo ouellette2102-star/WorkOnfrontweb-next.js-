@@ -1,33 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-
-type MissionFeed = {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string | null;
-  city: string | null;
-  address: string | null;
-  hourlyRate: number | null;
-  startsAt: string | null;
-  endsAt: string | null;
-  status: string;
-  employerId: string;
-  employerName: string | null;
-  priceCents: number;
-  currency: string;
-  distance: number | null;
-  latitude: number | null;
-  longitude: number | null;
-  createdAt: string;
-};
+import type { MissionFeedItem } from "@/types/mission";
 
 type Props = {
-  missions: MissionFeed[];
+  missions: MissionFeedItem[];
   onReserve: (missionId: string) => void;
   onReject: (missionId: string) => void;
   onSave: (missionId: string) => void;
@@ -35,32 +16,37 @@ type Props = {
 
 export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState<"left" | "right" | null>(null);
 
   const currentMission = missions[currentIndex];
 
   const handleNext = () => {
     if (currentIndex < missions.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setDirection(null);
     }
   };
 
   const handleReject = () => {
+    setDirection("left");
     onReject(currentMission.id);
-    handleNext();
+    setTimeout(handleNext, 300);
   };
 
   const handleSave = () => {
     onSave(currentMission.id);
-    handleNext();
+    setTimeout(handleNext, 300);
   };
 
   const handleReserve = () => {
+    setDirection("right");
     onReserve(currentMission.id);
+    setTimeout(handleNext, 300);
   };
 
   if (!currentMission) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-white/10 bg-neutral-900/70 p-12">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-white/10 bg-neutral-900/70 p-12 backdrop-blur">
         <div className="mb-4 text-6xl">✅</div>
         <h3 className="mb-2 text-xl font-semibold text-white">
           Toutes les missions parcourues !
@@ -78,104 +64,132 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
         <span>{missions.length - currentIndex - 1} restante(s)</span>
       </div>
 
-      {/* Carte principale */}
-      <div className="overflow-hidden rounded-3xl border-2 border-white/10 bg-neutral-900 shadow-2xl">
-        {/* Header avec distance */}
-        {currentMission.distance !== null && (
-          <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
-            <p className="text-center text-lg font-bold text-white">
-              📍 {currentMission.distance} km de vous
-            </p>
-          </div>
-        )}
+      {/* Carte principale avec animations */}
+      <div className="relative h-[600px]">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={currentMission.id}
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+              rotateY: -20,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              rotateY: 0,
+              x: 0,
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.8,
+              x: direction === "left" ? -400 : direction === "right" ? 400 : 0,
+              rotateZ: direction === "left" ? -30 : direction === "right" ? 30 : 0,
+            }}
+            transition={{
+              duration: 0.3,
+              ease: "easeInOut",
+            }}
+            className="absolute inset-0 overflow-hidden rounded-3xl border-2 border-white/10 bg-neutral-900 shadow-2xl"
+          >
+            {/* Header avec distance */}
+            {currentMission.distance !== null && (
+              <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
+                <p className="text-center text-lg font-bold text-white">
+                  📍 {currentMission.distance} km de vous
+                </p>
+              </div>
+            )}
 
-        <div className="p-8">
-          {/* Titre et employeur */}
-          <div className="mb-6">
-            <h2 className="mb-2 text-3xl font-bold text-white">
-              {currentMission.title}
-            </h2>
-            <p className="text-lg text-white/60">
-              par {currentMission.employerName || "Employeur"}
-            </p>
-          </div>
+            <div className="h-full overflow-y-auto p-8">
+              {/* Titre et employeur */}
+              <div className="mb-6">
+                <h2 className="mb-2 text-3xl font-bold text-white">
+                  {currentMission.title}
+                </h2>
+                <p className="text-lg text-white/60">
+                  par {currentMission.employerName || "Employeur"}
+                </p>
+              </div>
 
-          {/* Description */}
-          {currentMission.description && (
-            <div className="mb-6">
-              <p className="text-white/80">{currentMission.description}</p>
+              {/* Description */}
+              {currentMission.description && (
+                <div className="mb-6">
+                  <p className="text-white/80">{currentMission.description}</p>
+                </div>
+              )}
+
+              {/* Infos détaillées */}
+              <div className="mb-8 space-y-4">
+                {currentMission.category && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🏷️</span>
+                    <div>
+                      <p className="text-sm text-white/50">Catégorie</p>
+                      <p className="font-semibold text-white">{currentMission.category}</p>
+                    </div>
+                  </div>
+                )}
+
+                {currentMission.city && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">📍</span>
+                    <div>
+                      <p className="text-sm text-white/50">Lieu</p>
+                      <p className="font-semibold text-white">{currentMission.city}</p>
+                    </div>
+                  </div>
+                )}
+
+                {currentMission.hourlyRate && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">💰</span>
+                    <div>
+                      <p className="text-sm text-white/50">Rémunération</p>
+                      <p className="text-xl font-bold text-green-400">
+                        {currentMission.hourlyRate.toFixed(2)} $ / heure
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {currentMission.startsAt && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">📅</span>
+                    <div>
+                      <p className="text-sm text-white/50">Date de début</p>
+                      <p className="font-semibold text-white">
+                        {format(new Date(currentMission.startsAt), "PPP", { locale: frCA })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions principales */}
+              <div className="flex gap-4">
+                <Button
+                  onClick={handleReject}
+                  className="flex-1 rounded-xl border-2 border-red-500 bg-transparent py-6 text-lg font-bold text-red-500 transition hover:bg-red-500 hover:text-white"
+                >
+                  ❌ Passer
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  className="flex-1 rounded-xl border-2 border-yellow-500 bg-transparent py-6 text-lg font-bold text-yellow-500 transition hover:bg-yellow-500 hover:text-white"
+                >
+                  ⭐ Sauvegarder
+                </Button>
+                <Button
+                  onClick={handleReserve}
+                  className="flex-1 rounded-xl bg-green-600 py-6 text-lg font-bold text-white transition hover:bg-green-500"
+                >
+                  ✅ Réserver
+                </Button>
+              </div>
             </div>
-          )}
-
-          {/* Infos détaillées */}
-          <div className="mb-8 space-y-4">
-            {currentMission.category && (
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🏷️</span>
-                <div>
-                  <p className="text-sm text-white/50">Catégorie</p>
-                  <p className="font-semibold text-white">{currentMission.category}</p>
-                </div>
-              </div>
-            )}
-
-            {currentMission.city && (
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📍</span>
-                <div>
-                  <p className="text-sm text-white/50">Lieu</p>
-                  <p className="font-semibold text-white">{currentMission.city}</p>
-                </div>
-              </div>
-            )}
-
-            {currentMission.hourlyRate && (
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">💰</span>
-                <div>
-                  <p className="text-sm text-white/50">Rémunération</p>
-                  <p className="text-xl font-bold text-green-400">
-                    {currentMission.hourlyRate.toFixed(2)} $ / heure
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {currentMission.startsAt && (
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📅</span>
-                <div>
-                  <p className="text-sm text-white/50">Date de début</p>
-                  <p className="font-semibold text-white">
-                    {format(new Date(currentMission.startsAt), "PPP", { locale: frCA })}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Actions principales */}
-          <div className="flex gap-4">
-            <Button
-              onClick={handleReject}
-              className="flex-1 rounded-xl border-2 border-red-500 bg-transparent py-6 text-lg font-bold text-red-500 transition hover:bg-red-500 hover:text-white"
-            >
-              ❌ Passer
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="flex-1 rounded-xl border-2 border-yellow-500 bg-transparent py-6 text-lg font-bold text-yellow-500 transition hover:bg-yellow-500 hover:text-white"
-            >
-              ⭐ Sauvegarder
-            </Button>
-            <Button
-              onClick={handleReserve}
-              className="flex-1 rounded-xl bg-green-600 py-6 text-lg font-bold text-white transition hover:bg-green-500"
-            >
-              ✅ Réserver
-            </Button>
-          </div>
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Navigation secondaire */}
@@ -192,4 +206,3 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
     </div>
   );
 }
-

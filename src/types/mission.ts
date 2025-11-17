@@ -34,6 +34,7 @@ export type Mission = {
   currency: string;
   createdAt: string;
   updatedAt: string;
+  completedAt?: string;
 };
 
 export type CreateMissionPayload = {
@@ -57,4 +58,36 @@ export type UpdateMissionStatusPayload = {
 };
 
 export type ReserveMissionResponse = Mission;
+
+/**
+ * Type pour le feed de missions incluant la distance et les infos de l'employeur
+ */
+export type MissionFeedItem = {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  city: string | null;
+  address: string | null;
+  hourlyRate: number | null;
+  startsAt: string | null;
+  endsAt: string | null;
+  status: string;
+  employerId: string;
+  employerName: string | null;
+  priceCents: number;
+  currency: string;
+  distance: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  createdAt: string;
+};
+
+export type MissionFeedFilters = {
+  category?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  maxDistance?: number;
+};
 

@@ -1,31 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-
-type MissionFeed = {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string | null;
-  city: string | null;
-  address: string | null;
-  hourlyRate: number | null;
-  startsAt: string | null;
-  endsAt: string | null;
-  status: string;
-  employerId: string;
-  employerName: string | null;
-  priceCents: number;
-  currency: string;
-  distance: number | null;
-  latitude: number | null;
-  longitude: number | null;
-  createdAt: string;
-};
+import type { MissionFeedItem } from "@/types/mission";
 
 type Props = {
-  missions: MissionFeed[];
+  missions: MissionFeedItem[];
   userLocation: { lat: number; lng: number } | null;
   onReserve: (missionId: string) => void;
 };
@@ -162,11 +141,10 @@ export function MissionMap({ missions, userLocation, onReserve }: Props) {
         style={{ zIndex: 0 }}
       />
       {!userLocation && (
-        <div className="bg-yellow-500/20 border-t border-yellow-500/30 p-4 text-center text-sm text-yellow-300">
+        <div className="border-t border-yellow-500/30 bg-yellow-500/20 p-4 text-center text-sm text-yellow-300">
           ⚠️ Activez la géolocalisation pour voir votre position sur la carte
         </div>
       )}
     </div>
   );
 }
-

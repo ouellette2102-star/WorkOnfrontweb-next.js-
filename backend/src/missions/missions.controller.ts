@@ -37,6 +37,13 @@ export class MissionsController {
     return this.missionsService.getMissionsForEmployer(req.user.sub);
   }
 
+  @Get('worker/mine')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.WORKER)
+  listWorkerMissions(@Request() req: any) {
+    return this.missionsService.getMissionsForWorker(req.user.sub);
+  }
+
   @Get('available')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.WORKER)

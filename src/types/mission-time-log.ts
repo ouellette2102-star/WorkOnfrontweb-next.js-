@@ -13,6 +13,7 @@ export type MissionTimeLog = {
   userId: string;
   type: MissionTimeLogType;
   note?: string;
+  timestamp: string;
   createdAt: string;
 };
 

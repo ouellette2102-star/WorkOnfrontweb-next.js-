@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs";
 import { Providers } from "@/components/providers";
 import { NotificationBadge } from "@/components/notifications/notification-badge";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -74,6 +75,12 @@ export default function RootLayout({
             </div>
           </SignedIn>
 
+          <Toaster 
+            position="top-right" 
+            richColors 
+            closeButton
+            theme="dark"
+          />
           <Providers>{children}</Providers>
         </body>
       </html>

@@ -3,41 +3,21 @@
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-
-type MissionFeed = {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string | null;
-  city: string | null;
-  address: string | null;
-  hourlyRate: number | null;
-  startsAt: string | null;
-  endsAt: string | null;
-  status: string;
-  employerId: string;
-  employerName: string | null;
-  priceCents: number;
-  currency: string;
-  distance: number | null;
-  latitude: number | null;
-  longitude: number | null;
-  createdAt: string;
-};
+import type { MissionFeedItem } from "@/types/mission";
 
 type Props = {
-  missions: MissionFeed[];
+  missions: MissionFeedItem[];
   onReserve: (missionId: string) => void;
   userLocation: { lat: number; lng: number } | null;
 };
 
-export function MissionFeedList({ missions, onReserve, userLocation }: Props) {
+export function MissionFeedList({ missions, onReserve }: Props) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {missions.map((mission) => (
         <div
           key={mission.id}
-          className="group overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/70 backdrop-blur transition hover:border-blue-500/50 hover:bg-neutral-900"
+          className="group relative overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/70 backdrop-blur transition hover:border-blue-500/50 hover:bg-neutral-900"
         >
           {/* Badge de distance */}
           {mission.distance !== null && (
@@ -125,4 +105,3 @@ export function MissionFeedList({ missions, onReserve, userLocation }: Props) {
     </div>
   );
 }
-

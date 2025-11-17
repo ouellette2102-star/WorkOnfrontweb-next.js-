@@ -303,6 +303,28 @@ export class MissionsService {
   }
 
   /**
+   * Récupérer toutes les missions du worker (RESERVED, IN_PROGRESS, COMPLETED)
+   */
+  async getMissionsForWorker(userId: string): Promise<MissionResponse[]> {
+    const worker = await this.prisma.worker.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!worker) {
+      throw new ForbiddenException('Accès réservé aux workers WorkOn');
+    }
+
+    const missions = await this.prisma.mission.findMany({
+      where: { workerId: worker.id },
+      orderBy: { createdAt: 'desc' },
+      select: missionSelect,
+    });
+
+    return missions.map((mission) => this.mapToResponse(mission));
+  }
+
+  /**
    * Récupérer le feed de missions pour le worker avec distance calculée
    */
   async getMissionFeed(

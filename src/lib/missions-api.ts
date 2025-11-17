@@ -8,6 +8,8 @@ import type {
   CreateMissionPayload,
   ListMissionsFilters,
   UpdateMissionStatusPayload,
+  MissionFeedItem,
+  MissionFeedFilters,
 } from "@/types/mission";
 
 const API_BASE_URL =
@@ -81,6 +83,15 @@ export async function getMyMissions(token: string): Promise<Mission[]> {
 }
 
 /**
+ * Lister toutes les missions du worker courant (RESERVED, IN_PROGRESS, COMPLETED)
+ */
+export async function getWorkerMissions(token: string): Promise<Mission[]> {
+  return authenticatedRequest<Mission[]>("/missions/worker/mine", token, {
+    method: "GET",
+  });
+}
+
+/**
  * Lister les missions disponibles (WORKER)
  */
 export async function getAvailableMissions(
@@ -127,6 +138,30 @@ export async function reserveMission(
 ): Promise<Mission> {
   return authenticatedRequest<Mission>(`/missions/${missionId}/reserve`, token, {
     method: "POST",
+  });
+}
+
+/**
+ * Récupérer le feed de missions avec distance calculée (WORKER uniquement)
+ * Permet de filtrer par catégorie, ville, distance max et position GPS
+ */
+export async function getMissionFeed(
+  token: string,
+  filters?: MissionFeedFilters,
+): Promise<MissionFeedItem[]> {
+  const queryParams = new URLSearchParams();
+  
+  if (filters?.category) queryParams.set("category", filters.category);
+  if (filters?.city) queryParams.set("city", filters.city);
+  if (filters?.latitude !== undefined) queryParams.set("latitude", filters.latitude.toString());
+  if (filters?.longitude !== undefined) queryParams.set("longitude", filters.longitude.toString());
+  if (filters?.maxDistance !== undefined) queryParams.set("maxDistance", filters.maxDistance.toString());
+
+  const queryString = queryParams.toString();
+  const path = `/missions/feed${queryString ? `?${queryString}` : ""}`;
+
+  return authenticatedRequest<MissionFeedItem[]>(path, token, {
+    method: "GET",
   });
 }
 

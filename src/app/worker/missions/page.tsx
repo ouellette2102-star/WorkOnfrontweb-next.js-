@@ -1,35 +1,26 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { RequireWorkerClient } from "@/components/auth/require-worker-client";
 import { MissionFeedList } from "@/components/worker/mission-feed-list";
 import { MissionSwipeCards } from "@/components/worker/mission-swipe-cards";
 import { MissionMap } from "@/components/worker/mission-map";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getMissionFeed, reserveMission } from "@/lib/missions-api";
+import type { MissionFeedItem } from "@/types/mission";
+import { toast } from "sonner";
 
 type ViewMode = "list" | "swipe" | "map";
-
-type MissionFeed = {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string | null;
-  city: string | null;
-  address: string | null;
-  hourlyRate: number | null;
-  startsAt: string | null;
-  endsAt: string | null;
-  status: string;
-  employerId: string;
-  employerName: string | null;
-  priceCents: number;
-  currency: string;
-  distance: number | null;
-  latitude: number | null;
-  longitude: number | null;
-  createdAt: string;
-};
 
 export default function WorkerMissionsPage() {
   return (
@@ -40,16 +31,21 @@ export default function WorkerMissionsPage() {
 }
 
 function WorkerMissionsContent() {
-  const { getToken, isLoaded } = useAuth();
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const [missions, setMissions] = useState<MissionFeed[]>([]);
+  const [missions, setMissions] = useState<MissionFeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   // Filtres
-  const [maxDistance, setMaxDistance] = useState<number>(20); // km
+  const [maxDistance, setMaxDistance] = useState<number | "unlimited">("unlimited");
   const [category, setCategory] = useState<string>("");
   const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  // Extraire le prénom de l'utilisateur Clerk
+  const firstName = user?.firstName || "Travailleur";
 
   // Demander la géolocalisation au chargement
   useEffect(() => {
@@ -60,16 +56,27 @@ function WorkerMissionsContent() {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
+          setLocationError(null);
         },
         (error) => {
           console.error("Erreur géolocalisation:", error);
+          setLocationError(
+            "Impossible d'obtenir votre position. Certaines fonctionnalités (distance) seront limitées."
+          );
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
         }
       );
+    } else {
+      setLocationError("Votre navigateur ne supporte pas la géolocalisation.");
     }
   }, []);
 
   const loadMissions = useCallback(async () => {
-    if (!isLoaded) return;
+    if (!isLoaded || !isSignedIn) return;
 
     try {
       setIsLoading(true);
@@ -77,40 +84,31 @@ function WorkerMissionsContent() {
 
       const token = await getToken();
       if (!token) {
-        setError("Token non disponible");
+        setError("Impossible de récupérer le token d'authentification.");
         return;
       }
 
-      const params = new URLSearchParams();
-      if (category) params.append("category", category);
-      if (maxDistance) params.append("maxDistance", maxDistance.toString());
-      if (userLocation) {
-        params.append("latitude", userLocation.lat.toString());
-        params.append("longitude", userLocation.lng.toString());
-      }
+      const filters = {
+        category: category || undefined,
+        maxDistance: maxDistance === "unlimited" ? undefined : maxDistance,
+        latitude: userLocation?.lat,
+        longitude: userLocation?.lng,
+      };
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/missions/feed?${params.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          cache: "no-store",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erreur lors du chargement des missions");
-      }
-
-      const data = await response.json();
-      setMissions(data);
+      const fetchedMissions = await getMissionFeed(token, filters);
+      setMissions(fetchedMissions);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      console.error("Erreur lors du chargement des missions:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erreur lors du chargement des missions."
+      );
+      toast.error("Erreur lors du chargement des missions");
     } finally {
       setIsLoading(false);
     }
-  }, [isLoaded, getToken, category, maxDistance, userLocation]);
+  }, [isLoaded, isSignedIn, getToken, category, maxDistance, userLocation]);
 
   useEffect(() => {
     loadMissions();
@@ -120,29 +118,20 @@ function WorkerMissionsContent() {
     try {
       const token = await getToken();
       if (!token) {
-        alert("Authentification requise");
+        toast.error("Vous devez être connecté pour réserver une mission.");
         return;
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/missions/${missionId}/reserve`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erreur lors de la réservation");
-      }
-
-      alert("Mission réservée avec succès !");
+      await reserveMission(token, missionId);
+      toast.success("Mission réservée avec succès !");
       loadMissions(); // Recharger la liste
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erreur lors de la réservation");
+      console.error("Erreur lors de la réservation:", err);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la réservation de la mission."
+      );
     }
   };
 
@@ -152,7 +141,7 @@ function WorkerMissionsContent() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="mb-2 text-3xl font-bold text-white">
-            Missions disponibles 🔍
+            Salut {firstName} 👋
           </h1>
           <p className="text-white/70">
             {userLocation
@@ -161,68 +150,92 @@ function WorkerMissionsContent() {
           </p>
         </div>
 
+        {/* Alerte géolocalisation */}
+        {locationError && (
+          <div className="mb-6 rounded-xl border border-yellow-500 bg-yellow-500/20 p-4 text-yellow-300">
+            ⚠️ {locationError}
+          </div>
+        )}
+
         {/* Filtres */}
-        <div className="mb-6 flex flex-wrap gap-3">
-          <select
-            value={maxDistance}
-            onChange={(e) => setMaxDistance(Number(e.target.value))}
-            className="rounded-xl border border-white/10 bg-neutral-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-          >
-            <option value={5}>5 km</option>
-            <option value={10}>10 km</option>
-            <option value={20}>20 km</option>
-            <option value={50}>50 km</option>
-            <option value={999}>Illimité</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Catégorie (ex: ménage)"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="rounded-xl border border-white/10 bg-neutral-800 px-4 py-2 text-white placeholder-white/50 focus:border-blue-500 focus:outline-none"
-          />
-
+        <div className="mb-6 flex flex-col gap-4 rounded-xl border border-white/10 bg-neutral-900/70 p-4 backdrop-blur md:flex-row md:items-end">
+          <div className="flex-1">
+            <Label htmlFor="category" className="text-white/70">
+              Catégorie de mission
+            </Label>
+            <Input
+              id="category"
+              placeholder="Ex: Ménage, Plomberie..."
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="mt-1 bg-neutral-800 text-white placeholder:text-white/50"
+            />
+          </div>
+          <div className="flex-1">
+            <Label htmlFor="distance" className="text-white/70">
+              Distance maximale
+            </Label>
+            <Select
+              value={String(maxDistance)}
+              onValueChange={(value) =>
+                setMaxDistance(value === "unlimited" ? "unlimited" : Number(value))
+              }
+            >
+              <SelectTrigger className="mt-1 w-full bg-neutral-800 text-white">
+                <SelectValue placeholder="Sélectionner une distance" />
+              </SelectTrigger>
+              <SelectContent className="bg-neutral-800 text-white">
+                <SelectItem value="5">5 km</SelectItem>
+                <SelectItem value="10">10 km</SelectItem>
+                <SelectItem value="20">20 km</SelectItem>
+                <SelectItem value="50">50 km</SelectItem>
+                <SelectItem value="unlimited">Illimité</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             onClick={loadMissions}
-            className="rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
+            className="bg-blue-600 text-white hover:bg-blue-500"
           >
-            Actualiser
+            Actualiser les missions
           </Button>
         </div>
 
         {/* Switch de vue */}
-        <div className="mb-6 flex gap-2 rounded-xl border border-white/10 bg-neutral-900/70 p-2">
-          <button
+        <div className="mb-6 flex justify-center gap-2">
+          <Button
+            variant={viewMode === "list" ? "default" : "outline"}
             onClick={() => setViewMode("list")}
-            className={`flex-1 rounded-lg px-4 py-2 font-semibold transition ${
+            className={
               viewMode === "list"
                 ? "bg-blue-600 text-white"
-                : "text-white/70 hover:text-white"
-            }`}
+                : "border-white/20 text-white/70 hover:bg-neutral-800"
+            }
           >
             📋 Liste
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={viewMode === "swipe" ? "default" : "outline"}
             onClick={() => setViewMode("swipe")}
-            className={`flex-1 rounded-lg px-4 py-2 font-semibold transition ${
+            className={
               viewMode === "swipe"
                 ? "bg-blue-600 text-white"
-                : "text-white/70 hover:text-white"
-            }`}
+                : "border-white/20 text-white/70 hover:bg-neutral-800"
+            }
           >
             💫 Swipe
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={viewMode === "map" ? "default" : "outline"}
             onClick={() => setViewMode("map")}
-            className={`flex-1 rounded-lg px-4 py-2 font-semibold transition ${
+            className={
               viewMode === "map"
                 ? "bg-blue-600 text-white"
-                : "text-white/70 hover:text-white"
-            }`}
+                : "border-white/20 text-white/70 hover:bg-neutral-800"
+            }
           >
             🗺️ Carte
-          </button>
+          </Button>
         </div>
 
         {/* Erreur */}
@@ -234,20 +247,21 @@ function WorkerMissionsContent() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-white/70">Chargement des missions...</div>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+            <p className="text-white/70">Chargement des missions...</p>
           </div>
         )}
 
         {/* Empty state */}
         {!isLoading && !error && missions.length === 0 && (
-          <div className="rounded-xl border border-white/10 bg-neutral-900/70 p-12 text-center">
-            <div className="mb-4 text-6xl">🔍</div>
+          <div className="flex flex-col items-center justify-center rounded-xl border border-white/10 bg-neutral-900/70 p-12 backdrop-blur">
+            <span className="mb-4 text-6xl">🔍</span>
             <h3 className="mb-2 text-xl font-semibold text-white">
               Aucune mission disponible
             </h3>
-            <p className="text-white/70">
-              Essayez d'élargir votre rayon de recherche ou vérifiez plus tard
+            <p className="text-center text-white/70">
+              Essayez d'élargir votre rayon de recherche ou de modifier les filtres.
             </p>
           </div>
         )}
@@ -283,4 +297,3 @@ function WorkerMissionsContent() {
     </div>
   );
 }
-

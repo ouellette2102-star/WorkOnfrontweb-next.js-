@@ -1,9 +1,15 @@
 import { requireWorker } from "@/lib/auth-helpers";
-import { Button } from "@/components/ui/button";
+import { ActiveMissionsCard } from "@/components/worker/active-missions-card";
+import { AvailableMissionsCard } from "@/components/worker/available-missions-card";
+import { MissionHistoryCard } from "@/components/worker/mission-history-card";
+import { QuickStatsCard } from "@/components/worker/quick-stats-card";
 import Link from "next/link";
 
 export default async function WorkerDashboardPage() {
   const profile = await requireWorker();
+
+  // Extraire le prénom (premier mot du fullName)
+  const firstName = profile.fullName?.split(" ")[0] || "Travailleur";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
@@ -11,88 +17,71 @@ export default async function WorkerDashboardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="mb-2 text-4xl font-bold text-white">
-            Bienvenue, {profile.fullName || "Travailleur"} 👋
+            Salut {firstName} 👋
           </h1>
           <p className="text-lg text-white/70">
-            Voici vos missions et opportunités
+            {profile.city ? `Tu es à ${profile.city}` : "Prêt à trouver des missions près de chez toi"}
           </p>
         </div>
 
+        {/* Quick Stats */}
+        <QuickStatsCard />
+
         {/* Actions rapides */}
         <div className="mb-8 grid gap-4 md:grid-cols-3">
-          <Link href="/missions/available">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-blue-500 hover:bg-neutral-900">
+          <Link href="/worker/missions">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-red-500 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">🔍</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Missions disponibles
               </h3>
               <p className="text-sm text-white/70">
-                Trouvez des missions près de chez vous
+                Trouve des missions près de chez toi
               </p>
             </div>
           </Link>
 
           <Link href="/notifications">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-blue-500 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-red-500 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">🔔</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Notifications
               </h3>
               <p className="text-sm text-white/70">
-                Consultez vos notifications
+                Consulte tes notifications
               </p>
             </div>
           </Link>
 
           <Link href="/messages">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-blue-500 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-red-500 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">💬</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Messages
               </h3>
               <p className="text-sm text-white/70">
-                Communiquez avec les employeurs
+                Communique avec les employeurs
               </p>
             </div>
           </Link>
         </div>
 
         {/* Sections principales */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Missions réservées */}
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">
-                Mes missions réservées
-              </h2>
-              <Link href="/missions/available">
-                <Button className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500">
-                  Voir toutes
-                </Button>
-              </Link>
-            </div>
-            <p className="text-white/70">
-              Vous n'avez pas encore de missions réservées
-            </p>
-          </div>
+        <div className="grid gap-8">
+          {/* Missions actives */}
+          <ActiveMissionsCard />
 
-          {/* Missions en cours */}
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">
-                Missions en cours
-              </h2>
-            </div>
-            <p className="text-white/70">
-              Aucune mission en cours pour le moment
-            </p>
-          </div>
+          {/* Missions disponibles (compacte) */}
+          <AvailableMissionsCard />
+
+          {/* Historique */}
+          <MissionHistoryCard />
         </div>
 
         {/* Infos profil */}
         <div className="mt-8 rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
           <h3 className="mb-4 text-xl font-semibold text-white">
-            Vos informations
+            Tes informations
           </h3>
           <div className="grid gap-4 md:grid-cols-3">
             <div>
@@ -109,13 +98,12 @@ export default async function WorkerDashboardPage() {
             </div>
           </div>
           <Link href="/profile">
-            <Button className="mt-4 rounded-xl bg-neutral-700 px-4 py-2 text-sm text-white transition hover:bg-neutral-600">
+            <button className="mt-4 rounded-xl bg-neutral-700 px-4 py-2 text-sm text-white transition hover:bg-neutral-600">
               Modifier mon profil
-            </Button>
+            </button>
           </Link>
         </div>
       </div>
     </div>
   );
 }
-
