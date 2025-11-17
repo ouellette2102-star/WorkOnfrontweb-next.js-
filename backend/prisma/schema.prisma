@@ -47,15 +47,19 @@ enum MissionTimeLogType {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  clerkId   String?  @unique
-  name      String
-  role      UserRole @default(WORKER)
-  profile   Json? // Profil flexible (avatar, bio, etc.)
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  email       String    @unique
+  clerkId     String?   @unique
+  name        String
+  role        UserRole  @default(WORKER)
+  primaryRole UserRole? // Rôle principal choisi par l'utilisateur (onboarding)
+  fullName    String? // Nom complet pour l'onboarding
+  phone       String? // Téléphone
+  city        String? // Ville
+  profile     Json? // Profil flexible (avatar, bio, etc.)
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Relations
   employer Employer?
@@ -64,6 +68,7 @@ model User {
   @@index([email])
   @@index([clerkId])
   @@index([role])
+  @@index([primaryRole])
   @@index([active])
   @@map("users")
 }

@@ -9,6 +9,10 @@ const userSelect = {
   clerkId: true,
   email: true,
   role: true,
+  primaryRole: true,
+  fullName: true,
+  phone: true,
+  city: true,
   profile: true,
   worker: { select: { id: true } },
   employer: { select: { id: true } },
@@ -62,32 +66,29 @@ export class ProfileService {
         throw new NotFoundException('Utilisateur introuvable');
       }
 
-      const profileData = this.toProfileData(user.profile);
-
-      if (dto.primaryRole) {
-        profileData.primaryRole = dto.primaryRole;
-      }
-      if (dto.fullName !== undefined) {
-        profileData.fullName = dto.fullName;
-      }
-      if (dto.phone !== undefined) {
-        profileData.phone = dto.phone;
-      }
-      if (dto.city !== undefined) {
-        profileData.city = dto.city;
-      }
-
-      const sanitizedProfile = this.sanitizeProfileData(profileData);
       const mappedRole = dto.primaryRole
         ? this.mapProfileRoleToUserRole(dto.primaryRole)
         : null;
 
+      const updateData: Prisma.UserUpdateInput = {};
+
+      if (mappedRole) {
+        updateData.role = mappedRole;
+        updateData.primaryRole = mappedRole;
+      }
+      if (dto.fullName !== undefined) {
+        updateData.fullName = dto.fullName;
+      }
+      if (dto.phone !== undefined) {
+        updateData.phone = dto.phone;
+      }
+      if (dto.city !== undefined) {
+        updateData.city = dto.city;
+      }
+
       const updated = await this.prisma.user.update({
         where: { id: userId },
-        data: {
-          profile: this.toJsonValue(sanitizedProfile),
-          ...(mappedRole ? { role: mappedRole } : {}),
-        },
+        data: updateData,
         select: userSelect,
       });
 
@@ -102,26 +103,33 @@ export class ProfileService {
   }
 
   private mapToProfileDto(user: UserWithRelations): ProfileResponseDto {
-    const profileData = this.toProfileData(user.profile);
     const isWorker =
       user.role === UserRole.WORKER || Boolean(user.worker);
     const isEmployer =
       user.role === UserRole.EMPLOYER ||
       user.role === UserRole.ADMIN ||
       Boolean(user.employer);
-    const derivedPrimaryRole = this.resolvePrimaryRole(
-      profileData,
-      user.role,
-      isWorker,
-      isEmployer,
-    );
+    
+    // Utiliser primaryRole depuis la DB, ou dériver depuis role si absent
+    let derivedPrimaryRole: ProfileRole;
+    if (user.primaryRole) {
+      derivedPrimaryRole = this.mapUserRoleToProfileRole(user.primaryRole) ?? ProfileRole.WORKER;
+    } else if (user.role) {
+      derivedPrimaryRole = this.mapUserRoleToProfileRole(user.role) ?? ProfileRole.WORKER;
+    } else if (isWorker) {
+      derivedPrimaryRole = ProfileRole.WORKER;
+    } else if (isEmployer) {
+      derivedPrimaryRole = ProfileRole.EMPLOYER;
+    } else {
+      derivedPrimaryRole = ProfileRole.CLIENT_RESIDENTIAL;
+    }
 
     const dto = new ProfileResponseDto();
     dto.id = user.id;
     dto.email = user.email;
-    dto.fullName = profileData.fullName ?? '';
-    dto.phone = profileData.phone ?? '';
-    dto.city = profileData.city ?? '';
+    dto.fullName = user.fullName ?? '';
+    dto.phone = user.phone ?? '';
+    dto.city = user.city ?? '';
     dto.primaryRole = derivedPrimaryRole;
     dto.isWorker = isWorker;
     dto.isEmployer = isEmployer;

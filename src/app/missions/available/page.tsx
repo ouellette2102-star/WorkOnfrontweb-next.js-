@@ -9,8 +9,17 @@ import { ReserveMissionButton } from "@/components/missions/reserve-mission-butt
 import { MissionActions } from "@/components/missions/mission-actions";
 import { MissionTimeTracking } from "@/components/missions/mission-time-tracking";
 import { MissionPhotos } from "@/components/missions/mission-photos";
+import { RequireWorkerClient } from "@/components/auth/require-worker-client";
 
 export default function AvailableMissionsPage() {
+  return (
+    <RequireWorkerClient>
+      <AvailableMissionsContent />
+    </RequireWorkerClient>
+  );
+}
+
+function AvailableMissionsContent() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);

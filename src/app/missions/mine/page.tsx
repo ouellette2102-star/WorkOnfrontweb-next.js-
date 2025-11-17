@@ -11,8 +11,17 @@ import { MissionActions } from "@/components/missions/mission-actions";
 import { MissionTimeView } from "@/components/missions/mission-time-view";
 import { MissionPhotos } from "@/components/missions/mission-photos";
 import { Button } from "@/components/ui/button";
+import { RequireEmployerClient } from "@/components/auth/require-employer-client";
 
 export default function MyMissionsPage() {
+  return (
+    <RequireEmployerClient>
+      <MyMissionsContent />
+    </RequireEmployerClient>
+  );
+}
+
+function MyMissionsContent() {
   const router = useRouter();
   const { getToken, isLoaded, isSignedIn } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
