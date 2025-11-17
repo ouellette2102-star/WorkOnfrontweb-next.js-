@@ -245,10 +245,21 @@ export class MissionsService {
       throw new ForbiddenException('Seuls les workers peuvent réserver des missions');
     }
 
-    // Récupérer la mission
+    // Récupérer la mission avec les infos de l'employer
     const mission = await this.prisma.mission.findUnique({
       where: { id: missionId },
-      select: missionSelect,
+      select: {
+        ...missionSelect,
+        employer: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!mission) {
@@ -278,7 +289,164 @@ export class MissionsService {
       select: missionSelect,
     });
 
+    // Créer une notification pour l'employer
+    if (mission.employer?.user?.clerkId) {
+      await this.notificationsService.createForMissionStatusChange(
+        missionId,
+        MissionStatus.CREATED,
+        MissionStatus.RESERVED,
+        mission.employer.user.clerkId,
+      );
+    }
+
     return this.mapToResponse(updated);
+  }
+
+  /**
+   * Récupérer le feed de missions pour le worker avec distance calculée
+   */
+  async getMissionFeed(
+    userId: string,
+    filters: {
+      category?: string;
+      city?: string;
+      latitude?: number;
+      longitude?: number;
+      maxDistance?: number;
+    },
+  ): Promise<any[]> {
+    const worker = await this.prisma.worker.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!worker) {
+      throw new ForbiddenException('Accès réservé aux workers WorkOn');
+    }
+
+    const where: Prisma.MissionWhereInput = {
+      status: MissionStatus.CREATED,
+    };
+
+    if (filters.category) {
+      where.category = { equals: filters.category, mode: 'insensitive' };
+    }
+
+    if (filters.city) {
+      where.city = { equals: filters.city, mode: 'insensitive' };
+    }
+
+    const missions = await this.prisma.mission.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        ...missionSelect,
+        location: true,
+        employer: {
+          select: {
+            user: {
+              select: {
+                fullName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Calculer la distance pour chaque mission
+    const missionsWithDistance = missions.map((mission) => {
+      let distance: number | null = null;
+      let lat: number | null = null;
+      let lng: number | null = null;
+
+      if (mission.location && typeof mission.location === 'object') {
+        const loc = mission.location as any;
+        lat = loc.lat || null;
+        lng = loc.lng || null;
+
+        if (
+          filters.latitude &&
+          filters.longitude &&
+          lat !== null &&
+          lng !== null
+        ) {
+          distance = this.calculateDistance(
+            filters.latitude,
+            filters.longitude,
+            lat,
+            lng,
+          );
+        }
+      }
+
+      return {
+        id: mission.id,
+        title: mission.title,
+        description: mission.description ?? null,
+        category: mission.category ?? null,
+        city: mission.city ?? null,
+        address: mission.address ?? null,
+        hourlyRate: mission.hourlyRate ?? null,
+        startsAt: mission.startsAt ? mission.startsAt.toISOString() : null,
+        endsAt: mission.endsAt ? mission.endsAt.toISOString() : null,
+        status: mission.status,
+        employerId: mission.employerId,
+        employerName: mission.employer?.user?.fullName ?? null,
+        priceCents: mission.priceCents,
+        currency: mission.currency,
+        distance,
+        latitude: lat,
+        longitude: lng,
+        createdAt: mission.createdAt.toISOString(),
+      };
+    });
+
+    // Filtrer par distance si spécifié
+    let filtered = missionsWithDistance;
+    if (filters.maxDistance && filters.latitude && filters.longitude) {
+      filtered = missionsWithDistance.filter(
+        (m) => m.distance === null || m.distance <= filters.maxDistance!,
+      );
+    }
+
+    // Trier par distance (les plus proches en premier)
+    filtered.sort((a, b) => {
+      if (a.distance === null && b.distance === null) return 0;
+      if (a.distance === null) return 1;
+      if (b.distance === null) return -1;
+      return a.distance - b.distance;
+    });
+
+    return filtered;
+  }
+
+  /**
+   * Calculer la distance entre deux points GPS (formule Haversine)
+   * Retourne la distance en kilomètres
+   */
+  private calculateDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
+    const R = 6371; // Rayon de la Terre en km
+    const dLat = this.deg2rad(lat2 - lat1);
+    const dLon = this.deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.deg2rad(lat1)) *
+        Math.cos(this.deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return Math.round(distance * 10) / 10; // Arrondir à 1 décimale
+  }
+
+  private deg2rad(deg: number): number {
+    return deg * (Math.PI / 180);
   }
 
   private validateStatusTransition(

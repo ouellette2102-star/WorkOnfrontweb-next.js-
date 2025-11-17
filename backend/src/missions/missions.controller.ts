@@ -16,6 +16,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { ListAvailableMissionsDto } from './dto/list-available-missions.dto';
 import { UpdateMissionStatusDto } from './dto/update-mission-status.dto';
+import { MissionFeedFiltersDto } from './dto/mission-feed.dto';
 import { UserRole } from '@prisma/client';
 
 @Controller('missions')
@@ -44,6 +45,16 @@ export class MissionsController {
     @Query() filters: ListAvailableMissionsDto,
   ) {
     return this.missionsService.getAvailableMissionsForWorker(req.user.sub, filters);
+  }
+
+  @Get('feed')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.WORKER)
+  getMissionFeed(
+    @Request() req: any,
+    @Query() filters: MissionFeedFiltersDto,
+  ) {
+    return this.missionsService.getMissionFeed(req.user.sub, filters);
   }
 
   @Post(':id/reserve')
