@@ -22,6 +22,7 @@
     "migrate:deploy": "prisma migrate deploy",
     "migrate:reset": "prisma migrate reset",
     "seed": "ts-node prisma/seed.ts",
+    "seed:dev": "ts-node prisma/seed.dev.ts",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "prisma:db:push": "prisma db push",

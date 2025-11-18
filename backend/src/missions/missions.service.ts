@@ -5,6 +5,7 @@ import {
   BadRequestException,
   Inject,
   forwardRef,
+  Logger,
 } from '@nestjs/common';
 import { MissionStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,6 +13,7 @@ import { CreateMissionDto } from './dto/create-mission.dto';
 import { ListAvailableMissionsDto } from './dto/list-available-missions.dto';
 import { UpdateMissionStatusDto } from './dto/update-mission-status.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { isDevEnvironment, devWarn } from '../common/utils/environment.util';
 
 type MissionSelect = {
   id: true;
@@ -74,6 +76,8 @@ export interface MissionResponse {
 
 @Injectable()
 export class MissionsService {
+  private readonly logger = new Logger(MissionsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     @Inject(forwardRef(() => NotificationsService))
@@ -168,17 +172,28 @@ export class MissionsService {
     return this.mapToResponse(mission);
   }
 
+  /**
+   * Lister les missions disponibles pour un worker
+   * 
+   * MODE DEV : Permet l'accès même sans profil Worker en DB (retourne un tableau vide)
+   * MODE PROD : Exige un profil Worker valide
+   */
   async getAvailableMissionsForWorker(
     userId: string,
     filters: ListAvailableMissionsDto,
   ): Promise<MissionResponse[]> {
-    const worker = await this.prisma.worker.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
+    // En dev, on tolère l'absence de worker profile
+    const worker = await this.getWorkerOrNull(
+      userId,
+      'Accès réservé aux workers WorkOn',
+    );
 
-    if (!worker) {
-      throw new ForbiddenException('Accès réservé aux workers WorkOn');
+    // En dev sans worker : retourner un tableau vide (pas d'erreur 403)
+    if (!worker && isDevEnvironment()) {
+      this.logger.log(
+        `[DEV MODE] User ${userId} has no Worker profile - returning empty missions list`,
+      );
+      return [];
     }
 
     const missions = await this.prisma.mission.findMany({
@@ -266,17 +281,32 @@ export class MissionsService {
     return this.mapToResponse(updated);
   }
 
+  /**
+   * Réserver une mission (worker uniquement)
+   * 
+   * MODE DEV : Requiert quand même un profil Worker (création de mission nécessite un workerId)
+   * MODE PROD : Exige un profil Worker valide
+   */
   async reserveMission(
     userId: string,
     missionId: string,
   ): Promise<MissionResponse> {
     // Vérifier que l'utilisateur est un worker
-    const worker = await this.prisma.worker.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
+    // Note : pour réserver, on a BESOIN du workerId, donc même en dev on exige le profil
+    const worker = await this.getWorkerOrNull(
+      userId,
+      'Seuls les workers peuvent réserver des missions',
+    );
 
     if (!worker) {
+      // En dev sans worker, on ne peut pas réserver (besoin du workerId)
+      if (isDevEnvironment()) {
+        throw new BadRequestException(
+          'Profil Worker manquant. Créez un profil Worker avec `npm run seed:dev` pour tester la réservation.',
+        );
+      }
+      // En prod, getWorkerOrNull a déjà lancé une ForbiddenException
+      // Cette ligne ne devrait jamais être atteinte mais TypeScript l'exige
       throw new ForbiddenException('Seuls les workers peuvent réserver des missions');
     }
 
@@ -318,7 +348,7 @@ export class MissionsService {
       },
       data: {
         status: MissionStatus.RESERVED,
-        workerId: worker.id,
+        workerId: worker.id, // worker existe forcément ici
         reservedUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h de réservation
       },
       select: missionSelect,
@@ -339,19 +369,27 @@ export class MissionsService {
 
   /**
    * Récupérer toutes les missions du worker (RESERVED, IN_PROGRESS, COMPLETED)
+   * 
+   * MODE DEV : Permet l'accès même sans profil Worker en DB (retourne un tableau vide)
+   * MODE PROD : Exige un profil Worker valide
    */
   async getMissionsForWorker(userId: string): Promise<MissionResponse[]> {
-    const worker = await this.prisma.worker.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
+    // En dev, on tolère l'absence de worker profile
+    const worker = await this.getWorkerOrNull(
+      userId,
+      'Accès réservé aux workers WorkOn',
+    );
 
-    if (!worker) {
-      throw new ForbiddenException('Accès réservé aux workers WorkOn');
+    // En dev sans worker : retourner un tableau vide (pas d'erreur 403)
+    if (!worker && isDevEnvironment()) {
+      this.logger.log(
+        `[DEV MODE] User ${userId} has no Worker profile - returning empty missions list`,
+      );
+      return [];
     }
 
     const missions = await this.prisma.mission.findMany({
-      where: { workerId: worker.id },
+      where: { workerId: worker!.id }, // worker existe forcément ici (prod) ou en dev on retourne []
       orderBy: { createdAt: 'desc' },
       select: missionSelect,
     });
@@ -361,6 +399,9 @@ export class MissionsService {
 
   /**
    * Récupérer le feed de missions pour le worker avec distance calculée
+   * 
+   * MODE DEV : Permet l'accès même sans profil Worker en DB (retourne un tableau vide)
+   * MODE PROD : Exige un profil Worker valide
    */
   async getMissionFeed(
     userId: string,
@@ -372,13 +413,18 @@ export class MissionsService {
       maxDistance?: number;
     },
   ): Promise<any[]> {
-    const worker = await this.prisma.worker.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
+    // En dev, on tolère l'absence de worker profile
+    const worker = await this.getWorkerOrNull(
+      userId,
+      'Accès réservé aux workers WorkOn',
+    );
 
-    if (!worker) {
-      throw new ForbiddenException('Accès réservé aux workers WorkOn');
+    // En dev sans worker : retourner un tableau vide (pas d'erreur 403)
+    if (!worker && isDevEnvironment()) {
+      this.logger.log(
+        `[DEV MODE] User ${userId} has no Worker profile - returning empty mission feed`,
+      );
+      return [];
     }
 
     const where: Prisma.MissionWhereInput = {
@@ -528,6 +574,49 @@ export class MissionsService {
         `Transition invalide: ${currentStatus} -> ${newStatus}`,
       );
     }
+  }
+
+  /**
+   * Helper privé : Vérifie qu'un worker existe pour le userId donné
+   * 
+   * En DÉVELOPPEMENT : retourne null si le worker n'existe pas (mode tolérant)
+   * En PRODUCTION : lance une ForbiddenException si le worker n'existe pas
+   * 
+   * @param userId - ID de l'utilisateur
+   * @param errorMessage - Message d'erreur personnalisé pour la production
+   * @returns Worker trouvé, ou null en dev si non trouvé
+   */
+  private async getWorkerOrNull(
+    userId: string,
+    errorMessage: string = 'Accès réservé aux workers WorkOn',
+  ): Promise<{ id: string } | null> {
+    const worker = await this.prisma.worker.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!worker) {
+      if (isDevEnvironment()) {
+        // Mode développement : log warning mais continue
+        devWarn(
+          `Worker profile not found for userId=${userId}. ` +
+          `Allowing access in DEV mode. ` +
+          `Create a Worker record or run seed:dev to fix this.`,
+        );
+        this.logger.warn(
+          `[DEV MODE] Worker profile missing for user ${userId} - access granted anyway`,
+        );
+        return null;
+      } else {
+        // Mode production : erreur stricte
+        this.logger.error(
+          `403 MissionsService: Worker profile not found for userId=${userId}`,
+        );
+        throw new ForbiddenException(errorMessage);
+      }
+    }
+
+    return worker;
   }
 
   private mapToResponse(mission: MissionRecord): MissionResponse {
