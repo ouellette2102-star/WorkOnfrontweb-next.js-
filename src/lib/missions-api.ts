@@ -27,6 +27,10 @@ async function authenticatedRequest<T>(
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const url = `${API_BASE_URL}${normalizedPath}`;
 
+  // Debug log temporaire - vérifier le token
+  const tokenPreview = token ? token.substring(0, 20) + "..." : "MISSING";
+  console.log(`[Missions API] Calling ${init?.method || "GET"} ${url} with token: ${tokenPreview}`);
+
   const response = await fetch(url, {
     ...init,
     headers: {
@@ -41,7 +45,9 @@ async function authenticatedRequest<T>(
     const errorBody = await response.text().catch(() => "");
     console.error("[WorkOn Missions API] Request failed", {
       url,
+      method: init?.method || "GET",
       status: response.status,
+      statusText: response.statusText,
       body: errorBody,
     });
 
@@ -51,12 +57,16 @@ async function authenticatedRequest<T>(
       const parsed = JSON.parse(errorBody);
       errorMessage = parsed?.message ?? parsed?.error ?? errorMessage;
     } catch {
-      // Ignore parse errors
+      // Si le body n'est pas du JSON, utiliser le texte brut s'il est court
+      if (errorBody && errorBody.length < 200) {
+        errorMessage = errorBody;
+      }
     }
 
     throw new Error(errorMessage);
   }
 
+  console.log(`[Missions API] Success: ${init?.method || "GET"} ${url} - ${response.status}`);
   return response.json() as Promise<T>;
 }
 

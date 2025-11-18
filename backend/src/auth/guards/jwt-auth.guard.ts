@@ -20,6 +20,10 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization manquante');
     }
 
+    // Debug log temporaire - token présent
+    const tokenPreview = token.substring(0, 20) + '...';
+    console.log(`[JwtAuthGuard] Token received: ${tokenPreview}`);
+
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
 
     if (jwtSecret) {
@@ -31,6 +35,7 @@ export class JwtAuthGuard implements CanActivate {
           role: payload.role,
           provider: 'local',
         };
+        console.log(`[JwtAuthGuard] Local JWT verified: user.sub=${payload.sub}, role=${payload.role}`);
         return true;
       } catch (error) {
         // On essaie ensuite via Clerk
@@ -46,6 +51,8 @@ export class JwtAuthGuard implements CanActivate {
       clerkId: clerkUser.clerkId,
       claims: clerkUser.claims,
     };
+
+    console.log(`[JwtAuthGuard] Clerk verified: user.sub=${clerkUser.sub}, role=${clerkUser.role}`);
 
     return true;
   }

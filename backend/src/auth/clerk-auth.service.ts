@@ -87,6 +87,11 @@ export class ClerkAuthService {
       // Cela permet de respecter le choix de l'utilisateur lors de l'onboarding
       const effectiveRole = user.primaryRole ?? user.role;
 
+      // Debug log temporaire
+      this.logger.debug(
+        `User verified: id=${user.id}, clerkId=${clerkId}, role=${user.role}, primaryRole=${user.primaryRole}, effectiveRole=${effectiveRole}`,
+      );
+
       return {
         sub: user.id,
         clerkId,
