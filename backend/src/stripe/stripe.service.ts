@@ -25,12 +25,43 @@ export class StripeService {
     private notificationsService: NotificationsService,
   ) {
     const secretKey = process.env.STRIPE_SECRET_KEY;
+    const isDev = process.env.NODE_ENV !== 'production';
+
     if (!secretKey) {
-      throw new Error('STRIPE_SECRET_KEY manquant dans .env');
+      if (isDev) {
+        // En développement, on crée une instance Stripe "mock" ou on log un warning
+        this.logger.warn(
+          '⚠️  STRIPE_SECRET_KEY not set in development. Payment features will be disabled. ' +
+          'Set STRIPE_SECRET_KEY in .env to enable payments.',
+        );
+        // On crée quand même une instance Stripe avec une clé de test factice
+        // pour éviter les crashes, mais les appels échoueront proprement
+        this.stripe = null as any; // Les méthodes doivent vérifier si stripe existe
+      } else {
+        // En production, c'est une erreur critique
+        throw new Error(
+          'STRIPE_SECRET_KEY manquant dans .env. Paiements impossibles en production.',
+        );
+      }
+    } else {
+      this.stripe = new Stripe(secretKey, {
+        apiVersion: '2025-02-24.acacia',
+      });
+      this.logger.log('✅ Stripe initialized successfully');
     }
-    this.stripe = new Stripe(secretKey, {
-      apiVersion: '2025-02-24.acacia',
-    });
+  }
+
+  /**
+   * Vérifie si Stripe est initialisé (clé présente)
+   * Lance une exception si Stripe n'est pas disponible
+   */
+  private ensureStripeInitialized(): void {
+    if (!this.stripe) {
+      throw new BadRequestException(
+        'Stripe is not configured. Payment features are disabled in development mode. ' +
+        'Set STRIPE_SECRET_KEY in .env to enable payments.',
+      );
+    }
   }
 
   /**
@@ -39,6 +70,7 @@ export class StripeService {
    * @returns URL de l'onboarding Stripe
    */
   async createConnectOnboardingLink(userId: string): Promise<string> {
+    this.ensureStripeInitialized();
     // Vérifier que l'utilisateur est un Worker
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

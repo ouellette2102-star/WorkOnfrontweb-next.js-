@@ -27,6 +27,7 @@
     "prisma:validate": "prisma validate",
     "prisma:db:push": "prisma db push",
     "prisma:studio": "prisma studio",
+    "env:generate": "node scripts/generate-env.js",
     "check:env": "ts-node ./scripts/check-env.ts || node ./scripts/check-env.ts"
   },
   "dependencies": {
