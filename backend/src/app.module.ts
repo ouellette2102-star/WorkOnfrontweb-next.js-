@@ -18,28 +18,32 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.module';
 import { MissionPhotosModule } from './mission-photos/mission-photos.module';
 import { StripeModule } from './stripe/stripe.module';
+import { validate } from './config/env.validation';
 
 @Module({
   imports: [
-    // Configuration globale
+    // Configuration globale avec validation stricte des ENV
+    // ⚠️ SÉCURITÉ: Valide les variables requises au démarrage
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
+      validate, // Valide DATABASE_URL, CLERK_SECRET_KEY, NODE_ENV, etc.
     }),
 
-    // Rate limiting
+    // Rate limiting - Protection contre les abus et attaques par force brute
+    // ⚠️ SÉCURITÉ: Limite globale stricte - 20 requêtes par minute par IP
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService): ThrottlerModuleOptions => {
-        const ttl = config.get<number>('THROTTLE_TTL', 60);
-        const limit = config.get<number>('THROTTLE_LIMIT', 100);
+        const ttl = config.get<number>('THROTTLE_TTL', 60); // 60 secondes
+        const limit = config.get<number>('THROTTLE_LIMIT', 20); // 20 requêtes (réduit de 100)
 
         return {
           throttlers: [
             {
               name: 'global',
-              ttl,
+              ttl: ttl * 1000, // Convertir en millisecondes
               limit,
             },
           ],

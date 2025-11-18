@@ -40,23 +40,38 @@ async function bootstrap() {
   // Security middleware
   app.use(helmet());
 
-  // CORS
+  // CORS - Configuration stricte pour la sécurité
+  // ⚠️ PRODUCTION: Remplacer par les domaines réels (ex: https://workon.app)
+  // ⚠️ NE JAMAIS utiliser origin: '*' en production avec credentials: true
   const corsOrigin = configService.get<string>(
     'CORS_ORIGIN',
     'http://localhost:3000',
   );
+  
+  // En production, on refuse explicitement le wildcard
+  if (nodeEnv === 'production' && corsOrigin === '*') {
+    throw new Error(
+      '❌ SECURITY ERROR: CORS_ORIGIN cannot be "*" in production when credentials are enabled. ' +
+      'Set CORS_ORIGIN to your frontend domain (e.g., https://workon.app)',
+    );
+  }
+
   const origins =
     corsOrigin === '*'
-      ? true
+      ? true // Autorisé uniquement en dev
       : corsOrigin
           .split(',')
           .map((origin) => origin.trim())
           .filter(Boolean);
+
   app.enableCors({
     origin: origins,
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    // Empêche les headers non autorisés
+    exposedHeaders: ['X-Request-ID'],
+    maxAge: 3600, // Cache preflight 1h
   });
 
   // Servir les fichiers statiques (uploads)

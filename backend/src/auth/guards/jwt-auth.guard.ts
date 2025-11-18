@@ -20,39 +20,44 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization manquante');
     }
 
-    // Debug log temporaire - token présent
-    const tokenPreview = token.substring(0, 20) + '...';
-    console.log(`[JwtAuthGuard] Token received: ${tokenPreview}`);
+    // ⚠️ SÉCURITÉ: Ne jamais logger les tokens complets en production
+    // Les tokens sont des secrets qui peuvent être utilisés pour usurper l'identité
 
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
 
+    // Tentative 1: JWT local (si configuré)
     if (jwtSecret) {
       try {
         const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
+        
+        // ⚠️ SÉCURITÉ CRITIQUE: Le rôle et l'ID viennent UNIQUEMENT du JWT vérifié
+        // Ne jamais accepter de valeurs fournies par le frontend (body/query/headers)
         request.user = {
           sub: payload.sub,
           email: payload.email,
-          role: payload.role,
+          role: payload.role, // Extrait du JWT signé uniquement
           provider: 'local',
         };
-        console.log(`[JwtAuthGuard] Local JWT verified: user.sub=${payload.sub}, role=${payload.role}`);
+        
         return true;
       } catch (error) {
-        // On essaie ensuite via Clerk
+        // Échec JWT local → On essaie via Clerk
       }
     }
 
+    // Tentative 2: Clerk JWT (production principale)
     const clerkUser = await this.clerkAuthService.verifyAndSyncUser(token);
+    
+    // ⚠️ SÉCURITÉ CRITIQUE: Le rôle vient de Clerk (source de vérité)
+    // primaryRole est extrait de la DB après vérification du token Clerk
     request.user = {
-      sub: clerkUser.sub,
-      email: clerkUser.email,
-      role: clerkUser.role,
+      sub: clerkUser.sub,           // ID interne (DB)
+      email: clerkUser.email,       // Email vérifié par Clerk
+      role: clerkUser.role,         // Rôle effectif (primaryRole ?? role)
       provider: 'clerk',
-      clerkId: clerkUser.clerkId,
-      claims: clerkUser.claims,
+      clerkId: clerkUser.clerkId,   // ID Clerk (externe)
+      claims: clerkUser.claims,     // Claims JWT Clerk originaux
     };
-
-    console.log(`[JwtAuthGuard] Clerk verified: user.sub=${clerkUser.sub}, role=${clerkUser.role}`);
 
     return true;
   }
