@@ -83,11 +83,15 @@ export class ClerkAuthService {
         });
       }
 
+      // Utiliser primaryRole si défini, sinon fallback sur role
+      // Cela permet de respecter le choix de l'utilisateur lors de l'onboarding
+      const effectiveRole = user.primaryRole ?? user.role;
+
       return {
         sub: user.id,
         clerkId,
         email: user.email,
-        role: user.role,
+        role: effectiveRole,
         claims: payload,
       };
     } catch (error) {

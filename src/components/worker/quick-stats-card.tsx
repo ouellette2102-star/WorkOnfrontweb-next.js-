@@ -13,14 +13,19 @@ export function QuickStatsCard() {
     totalEarnings: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadStats = async () => {
       if (!isLoaded) return;
 
       try {
+        setError(null);
         const token = await getToken();
-        if (!token) return;
+        if (!token) {
+          setError("Token d'authentification introuvable");
+          return;
+        }
 
         const missions = await getWorkerMissions(token);
         
@@ -40,6 +45,8 @@ export function QuickStatsCard() {
         setStats({ active, completed, totalEarnings });
       } catch (error) {
         console.error("Erreur lors du chargement des stats:", error);
+        const errorMessage = error instanceof Error ? error.message : "Impossible de charger les statistiques";
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -57,6 +64,26 @@ export function QuickStatsCard() {
             className="h-32 animate-pulse rounded-3xl border border-white/10 bg-neutral-900/70"
           />
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mb-8 rounded-3xl border border-red-500/30 bg-red-900/10 p-6 backdrop-blur">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">⚠️</span>
+          <div>
+            <h4 className="text-lg font-semibold text-red-400">Erreur de chargement</h4>
+            <p className="text-sm text-red-300/80">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500"
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

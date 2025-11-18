@@ -12,20 +12,27 @@ export function AvailableMissionsCard() {
   const { getToken, isLoaded } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [reservingId, setReservingId] = useState<string | null>(null);
 
   const loadMissions = async () => {
     if (!isLoaded) return;
 
     try {
+      setError(null);
       const token = await getToken();
-      if (!token) return;
+      if (!token) {
+        setError("Token d'authentification introuvable");
+        return;
+      }
 
       const available = await getAvailableMissions(token);
       // Limiter à 3 pour la version compacte
       setMissions(available.slice(0, 3));
     } catch (error) {
       console.error("Erreur lors du chargement des missions disponibles:", error);
+      const errorMessage = error instanceof Error ? error.message : "Impossible de charger les missions";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -71,6 +78,23 @@ export function AvailableMissionsCard() {
             />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-3xl border border-red-500/30 bg-red-900/10 p-6 backdrop-blur">
+        <h2 className="mb-4 text-2xl font-bold text-red-400">
+          Erreur de chargement
+        </h2>
+        <p className="mb-4 text-sm text-red-300/80">{error}</p>
+        <button
+          onClick={loadMissions}
+          className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500"
+        >
+          Réessayer
+        </button>
       </div>
     );
   }
