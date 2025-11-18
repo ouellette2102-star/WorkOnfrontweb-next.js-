@@ -12,6 +12,10 @@ import { IsString, IsNotEmpty, IsOptional, IsIn, validateSync } from 'class-vali
 import { plainToInstance } from 'class-transformer';
 
 export class EnvironmentVariables {
+  // ========================================
+  // VARIABLES REQUISES (TOUS ENVIRONNEMENTS)
+  // ========================================
+  
   @IsString()
   @IsNotEmpty()
   DATABASE_URL: string;
@@ -20,6 +24,15 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   CLERK_SECRET_KEY: string;
 
+  @IsString()
+  @IsIn(['development', 'production', 'test'])
+  @IsNotEmpty()
+  NODE_ENV: string;
+
+  // ========================================
+  // VARIABLES OPTIONNELLES (DEV/PROD)
+  // ========================================
+  
   @IsString()
   @IsOptional()
   CLERK_ISSUER?: string;
@@ -30,20 +43,39 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
-  STRIPE_SECRET_KEY?: string;
-
-  @IsString()
-  @IsIn(['development', 'production', 'test'])
-  @IsNotEmpty()
-  NODE_ENV: string;
-
-  @IsString()
-  @IsOptional()
   PORT?: string;
 
   @IsString()
   @IsOptional()
+  CORS_ORIGIN?: string;
+
+  @IsString()
+  @IsOptional()
+  FRONTEND_URL?: string;
+
+  // ========================================
+  // VARIABLES PRODUCTION-ONLY (optionnelles en dev)
+  // ========================================
+  
+  @IsString()
+  @IsOptional()
+  STRIPE_SECRET_KEY?: string;
+
+  @IsString()
+  @IsOptional()
+  STRIPE_WEBHOOK_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
   SENTRY_DSN?: string;
+
+  @IsString()
+  @IsOptional()
+  THROTTLE_LIMIT?: string;
+
+  @IsString()
+  @IsOptional()
+  THROTTLE_TTL?: string;
 }
 
 /**
@@ -74,23 +106,50 @@ export function validate(config: Record<string, unknown>): EnvironmentVariables 
     );
   }
 
-  // Avertissements pour les variables optionnelles mais recommandées
-  if (!validatedConfig.STRIPE_SECRET_KEY) {
-    console.warn(
-      '⚠️  WARNING: STRIPE_SECRET_KEY is not set. Payment features will not work.',
-    );
-  }
+  const isProduction = validatedConfig.NODE_ENV === 'production';
 
-  if (!validatedConfig.JWT_SECRET) {
-    console.warn(
-      '⚠️  WARNING: JWT_SECRET is not set. Local JWT auth will not work (Clerk only).',
-    );
-  }
+  // ========================================
+  // AVERTISSEMENTS PRODUCTION-ONLY
+  // ========================================
+  
+  if (isProduction) {
+    // Variables critiques en production
+    if (!validatedConfig.STRIPE_SECRET_KEY) {
+      console.error(
+        '❌ ERROR: STRIPE_SECRET_KEY is required in production. Payments will fail.',
+      );
+    }
 
-  if (!validatedConfig.SENTRY_DSN && validatedConfig.NODE_ENV === 'production') {
-    console.warn(
-      '⚠️  WARNING: SENTRY_DSN is not set. Error tracking disabled in production.',
-    );
+    if (!validatedConfig.STRIPE_WEBHOOK_SECRET) {
+      console.warn(
+        '⚠️  WARNING: STRIPE_WEBHOOK_SECRET is not set. Webhook validation will fail.',
+      );
+    }
+
+    if (!validatedConfig.SENTRY_DSN) {
+      console.warn(
+        '⚠️  WARNING: SENTRY_DSN is not set. Error tracking disabled in production.',
+      );
+    }
+
+    if (!validatedConfig.FRONTEND_URL && !validatedConfig.CORS_ORIGIN) {
+      console.error(
+        '❌ ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production for CORS configuration.',
+      );
+    }
+  } else {
+    // Avertissements légers en développement
+    if (!validatedConfig.STRIPE_SECRET_KEY) {
+      console.log(
+        '💡 INFO: STRIPE_SECRET_KEY not set in development. Payment features will be limited.',
+      );
+    }
+
+    if (!validatedConfig.JWT_SECRET) {
+      console.log(
+        '💡 INFO: JWT_SECRET not set. Using Clerk authentication only.',
+      );
+    }
   }
 
   return validatedConfig;

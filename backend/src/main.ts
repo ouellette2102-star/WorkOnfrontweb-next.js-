@@ -41,37 +41,69 @@ async function bootstrap() {
   app.use(helmet());
 
   // CORS - Configuration stricte pour la sécurité
-  // ⚠️ PRODUCTION: Remplacer par les domaines réels (ex: https://workon.app)
+  // ⚠️ PRODUCTION: Définir FRONTEND_URL ou CORS_ORIGIN dans .env
   // ⚠️ NE JAMAIS utiliser origin: '*' en production avec credentials: true
-  const corsOrigin = configService.get<string>(
-    'CORS_ORIGIN',
-    'http://localhost:3000',
-  );
   
-  // En production, on refuse explicitement le wildcard
-  if (nodeEnv === 'production' && corsOrigin === '*') {
-    throw new Error(
-      '❌ SECURITY ERROR: CORS_ORIGIN cannot be "*" in production when credentials are enabled. ' +
-      'Set CORS_ORIGIN to your frontend domain (e.g., https://workon.app)',
-    );
+  const isProd = nodeEnv === 'production';
+  
+  let allowedOrigins: string[] | boolean;
+
+  if (isProd) {
+    // PRODUCTION: Utiliser FRONTEND_URL ou CORS_ORIGIN (strict)
+    const frontendUrl = configService.get<string>('FRONTEND_URL');
+    const corsOrigin = configService.get<string>('CORS_ORIGIN');
+
+    if (corsOrigin === '*') {
+      throw new Error(
+        '❌ SECURITY ERROR: CORS_ORIGIN cannot be "*" in production when credentials are enabled. ' +
+        'Set CORS_ORIGIN or FRONTEND_URL to your frontend domain (e.g., https://workon.app)',
+      );
+    }
+
+    if (frontendUrl) {
+      allowedOrigins = [frontendUrl];
+    } else if (corsOrigin) {
+      allowedOrigins = corsOrigin
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+    } else {
+      throw new Error(
+        '❌ CONFIGURATION ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production. ' +
+        'Add to .env: FRONTEND_URL=https://workon.app',
+      );
+    }
+
+    console.log(`🔒 CORS enabled for production origins: ${allowedOrigins.join(', ')}`);
+  } else {
+    // DEVELOPMENT: Autoriser localhost sur plusieurs ports
+    const corsOrigin = configService.get<string>('CORS_ORIGIN');
+    
+    if (corsOrigin && corsOrigin !== '*') {
+      // Utiliser CORS_ORIGIN si défini en dev (pour tester)
+      allowedOrigins = corsOrigin
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+    } else {
+      // Default dev: autoriser localhost
+      allowedOrigins = [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:3001', // Backend (si besoin de s'appeler lui-même)
+      ];
+    }
+
+    console.log(`🔓 CORS enabled for development origins: ${Array.isArray(allowedOrigins) ? allowedOrigins.join(', ') : 'all'}`);
   }
 
-  const origins =
-    corsOrigin === '*'
-      ? true // Autorisé uniquement en dev
-      : corsOrigin
-          .split(',')
-          .map((origin) => origin.trim())
-          .filter(Boolean);
-
   app.enableCors({
-    origin: origins,
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    // Empêche les headers non autorisés
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     exposedHeaders: ['X-Request-ID'],
-    maxAge: 3600, // Cache preflight 1h
+    maxAge: isProd ? 3600 : 300, // Cache preflight: 1h en prod, 5min en dev
   });
 
   // Servir les fichiers statiques (uploads)
