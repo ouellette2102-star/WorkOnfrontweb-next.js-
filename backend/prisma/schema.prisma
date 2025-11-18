@@ -16,6 +16,12 @@ enum UserRole {
   ADMIN
 }
 
+enum LocalUserRole {
+  worker
+  employer
+  residential_client
+}
+
 enum MissionStatus {
   CREATED
   RESERVED
@@ -286,4 +292,29 @@ model MissionPhoto {
 
   @@index([missionId])
   @@map("mission_photos")
+}
+
+// ========================================
+// LOCAL AUTH - Email/Password Authentication
+// ========================================
+// Separate from Clerk authentication
+// Used for local development and testing
+
+model LocalUser {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  hashedPassword String // bcrypt hashed password
+  firstName      String
+  lastName       String
+  phone          String?
+  city           String?
+  role           LocalUserRole @default(worker)
+  active         Boolean       @default(true) // Soft delete flag
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([email])
+  @@index([role])
+  @@index([active])
+  @@map("local_users")
 }

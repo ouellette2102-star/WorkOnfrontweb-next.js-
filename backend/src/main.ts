@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -147,6 +148,26 @@ async function bootstrap() {
   // Error handler Sentry (si activé)
   if (sentryDsn) {
     app.use(Sentry.Handlers.errorHandler());
+  }
+
+  // Swagger API Documentation (development only)
+  if (nodeEnv !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('WorkOn API')
+      .setDescription('WorkOn - Uber-for-work marketplace API documentation')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addTag('auth', 'Authentication endpoints (register, login)')
+      .addTag('users', 'User management')
+      .addTag('health', 'Health check endpoint')
+      .addTag('missions', 'Mission management')
+      .addTag('payments', 'Payment processing')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+
+    console.log(`📚 Swagger docs available at: http://localhost:${port}/api/docs`);
   }
 
   await app.listen(port);

@@ -10,10 +10,16 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ClerkAuthService } from './clerk-auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+// Local Auth (email/password)
+import { LocalAuthController } from './local-auth.controller';
+import { LocalAuthService } from './local-auth.service';
+import { JwtLocalStrategy } from './strategies/jwt-local.strategy';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     PrismaModule,
+    UsersModule, // Import UsersModule for LocalAuthService
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -21,14 +27,24 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: config.get<string>('JWT_EXPIRES_IN', '15m'),
+          expiresIn: config.get<string>('JWT_EXPIRES_IN', '7d'),
         },
       }),
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtRefreshStrategy, LocalStrategy, ClerkAuthService, JwtAuthGuard],
-  exports: [AuthService, ClerkAuthService, JwtAuthGuard, JwtModule],
+  controllers: [AuthController, LocalAuthController],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtRefreshStrategy,
+    LocalStrategy,
+    ClerkAuthService,
+    JwtAuthGuard,
+    // Local Auth
+    LocalAuthService,
+    JwtLocalStrategy,
+  ],
+  exports: [AuthService, ClerkAuthService, JwtAuthGuard, JwtModule, LocalAuthService],
 })
 export class AuthModule {}
 

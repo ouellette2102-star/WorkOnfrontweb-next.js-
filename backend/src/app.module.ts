@@ -19,6 +19,8 @@ import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.mod
 import { MissionPhotosModule } from './mission-photos/mission-photos.module';
 import { StripeModule } from './stripe/stripe.module';
 import { validate } from './config/env.validation';
+import { UsersModule } from './users/users.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -107,6 +109,9 @@ import { validate } from './config/env.validation';
     MissionTimeLogsModule,
     MissionPhotosModule,
     StripeModule,
+    // Nouveaux modules
+    UsersModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [
