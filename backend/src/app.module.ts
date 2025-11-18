@@ -21,6 +21,9 @@ import { StripeModule } from './stripe/stripe.module';
 import { validate } from './config/env.validation';
 import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
+import { MissionsLocalModule } from './missions-local/missions-local.module';
+import { MetricsModule } from './metrics/metrics.module';
+import { PaymentsLocalModule } from './payments-local/payments-local.module';
 
 @Module({
   imports: [
@@ -112,6 +115,10 @@ import { HealthModule } from './health/health.module';
     // Nouveaux modules
     UsersModule,
     HealthModule,
+    // MVP Marketplace modules
+    MissionsLocalModule,
+    MetricsModule,
+    PaymentsLocalModule,
   ],
   controllers: [AppController],
   providers: [

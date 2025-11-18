@@ -313,8 +313,54 @@ model LocalUser {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
+  // Relations
+  createdMissions  LocalMission[] @relation("MissionCreator")
+  assignedMissions LocalMission[] @relation("MissionWorker")
+
   @@index([email])
   @@index([role])
   @@index([active])
+  @@index([city])
   @@map("local_users")
+}
+
+// ========================================
+// LOCAL MISSIONS - Marketplace Domain
+// ========================================
+
+enum LocalMissionStatus {
+  open
+  assigned
+  in_progress
+  completed
+  cancelled
+}
+
+model LocalMission {
+  id               String             @id @default(cuid())
+  title            String
+  description      String
+  category         String // cleaning, snow_removal, moving, etc.
+  status           LocalMissionStatus @default(open)
+  price            Float // Price in CAD
+  latitude         Float // Geolocation
+  longitude        Float // Geolocation
+  city             String // Region/city
+  address          String? // Optional full address
+  createdByUserId  String // Employer or residential client
+  assignedToUserId String? // Worker (nullable until accepted)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  // Relations
+  creator LocalUser  @relation("MissionCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  worker  LocalUser? @relation("MissionWorker", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([city])
+  @@index([createdByUserId])
+  @@index([assignedToUserId])
+  @@index([category])
+  @@index([latitude, longitude]) // For geospatial queries
+  @@map("local_missions")
 }
