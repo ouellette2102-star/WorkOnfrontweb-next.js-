@@ -56,8 +56,11 @@ PORT=3001
 # Frontend URL for CORS (optional in dev - auto-allows localhost)
 CORS_ORIGIN=http://localhost:3000
 
-# JWT Secret (optional - Clerk is primary auth)
+# JWT Secret for local auth (auto-generated in dev)
 JWT_SECRET=dev-jwt-secret-change-in-production
+JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
 
 # Clerk issuer (optional - auto-detected)
 # CLERK_ISSUER=https://your-app.clerk.accounts.dev

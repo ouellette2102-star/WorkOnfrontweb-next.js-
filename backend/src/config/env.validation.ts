@@ -43,6 +43,18 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
+  JWT_REFRESH_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
+  JWT_EXPIRES_IN?: string;
+
+  @IsString()
+  @IsOptional()
+  JWT_REFRESH_EXPIRES_IN?: string;
+
+  @IsString()
+  @IsOptional()
   PORT?: string;
 
   @IsString()
@@ -114,6 +126,20 @@ export function validate(config: Record<string, unknown>): EnvironmentVariables 
   
   if (isProduction) {
     // Variables critiques en production
+    if (!validatedConfig.JWT_SECRET) {
+      console.error(
+        '❌ ERROR: JWT_SECRET is required in production. Authentication will fail.',
+      );
+      throw new Error('JWT_SECRET is required in production');
+    }
+
+    if (!validatedConfig.JWT_REFRESH_SECRET) {
+      console.error(
+        '❌ ERROR: JWT_REFRESH_SECRET is required in production. Token refresh will fail.',
+      );
+      throw new Error('JWT_REFRESH_SECRET is required in production');
+    }
+
     if (!validatedConfig.STRIPE_SECRET_KEY) {
       console.error(
         '❌ ERROR: STRIPE_SECRET_KEY is required in production. Payments will fail.',
@@ -138,16 +164,24 @@ export function validate(config: Record<string, unknown>): EnvironmentVariables 
       );
     }
   } else {
-    // Avertissements légers en développement
-    if (!validatedConfig.STRIPE_SECRET_KEY) {
+    // Avertissements légers en développement + set defaults for JWT
+    if (!validatedConfig.JWT_SECRET) {
+      validatedConfig.JWT_SECRET = 'dev-jwt-secret-change-in-production';
       console.log(
-        '💡 INFO: STRIPE_SECRET_KEY not set in development. Payment features will be limited.',
+        '💡 INFO: JWT_SECRET not set. Using default dev value.',
       );
     }
 
-    if (!validatedConfig.JWT_SECRET) {
+    if (!validatedConfig.JWT_REFRESH_SECRET) {
+      validatedConfig.JWT_REFRESH_SECRET = 'dev-refresh-secret-change-in-production';
       console.log(
-        '💡 INFO: JWT_SECRET not set. Using Clerk authentication only.',
+        '💡 INFO: JWT_REFRESH_SECRET not set. Using default dev value.',
+      );
+    }
+
+    if (!validatedConfig.STRIPE_SECRET_KEY) {
+      console.log(
+        '💡 INFO: STRIPE_SECRET_KEY not set in development. Payment features will be limited.',
       );
     }
   }
