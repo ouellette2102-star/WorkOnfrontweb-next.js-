@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MissionsLocalController } from './missions-local.controller';
 import { MissionsLocalService } from './missions-local.service';
 import { MissionsLocalRepository } from './missions-local.repository';
@@ -8,7 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [
     PrismaModule,
-    forwardRef(() => AuthModule), // Required for JwtAuthGuard
+    AuthModule, // Import AuthModule for JwtAuthGuard and JwtService
   ],
   controllers: [MissionsLocalController],
   providers: [MissionsLocalService, MissionsLocalRepository],

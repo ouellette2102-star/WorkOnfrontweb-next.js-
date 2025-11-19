@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -19,7 +19,7 @@ import { UsersModule } from '../users/users.module';
 @Module({
   imports: [
     PrismaModule,
-    forwardRef(() => UsersModule), // Forward ref to avoid circular dependency
+    UsersModule, // Import UsersModule to get UsersService for LocalAuthService
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -44,7 +44,14 @@ import { UsersModule } from '../users/users.module';
     LocalAuthService,
     JwtLocalStrategy,
   ],
-  exports: [AuthService, ClerkAuthService, JwtAuthGuard, JwtModule, LocalAuthService],
+  exports: [
+    AuthService,
+    ClerkAuthService,
+    JwtAuthGuard,
+    JwtModule, // Export JwtModule so other modules can use JwtService
+    PassportModule, // Export PassportModule for strategies
+    LocalAuthService,
+  ],
 })
 export class AuthModule {}
 

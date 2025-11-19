@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { PaymentsLocalController } from './payments-local.controller';
 import { PaymentsLocalService } from './payments-local.service';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -7,7 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [
     PrismaModule,
-    forwardRef(() => AuthModule), // Required for JwtAuthGuard
+    AuthModule, // Import AuthModule for JwtAuthGuard and JwtService
   ],
   controllers: [PaymentsLocalController],
   providers: [PaymentsLocalService],
