@@ -99,22 +99,27 @@ AppModule
 
 ### 2. Dependency Flow
 
-**No Circular Dependencies:**
+**Circular Dependency Resolved with forwardRef:**
 
 ```
 AuthModule
-  ↓ imports
+  ↓ forwardRef(() => UsersModule)  ← Deferred import
 UsersModule
   ↓ exports UsersService
+  ↓ forwardRef(() => AuthModule)  ← Deferred import
 AuthModule (uses UsersService in LocalAuthService)
+        ↓ exports JwtAuthGuard
+UsersModule (uses JwtAuthGuard in controllers)
+
+✅ Circular dependency broken by forwardRef
 ```
 
-**Other modules:**
+**Other modules (no forwardRef needed):**
 
 ```
 MissionsLocalModule → imports → AuthModule → gets JwtAuthGuard & JwtService
 PaymentsLocalModule → imports → AuthModule → gets JwtAuthGuard & JwtService
-UsersModule → imports → AuthModule → gets JwtAuthGuard & JwtService
+MetricsModule → imports → PrismaModule only (no auth)
 ```
 
 ### 3. JwtAuthGuard Usage
@@ -132,22 +137,51 @@ UsersModule → imports → AuthModule → gets JwtAuthGuard & JwtService
 
 ### 4. Import Order in AppModule
 
-**Critical order:**
+**Critical order (UPDATED):**
 1. ConfigModule (global, first)
 2. PrismaModule (used by many modules)
-3. **AuthModule** (provides JwtService & guards)
-4. **UsersModule** (depends on AuthModule, exports UsersService)
-5. MissionsLocalModule, PaymentsLocalModule, etc. (depend on AuthModule)
+3. **UsersModule** (provides UsersService, defers AuthModule import with forwardRef)
+4. **AuthModule** (uses UsersService, provides JwtService & guards, defers UsersModule with forwardRef)
+5. Old modules (MissionsModule, PaymentsModule, etc.)
+6. MissionsLocalModule, PaymentsLocalModule, etc. (depend on AuthModule)
+
+**Why UsersModule comes first:**
+- AuthModule needs UsersService for LocalAuthService
+- UsersModule is initialized first, making UsersService available
+- forwardRef allows both modules to reference each other during initialization
 
 ---
 
 ## 🚫 What NOT to Do
 
-❌ **DO NOT** create circular imports:
+✅ **UPDATE:** forwardRef IS REQUIRED for AuthModule ↔ UsersModule
+
+**The circular dependency is REAL:**
 ```typescript
-// BAD - Circular dependency
-AuthModule → forwardRef(() => UsersModule)
-UsersModule → forwardRef(() => AuthModule)
+// CORRECT - Use forwardRef for circular dependencies
+// AuthModule
+@Module({
+  imports: [
+    forwardRef(() => UsersModule), // ✅ Required
+  ],
+})
+
+// UsersModule
+@Module({
+  imports: [
+    forwardRef(() => AuthModule), // ✅ Required
+  ],
+})
+```
+
+❌ **DO NOT** use forwardRef unnecessarily:
+```typescript
+// BAD - No circular dependency here
+@Module({
+  imports: [
+    forwardRef(() => PrismaModule), // ❌ Not needed
+  ],
+})
 ```
 
 ❌ **DO NOT** import JwtModule directly in other modules:
