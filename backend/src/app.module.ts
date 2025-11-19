@@ -101,7 +101,11 @@ import { PaymentsLocalModule } from './payments-local/payments-local.module';
     // Modules métier
     PrismaModule,
     LoggerModule,
+    // Nouveaux modules - Users first (needed by AuthModule)
+    UsersModule,
+    // Auth module (depends on UsersModule)
     AuthModule,
+    // Old modules
     MissionsModule,
     PaymentsModule,
     ContractsModule,
@@ -112,10 +116,9 @@ import { PaymentsLocalModule } from './payments-local/payments-local.module';
     MissionTimeLogsModule,
     MissionPhotosModule,
     StripeModule,
-    // Nouveaux modules
-    UsersModule,
+    // Health check
     HealthModule,
-    // MVP Marketplace modules
+    // MVP Marketplace modules (depend on AuthModule)
     MissionsLocalModule,
     MetricsModule,
     PaymentsLocalModule,
