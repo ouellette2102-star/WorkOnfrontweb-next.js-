@@ -36,8 +36,9 @@ const envContent = `# ========================================
 # ========================================
 
 # Database connection (PostgreSQL)
-# Update with your local PostgreSQL credentials
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/workon_dev
+# For Docker: postgresql://postgres:workon@localhost:5432/workon
+# For local PostgreSQL: postgresql://postgres:YOUR_PASSWORD@localhost:5432/workon_dev
+DATABASE_URL=postgresql://postgres:workon@localhost:5432/workon
 
 # Clerk authentication
 # Loaded from .clerk/.tmp/keyless.json

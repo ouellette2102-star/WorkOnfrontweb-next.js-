@@ -1,6 +1,3 @@
-// Backend WorkOn - Schema Prisma
-// Production-ready avec contraintes et indexes optimisés
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,357 +7,410 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  EMPLOYER
-  WORKER
-  ADMIN
+model User {
+  id                                        String                 @id @default(cuid())
+  clerkId                                   String                 @unique
+  createdAt                                 DateTime               @default(now())
+  updatedAt                                 DateTime               @updatedAt
+  audit_events                              audit_events[]
+  client_orgs                               client_orgs[]
+  compliance_documents                      compliance_documents[]
+  disputes                                  disputes[]
+  missions_missions_assigneeWorkerIdTousers Mission[]              @relation("missions_assigneeWorkerIdTousers")
+  missions_missions_authorClientIdTousers   Mission[]              @relation("missions_authorClientIdTousers")
+  notifications                             Notification[]
+  post_likes                                post_likes[]
+  reviews_reviews_authorIdTousers           reviews[]              @relation("reviews_authorIdTousers")
+  reviews_reviews_targetUserIdTousers       reviews[]              @relation("reviews_targetUserIdTousers")
+  subscriptions                             subscriptions[]
+  user_profiles                             user_profiles?
+  worker_profiles                           worker_profiles?
+
+  @@map("users")
 }
 
-enum LocalUserRole {
-  worker
-  employer
-  residential_client
+model Mission {
+  id                                     String           @id @default(cuid())
+  authorClientId                         String
+  assigneeWorkerId                       String?
+  clientOrgId                            String?
+  title                                  String
+  description                            String
+  categoryId                             String
+  requiredSkills                         String[]         @default([])
+  locationLat                            Float
+  locationLng                            Float
+  locationAddress                        String?
+  priceType                              String
+  budgetMin                              Float
+  budgetMax                              Float
+  status                                 MissionStatus    @default(DRAFT)
+  startAt                                DateTime?
+  endAt                                  DateTime?
+  createdAt                              DateTime         @default(now())
+  updatedAt                              DateTime         @updatedAt
+  deletedAt                              DateTime?
+  workerProfileId                        String?
+  disputes                               disputes?
+  matches                                matches[]
+  users_missions_assigneeWorkerIdTousers User?            @relation("missions_assigneeWorkerIdTousers", fields: [assigneeWorkerId], references: [id])
+  users_missions_authorClientIdTousers   User             @relation("missions_authorClientIdTousers", fields: [authorClientId], references: [id], onDelete: Cascade)
+  categories                             categories       @relation(fields: [categoryId], references: [id])
+  client_orgs                            client_orgs?     @relation(fields: [clientOrgId], references: [id])
+  worker_profiles                        worker_profiles? @relation(fields: [workerProfileId], references: [id])
+  offers                                 offers[]
+  payments                               Payment[]
+  reviews                                reviews[]
+
+  @@index([status])
+  @@index([assigneeWorkerId])
+  @@index([authorClientId])
+  @@index([categoryId])
+  @@index([deletedAt])
+  @@index([locationLat, locationLng])
+  @@index([workerProfileId])
+  @@map("missions")
+}
+
+model Payment {
+  id                     String        @id @default(cuid())
+  missionId              String
+  stripePaymentIntentId  String?       @unique
+  stripeConnectAccountId String?
+  amount                 Float
+  currency               String        @default("CAD")
+  platformFeePct         Float         @default(10)
+  status                 PaymentStatus @default(REQUIRES_ACTION)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+  mission                Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String
+  payloadJSON Json
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+  users       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([readAt])
+  @@index([userId])
+  @@map("notifications")
+}
+
+model audit_events {
+  id         String   @id
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  users      User?    @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([resource, resourceId])
+  @@index([userId])
+}
+
+model categories {
+  id                 String    @id
+  name               String    @unique
+  nameEn             String?
+  icon               String?
+  legalNotes         String?
+  residentialAllowed Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  missions           Mission[]
+  skills             skills[]
+}
+
+model client_orgs {
+  id                 String             @id
+  ownerId            String
+  type               ClientOrgType
+  name               String
+  logoUrl            String?
+  billingAddress     Json?
+  taxNumbers         Json?
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime
+  users              User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  missions           Mission[]
+
+  @@index([ownerId])
+}
+
+model compliance_documents {
+  id         String                 @id
+  userId     String
+  type       ComplianceDocumentType
+  version    String
+  acceptedAt DateTime
+  createdAt  DateTime               @default(now())
+  users      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([type])
+  @@index([userId])
+}
+
+model disputes {
+  id         String        @id
+  missionId  String        @unique
+  openedById String
+  reason     String
+  status     DisputeStatus @default(OPEN)
+  resolution String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime
+  missions   Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  users      User          @relation(fields: [openedById], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model matches {
+  id              String          @id
+  missionId       String
+  workerId        String
+  score           Float
+  featuresJSON    Json?
+  createdAt       DateTime        @default(now())
+  missions        Mission         @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  worker_profiles worker_profiles @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@index([score])
+  @@index([workerId])
+}
+
+model offers {
+  id              String          @id
+  missionId       String
+  workerId        String
+  message         String?
+  proposedRate    Float
+  eta             String?
+  status          OfferStatus     @default(PENDING)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime
+  missions        Mission         @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  worker_profiles worker_profiles @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@index([status])
+  @@index([workerId])
+}
+
+model post_likes {
+  id        String   @id
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  posts     posts    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  users     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+model posts {
+  id              String          @id
+  workerProfileId String
+  title           String?
+  description     String
+  mediaUrl        String
+  likeCount       Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime
+  post_likes      post_likes[]
+  worker_profiles worker_profiles @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([workerProfileId])
+}
+
+model reviews {
+  id                                String           @id
+  authorId                          String
+  targetUserId                      String
+  missionId                         String?
+  rating                            Int
+  comment                           String?
+  moderation                        ReviewModeration @default(OK)
+  createdAt                         DateTime         @default(now())
+  updatedAt                         DateTime
+  users_reviews_authorIdTousers     User             @relation("reviews_authorIdTousers", fields: [authorId], references: [id], onDelete: Cascade)
+  missions                          Mission?         @relation(fields: [missionId], references: [id])
+  users_reviews_targetUserIdTousers User             @relation("reviews_targetUserIdTousers", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@index([moderation])
+  @@index([targetUserId])
+}
+
+model schedule_slots {
+  id              String          @id
+  workerId        String
+  startAt         DateTime
+  endAt           DateTime
+  available       Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  worker_profiles worker_profiles @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([workerId, startAt, endAt])
+}
+
+model skills {
+  id             String          @id
+  name           String
+  nameEn         String?
+  categoryId     String
+  requiresPermit Boolean         @default(false)
+  proofType      String?
+  createdAt      DateTime        @default(now())
+  categories     categories      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  worker_skills  worker_skills[]
+
+  @@unique([name, categoryId])
+}
+
+model subscriptions {
+  id                   String             @id
+  userId               String
+  plan                 SubscriptionPlan   @default(FREE)
+  stripeSubscriptionId String?            @unique
+  startedAt            DateTime           @default(now())
+  renewsAt             DateTime?
+  status               SubscriptionStatus @default(ACTIVE)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime
+  users                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([userId])
+}
+
+model user_profiles {
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique
+  role      UserRole
+  name      String
+  phone     String
+  city      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  users     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model worker_profiles {
+  id                 String           @id
+  userId             String           @unique
+  hourlyRate         Float
+  serviceAreas       Json?
+  residentialEnabled Boolean          @default(false)
+  portfolio          Json[]           @default([])
+  availability       Json?
+  completedMissions  Int              @default(0)
+  totalEarnings      Float            @default(0)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime
+  matches            matches[]
+  missions           Mission[]
+  offers             offers[]
+  posts              posts[]
+  schedule_slots     schedule_slots[]
+  users              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  worker_skills      worker_skills[]
+}
+
+model worker_skills {
+  id              String          @id
+  workerId        String
+  skillId         String
+  verified        Boolean         @default(false)
+  proofUrl        String?
+  createdAt       DateTime        @default(now())
+  skills          skills          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  worker_profiles worker_profiles @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@unique([workerId, skillId])
+}
+
+enum UserRole {
+  WORKER
+  EMPLOYER
+  RESIDENTIAL
 }
 
 enum MissionStatus {
-  CREATED
-  RESERVED
+  DRAFT
+  OPEN
+  MATCHED
   IN_PROGRESS
   COMPLETED
   CANCELLED
 }
 
 enum PaymentStatus {
-  PENDING
+  REQUIRES_ACTION
   SUCCEEDED
-  FAILED
+  REFUNDED
+  DISPUTED
 }
 
-enum MessageSenderRole {
-  WORKER
-  EMPLOYER
+enum ClientOrgType {
+  BUSINESS
+  RESIDENTIAL
 }
 
-enum NotificationType {
-  NEW_MESSAGE
-  MISSION_STATUS_CHANGED
-  MISSION_TIME_EVENT
+enum ComplianceDocumentType {
+  TERMS
+  PRIVACY
+  CONTRACT
+  POLICY_LAW25
 }
 
-enum MissionTimeLogType {
-  CHECK_IN
-  CHECK_OUT
+enum DisputeStatus {
+  OPEN
+  IN_MEDIATION
+  RESOLVED
+  CLOSED
 }
 
-model User {
-  id              String    @id @default(cuid())
-  email           String    @unique
-  clerkId         String?   @unique
-  name            String
-  role            UserRole  @default(WORKER)
-  primaryRole     UserRole? // Rôle principal choisi par l'utilisateur (onboarding)
-  fullName        String? // Nom complet pour l'onboarding
-  phone           String? // Téléphone
-  city            String? // Ville
-  profile         Json? // Profil flexible (avatar, bio, etc.)
-  active          Boolean   @default(true)
-  // Stripe Connect (pour Workers)
-  stripeAccountId String? // ID du compte Stripe Connect (acct_xxx)
-  stripeOnboarded Boolean   @default(false) // True si onboarding Stripe complet
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  // Relations
-  employer Employer?
-  worker   Worker?
-
-  @@index([email])
-  @@index([clerkId])
-  @@index([role])
-  @@index([primaryRole])
-  @@index([active])
-  @@index([stripeAccountId])
-  @@map("users")
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }
 
-model Employer {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  companyName String
-  billingInfo Json? // Informations de facturation (adresse, TVQ/TPS, etc.)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  missions Mission[]
-
-  @@index([userId])
-  @@map("employers")
+enum ReviewModeration {
+  OK
+  FLAGGED
 }
 
-model Worker {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  skills    Json // Array de compétences [{name, level, verified}]
-  rating    Float    @default(0.0)
-  badges    String[] @default([]) // Badges obtenus
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  missions Mission[]
-
-  @@index([userId])
-  @@index([rating])
-  @@map("workers")
+enum SubscriptionPlan {
+  FREE
+  PRO
+  PREMIUM
 }
 
-model Mission {
-  id            String        @id @default(cuid())
-  title         String
-  description   String?
-  category      String?
-  city          String?
-  address       String?
-  hourlyRate    Float?
-  startsAt      DateTime?
-  endsAt        DateTime?
-  employerId    String
-  workerId      String? // Nullable jusqu'à acceptation
-  status        MissionStatus @default(CREATED)
-  location      Json // {lat: number, lng: number}
-  reservedUntil DateTime? // Timestamp de réservation (pour atomicité)
-  priceCents    Int // Prix en centimes
-  currency      String        @default("CAD")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  // Relations
-  employer      Employer         @relation(fields: [employerId], references: [id], onDelete: Restrict)
-  worker        Worker?          @relation(fields: [workerId], references: [id], onDelete: SetNull)
-  payments      Payment[]
-  contracts     Contract[]
-  messages      Message[]
-  notifications Notification[]
-  timeLogs      MissionTimeLog[]
-  photos        MissionPhoto[]
-
-  @@index([employerId])
-  @@index([workerId])
-  @@index([status])
-  @@index([reservedUntil])
-  // Index composite pour recherche géographique (si supporté par PostgreSQL)
-  @@index([status, createdAt])
-  @@map("missions")
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
 }
 
-model Message {
-  id         String            @id @default(cuid())
-  missionId  String
-  senderId   String // Clerk user ID
-  senderRole MessageSenderRole
-  content    String // Contenu du message (non vide)
-  createdAt  DateTime          @default(now())
-
-  // Relations
-  mission       Mission        @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  notifications Notification[]
-
-  @@index([missionId, createdAt])
-  @@map("messages")
-}
-
-model Payment {
-  id                    String        @id @default(cuid())
-  missionId             String
-  stripePaymentIntentId String?       @unique
-  amountCents           Int // Montant total en centimes
-  feeCents              Int // Frais WorkOn en centimes (12%)
-  currency              String        @default("CAD")
-  status                PaymentStatus @default(PENDING)
-  stripeAccountId       String? // Compte Stripe Connect du worker destinataire
-  metadata              Json? // Métadonnées additionnelles
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
-
-  mission Mission @relation(fields: [missionId], references: [id], onDelete: Restrict)
-
-  @@index([missionId])
-  @@index([status])
-  @@index([stripePaymentIntentId])
-  @@index([stripeAccountId])
-  @@map("payments")
-}
-
-model Contract {
-  id               String   @id @default(cuid())
-  missionId        String
-  signedByWorker   Boolean  @default(false)
-  signedByEmployer Boolean  @default(false)
-  contractUrl      String? // URL du contrat stocké (S3, etc.)
-  signatureNonce   String   @unique // Nonce pour éviter les signatures dupliquées
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
-
-  @@index([missionId])
-  @@index([signatureNonce])
-  @@map("contracts")
-}
-
-// Table pour idempotence des webhooks Stripe
-model WebhookEvent {
-  id            String    @id @default(cuid())
-  stripeEventId String    @unique
-  eventType     String
-  processed     Boolean   @default(false)
-  processedAt   DateTime?
-  errorMessage  String?
-  retryCount    Int       @default(0)
-  createdAt     DateTime  @default(now())
-
-  @@index([stripeEventId])
-  @@index([processed])
-  @@index([eventType])
-  @@map("webhook_events")
-}
-
-// Table pour jobs de réconciliation (admin)
-model ReconciliationJob {
-  id          String    @id @default(cuid())
-  status      String // PENDING, PROCESSING, COMPLETED, FAILED
-  startedAt   DateTime  @default(now())
-  completedAt DateTime?
-  result      Json? // Résultats de la réconciliation
-  error       String?
-  createdBy   String? // User ID de l'admin qui a lancé le job
-
-  @@index([status])
-  @@index([startedAt])
-  @@map("reconciliation_jobs")
-}
-
-// Table de notifications pour les utilisateurs
-model Notification {
-  id           String           @id @default(cuid())
-  userId       String // Clerk user ID du destinataire
-  type         NotificationType
-  missionId    String
-  messageId    String? // Optionnel, pour les notifications NEW_MESSAGE
-  statusBefore String? // Statut avant (pour MISSION_STATUS_CHANGED)
-  statusAfter  String? // Statut après (pour MISSION_STATUS_CHANGED)
-  isRead       Boolean          @default(false)
-  createdAt    DateTime         @default(now())
-  readAt       DateTime?
-
-  // Relations
-  mission Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  message Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-  @@index([userId, isRead])
-  @@map("notifications")
-}
-
-// Table de suivi du temps de travail sur les missions
-model MissionTimeLog {
-  id        String             @id @default(cuid())
-  missionId String
-  userId    String // Clerk user ID du worker
-  type      MissionTimeLogType
-  note      String? // Commentaire optionnel
-  createdAt DateTime           @default(now())
-
-  // Relations
-  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
-
-  @@index([missionId, createdAt])
-  @@map("mission_time_logs")
-}
-
-// Table des photos attachées aux missions
-model MissionPhoto {
-  id        String   @id @default(uuid())
-  missionId String
-  userId    String // Clerk user ID de celui qui upload (worker ou employer)
-  url       String // URL complète pour accéder à la photo
-  createdAt DateTime @default(now())
-
-  // Relations
-  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
-
-  @@index([missionId])
-  @@map("mission_photos")
-}
-
-// ========================================
-// LOCAL AUTH - Email/Password Authentication
-// ========================================
-// Separate from Clerk authentication
-// Used for local development and testing
-
-model LocalUser {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  hashedPassword String // bcrypt hashed password
-  firstName      String
-  lastName       String
-  phone          String?
-  city           String?
-  role           LocalUserRole @default(worker)
-  active         Boolean       @default(true) // Soft delete flag
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-  // Relations
-  createdMissions  LocalMission[] @relation("MissionCreator")
-  assignedMissions LocalMission[] @relation("MissionWorker")
-
-  @@index([email])
-  @@index([role])
-  @@index([active])
-  @@index([city])
-  @@map("local_users")
-}
-
-// ========================================
-// LOCAL MISSIONS - Marketplace Domain
-// ========================================
-
-enum LocalMissionStatus {
-  open
-  assigned
-  in_progress
-  completed
-  cancelled
-}
-
-model LocalMission {
-  id               String             @id @default(cuid())
-  title            String
-  description      String
-  category         String // cleaning, snow_removal, moving, etc.
-  status           LocalMissionStatus @default(open)
-  price            Float // Price in CAD
-  latitude         Float // Geolocation
-  longitude        Float // Geolocation
-  city             String // Region/city
-  address          String? // Optional full address
-  createdByUserId  String // Employer or residential client
-  assignedToUserId String? // Worker (nullable until accepted)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-
-  // Relations
-  creator LocalUser  @relation("MissionCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
-  worker  LocalUser? @relation("MissionWorker", fields: [assignedToUserId], references: [id], onDelete: SetNull)
-
-  @@index([status])
-  @@index([city])
-  @@index([createdByUserId])
-  @@index([assignedToUserId])
-  @@index([category])
-  @@index([latitude, longitude]) // For geospatial queries
-  @@map("local_missions")
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }
