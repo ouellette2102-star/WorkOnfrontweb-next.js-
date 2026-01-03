@@ -19,17 +19,16 @@ type MissionSelect = {
   id: true;
   title: true;
   description: true;
-  category: true;
-  city: true;
-  address: true;
-  hourlyRate: true;
-  startsAt: true;
-  endsAt: true;
+  categoryId: true;
+  locationAddress: true;
+  budgetMin: true;
+  budgetMax: true;
+  startAt: true;
+  endAt: true;
   status: true;
-  employerId: true;
-  workerId: true;
-  priceCents: true;
-  currency: true;
+  authorClientId: true;
+  assigneeWorkerId: true;
+  priceType: true;
   createdAt: true;
   updatedAt: true;
 };
@@ -40,17 +39,16 @@ const missionSelect: MissionSelect = {
   id: true,
   title: true,
   description: true,
-  category: true,
-  city: true,
-  address: true,
-  hourlyRate: true,
-  startsAt: true,
-  endsAt: true,
+  categoryId: true,
+  locationAddress: true,
+  budgetMin: true,
+  budgetMax: true,
+  startAt: true,
+  endAt: true,
   status: true,
-  employerId: true,
-  workerId: true,
-  priceCents: true,
-  currency: true,
+  authorClientId: true,
+  assigneeWorkerId: true,
+  priceType: true,
   createdAt: true,
   updatedAt: true,
 };
@@ -58,20 +56,19 @@ const missionSelect: MissionSelect = {
 export interface MissionResponse {
   id: string;
   title: string;
-  description: string | null;
-  category: string | null;
-  city: string | null;
-  address: string | null;
-  hourlyRate: number | null;
-  startsAt: string | null;
-  endsAt: string | null;
+  description: string;
+  categoryId: string;
+  locationAddress: string | null;
+  budgetMin: number;
+  budgetMax: number;
+  startAt: Date | null;
+  endAt: Date | null;
   status: MissionStatus;
-  employerId: string;
-  workerId: string | null;
-  priceCents: number;
-  currency: string;
-  createdAt: string;
-  updatedAt: string;
+  authorClientId: string;
+  assigneeWorkerId: string | null;
+  priceType: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 @Injectable()
@@ -108,7 +105,7 @@ export class MissionsService {
         hourlyRate: dto.hourlyRate ?? null,
         startsAt: dto.startsAt ? new Date(dto.startsAt) : null,
         endsAt: dto.endsAt ? new Date(dto.endsAt) : null,
-        status: MissionStatus.CREATED,
+        status: MissionStatus.OPEN,
         location: this.buildLocation(dto),
         priceCents: this.computePriceCents(dto),
       },
@@ -198,7 +195,7 @@ export class MissionsService {
 
     const missions = await this.prisma.mission.findMany({
       where: {
-        status: MissionStatus.CREATED,
+        status: MissionStatus.OPEN,
         city: filters.city ? { equals: filters.city, mode: 'insensitive' } : undefined,
         category: filters.category
           ? { equals: filters.category, mode: 'insensitive' }
@@ -332,7 +329,7 @@ export class MissionsService {
     }
 
     // Vérifier que la mission est disponible
-    if (mission.status !== MissionStatus.CREATED) {
+    if (mission.status !== MissionStatus.OPEN) {
       throw new BadRequestException(
         'Cette mission ne peut plus être réservée (statut actuel: ' +
           mission.status +
@@ -344,7 +341,7 @@ export class MissionsService {
     const updated = await this.prisma.mission.update({
       where: {
         id: missionId,
-        status: MissionStatus.CREATED, // Double check atomique
+        status: MissionStatus.OPEN, // Double check atomique
       },
       data: {
         status: MissionStatus.RESERVED,
@@ -358,7 +355,7 @@ export class MissionsService {
     if (mission.employer?.user?.clerkId) {
       await this.notificationsService.createForMissionStatusChange(
         missionId,
-        MissionStatus.CREATED,
+        MissionStatus.OPEN,
         MissionStatus.RESERVED,
         mission.employer.user.clerkId,
       );
@@ -428,7 +425,7 @@ export class MissionsService {
     }
 
     const where: Prisma.MissionWhereInput = {
-      status: MissionStatus.CREATED,
+      status: MissionStatus.OPEN,
     };
 
     if (filters.category) {
@@ -557,7 +554,7 @@ export class MissionsService {
     newStatus: MissionStatus,
   ): void {
     const validTransitions: Record<MissionStatus, MissionStatus[]> = {
-      [MissionStatus.CREATED]: [MissionStatus.CANCELLED],
+      [MissionStatus.OPEN]: [MissionStatus.CANCELLED],
       [MissionStatus.RESERVED]: [
         MissionStatus.IN_PROGRESS,
         MissionStatus.CANCELLED,

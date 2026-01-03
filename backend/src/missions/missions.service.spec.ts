@@ -55,7 +55,7 @@ describe('MissionsService', () => {
         hourlyRate: null,
         startsAt: null,
         endsAt: null,
-        status: MissionStatus.CREATED,
+        status: MissionStatus.OPEN,
         createdAt: new Date(),
         employerId,
       });
@@ -89,7 +89,7 @@ describe('MissionsService', () => {
           hourlyRate: null,
           startsAt: null,
           endsAt: null,
-          status: MissionStatus.CREATED,
+          status: MissionStatus.OPEN,
           createdAt: new Date(),
           employerId: 'emp-1',
         },
@@ -123,7 +123,7 @@ describe('MissionsService', () => {
         hourlyRate: null,
         startsAt: null,
         endsAt: null,
-        status: MissionStatus.CREATED,
+        status: MissionStatus.OPEN,
         createdAt: new Date(),
         employerId: 'emp-1',
       };
@@ -152,7 +152,7 @@ describe('MissionsService', () => {
         hourlyRate: null,
         startsAt: null,
         endsAt: null,
-        status: MissionStatus.CREATED,
+        status: MissionStatus.OPEN,
         createdAt: new Date(),
         employerId: 'other',
       });

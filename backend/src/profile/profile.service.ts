@@ -7,15 +7,16 @@ import { UpdateProfileDto } from './dto/update-profile-role.dto';
 const userSelect = {
   id: true,
   clerkId: true,
-  email: true,
-  role: true,
-  primaryRole: true,
-  fullName: true,
-  phone: true,
-  city: true,
-  profile: true,
-  worker: { select: { id: true } },
-  employer: { select: { id: true } },
+  createdAt: true,
+  updatedAt: true,
+  userProfile: {
+    select: {
+      name: true,
+      phone: true,
+      city: true,
+      role: true,
+    },
+  },
 } as const satisfies Prisma.UserSelect;
 
 type UserWithRelations = Prisma.UserGetPayload<{
@@ -70,25 +71,54 @@ export class ProfileService {
         ? this.mapProfileRoleToUserRole(dto.primaryRole)
         : null;
 
-      const updateData: Prisma.UserUpdateInput = {};
+      // Update User's updatedAt timestamp
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { updatedAt: new Date() },
+      });
+
+      // Update UserProfile fields
+      const profileUpdateData: Prisma.UserProfileUpdateInput = {};
 
       if (mappedRole) {
-        updateData.role = mappedRole;
-        updateData.primaryRole = mappedRole;
+        profileUpdateData.role = mappedRole;
       }
       if (dto.fullName !== undefined) {
-        updateData.fullName = dto.fullName;
+        profileUpdateData.name = dto.fullName;
       }
       if (dto.phone !== undefined) {
-        updateData.phone = dto.phone;
+        profileUpdateData.phone = dto.phone;
       }
       if (dto.city !== undefined) {
-        updateData.city = dto.city;
+        profileUpdateData.city = dto.city;
       }
 
-      const updated = await this.prisma.user.update({
+      // Update UserProfile
+      const userProfile = await this.prisma.userProfile.findFirst({
+        where: { userId },
+      });
+
+      if (userProfile) {
+        await this.prisma.userProfile.update({
+          where: { id: userProfile.id },
+          data: { ...profileUpdateData, updatedAt: new Date() },
+        });
+      } else if (Object.keys(profileUpdateData).length > 0) {
+        // Create UserProfile if it doesn't exist
+        await this.prisma.userProfile.create({
+          data: {
+            userId,
+            name: dto.fullName || '',
+            phone: dto.phone || '',
+            city: dto.city || '',
+            role: mappedRole || UserRole.WORKER,
+            updatedAt: new Date(),
+          },
+        });
+      }
+
+      const updated = await this.prisma.user.findUnique({
         where: { id: userId },
-        data: updateData,
         select: userSelect,
       });
 
@@ -102,34 +132,26 @@ export class ProfileService {
     }
   }
 
-  private mapToProfileDto(user: UserWithRelations): ProfileResponseDto {
-    const isWorker =
-      user.role === UserRole.WORKER || Boolean(user.worker);
-    const isEmployer =
-      user.role === UserRole.EMPLOYER ||
-      user.role === UserRole.ADMIN ||
-      Boolean(user.employer);
-    
-    // Utiliser primaryRole depuis la DB, ou dériver depuis role si absent
-    let derivedPrimaryRole: ProfileRole;
-    if (user.primaryRole) {
-      derivedPrimaryRole = this.mapUserRoleToProfileRole(user.primaryRole) ?? ProfileRole.WORKER;
-    } else if (user.role) {
-      derivedPrimaryRole = this.mapUserRoleToProfileRole(user.role) ?? ProfileRole.WORKER;
-    } else if (isWorker) {
-      derivedPrimaryRole = ProfileRole.WORKER;
-    } else if (isEmployer) {
-      derivedPrimaryRole = ProfileRole.EMPLOYER;
-    } else {
-      derivedPrimaryRole = ProfileRole.CLIENT_RESIDENTIAL;
+  private mapToProfileDto(user: UserWithRelations | null): ProfileResponseDto {
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+
+    const profile = user.userProfile;
+    const userRole = profile?.role ?? UserRole.WORKER;
+
+    const isWorker = userRole === UserRole.WORKER;
+    const isEmployer = userRole === UserRole.EMPLOYER || userRole === UserRole.ADMIN;
+    
+    // Utiliser role depuis UserProfile
+    const derivedPrimaryRole = this.mapUserRoleToProfileRole(userRole) ?? ProfileRole.WORKER;
 
     const dto = new ProfileResponseDto();
     dto.id = user.id;
-    dto.email = user.email;
-    dto.fullName = user.fullName ?? '';
-    dto.phone = user.phone ?? '';
-    dto.city = user.city ?? '';
+    dto.email = `${user.clerkId}@clerk.local`; // User n'a pas d'email direct, utiliser clerkId
+    dto.fullName = profile?.name ?? '';
+    dto.phone = profile?.phone ?? '';
+    dto.city = profile?.city ?? '';
     dto.primaryRole = derivedPrimaryRole;
     dto.isWorker = isWorker;
     dto.isEmployer = isEmployer;

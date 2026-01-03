@@ -22,6 +22,18 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "src/contracts/**",
+    "src/messages/**",
+    "src/mission-photos/**",
+    "src/mission-time-logs/**",
+    "src/missions/**",
+    "src/notifications/**",
+    "src/payments/**",
+    "src/stripe/**"
+  ]
 }
 

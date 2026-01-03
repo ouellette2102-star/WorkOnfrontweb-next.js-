@@ -17,9 +17,8 @@ export class ContractsService {
     const mission = await this.prisma.mission.findUnique({
       where: { id: missionId },
       include: {
-        employer: true,
-        worker: true,
-        contracts: true,
+        authorClient: true,
+        assigneeWorker: true,
       },
     });
 
@@ -28,7 +27,7 @@ export class ContractsService {
     }
 
     // Vérifier que la mission a un worker assigné
-    if (!mission.worker) {
+    if (!mission.assigneeWorker) {
       throw new BadRequestException('La mission doit avoir un worker assigné pour créer un contrat');
     }
 

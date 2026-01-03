@@ -272,7 +272,7 @@ export class StripeService {
         amountCents,
         feeCents,
         currency: 'CAD',
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.REQUIRES_ACTION,
         stripeAccountId: workerStripeAccountId,
       },
     });
@@ -444,7 +444,7 @@ export class StripeService {
 
     await this.prisma.payment.update({
       where: { id: payment.id },
-      data: { status: PaymentStatus.FAILED },
+      data: { status: PaymentStatus.DISPUTED },
     });
 
     this.logger.error(

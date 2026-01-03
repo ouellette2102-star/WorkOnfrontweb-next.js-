@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/",
   "/api/webhooks(.*)",
+  "/debug(.*)", // Debug routes (health check, etc.)
 ]);
 
 // Routes d'onboarding (auth requise mais pas de rôle)

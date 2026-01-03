@@ -19,8 +19,10 @@ export class MissionsLocalRepository {
   async create(createMissionDto: CreateMissionDto, createdByUserId: string) {
     this.logger.log(`Creating mission: ${createMissionDto.title}`);
 
+    const id = `lm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     return this.prisma.localMission.create({
       data: {
+        id,
         title: createMissionDto.title,
         description: createMissionDto.description,
         category: createMissionDto.category,
@@ -31,6 +33,7 @@ export class MissionsLocalRepository {
         address: createMissionDto.address,
         createdByUserId,
         status: 'open',
+        updatedAt: new Date(),
       },
     });
   }

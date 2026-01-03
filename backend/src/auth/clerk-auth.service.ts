@@ -54,49 +54,68 @@ export class ClerkAuthService {
 
       let user = await this.prisma.user.findFirst({
         where: { clerkId },
+        include: {
+          userProfile: true,
+        },
       });
-
-      if (!user && email) {
-        user = await this.prisma.user.findUnique({
-          where: { email },
-        });
-      }
 
       const fallbackName =
         `${payload.first_name ?? ''} ${payload.last_name ?? ''}`.trim() || 'Utilisateur Clerk';
 
       if (!user) {
+        // Create new user with Clerk ID + profile
+        const userId = `user_${clerkId}`;
         user = await this.prisma.user.create({
           data: {
-            email: email ?? `${clerkId}@clerk.local`,
+            id: userId,
             clerkId,
-            name: fallbackName,
-            role: UserRole.WORKER,
-            profile: {},
-            active: true,
+            updatedAt: new Date(),
+            userProfile: {
+              create: {
+                name: fallbackName,
+                phone: '',
+                city: '',
+                role: UserRole.WORKER, // Default role
+                updatedAt: new Date(),
+              },
+            },
+          },
+          include: {
+            userProfile: true,
           },
         });
       } else if (!user.clerkId) {
+        // Update existing user with Clerk ID
         user = await this.prisma.user.update({
           where: { id: user.id },
-          data: { clerkId },
+          data: { 
+            clerkId,
+            updatedAt: new Date(),
+          },
+          include: {
+            userProfile: true,
+          },
         });
       }
 
-      // Utiliser primaryRole si défini, sinon fallback sur role
-      // Cela permet de respecter le choix de l'utilisateur lors de l'onboarding
-      const effectiveRole = user.primaryRole ?? user.role;
+      // Guard clause: user should never be null at this point
+      if (!user) {
+        throw new UnauthorizedException('Failed to create or retrieve user');
+      }
+
+      // Get role from userProfile
+      const role = user.userProfile?.role ?? UserRole.WORKER;
 
       // Debug log temporaire
       this.logger.debug(
-        `User verified: id=${user.id}, clerkId=${clerkId}, role=${user.role}, primaryRole=${user.primaryRole}, effectiveRole=${effectiveRole}`,
+        `User verified: id=${user.id}, clerkId=${clerkId}, role=${role}`,
       );
 
       return {
         sub: user.id,
         clerkId,
-        email: user.email,
-        role: effectiveRole,
+        email: email ?? `${clerkId}@clerk.local`,
+        role,
         claims: payload,
       };
     } catch (error) {

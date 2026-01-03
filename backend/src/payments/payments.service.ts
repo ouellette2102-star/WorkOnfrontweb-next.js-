@@ -78,7 +78,7 @@ export class PaymentsService {
     const existingPayment = await this.prisma.payment.findFirst({
       where: {
         missionId,
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.REQUIRES_ACTION,
         stripePaymentIntentId: {
           not: null,
         },
@@ -126,7 +126,7 @@ export class PaymentsService {
         amountCents: mission.priceCents,
         feeCents,
         currency: mission.currency,
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.REQUIRES_ACTION,
       },
     });
 
@@ -188,7 +188,7 @@ export class PaymentsService {
     const payment = await this.prisma.payment.updateMany({
       where: {
         stripePaymentIntentId: paymentIntent.id,
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.REQUIRES_ACTION,
       },
       data: {
         status: PaymentStatus.SUCCEEDED,
@@ -213,10 +213,10 @@ export class PaymentsService {
     await this.prisma.payment.updateMany({
       where: {
         stripePaymentIntentId: paymentIntent.id,
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.REQUIRES_ACTION,
       },
       data: {
-        status: PaymentStatus.FAILED,
+        status: PaymentStatus.DISPUTED,
       },
     });
 
@@ -240,7 +240,7 @@ export class PaymentsService {
 
     const pendingPayments = await this.prisma.payment.findMany({
       where: {
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.REQUIRES_ACTION,
         createdAt: {
           gte: startDate,
           lte: endDate,
@@ -282,7 +282,7 @@ export class PaymentsService {
         ) {
           await this.prisma.payment.update({
             where: { id: payment.id },
-            data: { status: PaymentStatus.FAILED },
+            data: { status: PaymentStatus.DISPUTED },
           });
           results.updated++;
         }

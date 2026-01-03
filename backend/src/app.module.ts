@@ -7,17 +7,17 @@ import * as winston from 'winston';
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
-import { MissionsModule } from './missions/missions.module';
-import { PaymentsModule } from './payments/payments.module';
-import { ContractsModule } from './contracts/contracts.module';
+// import { MissionsModule } from './missions/missions.module';
+// import { PaymentsModule } from './payments/payments.module';
+// import { ContractsModule } from './contracts/contracts.module';
 import { AdminModule } from './admin/admin.module';
 import { LoggerModule } from './logger/logger.module';
 import { ProfileModule } from './profile/profile.module';
-import { MessagesModule } from './messages';
-import { NotificationsModule } from './notifications/notifications.module';
-import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.module';
-import { MissionPhotosModule } from './mission-photos/mission-photos.module';
-import { StripeModule } from './stripe/stripe.module';
+// import { MessagesModule } from './messages';
+// import { NotificationsModule } from './notifications/notifications.module';
+// import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.module';
+// import { MissionPhotosModule } from './mission-photos/mission-photos.module';
+// import { StripeModule } from './stripe/stripe.module';
 import { validate } from './config/env.validation';
 import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
@@ -105,17 +105,18 @@ import { PaymentsLocalModule } from './payments-local/payments-local.module';
     UsersModule,
     // Auth module (depends on UsersModule)
     AuthModule,
-    // Old modules
-    MissionsModule,
-    PaymentsModule,
-    ContractsModule,
+    // Old modules (temporarily disabled for Prisma alignment)
+    // TODO: Re-enable after aligning with new Prisma schema
+    // MissionsModule,
+    // PaymentsModule,
+    // ContractsModule,
     AdminModule,
     ProfileModule,
-    MessagesModule,
-    NotificationsModule,
-    MissionTimeLogsModule,
-    MissionPhotosModule,
-    StripeModule,
+    // MessagesModule,
+    // NotificationsModule,
+    // MissionTimeLogsModule,
+    // MissionPhotosModule,
+    // StripeModule,
     // Health check
     HealthModule,
     // MVP Marketplace modules (depend on AuthModule)
