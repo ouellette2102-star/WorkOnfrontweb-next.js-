@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { CreateMissionForm } from "@/components/missions/create-mission-form";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Créer une mission - WorkOn",
   description: "Publie une nouvelle mission pour trouver des travailleurs qualifiés",

@@ -4,6 +4,8 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { ProfileRolesCard } from "@/components/profile/profile-roles-card";
 import { getCurrentProfile } from "@/lib/get-profile";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfilePage() {
   const clerkUser = await currentUser();
 

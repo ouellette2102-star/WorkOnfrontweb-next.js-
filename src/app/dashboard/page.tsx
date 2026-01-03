@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { getCurrentProfile } from "@/lib/get-profile";
 
+export const dynamic = "force-dynamic";
+
 /**
  * /dashboard - Point d'entrée principal
  * Redirige l'utilisateur vers son dashboard spécifique selon son rôle

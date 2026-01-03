@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/navigation/sidebar";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfileLayout({ children }: { children: React.ReactNode }) {
   const { userId } = await auth();
 
