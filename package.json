@@ -15,7 +15,9 @@
     "test:smoke:ui": "playwright test e2e/smoke.spec.ts --ui",
     "test:smoke:headed": "playwright test e2e/smoke.spec.ts --headed",
     "smoke": "SKIP_BACKEND_TESTS=true playwright test e2e/smoke.spec.ts --project=chromium",
-    "smoke:headed": "SKIP_BACKEND_TESTS=true playwright test e2e/smoke.spec.ts --project=chromium --headed"
+    "smoke:headed": "SKIP_BACKEND_TESTS=true playwright test e2e/smoke.spec.ts --project=chromium --headed",
+    "audit:critical": "npm audit --audit-level=critical",
+    "audit:prod": "npm audit --omit=dev"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.5",
