@@ -1,30 +1,41 @@
 "use client";
 
-import { useState, useTransition, KeyboardEvent } from "react";
+import { useState, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 
 type MessageInputProps = {
-  onSend: (content: string) => Promise<void>;
+  onSend: (content: string) => Promise<{ success: boolean; error?: string }>;
   disabled?: boolean;
 };
 
 export function MessageInput({ onSend, disabled }: MessageInputProps) {
   const [content, setContent] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = content.trim();
-    if (!trimmed || isPending || disabled) return;
+    if (!trimmed || isSending || disabled) return;
 
-    startTransition(async () => {
-      try {
-        await onSend(trimmed);
-        setContent(""); // Clear input on success
-      } catch (error) {
-        // Error is handled by parent component
-        console.error("Error sending message:", error);
+    setIsSending(true);
+    setError(null);
+
+    try {
+      const result = await onSend(trimmed);
+
+      if (result.success) {
+        setContent(""); // Clear input only on success
+        setError(null);
+      } else {
+        // Keep the text so user can retry
+        setError(result.error ?? "Erreur d'envoi");
       }
-    });
+    } catch (err) {
+      // Keep the text so user can retry
+      setError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -36,25 +47,54 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
 
   return (
     <div className="border-t border-white/10 bg-neutral-900/50 p-4">
+      {/* Error message */}
+      {error && (
+        <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+          ⚠️ {error}
+          <button
+            onClick={() => setError(null)}
+            className="ml-2 text-xs underline hover:no-underline"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <div className="flex gap-3">
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyPress={handleKeyPress}
-          disabled={isPending || disabled}
-          placeholder="Écris ton message... (Entrée pour envoyer, Shift+Entrée pour une nouvelle ligne)"
-          className="flex-1 resize-none rounded-2xl border border-white/10 bg-neutral-900 px-4 py-3 text-white placeholder:text-white/50 focus:border-red-500 focus:outline-none disabled:opacity-50"
+          disabled={isSending || disabled}
+          placeholder="Ecris ton message... (Entree pour envoyer)"
+          className={`flex-1 resize-none rounded-2xl border px-4 py-3 text-white placeholder:text-white/50 focus:outline-none disabled:opacity-50 ${
+            error
+              ? "border-red-500/30 bg-red-500/5 focus:border-red-500"
+              : "border-white/10 bg-neutral-900 focus:border-red-500"
+          }`}
           rows={2}
         />
         <Button
           onClick={handleSend}
-          disabled={!content.trim() || isPending || disabled}
+          disabled={!content.trim() || isSending || disabled}
           className="self-end rounded-2xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-500 disabled:opacity-50"
         >
-          {isPending ? "..." : "Envoyer"}
+          {isSending ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            </span>
+          ) : (
+            "Envoyer"
+          )}
         </Button>
       </div>
+
+      {/* Character count */}
+      {content.length > 0 && (
+        <p className="mt-2 text-xs text-white/40">
+          {content.length} caractère{content.length > 1 ? "s" : ""}
+        </p>
+      )}
     </div>
   );
 }
-
