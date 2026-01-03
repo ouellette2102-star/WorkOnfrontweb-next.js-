@@ -1,89 +1,93 @@
+/**
+ * API Route: GET /api/feed
+ * Proxy HTTP vers le backend NestJS - ZERO Prisma cote frontend
+ */
+
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { FeedPost } from "@/types/feed";
+import type { FeedPost } from "@/types/feed";
 
-const FALLBACK_AVATAR =
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&w=200&h=200&q=80";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
+  "http://localhost:3001/api/v1";
+
+interface BackendFeedResponse {
+  data: FeedPost[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
 
 export async function GET(request: Request) {
   try {
-    const { userId: clerkUserId } = await auth();
-    if (!clerkUserId) {
+    const { userId, getToken } = await auth();
+
+    if (!userId) {
       return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
     }
-    const url = new URL(request.url);
-    const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
-    const limit = Math.min(50, Math.max(1, Number(url.searchParams.get("limit")) || 10));
-    const skip = (page - 1) * limit;
 
-    const [posts, total, internalUser] = await Promise.all([
-      prisma.post.findMany({
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-        include: {
-          workerProfile: {
-            include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-      prisma.post.count(),
-      clerkUserId
-        ? prisma.user.findUnique({
-            where: { clerkId: clerkUserId },
-            select: { id: true },
-          })
-        : Promise.resolve(null),
-    ]);
-
-    let likedIds = new Set<string>();
-    if (internalUser && posts.length > 0) {
-      const likes = await prisma.postLike.findMany({
-        where: {
-          userId: internalUser.id,
-          postId: { in: posts.map((post) => post.id) },
-        },
-        select: { postId: true },
-      });
-      likedIds = new Set(likes.map((like) => like.postId));
+    const token = await getToken();
+    if (!token) {
+      return NextResponse.json({ error: "TOKEN_UNAVAILABLE" }, { status: 401 });
     }
 
-    const data: FeedPost[] = posts.map((post) => {
-      const profile = post.workerProfile.user.profile;
-      return {
-        id: post.id,
-        workerName: profile?.name ?? "Pro WorkOn",
-        role: profile?.role ?? "Expert WorkOn",
-        avatarUrl: FALLBACK_AVATAR,
-        mediaUrl: post.mediaUrl,
-        description: post.description,
-        likeCount: post.likeCount,
-        isLiked: likedIds.has(post.id),
-        location: null,
-        createdAt: post.createdAt.toISOString(),
-      };
-    });
+    const url = new URL(request.url);
+    const page = url.searchParams.get("page") ?? "1";
+    const limit = url.searchParams.get("limit") ?? "10";
 
-    return NextResponse.json({
-      data,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.max(1, Math.ceil(total / limit)),
-      },
-    });
+    const backendUrl = `${API_BASE_URL}/feed?page=${page}&limit=${limit}`;
+
+    let response: Response;
+    try {
+      response = await fetch(backendUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      });
+    } catch (networkError) {
+      // Backend not reachable
+      console.error("[FEED_PROXY] Backend unreachable:", networkError);
+      return NextResponse.json(
+        {
+          error: "BACKEND_UNAVAILABLE",
+          message: "Le backend NestJS n'est pas accessible.",
+        },
+        { status: 503 }
+      );
+    }
+
+    // Backend returned 404 = endpoint not implemented
+    if (response.status === 404) {
+      return NextResponse.json(
+        {
+          error: "NOT_IMPLEMENTED",
+          message:
+            "Le endpoint GET /feed n'est pas encore implemente dans le backend NestJS.",
+        },
+        { status: 501 }
+      );
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        error: "BACKEND_ERROR",
+      }));
+      return NextResponse.json(errorData, { status: response.status });
+    }
+
+    const data: BackendFeedResponse = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("[FEED_GET_ERROR]", error);
-    return NextResponse.json({ error: "Unable to load feed" }, { status: 500 });
+    console.error("[FEED_PROXY_ERROR]", error);
+    return NextResponse.json(
+      { error: "INTERNAL_ERROR", message: "Erreur interne du proxy" },
+      { status: 500 }
+    );
   }
 }
-
-

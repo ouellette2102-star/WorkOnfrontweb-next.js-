@@ -1,57 +1,65 @@
+/**
+ * Page de profil public d'un worker
+ * Utilise un appel HTTP vers le backend - ZERO Prisma cote frontend
+ */
+
 import { notFound } from "next/navigation";
-import { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
 import { ProfileHeader } from "@/components/profile-header";
 import { PortfolioPost } from "@/components/portfolio-post";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, MessageCircle, Heart } from "lucide-react";
+import type {
+  UserWithFullProfile,
+  PortfolioItem,
+  WorkerSkill,
+  Review,
+} from "@/types/profile";
 
 interface ProfilePageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-const userWithProfile = Prisma.validator<Prisma.UserDefaultArgs>()({
-  include: {
-    profile: true,
-    workerProfile: {
-      include: {
-        skills: {
-          include: {
-            skill: {
-              include: {
-                category: true,
-              },
-            },
-          },
-        },
-      },
-    },
-    reviewsReceived: {
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 10,
-      include: {
-        author: {
-          include: {
-            profile: true,
-          },
-        },
-      },
-    },
-  },
-});
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
+  "http://localhost:3001/api/v1";
 
-type UserWithProfile = Prisma.UserGetPayload<typeof userWithProfile>;
+async function getPublicProfile(
+  userId: string
+): Promise<UserWithFullProfile | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      console.error(
+        `[PROFILE_FETCH] Backend error: ${response.status}`,
+        await response.text().catch(() => "")
+      );
+      return null;
+    }
+
+    const data = await response.json();
+    return data.user ?? data;
+  } catch (error) {
+    console.error("[PROFILE_FETCH] Error:", error);
+    return null;
+  }
+}
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-  const { id } = params;
+  const { id } = await params;
 
-  const user = await prisma.user.findUnique({
-    where: { id },
-    ...userWithProfile,
-  });
+  const user = await getPublicProfile(id);
 
   if (!user || !user.workerProfile) {
     notFound();
@@ -59,11 +67,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   const workerProfile = user.workerProfile;
 
-  const portfolio = (workerProfile.portfolio as Array<{
-    url: string;
-    type: string;
-    caption?: string;
-  }>) || [];
+  const portfolio: PortfolioItem[] = workerProfile.portfolio ?? [];
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white">
@@ -74,11 +78,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           name: user.profile?.name ?? "Travailleur WorkOn",
           avatarUrl: null,
           rating: workerProfile.completedMissions / 10,
-          ratingCount: user.reviewsReceived.length,
+          ratingCount: user.reviewsReceived?.length ?? 0,
           level: 1,
           badges: [],
           completedMissions: workerProfile.completedMissions,
-          bio: user.profile?.city ? `Basé à ${user.profile.city}` : null,
+          bio: user.profile?.city ? `Base a ${user.profile.city}` : null,
         }}
       />
 
@@ -86,7 +90,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       <div className="pt-32 pb-20">
         {portfolio.length > 0 ? (
           <div className="space-y-4 px-4 max-w-2xl mx-auto">
-            {portfolio.map((item, index) => (
+            {portfolio.map((item: PortfolioItem, index: number) => (
               <PortfolioPost
                 key={index}
                 post={{
@@ -110,7 +114,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <CardContent className="p-6">
             <h2 className="text-xl font-semibold mb-4">Services & Tarifs</h2>
             <div className="space-y-3">
-              {workerProfile.skills.map((ws) => (
+              {workerProfile.skills.map((ws: WorkerSkill) => (
                 <div
                   key={ws.id}
                   className="flex items-center justify-between p-3 bg-neutral-800 rounded-lg"
@@ -123,10 +127,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-red-500">
-                      ${user.workerProfile!.hourlyRate.toFixed(2)}/h
+                      ${workerProfile.hourlyRate.toFixed(2)}/h
                     </p>
                     {ws.verified && (
-                      <span className="text-xs text-green-400">✓ Vérifié</span>
+                      <span className="text-xs text-green-400">Verifie</span>
                     )}
                   </div>
                 </div>
@@ -136,12 +140,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         </Card>
 
         {/* Reviews */}
-        {user.reviewsReceived.length > 0 && (
+        {user.reviewsReceived && user.reviewsReceived.length > 0 && (
           <Card className="max-w-2xl mx-auto m-4">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Avis</h2>
               <div className="space-y-4">
-                {user.reviewsReceived.map((review) => (
+                {user.reviewsReceived.map((review: Review) => (
                   <div key={review.id} className="border-b border-white/10 pb-4">
                     <div className="flex items-start gap-3">
                       <div className="flex-1">
@@ -194,4 +198,3 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     </div>
   );
 }
-
