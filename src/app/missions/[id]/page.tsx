@@ -1,35 +1,30 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getMissionById } from "@/lib/missions-api";
 import type { Mission } from "@/types/mission";
+import { MissionStatus } from "@/types/mission";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const statusLabels: Record<string, string> = {
-  CREATED: "Disponible",
-  RESERVED: "Réservée",
-  IN_PROGRESS: "En cours",
-  COMPLETED: "Terminée",
-  CANCELLED: "Annulée",
-};
-
-const statusColors: Record<string, string> = {
-  CREATED: "bg-green-500/10 text-green-400 border-green-500/20",
-  RESERVED: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  IN_PROGRESS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  COMPLETED: "bg-gray-500/10 text-gray-400 border-gray-500/20",
-  CANCELLED: "bg-red-500/10 text-red-400 border-red-500/20",
-};
+import {
+  getStatusLabel,
+  getStatusColor,
+  getStatusIcon,
+  isCompleted,
+  canAccessChat,
+  canBePaid,
+  canBeReviewed,
+} from "@/lib/mission-status";
 
 export default function MissionDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
 
   const [mission, setMission] = useState<Mission | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -184,11 +179,15 @@ export default function MissionDetailPage() {
     }
   );
 
-  // Determine which CTAs to show based on status
-  const showChat = ["RESERVED", "IN_PROGRESS", "COMPLETED"].includes(
-    mission.status
-  );
-  const showPay = mission.status === "COMPLETED";
+  // Determine which CTAs to show based on status (using centralized helpers)
+  const showChat = canAccessChat(mission.status);
+  const showPay = canBePaid(mission.status);
+  const missionCompleted = isCompleted(mission.status);
+  
+  // Show review button if: mission COMPLETED + current user is employer (not worker)
+  // Note: ReviewForm component will be added in PR-20
+  const isEmployer = mission.employerId === user?.id;
+  const showReviewCTA = canBeReviewed(mission.status) && isEmployer && mission.workerId;
 
   return (
     <div className="min-h-screen bg-neutral-900 py-12">
@@ -207,11 +206,33 @@ export default function MissionDetailPage() {
           <div className="mb-6 flex items-start justify-between gap-4">
             <h1 className="text-3xl font-bold text-white">{mission.title}</h1>
             <Badge
-              className={`${statusColors[mission.status] ?? "bg-gray-500/10 text-gray-400"} shrink-0 text-sm`}
+              className={`${getStatusColor(mission.status)} shrink-0 text-sm`}
             >
-              {statusLabels[mission.status] ?? mission.status}
+              {getStatusIcon(mission.status)} {getStatusLabel(mission.status)}
             </Badge>
           </div>
+
+          {/* Completed mission banner */}
+          {missionCompleted && (
+            <div className="mb-6 rounded-xl border border-purple-500/20 bg-purple-500/10 p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">✅</span>
+                <div>
+                  <p className="font-semibold text-purple-300">Mission terminée</p>
+                  {mission.completedAt && (
+                    <p className="text-sm text-white/60">
+                      Complétée le{" "}
+                      {new Date(mission.completedAt).toLocaleDateString("fr-CA", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Description */}
           {mission.description && (
@@ -292,9 +313,28 @@ export default function MissionDetailPage() {
               </Link>
             )}
 
-            {mission.status === "CREATED" && (
+            {/* Review CTA - placeholder for PR-20 */}
+            {showReviewCTA && (
+              <Button
+                variant="outline"
+                className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                disabled
+                title="Fonctionnalité bientôt disponible"
+              >
+                ⭐ Laisser un avis (bientôt)
+              </Button>
+            )}
+
+            {mission.status === MissionStatus.CREATED && (
               <Link href={`/missions/available`}>
                 <Button variant="outline">🔍 Voir les missions disponibles</Button>
+              </Link>
+            )}
+
+            {/* Worker profile link for completed missions */}
+            {missionCompleted && mission.workerId && (
+              <Link href={`/profile/${mission.workerId}`}>
+                <Button variant="outline">👤 Voir le profil du worker</Button>
               </Link>
             )}
           </div>
