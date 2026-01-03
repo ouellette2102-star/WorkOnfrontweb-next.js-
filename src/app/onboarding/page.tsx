@@ -4,6 +4,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import { OnboardingForm } from "@/components/onboarding/onboarding-form";
 import { getCurrentProfile } from "@/lib/get-profile";
 
+export const dynamic = "force-dynamic";
+
 export default async function OnboardingPage() {
   const clerkUser = await currentUser();
 

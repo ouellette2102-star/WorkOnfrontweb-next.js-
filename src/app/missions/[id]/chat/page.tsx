@@ -3,6 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { MissionChat } from "@/components/chat/mission-chat";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 type ChatPageProps = {
   params: {
     id: string;
