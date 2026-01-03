@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getMissionById } from "@/lib/missions-api";
@@ -9,6 +9,7 @@ import type { Mission } from "@/types/mission";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ReviewForm } from "@/components/reviews/review-form";
 
 const statusLabels: Record<string, string> = {
   CREATED: "Disponible",
@@ -30,11 +31,14 @@ export default function MissionDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
 
   const [mission, setMission] = useState<Mission | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const missionId = params.id as string;
 
@@ -189,6 +193,10 @@ export default function MissionDetailPage() {
     mission.status
   );
   const showPay = mission.status === "COMPLETED";
+  
+  // Show review button if: mission COMPLETED + current user is employer (not worker)
+  const isEmployer = mission.employerId === user?.id;
+  const canReview = mission.status === "COMPLETED" && isEmployer && mission.workerId && !reviewSubmitted;
 
   return (
     <div className="min-h-screen bg-neutral-900 py-12">
@@ -292,12 +300,52 @@ export default function MissionDetailPage() {
               </Link>
             )}
 
+            {canReview && !showReviewForm && (
+              <Button
+                onClick={() => setShowReviewForm(true)}
+                className="bg-yellow-600 hover:bg-yellow-500"
+              >
+                ⭐ Laisser un avis
+              </Button>
+            )}
+
             {mission.status === "CREATED" && (
               <Link href={`/missions/available`}>
                 <Button variant="outline">🔍 Voir les missions disponibles</Button>
               </Link>
             )}
           </div>
+
+          {/* Review Form */}
+          {showReviewForm && mission.workerId && (
+            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+              <h3 className="mb-4 text-lg font-bold text-white">Laisser un avis</h3>
+              <ReviewForm
+                missionId={mission.id}
+                workerId={mission.workerId}
+                onSuccess={() => {
+                  setShowReviewForm(false);
+                  setReviewSubmitted(true);
+                }}
+                onCancel={() => setShowReviewForm(false)}
+              />
+            </div>
+          )}
+
+          {/* Review submitted confirmation */}
+          {reviewSubmitted && (
+            <div className="mt-6 rounded-2xl border border-green-500/20 bg-green-500/10 p-4 text-center">
+              <p className="text-green-400">✅ Merci pour votre avis !</p>
+              {mission.workerId && (
+                <Link
+                  href={`/profile/${mission.workerId}`}
+                  className="mt-2 inline-block text-sm text-white/70 underline hover:text-white"
+                >
+                  Voir le profil du worker
+                </Link>
+              )}
+            </div>
+          )}
 
           {/* Footer info */}
           <div className="mt-8 border-t border-white/10 pt-4 text-sm text-white/50">
