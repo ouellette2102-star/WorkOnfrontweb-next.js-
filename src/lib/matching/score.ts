@@ -1,13 +1,42 @@
-import { Mission, WorkerProfile, User, UserProfile } from "@prisma/client";
+/**
+ * Score de matching pour les missions WorkOn
+ * Types locaux decouples de Prisma
+ */
+
+import type { UserProfile, WorkerProfile } from "@/types/profile";
+
+/**
+ * Types locaux pour le matching (alignes avec les reponses API backend)
+ */
+interface MissionForMatching {
+  id: string;
+  requiredSkills: string[];
+  priceType: "HOURLY" | "FIXED" | null;
+  budgetMin: number;
+  budgetMax: number;
+  category?: {
+    skills: Array<{ id: string }>;
+  } | null;
+}
+
+interface WorkerForMatching {
+  completedMissions: number;
+  hourlyRate: number;
+  availability: { instantToggle?: boolean } | null;
+  skills: Array<{ skillId: string }>;
+  user?: {
+    profile: UserProfile | null;
+  } | null;
+}
 
 interface MatchFeatures {
-  distance: number; // km
-  skillsOverlap: number; // 0-1
-  rating: number; // 0-5
-  sla: number; // 0-1 (response time, completion rate)
-  responseTime: number; // hours
-  priceFit: number; // 0-1
-  availability: number; // 0-1
+  distance: number;
+  skillsOverlap: number;
+  rating: number;
+  sla: number;
+  responseTime: number;
+  priceFit: number;
+  availability: number;
 }
 
 interface MatchWeights {
@@ -30,66 +59,30 @@ const DEFAULT_WEIGHTS: MatchWeights = {
   availability: 0.05,
 };
 
-/**
- * Calcule la distance en km entre deux points GPS (formule de Haversine)
- */
-function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
-  const R = 6371; // Rayon de la Terre en km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-/**
- * Normalise une valeur entre min et max vers 0-1 (inverse: plus grand = meilleur)
- */
 function normalizeInverse(value: number, min: number, max: number): number {
   if (max === min) return 1;
   const normalized = (value - min) / (max - min);
-  return Math.max(0, Math.min(1, 1 - normalized)); // Inverse: plus proche de max = plus proche de 0
+  return Math.max(0, Math.min(1, 1 - normalized));
 }
 
-/**
- * Normalise une valeur entre min et max vers 0-1 (direct: plus grand = meilleur)
- */
 function normalizeDirect(value: number, min: number, max: number): number {
   if (max === min) return 1;
   return Math.max(0, Math.min(1, (value - min) / (max - min)));
 }
 
-/**
- * Calcule les features de matching entre une mission et un worker
- */
 export function computeMatchFeatures(
-  mission: Mission & { category: { skills: Array<{ id: string }> } },
-  worker: WorkerProfile & {
-    user: User & { profile: UserProfile | null };
-    skills: Array<{ skillId: string }>;
-  },
+  mission: MissionForMatching,
+  worker: WorkerForMatching,
   options?: {
     maxDistance?: number;
     defaultResponseTime?: number;
   }
 ): MatchFeatures {
-  const maxDistance = options?.maxDistance ?? 50; // 50km par défaut
-  const defaultResponseTime = options?.defaultResponseTime ?? 24; // 24h par défaut
+  const maxDistance = options?.maxDistance ?? 50;
+  const defaultResponseTime = options?.defaultResponseTime ?? 24;
 
-  // Distance
   const distanceScore = normalizeInverse(maxDistance, 0, maxDistance);
 
-  // Skills overlap
   const requiredSkillIds = new Set(mission.requiredSkills);
   const workerSkillIds = new Set(worker.skills.map((s) => s.skillId));
   const commonSkills = Array.from(requiredSkillIds).filter((id) =>
@@ -98,24 +91,19 @@ export function computeMatchFeatures(
   const skillsOverlap =
     requiredSkillIds.size > 0
       ? commonSkills.length / requiredSkillIds.size
-      : 0.5; // Si pas de skills requis, score neutre
+      : 0.5;
 
-  // Rating (normalisé 0-5 -> 0-1)
   const derivedRating = Math.min(5, worker.completedMissions / 10);
   const rating = normalizeDirect(derivedRating, 0, 5);
 
-  // SLA (basé sur completedMissions et rating)
   const sla = Math.min(
     1,
-    normalizeDirect(worker.completedMissions, 0, 50) * 0.7 +
-      rating * 0.3
+    normalizeDirect(worker.completedMissions, 0, 50) * 0.7 + rating * 0.3
   );
 
-  // Response time (placeholder: basé sur historique, défaut 24h)
   const responseTime = defaultResponseTime;
-  const responseTimeScore = normalizeInverse(responseTime, 0, 48); // 0-48h
+  const responseTimeScore = normalizeInverse(responseTime, 0, 48);
 
-  // Price fit
   let priceFit = 0.5;
   if (mission.priceType === "HOURLY" && worker.hourlyRate) {
     const rate = worker.hourlyRate;
@@ -124,20 +112,14 @@ export function computeMatchFeatures(
     } else {
       const mid = (mission.budgetMin + mission.budgetMax) / 2;
       const diff = Math.abs(rate - mid);
-      const range = mission.budgetMax - mission.budgetMin;
+      const range = mission.budgetMax - mission.budgetMin || 1;
       priceFit = Math.max(0, 1 - diff / range);
     }
   } else if (mission.priceType === "FIXED") {
-    // Pour fixed, on compare avec le taux horaire estimé
-    priceFit = 0.7; // Placeholder
+    priceFit = 0.7;
   }
 
-  // Availability (placeholder: basé sur instantToggle et schedules)
-  const availability = worker.availability
-    ? (worker.availability as { instantToggle?: boolean }).instantToggle
-      ? 1
-      : 0.5
-    : 0.3;
+  const availability = worker.availability?.instantToggle ? 1 : 0.3;
 
   return {
     distance: distanceScore,
@@ -150,9 +132,6 @@ export function computeMatchFeatures(
   };
 }
 
-/**
- * Calcule le score de matching final (0-100)
- */
 export function computeMatchScore(
   features: MatchFeatures,
   weights: MatchWeights = DEFAULT_WEIGHTS
@@ -169,15 +148,9 @@ export function computeMatchScore(
   return Math.round(score * 100);
 }
 
-/**
- * Calcule le score de matching complet pour une mission et un worker
- */
 export async function matchMissionToWorker(
-  mission: Mission & { category: { skills: Array<{ id: string }> } },
-  worker: WorkerProfile & {
-    user: User & { profile: UserProfile | null };
-    skills: Array<{ skillId: string }>;
-  },
+  mission: MissionForMatching,
+  worker: WorkerForMatching,
   weights?: MatchWeights
 ): Promise<{ score: number; features: MatchFeatures }> {
   const features = computeMatchFeatures(mission, worker);
@@ -185,3 +158,9 @@ export async function matchMissionToWorker(
   return { score, features };
 }
 
+export type {
+  MissionForMatching,
+  WorkerForMatching,
+  MatchFeatures,
+  MatchWeights,
+};

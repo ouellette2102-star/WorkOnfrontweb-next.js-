@@ -12,7 +12,7 @@ import type { Mission } from "@/types/mission";
 import type { MissionPhoto } from "@/types/mission-photo";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
-import { MissionStatus } from "@prisma/client";
+import { MissionStatus } from "@/types/mission";
 import Image from "next/image";
 
 type MissionPhotosProps = {
