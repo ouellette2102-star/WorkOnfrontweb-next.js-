@@ -5,60 +5,15 @@ import { FeedCard } from '@/components/feed/feed-card';
 import { FeedSkeleton } from '@/components/feed/feed-skeleton';
 import { FeedApiResponse, FeedPost } from '@/types/feed';
 
-const FALLBACK_POSTS: FeedPost[] = [
-  {
-    id: 'post-1',
-    workerName: 'Alexandra N.',
-    role: 'Chef traiteur',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=facearea&w=200&h=200&q=80',
-    mediaUrl:
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
-    description:
-      'Service catering express pour un gala fintech. Menu 100% local, monté en 4h avec l’équipe WorkOn.',
-    likeCount: 128,
-    isLiked: false,
-    location: 'Montréal • Vieux-Port',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'post-2',
-    workerName: 'Moussa Diallo',
-    role: 'Électricien certifié',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1544006659-f0b21884ce1d?auto=format&fit=facearea&w=200&h=200&q=80',
-    mediaUrl:
-      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
-    description:
-      'Remise aux normes d’un loft Mile-End + ajout éclairage d’ambiance. Réservation via WorkOn en moins de 30 min.',
-    likeCount: 96,
-    isLiked: false,
-    location: 'Montréal • Mile-End',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-  },
-  {
-    id: 'post-3',
-    workerName: 'Camila Ortega',
-    role: 'Designer d’intérieur',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1546456073-92b9f0a8d1d6?auto=format&fit=facearea&w=200&h=200&q=80',
-    mediaUrl:
-      'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80',
-    description:
-      'Transformation express d’un pop-up store. Moodboard WorkOn + exécution en 48h.',
-    likeCount: 211,
-    isLiked: false,
-    location: 'Québec • Saint-Roch',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
-  },
-];
+type FeedSource = "backend" | "demo" | null;
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ code: string; message: string } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [pendingLikes, setPendingLikes] = useState<Record<string, boolean>>({});
+  const [source, setSource] = useState<FeedSource>(null);
 
   const loadPosts = useCallback(
     async (isRefresh = false) => {
@@ -67,23 +22,35 @@ export default function FeedPage() {
       } else {
         setIsLoading(true);
       }
-    setError(null);
-    try {
-      const response = await fetch('/api/feed', { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error('Feed request failed');
+      setError(null);
+
+      try {
+        const response = await fetch('/api/feed', { cache: 'no-store' });
+        const payload = (await response.json()) as FeedApiResponse;
+
+        if (payload.ok) {
+          // Success: backend or demo data
+          setPosts(payload.data ?? []);
+          setSource(payload.source);
+          setError(null);
+        } else {
+          // Error from API (normalized)
+          setPosts([]);
+          setSource(null);
+          setError(payload.error ?? { code: "UNKNOWN", message: "Erreur inconnue" });
+        }
+      } catch (err) {
+        // Network or parsing error
+        setPosts([]);
+        setSource(null);
+        setError({
+          code: "NETWORK_ERROR",
+          message: err instanceof Error ? err.message : "Impossible de charger le fil",
+        });
+      } finally {
+        setIsLoading(false);
+        setRefreshing(false);
       }
-      const payload = (await response.json()) as FeedApiResponse;
-      setPosts(payload.data);
-    } catch (err) {
-      setError("Impossible de charger le fil. Mode démo affiché.");
-      if (!isRefresh) {
-        setPosts(FALLBACK_POSTS);
-      }
-    } finally {
-      setIsLoading(false);
-      setRefreshing(false);
-    }
     },
     [],
   );
@@ -124,13 +91,12 @@ export default function FeedPage() {
             post.id === data.postId ? { ...post, isLiked: data.liked, likeCount: data.likeCount } : post,
           ),
         );
-      } catch (err) {
+      } catch {
         setPosts((prev) =>
           prev.map((post) =>
             post.id === postId ? { ...post, isLiked: currentPost.isLiked, likeCount: currentPost.likeCount } : post,
           ),
         );
-        setError("Action non disponible. Réessaie après connexion.");
       } finally {
         setPendingLikes((prev) => ({ ...prev, [postId]: false }));
       }
@@ -138,17 +104,15 @@ export default function FeedPage() {
     [posts],
   );
 
-  const statusMessage = useMemo(
-    () =>
-      error
-    ? error
-    : isLoading
-    ? 'Chargement du fil en cours...'
-        : 'Connecte-toi pour liker les missions en temps réel.',
-    [error, isLoading],
-  );
+  const statusMessage = useMemo(() => {
+    if (isLoading) return 'Chargement du fil en cours...';
+    if (error) return `⚠️ ${error.message}`;
+    if (source === 'demo') return '🎭 Mode démo — données de démonstration';
+    return 'Connecte-toi pour liker les missions en temps réel.';
+  }, [error, isLoading, source]);
 
-  const showEmpty = !isLoading && posts.length === 0;
+  const showEmpty = !isLoading && !error && posts.length === 0;
+  const showError = !isLoading && error !== null;
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
@@ -182,6 +146,26 @@ export default function FeedPage() {
               <FeedSkeleton />
               <FeedSkeleton />
             </>
+          ) : showError ? (
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-6 py-12 text-center">
+              <div className="mb-4 text-4xl">⚠️</div>
+              <h3 className="mb-2 text-xl font-bold text-red-400">
+                Feed indisponible
+              </h3>
+              <p className="mb-6 text-white/70">
+                {error?.message ?? "Une erreur est survenue"}
+              </p>
+              <button
+                type="button"
+                onClick={() => loadPosts(false)}
+                className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-500"
+              >
+                🔄 Réessayer
+              </button>
+              {error?.code && (
+                <p className="mt-4 text-xs text-white/40">Code: {error.code}</p>
+              )}
+            </div>
           ) : showEmpty ? (
             <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 px-6 py-16 text-center text-white/70">
               Aucun post pour le moment. <br />
