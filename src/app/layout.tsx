@@ -4,6 +4,7 @@ import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs";
 import { Providers } from "@/components/providers";
 import { NotificationBadge } from "@/components/notifications/notification-badge";
 import { Toaster } from "sonner";
+import { isClerkConfigured, logEnvStatus } from "@/lib/env";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -24,11 +25,42 @@ export const metadata: Metadata = {
   keywords: ["travail", "marketplace", "travailleurs autonomes", "missions"],
 };
 
-const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+// Log env status in development (no values, only presence)
+logEnvStatus();
 
-if (!clerkPublishableKey) {
-  throw new Error(
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY est manquante. Vérifie ton fichier .env.local.",
+// Check if Clerk is properly configured
+const clerkEnabled = isClerkConfigured();
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
+
+/**
+ * Fallback layout when Clerk is not configured
+ * Shows a non-crashing UI with setup instructions
+ */
+function FallbackLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="fr-CA">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-900 text-white`}
+      >
+        {/* Setup Warning Banner */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-600/90 text-black px-4 py-2 text-center text-sm font-medium">
+          ⚠️ Configuration incomplète — 
+          <a href="/setup" className="underline ml-1 font-bold">
+            Voir les instructions de configuration
+          </a>
+        </div>
+        
+        <div className="pt-10">
+          <Toaster 
+            position="top-right" 
+            richColors 
+            closeButton
+            theme="dark"
+          />
+          <Providers>{children}</Providers>
+        </div>
+      </body>
+    </html>
   );
 }
 
@@ -37,6 +69,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // If Clerk is not configured, use fallback layout (no crash)
+  if (!clerkEnabled) {
+    return <FallbackLayout>{children}</FallbackLayout>;
+  }
+
   return (
     <ClerkProvider
       publishableKey={clerkPublishableKey}
