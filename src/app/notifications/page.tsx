@@ -69,11 +69,20 @@ export default function NotificationsPage() {
       }
     }
 
-    // Naviguer vers la destination appropriée
+    // Naviguer vers la destination appropriée selon le type et le statut
     if (notification.type === NotificationType.NEW_MESSAGE) {
       router.push(`/missions/${notification.missionId}/chat`);
     } else if (notification.type === NotificationType.MISSION_STATUS_CHANGED) {
-      router.push(`/missions/mine`);
+      const status = notification.statusAfter;
+      // Si terminée, aller vers le paiement/évaluation
+      if (status === "COMPLETED") {
+        router.push(`/missions/${notification.missionId}/pay`);
+      } else {
+        // Sinon, aller vers le détail de la mission
+        router.push(`/missions/${notification.missionId}`);
+      }
+    } else if (notification.type === NotificationType.MISSION_TIME_EVENT) {
+      router.push(`/missions/${notification.missionId}`);
     }
   };
 
@@ -93,23 +102,36 @@ export default function NotificationsPage() {
     const missionTitle = notification.mission?.title ?? "une mission";
 
     if (notification.type === NotificationType.NEW_MESSAGE) {
-      return `Nouveau message reçu sur la mission "${missionTitle}".`;
+      return `💬 Nouveau message sur "${missionTitle}"`;
     }
 
     if (notification.type === NotificationType.MISSION_STATUS_CHANGED) {
-      return `Statut de la mission "${missionTitle}" mis à jour : ${notification.statusBefore} → ${notification.statusAfter}.`;
+      const status = notification.statusAfter;
+      if (status === "COMPLETED") {
+        return `✅ "${missionTitle}" est terminée — laissez un avis`;
+      }
+      if (status === "RESERVED") {
+        return `🎯 "${missionTitle}" a été réservée`;
+      }
+      if (status === "IN_PROGRESS") {
+        return `🚀 "${missionTitle}" est en cours`;
+      }
+      if (status === "CANCELLED") {
+        return `❌ "${missionTitle}" a été annulée`;
+      }
+      return `📋 "${missionTitle}" : ${notification.statusBefore ?? "?"} → ${notification.statusAfter ?? "?"}`;
     }
 
     if (notification.type === NotificationType.MISSION_TIME_EVENT) {
-      const eventType = notification.statusBefore; // On réutilise ce champ
+      const eventType = notification.statusBefore;
       if (eventType === "CHECK_IN") {
-        return `Le travailleur s'est enregistré sur la mission "${missionTitle}".`;
+        return `⏰ Le worker s'est enregistré sur "${missionTitle}"`;
       } else if (eventType === "CHECK_OUT") {
-        return `Le travailleur a quitté la mission "${missionTitle}".`;
+        return `⏱️ Le worker a terminé sur "${missionTitle}"`;
       }
     }
 
-    return "Notification";
+    return "📌 Notification";
   };
 
   const getNotificationBadgeColor = (
