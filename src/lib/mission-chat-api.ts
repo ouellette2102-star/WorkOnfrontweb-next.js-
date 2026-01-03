@@ -1,88 +1,139 @@
 /**
  * Client API pour le chat des missions WorkOn
+ * Appelle le proxy front /api/missions/[id]/messages (PR-23)
+ *
+ * Contrat normalisé:
+ * - { ok: true, data: Message[] | Message, source: "backend" }
+ * - { ok: false, data: [], error: { code, message }, source: "proxy" }
  */
 
 import type { Message, CreateMessagePayload } from "@/types/mission-chat";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "http://localhost:3001/api/v1";
+const FETCH_TIMEOUT_MS = 10000; // 10 seconds client-side timeout
+
+// Normalized API response types
+export type ChatMessagesResponse =
+  | { ok: true; data: Message[]; source: "backend" }
+  | { ok: false; data: []; error: { code: string; message: string }; source: "proxy" };
+
+export type ChatSendResponse =
+  | { ok: true; data: Message; source: "backend" }
+  | { ok: false; data: []; error: { code: string; message: string }; source: "proxy" };
 
 /**
- * Helper générique pour les requêtes authentifiées
+ * Helper for fetch with timeout
  */
-async function authenticatedRequest<T>(
-  path: string,
-  token: string,
-  init?: RequestInit,
-): Promise<T> {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${API_BASE_URL}${normalizedPath}`;
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number = FETCH_TIMEOUT_MS
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(init?.headers ?? {}),
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text().catch(() => "");
-    console.error("[WorkOn Chat API] Request failed", {
-      url,
-      status: response.status,
-      body: errorBody,
+  try {
+    const response = await fetch(url, {
+      ...init,
+      signal: controller.signal,
     });
-
-    // Essayer d'extraire un message d'erreur du backend
-    let errorMessage = `Erreur API ${response.status}`;
-    try {
-      const parsed = JSON.parse(errorBody);
-      errorMessage = parsed?.message ?? parsed?.error ?? errorMessage;
-    } catch {
-      // Ignore parse errors
-    }
-
-    throw new Error(errorMessage);
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return response.json() as Promise<T>;
 }
 
 /**
  * Récupérer tous les messages d'une mission
+ * @returns Normalized response with ok/error
  */
 export async function getMessagesForMission(
   token: string,
-  missionId: string,
-): Promise<Message[]> {
-  return authenticatedRequest<Message[]>(
-    `/missions/${missionId}/messages`,
-    token,
-    {
-      method: "GET",
-    },
-  );
+  missionId: string
+): Promise<ChatMessagesResponse> {
+  try {
+    const response = await fetchWithTimeout(
+      `/api/missions/${missionId}/messages`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
+
+    const data = await response.json();
+    return data as ChatMessagesResponse;
+  } catch (error) {
+    // Handle timeout
+    if (error instanceof Error && error.name === "AbortError") {
+      return {
+        ok: false,
+        data: [],
+        error: { code: "TIMEOUT", message: "Le chargement a pris trop de temps" },
+        source: "proxy",
+      };
+    }
+
+    // Network error
+    return {
+      ok: false,
+      data: [],
+      error: {
+        code: "NETWORK_ERROR",
+        message: error instanceof Error ? error.message : "Erreur réseau",
+      },
+      source: "proxy",
+    };
+  }
 }
 
 /**
  * Envoyer un nouveau message dans une mission
+ * @returns Normalized response with ok/error
  */
 export async function sendMessage(
   token: string,
   missionId: string,
-  payload: CreateMessagePayload,
-): Promise<Message> {
-  return authenticatedRequest<Message>(
-    `/missions/${missionId}/messages`,
-    token,
-    {
-      method: "POST",
-      body: JSON.stringify(payload),
-    },
-  );
-}
+  payload: CreateMessagePayload
+): Promise<ChatSendResponse> {
+  try {
+    const response = await fetchWithTimeout(
+      `/api/missions/${missionId}/messages`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      }
+    );
 
+    const data = await response.json();
+    return data as ChatSendResponse;
+  } catch (error) {
+    // Handle timeout
+    if (error instanceof Error && error.name === "AbortError") {
+      return {
+        ok: false,
+        data: [],
+        error: { code: "TIMEOUT", message: "L'envoi a pris trop de temps" },
+        source: "proxy",
+      };
+    }
+
+    // Network error
+    return {
+      ok: false,
+      data: [],
+      error: {
+        code: "NETWORK_ERROR",
+        message: error instanceof Error ? error.message : "Impossible d'envoyer",
+      },
+      source: "proxy",
+    };
+  }
+}
