@@ -2,14 +2,18 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { ClerkAuthService } from '../clerk-auth.service';
 
+/**
+ * JWT Authentication Guard (Local Auth Only)
+ * 
+ * Verifies JWT tokens issued by LocalAuthService.
+ * Clerk authentication has been disabled.
+ */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly clerkAuthService: ClerkAuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,41 +29,27 @@ export class JwtAuthGuard implements CanActivate {
 
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
 
-    // Tentative 1: JWT local (si configuré)
-    if (jwtSecret) {
-      try {
-        const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
-        
-        // ⚠️ SÉCURITÉ CRITIQUE: Le rôle et l'ID viennent UNIQUEMENT du JWT vérifié
-        // Ne jamais accepter de valeurs fournies par le frontend (body/query/headers)
-        request.user = {
-          sub: payload.sub,
-          email: payload.email,
-          role: payload.role, // Extrait du JWT signé uniquement
-          provider: 'local',
-        };
-        
-        return true;
-      } catch (error) {
-        // Échec JWT local → On essaie via Clerk
-      }
+    if (!jwtSecret) {
+      throw new UnauthorizedException('JWT_SECRET not configured');
     }
 
-    // Tentative 2: Clerk JWT (production principale)
-    const clerkUser = await this.clerkAuthService.verifyAndSyncUser(token);
-    
-    // ⚠️ SÉCURITÉ CRITIQUE: Le rôle vient de Clerk (source de vérité)
-    // primaryRole est extrait de la DB après vérification du token Clerk
-    request.user = {
-      sub: clerkUser.sub,           // ID interne (DB)
-      email: clerkUser.email,       // Email vérifié par Clerk
-      role: clerkUser.role,         // Rôle effectif (primaryRole ?? role)
-      provider: 'clerk',
-      clerkId: clerkUser.clerkId,   // ID Clerk (externe)
-      claims: clerkUser.claims,     // Claims JWT Clerk originaux
-    };
-
-    return true;
+    try {
+      const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
+      
+      // ⚠️ SÉCURITÉ CRITIQUE: Le rôle et l'ID viennent UNIQUEMENT du JWT vérifié
+      // Ne jamais accepter de valeurs fournies par le frontend (body/query/headers)
+      request.user = {
+        sub: payload.sub,
+        email: payload.email,
+        role: payload.role, // Extrait du JWT signé uniquement
+        provider: 'local',
+        userId: payload.sub, // Add userId for compatibility with other services
+      };
+      
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 
   private extractTokenFromHeader(request: Request): string | null {

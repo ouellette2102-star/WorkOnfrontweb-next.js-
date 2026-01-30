@@ -1,44 +1,110 @@
-import { Injectable } from '@nestjs/common';
-import { NotificationType } from '@prisma/client';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PushService } from '../push/push.service';
+import { DevicesService } from '../devices/devices.service';
 
 export interface NotificationResponse {
   id: string;
   userId: string;
-  type: NotificationType;
-  missionId: string;
-  messageId?: string;
-  statusBefore?: string;
-  statusAfter?: string;
+  type: string;
+  payload: any;
   isRead: boolean;
   createdAt: string;
-  readAt?: string;
-  mission?: {
-    id: string;
-    title: string;
-  };
+  readAt?: string | null;
 }
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(NotificationsService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly pushService: PushService,
+    private readonly devicesService: DevicesService,
+  ) {}
 
   /**
-   * Créer une notification pour un nouveau message dans une mission
+   * Créer une notification pour un nouveau message dans une mission.
+   *
+   * PR-PUSH: Also sends a push notification to the receiver's devices.
    */
   async createForNewMessage(
     missionId: string,
     messageId: string,
-    receiverUserId: string,
+    receiverClerkId: string,
+    senderName?: string,
+    messagePreview?: string,
   ): Promise<void> {
-    await this.prisma.notification.create({
-      data: {
-        userId: receiverUserId,
-        type: NotificationType.NEW_MESSAGE,
+    try {
+      // Trouver l'utilisateur par clerkId
+      const user = await this.prisma.user.findUnique({
+        where: { clerkId: receiverClerkId },
+        select: { id: true },
+      });
+
+      if (!user) {
+        this.logger.warn(`User not found for clerkId: ${receiverClerkId}`);
+        return;
+      }
+
+      // Create in-app notification
+      await this.prisma.notification.create({
+        data: {
+          id: `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          userId: user.id,
+          type: 'NEW_MESSAGE',
+          payloadJSON: {
+            missionId,
+            messageId,
+          },
+        },
+      });
+
+      // PR-PUSH: Send push notification
+      await this.sendPushForNewMessage(
+        user.id,
         missionId,
-        messageId,
-      },
-    });
+        senderName || 'Quelqu\'un',
+        messagePreview || 'Nouveau message',
+      );
+    } catch (error) {
+      this.logger.error(`Failed to create notification for new message: ${error.message}`);
+    }
+  }
+
+  /**
+   * PR-PUSH: Send push notification for a new message.
+   *
+   * @param userId - Internal user ID (not clerkId)
+   * @param missionId - Mission/conversation ID
+   * @param senderName - Name of the sender
+   * @param preview - Message preview text
+   */
+  private async sendPushForNewMessage(
+    userId: string,
+    missionId: string,
+    senderName: string,
+    preview: string,
+  ): Promise<void> {
+    try {
+      // Get push tokens for this user
+      const tokens = await this.devicesService.getPushTokensForUser(userId);
+
+      if (!tokens.length) {
+        this.logger.debug(`No push tokens for user ${userId}`);
+        return;
+      }
+
+      await this.pushService.sendChatMessageNotification(tokens, {
+        conversationId: missionId,
+        missionId,
+        senderName,
+        preview,
+      });
+    } catch (error) {
+      // Don't throw - push failure shouldn't break the message flow
+      this.logger.error(`Failed to send push notification: ${error.message}`);
+    }
   }
 
   /**
@@ -48,17 +114,35 @@ export class NotificationsService {
     missionId: string,
     statusBefore: string,
     statusAfter: string,
-    receiverUserId: string,
+    receiverClerkId: string,
   ): Promise<void> {
-    await this.prisma.notification.create({
-      data: {
-        userId: receiverUserId,
-        type: NotificationType.MISSION_STATUS_CHANGED,
-        missionId,
-        statusBefore,
-        statusAfter,
-      },
-    });
+    try {
+      // Trouver l'utilisateur par clerkId
+      const user = await this.prisma.user.findUnique({
+        where: { clerkId: receiverClerkId },
+        select: { id: true },
+      });
+
+      if (!user) {
+        this.logger.warn(`User not found for clerkId: ${receiverClerkId}`);
+        return;
+      }
+
+      await this.prisma.notification.create({
+        data: {
+          id: `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          userId: user.id,
+          type: 'MISSION_STATUS_CHANGED',
+          payloadJSON: {
+            missionId,
+            statusBefore,
+            statusAfter,
+          },
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create notification for mission status change: ${error.message}`);
+    }
   }
 
   /**
@@ -67,16 +151,34 @@ export class NotificationsService {
   async createForMissionTimeEvent(
     missionId: string,
     eventType: 'CHECK_IN' | 'CHECK_OUT',
-    receiverUserId: string,
+    receiverClerkId: string,
   ): Promise<void> {
-    await this.prisma.notification.create({
-      data: {
-        userId: receiverUserId,
-        type: NotificationType.MISSION_TIME_EVENT,
-        missionId,
-        statusBefore: eventType, // On réutilise ce champ pour stocker le type d'événement
-      },
-    });
+    try {
+      // Trouver l'utilisateur par clerkId
+      const user = await this.prisma.user.findUnique({
+        where: { clerkId: receiverClerkId },
+        select: { id: true },
+      });
+
+      if (!user) {
+        this.logger.warn(`User not found for clerkId: ${receiverClerkId}`);
+        return;
+      }
+
+      await this.prisma.notification.create({
+        data: {
+          id: `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          userId: user.id,
+          type: 'MISSION_TIME_EVENT',
+          payloadJSON: {
+            missionId,
+            eventType,
+          },
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create notification for mission time event: ${error.message}`);
+    }
   }
 
   /**
@@ -89,15 +191,7 @@ export class NotificationsService {
     const notifications = await this.prisma.notification.findMany({
       where: {
         userId,
-        ...(unreadOnly ? { isRead: false } : {}),
-      },
-      include: {
-        mission: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
+        ...(unreadOnly ? { readAt: null } : {}),
       },
       orderBy: {
         createdAt: 'desc',
@@ -108,65 +202,44 @@ export class NotificationsService {
       id: notif.id,
       userId: notif.userId,
       type: notif.type,
-      missionId: notif.missionId,
-      messageId: notif.messageId ?? undefined,
-      statusBefore: notif.statusBefore ?? undefined,
-      statusAfter: notif.statusAfter ?? undefined,
-      isRead: notif.isRead,
+      payload: notif.payloadJSON,
+      isRead: notif.readAt !== null,
       createdAt: notif.createdAt.toISOString(),
-      readAt: notif.readAt?.toISOString(),
-      mission: notif.mission,
+      readAt: notif.readAt ? notif.readAt.toISOString() : null,
     }));
   }
 
   /**
    * Marquer une notification comme lue
    */
-  async markAsRead(notificationId: string, userId: string): Promise<void> {
-    // Vérifier que la notification appartient bien à l'utilisateur
-    const notification = await this.prisma.notification.findUnique({
-      where: { id: notificationId },
-    });
-
-    if (!notification || notification.userId !== userId) {
-      throw new Error('Notification not found or access denied');
-    }
-
+  async markAsRead(notificationId: string): Promise<void> {
     await this.prisma.notification.update({
       where: { id: notificationId },
-      data: {
-        isRead: true,
-        readAt: new Date(),
-      },
+      data: { readAt: new Date() },
     });
   }
 
   /**
    * Marquer toutes les notifications d'un utilisateur comme lues
    */
-  async markAllAsRead(userId: string): Promise<number> {
-    const result = await this.prisma.notification.updateMany({
+  async markAllAsRead(userId: string): Promise<void> {
+    await this.prisma.notification.updateMany({
       where: {
         userId,
-        isRead: false,
+        readAt: null,
       },
-      data: {
-        isRead: true,
-        readAt: new Date(),
-      },
+      data: { readAt: new Date() },
     });
-
-    return result.count;
   }
 
   /**
    * Compter les notifications non lues d'un utilisateur
    */
-  async getUnreadCount(userId: string): Promise<number> {
+  async countUnread(userId: string): Promise<number> {
     return this.prisma.notification.count({
       where: {
         userId,
-        isRead: false,
+        readAt: null,
       },
     });
   }

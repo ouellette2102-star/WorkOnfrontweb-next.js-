@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -34,24 +33,16 @@ export class MissionPhotosService {
       where: { id: missionId },
       select: {
         id: true,
-        employerId: true,
-        workerId: true,
-        employer: {
+        authorClientId: true,
+        assigneeWorkerId: true,
+        authorClient: {
           select: {
-            user: {
-              select: {
-                clerkId: true,
-              },
-            },
+            clerkId: true,
           },
         },
-        worker: {
+        assigneeWorker: {
           select: {
-            user: {
-              select: {
-                clerkId: true,
-              },
-            },
+            clerkId: true,
           },
         },
       },
@@ -61,12 +52,12 @@ export class MissionPhotosService {
       throw new NotFoundException('Mission introuvable');
     }
 
-    const isEmployer = mission.employer.user.clerkId === clerkUserId;
-    const isWorker = mission.worker?.user.clerkId === clerkUserId;
+    const isAuthor = mission.authorClient.clerkId === clerkUserId;
+    const isWorker = mission.assigneeWorker?.clerkId === clerkUserId;
 
     return {
-      canAccess: isEmployer || isWorker,
-      canUpload: isEmployer || isWorker,
+      canAccess: isAuthor || isWorker,
+      canUpload: isAuthor || isWorker,
     };
   }
 
@@ -107,14 +98,14 @@ export class MissionPhotosService {
   }
 
   /**
-   * Upload une photo pour une mission
+   * Upload plusieurs photos pour une mission
    */
-  async uploadPhoto(
+  async uploadPhotos(
     missionId: string,
     clerkUserId: string,
-    file: Express.Multer.File,
+    files: Express.Multer.File[],
     baseUrl: string,
-  ): Promise<MissionPhotoResponse> {
+  ): Promise<MissionPhotoResponse[]> {
     // Vérifier les droits
     const { canUpload } = await this.checkMissionAccess(missionId, clerkUserId);
 
@@ -124,61 +115,69 @@ export class MissionPhotosService {
       );
     }
 
-    // Vérifier le type de fichier
-    if (!file.mimetype.startsWith('image/')) {
-      throw new BadRequestException(
-        'Seules les images sont acceptées (jpg, png, gif, webp)',
-      );
-    }
-
-    // Vérifier la taille (8MB max)
-    const maxSize = 8 * 1024 * 1024; // 8MB
-    if (file.size > maxSize) {
-      throw new BadRequestException(
-        'La taille du fichier ne doit pas dépasser 8 MB',
-      );
-    }
-
-    // Générer un nom de fichier unique et sécurisé
-    const ext = path.extname(file.originalname).toLowerCase();
-    const filename = `${uuidv4()}${ext}`;
-
     // Créer le dossier de la mission si nécessaire
     const missionDir = path.join(this.uploadsDir, missionId);
     await fs.mkdir(missionDir, { recursive: true });
 
-    // Chemin complet du fichier
-    const filepath = path.join(missionDir, filename);
+    const results: MissionPhotoResponse[] = [];
 
-    // Sauvegarder le fichier
-    await fs.writeFile(filepath, file.buffer);
+    for (const file of files) {
+      // Générer un nom de fichier unique et sécurisé
+      const ext = path.extname(file.originalname).toLowerCase();
+      const filename = `${uuidv4()}${ext}`;
 
-    // URL pour accéder à la photo
-    const url = `${baseUrl}/uploads/missions/${missionId}/${filename}`;
+      // Chemin complet du fichier
+      const filepath = path.join(missionDir, filename);
 
-    // Créer l'enregistrement en base
-    const photo = await this.prisma.missionPhoto.create({
-      data: {
-        missionId,
-        userId: clerkUserId,
-        url,
-      },
-      select: {
-        id: true,
-        missionId: true,
-        userId: true,
-        url: true,
-        createdAt: true,
-      },
-    });
+      // Sauvegarder le fichier
+      await fs.writeFile(filepath, file.buffer);
 
-    return {
-      id: photo.id,
-      missionId: photo.missionId,
-      userId: photo.userId,
-      url: photo.url,
-      createdAt: photo.createdAt.toISOString(),
-    };
+      // URL pour accéder à la photo
+      const url = `${baseUrl}/uploads/missions/${missionId}/${filename}`;
+
+      // Créer l'enregistrement en base
+      const photo = await this.prisma.missionPhoto.create({
+        data: {
+          missionId,
+          userId: clerkUserId,
+          url,
+          path: `/uploads/missions/${missionId}/${filename}`,
+          mimeType: file.mimetype,
+          size: file.size,
+          originalName: file.originalname,
+        },
+        select: {
+          id: true,
+          missionId: true,
+          userId: true,
+          url: true,
+          createdAt: true,
+        },
+      });
+
+      results.push({
+        id: photo.id,
+        missionId: photo.missionId,
+        userId: photo.userId,
+        url: photo.url,
+        createdAt: photo.createdAt.toISOString(),
+      });
+    }
+
+    return results;
+  }
+
+  /**
+   * Upload une photo pour une mission (legacy - single file)
+   */
+  async uploadPhoto(
+    missionId: string,
+    clerkUserId: string,
+    file: Express.Multer.File,
+    baseUrl: string,
+  ): Promise<MissionPhotoResponse> {
+    const results = await this.uploadPhotos(missionId, clerkUserId, [file], baseUrl);
+    return results[0];
   }
 
   /**
@@ -198,13 +197,9 @@ export class MissionPhotosService {
         url: true,
         mission: {
           select: {
-            employer: {
+            authorClient: {
               select: {
-                user: {
-                  select: {
-                    clerkId: true,
-                  },
-                },
+                clerkId: true,
               },
             },
           },
@@ -216,11 +211,11 @@ export class MissionPhotosService {
       throw new NotFoundException('Photo introuvable');
     }
 
-    // Seul l'uploader ou l'employer peut supprimer
+    // Seul l'uploader ou l'auteur de la mission peut supprimer
     const isUploader = photo.userId === clerkUserId;
-    const isEmployer = photo.mission.employer.user.clerkId === clerkUserId;
+    const isAuthor = photo.mission.authorClient.clerkId === clerkUserId;
 
-    if (!isUploader && !isEmployer) {
+    if (!isUploader && !isAuthor) {
       throw new ForbiddenException(
         "Vous n'avez pas le droit de supprimer cette photo",
       );

@@ -7,13 +7,13 @@ import {
   forwardRef,
   Logger,
 } from '@nestjs/common';
-import { MissionStatus, Prisma } from '@prisma/client';
+import { MissionStatus, Prisma, UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { ListAvailableMissionsDto } from './dto/list-available-missions.dto';
 import { UpdateMissionStatusDto } from './dto/update-mission-status.dto';
 import { NotificationsService } from '../notifications/notifications.service';
-import { isDevEnvironment, devWarn } from '../common/utils/environment.util';
+import { isDevEnvironment } from '../common/utils/environment.util';
 
 type MissionSelect = {
   id: true;
@@ -21,6 +21,8 @@ type MissionSelect = {
   description: true;
   categoryId: true;
   locationAddress: true;
+  locationLat: true;
+  locationLng: true;
   budgetMin: true;
   budgetMax: true;
   startAt: true;
@@ -41,6 +43,8 @@ const missionSelect: MissionSelect = {
   description: true,
   categoryId: true,
   locationAddress: true,
+  locationLat: true,
+  locationLng: true,
   budgetMin: true,
   budgetMax: true,
   startAt: true,
@@ -85,29 +89,69 @@ export class MissionsService {
     userId: string,
     dto: CreateMissionDto,
   ): Promise<MissionResponse> {
-    const employer = await this.prisma.employer.findUnique({
-      where: { userId },
+    // Vérifier que l'utilisateur existe et a le rôle EMPLOYER
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        userProfile: {
+          select: { role: true },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.userProfile?.role !== UserRole.EMPLOYER && user.userProfile?.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Vous devez être employeur pour créer une mission');
+    }
+
+    // Utiliser une catégorie par défaut si non fournie (ou mapper depuis dto.category)
+    let categoryId = dto.category || 'default-category';
+    
+    // Si la catégorie fournie n'est pas un ID, essayer de trouver la catégorie par nom
+    const existingCategory = await this.prisma.category.findFirst({
+      where: {
+        OR: [
+          { id: categoryId },
+          { name: { equals: categoryId, mode: 'insensitive' } },
+        ],
+      },
       select: { id: true },
     });
 
-    if (!employer) {
-      throw new ForbiddenException('Vous devez être employeur pour créer une mission');
+    if (existingCategory) {
+      categoryId = existingCategory.id;
+    } else {
+      // Créer une nouvelle catégorie si elle n'existe pas
+      const newCategory = await this.prisma.category.create({
+        data: {
+          id: `cat_${Date.now()}`,
+          name: categoryId,
+        },
+      });
+      categoryId = newCategory.id;
     }
 
     const mission = await this.prisma.mission.create({
       data: {
-        employerId: employer.id,
+        id: `mission_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        authorClientId: userId,
         title: dto.title,
-        description: dto.description,
-        category: dto.category,
-        city: dto.city,
-        address: dto.address,
-        hourlyRate: dto.hourlyRate ?? null,
-        startsAt: dto.startsAt ? new Date(dto.startsAt) : null,
-        endsAt: dto.endsAt ? new Date(dto.endsAt) : null,
+        description: dto.description || '',
+        categoryId,
+        locationAddress: dto.address || dto.city || null,
+        locationLat: 0, // TODO: géolocalisation réelle
+        locationLng: 0, // TODO: géolocalisation réelle
+        priceType: dto.hourlyRate ? 'HOURLY' : 'FIXED',
+        budgetMin: dto.hourlyRate || 0,
+        budgetMax: dto.hourlyRate || 0,
+        startAt: dto.startsAt ? new Date(dto.startsAt) : null,
+        endAt: dto.endsAt ? new Date(dto.endsAt) : null,
         status: MissionStatus.OPEN,
-        location: this.buildLocation(dto),
-        priceCents: this.computePriceCents(dto),
+        updatedAt: new Date(),
       },
       select: missionSelect,
     });
@@ -116,17 +160,31 @@ export class MissionsService {
   }
 
   async getMissionsForEmployer(userId: string): Promise<MissionResponse[]> {
-    const employer = await this.prisma.employer.findUnique({
-      where: { userId },
-      select: { id: true },
+    // Vérifier que l'utilisateur existe et a le rôle EMPLOYER
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        userProfile: {
+          select: { role: true },
+        },
+      },
     });
 
-    if (!employer) {
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.userProfile?.role !== UserRole.EMPLOYER && user.userProfile?.role !== UserRole.ADMIN) {
+      if (isDevEnvironment()) {
+        this.logger.warn(`[DEV MODE] User ${userId} is not EMPLOYER - returning empty missions list`);
+        return [];
+      }
       throw new ForbiddenException('Accès réservé aux employeurs WorkOn');
     }
 
     const missions = await this.prisma.mission.findMany({
-      where: { employerId: employer.id },
+      where: { authorClientId: userId },
       orderBy: { createdAt: 'desc' },
       select: missionSelect,
     });
@@ -134,10 +192,6 @@ export class MissionsService {
     return missions.map((mission) => this.mapToResponse(mission));
   }
 
-  /**
-   * Récupérer une mission par ID (authentifié uniquement)
-   * L'utilisateur doit être soit l'employeur, soit le worker assigné
-   */
   async getMissionById(userId: string, missionId: string): Promise<MissionResponse> {
     const mission = await this.prisma.mission.findUnique({
       where: { id: missionId },
@@ -149,58 +203,67 @@ export class MissionsService {
     }
 
     // Vérifier que l'utilisateur a accès à cette mission
-    const employer = await this.prisma.employer.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
+    const isAuthor = mission.authorClientId === userId;
+    const isAssignee = mission.assigneeWorkerId === userId;
 
-    const worker = await this.prisma.worker.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
-
-    const isEmployer = employer && mission.employerId === employer.id;
-    const isWorker = worker && mission.workerId === worker.id;
-
-    if (!isEmployer && !isWorker) {
+    if (!isAuthor && !isAssignee) {
       throw new ForbiddenException("Vous n'avez pas accès à cette mission");
     }
 
     return this.mapToResponse(mission);
   }
 
-  /**
-   * Lister les missions disponibles pour un worker
-   * 
-   * MODE DEV : Permet l'accès même sans profil Worker en DB (retourne un tableau vide)
-   * MODE PROD : Exige un profil Worker valide
-   */
   async getAvailableMissionsForWorker(
     userId: string,
     filters: ListAvailableMissionsDto,
   ): Promise<MissionResponse[]> {
-    // En dev, on tolère l'absence de worker profile
-    const worker = await this.getWorkerOrNull(
-      userId,
-      'Accès réservé aux workers WorkOn',
-    );
+    // Vérifier que l'utilisateur existe et a le rôle WORKER
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        userProfile: {
+          select: { role: true },
+        },
+      },
+    });
 
-    // En dev sans worker : retourner un tableau vide (pas d'erreur 403)
-    if (!worker && isDevEnvironment()) {
-      this.logger.log(
-        `[DEV MODE] User ${userId} has no Worker profile - returning empty missions list`,
-      );
-      return [];
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.userProfile?.role !== UserRole.WORKER) {
+      if (isDevEnvironment()) {
+        this.logger.warn(`[DEV MODE] User ${userId} is not WORKER - returning missions anyway`);
+      } else {
+        throw new ForbiddenException('Accès réservé aux workers WorkOn');
+      }
+    }
+
+    const whereClause: Prisma.MissionWhereInput = {
+      status: MissionStatus.OPEN,
+    };
+
+    if (filters.city) {
+      whereClause.locationAddress = { contains: filters.city, mode: 'insensitive' };
+    }
+
+    if (filters.category) {
+      const category = await this.prisma.category.findFirst({
+        where: {
+          OR: [
+            { id: filters.category },
+            { name: { equals: filters.category, mode: 'insensitive' } },
+          ],
+        },
+      });
+      if (category) {
+        whereClause.categoryId = category.id;
+      }
     }
 
     const missions = await this.prisma.mission.findMany({
-      where: {
-        status: MissionStatus.OPEN,
-        city: filters.city ? { equals: filters.city, mode: 'insensitive' } : undefined,
-        category: filters.category
-          ? { equals: filters.category, mode: 'insensitive' }
-          : undefined,
-      },
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
       select: missionSelect,
     });
@@ -213,19 +276,22 @@ export class MissionsService {
     missionId: string,
     dto: UpdateMissionStatusDto,
   ): Promise<MissionResponse> {
-    const employer = await this.prisma.employer.findUnique({
-      where: { userId },
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
       select: {
         id: true,
-        user: {
-          select: {
-            clerkId: true,
-          },
+        clerkId: true,
+        userProfile: {
+          select: { role: true },
         },
       },
     });
 
-    if (!employer) {
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.userProfile?.role !== UserRole.EMPLOYER && user.userProfile?.role !== UserRole.ADMIN) {
       throw new ForbiddenException('Accès réservé aux employeurs WorkOn');
     }
 
@@ -233,13 +299,9 @@ export class MissionsService {
       where: { id: missionId },
       select: {
         ...missionSelect,
-        worker: {
+        assigneeWorker: {
           select: {
-            user: {
-              select: {
-                clerkId: true,
-              },
-            },
+            clerkId: true,
           },
         },
       },
@@ -249,7 +311,7 @@ export class MissionsService {
       throw new NotFoundException('Mission introuvable');
     }
 
-    if (mission.employerId !== employer.id) {
+    if (mission.authorClientId !== userId) {
       throw new ForbiddenException('Impossible de modifier une mission qui ne vous appartient pas');
     }
 
@@ -261,64 +323,58 @@ export class MissionsService {
 
     const updated = await this.prisma.mission.update({
       where: { id: missionId },
-      data: { status: newStatus },
+      data: { status: newStatus, updatedAt: new Date() },
       select: missionSelect,
     });
 
     // Créer une notification pour le worker (si assigné)
-    if (mission.worker?.user.clerkId) {
-      await this.notificationsService.createForMissionStatusChange(
-        missionId,
-        oldStatus,
-        newStatus,
-        mission.worker.user.clerkId,
-      );
+    if (mission.assigneeWorker?.clerkId) {
+      try {
+        await this.notificationsService.createForMissionStatusChange(
+          missionId,
+          oldStatus,
+          newStatus,
+          mission.assigneeWorker.clerkId,
+        );
+      } catch (error) {
+        this.logger.error(`Failed to create notification: ${error.message}`);
+      }
     }
 
     return this.mapToResponse(updated);
   }
 
-  /**
-   * Réserver une mission (worker uniquement)
-   * 
-   * MODE DEV : Requiert quand même un profil Worker (création de mission nécessite un workerId)
-   * MODE PROD : Exige un profil Worker valide
-   */
   async reserveMission(
     userId: string,
     missionId: string,
   ): Promise<MissionResponse> {
     // Vérifier que l'utilisateur est un worker
-    // Note : pour réserver, on a BESOIN du workerId, donc même en dev on exige le profil
-    const worker = await this.getWorkerOrNull(
-      userId,
-      'Seuls les workers peuvent réserver des missions',
-    );
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        userProfile: {
+          select: { role: true },
+        },
+      },
+    });
 
-    if (!worker) {
-      // En dev sans worker, on ne peut pas réserver (besoin du workerId)
-      if (isDevEnvironment()) {
-        throw new BadRequestException(
-          'Profil Worker manquant. Créez un profil Worker avec `npm run seed:dev` pour tester la réservation.',
-        );
-      }
-      // En prod, getWorkerOrNull a déjà lancé une ForbiddenException
-      // Cette ligne ne devrait jamais être atteinte mais TypeScript l'exige
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.userProfile?.role !== UserRole.WORKER) {
       throw new ForbiddenException('Seuls les workers peuvent réserver des missions');
     }
 
-    // Récupérer la mission avec les infos de l'employer
+    // Récupérer la mission avec les infos de l'auteur
     const mission = await this.prisma.mission.findUnique({
       where: { id: missionId },
       select: {
         ...missionSelect,
-        employer: {
+        authorClient: {
           select: {
-            user: {
-              select: {
-                clerkId: true,
-              },
-            },
+            clerkId: true,
           },
         },
       },
@@ -337,56 +393,63 @@ export class MissionsService {
       );
     }
 
-    // Réserver la mission (atomique)
+    // Réserver la mission (atomique) - utiliser MATCHED au lieu de RESERVED
     const updated = await this.prisma.mission.update({
       where: {
         id: missionId,
-        status: MissionStatus.OPEN, // Double check atomique
+        status: MissionStatus.OPEN,
       },
       data: {
-        status: MissionStatus.RESERVED,
-        workerId: worker.id, // worker existe forcément ici
-        reservedUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h de réservation
+        status: MissionStatus.MATCHED,
+        assigneeWorkerId: userId,
+        updatedAt: new Date(),
       },
       select: missionSelect,
     });
 
-    // Créer une notification pour l'employer
-    if (mission.employer?.user?.clerkId) {
-      await this.notificationsService.createForMissionStatusChange(
-        missionId,
-        MissionStatus.OPEN,
-        MissionStatus.RESERVED,
-        mission.employer.user.clerkId,
-      );
+    // Créer une notification pour l'auteur
+    if (mission.authorClient?.clerkId) {
+      try {
+        await this.notificationsService.createForMissionStatusChange(
+          missionId,
+          MissionStatus.OPEN,
+          MissionStatus.MATCHED,
+          mission.authorClient.clerkId,
+        );
+      } catch (error) {
+        this.logger.error(`Failed to create notification: ${error.message}`);
+      }
     }
 
     return this.mapToResponse(updated);
   }
 
-  /**
-   * Récupérer toutes les missions du worker (RESERVED, IN_PROGRESS, COMPLETED)
-   * 
-   * MODE DEV : Permet l'accès même sans profil Worker en DB (retourne un tableau vide)
-   * MODE PROD : Exige un profil Worker valide
-   */
   async getMissionsForWorker(userId: string): Promise<MissionResponse[]> {
-    // En dev, on tolère l'absence de worker profile
-    const worker = await this.getWorkerOrNull(
-      userId,
-      'Accès réservé aux workers WorkOn',
-    );
+    // Vérifier que l'utilisateur existe et a le rôle WORKER
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        userProfile: {
+          select: { role: true },
+        },
+      },
+    });
 
-    // En dev sans worker : retourner un tableau vide (pas d'erreur 403)
-    if (!worker && isDevEnvironment()) {
-      this.logger.log(
-        `[DEV MODE] User ${userId} has no Worker profile - returning empty missions list`,
-      );
-      return [];
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.userProfile?.role !== UserRole.WORKER) {
+      if (isDevEnvironment()) {
+        this.logger.warn(`[DEV MODE] User ${userId} is not WORKER - returning empty missions list`);
+        return [];
+      }
+      throw new ForbiddenException('Accès réservé aux workers WorkOn');
     }
 
     const missions = await this.prisma.mission.findMany({
-      where: { workerId: worker!.id }, // worker existe forcément ici (prod) ou en dev on retourne []
+      where: { assigneeWorkerId: userId },
       orderBy: { createdAt: 'desc' },
       select: missionSelect,
     });
@@ -394,12 +457,6 @@ export class MissionsService {
     return missions.map((mission) => this.mapToResponse(mission));
   }
 
-  /**
-   * Récupérer le feed de missions pour le worker avec distance calculée
-   * 
-   * MODE DEV : Permet l'accès même sans profil Worker en DB (retourne un tableau vide)
-   * MODE PROD : Exige un profil Worker valide
-   */
   async getMissionFeed(
     userId: string,
     filters: {
@@ -410,18 +467,27 @@ export class MissionsService {
       maxDistance?: number;
     },
   ): Promise<any[]> {
-    // En dev, on tolère l'absence de worker profile
-    const worker = await this.getWorkerOrNull(
-      userId,
-      'Accès réservé aux workers WorkOn',
-    );
+    // Vérifier que l'utilisateur existe et a le rôle WORKER
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        userProfile: {
+          select: { role: true },
+        },
+      },
+    });
 
-    // En dev sans worker : retourner un tableau vide (pas d'erreur 403)
-    if (!worker && isDevEnvironment()) {
-      this.logger.log(
-        `[DEV MODE] User ${userId} has no Worker profile - returning empty mission feed`,
-      );
-      return [];
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.userProfile?.role !== UserRole.WORKER) {
+      if (isDevEnvironment()) {
+        this.logger.warn(`[DEV MODE] User ${userId} is not WORKER - returning empty feed`);
+        return [];
+      }
+      throw new ForbiddenException('Accès réservé aux workers WorkOn');
     }
 
     const where: Prisma.MissionWhereInput = {
@@ -429,11 +495,21 @@ export class MissionsService {
     };
 
     if (filters.category) {
-      where.category = { equals: filters.category, mode: 'insensitive' };
+      const category = await this.prisma.category.findFirst({
+        where: {
+          OR: [
+            { id: filters.category },
+            { name: { equals: filters.category, mode: 'insensitive' } },
+          ],
+        },
+      });
+      if (category) {
+        where.categoryId = category.id;
+      }
     }
 
     if (filters.city) {
-      where.city = { equals: filters.city, mode: 'insensitive' };
+      where.locationAddress = { contains: filters.city, mode: 'insensitive' };
     }
 
     const missions = await this.prisma.mission.findMany({
@@ -441,12 +517,11 @@ export class MissionsService {
       orderBy: { createdAt: 'desc' },
       select: {
         ...missionSelect,
-        location: true,
-        employer: {
+        authorClient: {
           select: {
-            user: {
+            userProfile: {
               select: {
-                fullName: true,
+                name: true,
               },
             },
           },
@@ -457,44 +532,37 @@ export class MissionsService {
     // Calculer la distance pour chaque mission
     const missionsWithDistance = missions.map((mission) => {
       let distance: number | null = null;
-      let lat: number | null = null;
-      let lng: number | null = null;
+      const lat = mission.locationLat;
+      const lng = mission.locationLng;
 
-      if (mission.location && typeof mission.location === 'object') {
-        const loc = mission.location as any;
-        lat = loc.lat || null;
-        lng = loc.lng || null;
-
-        if (
-          filters.latitude &&
-          filters.longitude &&
-          lat !== null &&
-          lng !== null
-        ) {
-          distance = this.calculateDistance(
-            filters.latitude,
-            filters.longitude,
-            lat,
-            lng,
-          );
-        }
+      if (
+        filters.latitude &&
+        filters.longitude &&
+        lat !== null &&
+        lng !== null
+      ) {
+        distance = this.calculateDistance(
+          filters.latitude,
+          filters.longitude,
+          lat,
+          lng,
+        );
       }
 
       return {
         id: mission.id,
         title: mission.title,
-        description: mission.description ?? null,
-        category: mission.category ?? null,
-        city: mission.city ?? null,
-        address: mission.address ?? null,
-        hourlyRate: mission.hourlyRate ?? null,
-        startsAt: mission.startsAt ? mission.startsAt.toISOString() : null,
-        endsAt: mission.endsAt ? mission.endsAt.toISOString() : null,
+        description: mission.description,
+        categoryId: mission.categoryId,
+        locationAddress: mission.locationAddress,
+        budgetMin: mission.budgetMin,
+        budgetMax: mission.budgetMax,
+        priceType: mission.priceType,
+        startAt: mission.startAt ? mission.startAt.toISOString() : null,
+        endAt: mission.endAt ? mission.endAt.toISOString() : null,
         status: mission.status,
-        employerId: mission.employerId,
-        employerName: mission.employer?.user?.fullName ?? null,
-        priceCents: mission.priceCents,
-        currency: mission.currency,
+        authorClientId: mission.authorClientId,
+        authorName: mission.authorClient?.userProfile?.name || null,
         distance,
         latitude: lat,
         longitude: lng,
@@ -521,10 +589,6 @@ export class MissionsService {
     return filtered;
   }
 
-  /**
-   * Calculer la distance entre deux points GPS (formule Haversine)
-   * Retourne la distance en kilomètres
-   */
   private calculateDistance(
     lat1: number,
     lon1: number,
@@ -542,7 +606,7 @@ export class MissionsService {
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c;
-    return Math.round(distance * 10) / 10; // Arrondir à 1 décimale
+    return Math.round(distance * 10) / 10;
   }
 
   private deg2rad(deg: number): number {
@@ -554,12 +618,13 @@ export class MissionsService {
     newStatus: MissionStatus,
   ): void {
     const validTransitions: Record<MissionStatus, MissionStatus[]> = {
-      [MissionStatus.OPEN]: [MissionStatus.CANCELLED],
-      [MissionStatus.RESERVED]: [
+      [MissionStatus.DRAFT]: [MissionStatus.OPEN, MissionStatus.CANCELLED],
+      [MissionStatus.OPEN]: [MissionStatus.MATCHED, MissionStatus.CANCELLED],
+      [MissionStatus.MATCHED]: [
         MissionStatus.IN_PROGRESS,
         MissionStatus.CANCELLED,
       ],
-      [MissionStatus.IN_PROGRESS]: [MissionStatus.COMPLETED],
+      [MissionStatus.IN_PROGRESS]: [MissionStatus.COMPLETED, MissionStatus.CANCELLED],
       [MissionStatus.COMPLETED]: [],
       [MissionStatus.CANCELLED]: [],
     };
@@ -573,86 +638,24 @@ export class MissionsService {
     }
   }
 
-  /**
-   * Helper privé : Vérifie qu'un worker existe pour le userId donné
-   * 
-   * En DÉVELOPPEMENT : retourne null si le worker n'existe pas (mode tolérant)
-   * En PRODUCTION : lance une ForbiddenException si le worker n'existe pas
-   * 
-   * @param userId - ID de l'utilisateur
-   * @param errorMessage - Message d'erreur personnalisé pour la production
-   * @returns Worker trouvé, ou null en dev si non trouvé
-   */
-  private async getWorkerOrNull(
-    userId: string,
-    errorMessage: string = 'Accès réservé aux workers WorkOn',
-  ): Promise<{ id: string } | null> {
-    const worker = await this.prisma.worker.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
-
-    if (!worker) {
-      if (isDevEnvironment()) {
-        // Mode développement : log warning mais continue
-        devWarn(
-          `Worker profile not found for userId=${userId}. ` +
-          `Allowing access in DEV mode. ` +
-          `Create a Worker record or run seed:dev to fix this.`,
-        );
-        this.logger.warn(
-          `[DEV MODE] Worker profile missing for user ${userId} - access granted anyway`,
-        );
-        return null;
-      } else {
-        // Mode production : erreur stricte
-        this.logger.error(
-          `403 MissionsService: Worker profile not found for userId=${userId}`,
-        );
-        throw new ForbiddenException(errorMessage);
-      }
-    }
-
-    return worker;
-  }
-
   private mapToResponse(mission: MissionRecord): MissionResponse {
     return {
       id: mission.id,
       title: mission.title,
-      description: mission.description ?? null,
-      category: mission.category ?? null,
-      city: mission.city ?? null,
-      address: mission.address ?? null,
-      hourlyRate: mission.hourlyRate ?? null,
-      startsAt: mission.startsAt ? mission.startsAt.toISOString() : null,
-      endsAt: mission.endsAt ? mission.endsAt.toISOString() : null,
+      description: mission.description,
+      categoryId: mission.categoryId,
+      locationAddress: mission.locationAddress,
+      budgetMin: mission.budgetMin,
+      budgetMax: mission.budgetMax,
+      startAt: mission.startAt,
+      endAt: mission.endAt,
       status: mission.status,
-      employerId: mission.employerId,
-      workerId: mission.workerId ?? null,
-      priceCents: mission.priceCents,
-      currency: mission.currency,
-      createdAt: mission.createdAt.toISOString(),
-      updatedAt: mission.updatedAt.toISOString(),
+      authorClientId: mission.authorClientId,
+      assigneeWorkerId: mission.assigneeWorkerId,
+      priceType: mission.priceType,
+      createdAt: mission.createdAt,
+      updatedAt: mission.updatedAt,
     };
-  }
-
-  private buildLocation(dto: CreateMissionDto): Prisma.InputJsonValue {
-    return JSON.parse(
-      JSON.stringify({
-        lat: 0,
-        lng: 0,
-        city: dto.city ?? null,
-        address: dto.address ?? null,
-      }),
-    );
-  }
-
-  private computePriceCents(dto: CreateMissionDto): number {
-    if (typeof dto.hourlyRate === 'number' && Number.isFinite(dto.hourlyRate)) {
-      return Math.max(0, Math.round(dto.hourlyRate * 100));
-    }
-    return 0;
   }
 }
 

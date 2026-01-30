@@ -130,56 +130,7 @@ pnpm test
 
 # Tests e2e
 pnpm test:e2e
-
-# Smoke tests (rapide, frontend-only)
-npm run smoke
 ```
-
-### 🔥 Smoke Tests
-
-Les smoke tests vérifient que les routes principales fonctionnent sans crash. Ils sont conçus pour:
-- Fonctionner **sans backend** (skip automatique des tests backend)
-- Fonctionner **sans authentification** (les redirects sont acceptés)
-- Être **rapides** (<1 minute)
-
-#### Routes vérifiées
-
-| Route | Comportement attendu |
-|-------|---------------------|
-| `/` | 200 OK |
-| `/setup` | 200 OK (page de configuration) |
-| `/pricing` | 200 OK |
-| `/faq` | 200 OK |
-| `/legal/terms` | 200 OK |
-| `/legal/privacy` | 200 OK |
-| `/dashboard` | Redirect vers `/sign-in` ou `/setup` |
-| `/profile` | Redirect vers `/sign-in` ou `/setup` |
-| `/onboarding` | Redirect vers `/sign-in` ou `/setup` |
-| `/missions/new` | Redirect vers `/sign-in` ou `/setup` |
-| `/debug/health` | 200 OK |
-
-#### Commandes
-
-```bash
-# Smoke test rapide (chromium only)
-npm run smoke
-
-# Smoke test avec navigateur visible
-npm run smoke:headed
-
-# Smoke test complet (tous les navigateurs)
-npm run test:smoke
-```
-
-#### Comportement sans auth
-
-Si Clerk n'est pas configuré (clés manquantes), le middleware redirige vers `/setup` au lieu de `/sign-in`. Les smoke tests acceptent les deux comportements.
-
-#### Known Issues / Dépendances externes
-
-- **Backend (localhost:3001)**: Non requis pour les smoke tests. Les tests backend sont skippés par défaut avec `npm run smoke`.
-- **Clerk**: Si non configuré, l'app fonctionne en "mode setup" avec banner d'avertissement.
-- **Database**: Non requise pour les pages publiques.
 
 ## 📦 Scripts Disponibles
 

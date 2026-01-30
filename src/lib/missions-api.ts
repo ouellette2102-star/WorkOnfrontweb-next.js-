@@ -1,6 +1,8 @@
 /**
  * Client API pour les missions WorkOn
  * Toutes les requêtes nécessitent un token Clerk valide
+ *
+ * PR-C2: Détection CONSENT_REQUIRED sur les endpoints protégés
  */
 
 import type {
@@ -11,6 +13,11 @@ import type {
   MissionFeedItem,
   MissionFeedFilters,
 } from "@/types/mission";
+import {
+  isConsentRequiredError,
+  createConsentRequiredError,
+  type ApiError,
+} from "./api-consent-handler";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
@@ -53,17 +60,31 @@ async function authenticatedRequest<T>(
 
     // Essayer d'extraire un message d'erreur du backend
     let errorMessage = `Erreur API ${response.status}`;
+    let errorData: Record<string, unknown> | undefined;
     try {
       const parsed = JSON.parse(errorBody);
+      errorData = parsed;
       errorMessage = parsed?.message ?? parsed?.error ?? errorMessage;
-    } catch {
+
+      // PR-C2: Détecter CONSENT_REQUIRED (403)
+      if (response.status === 403 && parsed?.error === "CONSENT_REQUIRED") {
+        throw createConsentRequiredError(parsed.missing);
+      }
+    } catch (e) {
+      // Re-throw CONSENT_REQUIRED errors
+      if (isConsentRequiredError(e)) {
+        throw e;
+      }
       // Si le body n'est pas du JSON, utiliser le texte brut s'il est court
       if (errorBody && errorBody.length < 200) {
         errorMessage = errorBody;
       }
     }
 
-    throw new Error(errorMessage);
+    const error = new Error(errorMessage) as ApiError;
+    error.status = response.status;
+    error.data = errorData;
+    throw error;
   }
 
   console.log(`[Missions API] Success: ${init?.method || "GET"} ${url} - ${response.status}`);

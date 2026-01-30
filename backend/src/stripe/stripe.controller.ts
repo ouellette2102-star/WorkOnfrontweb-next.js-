@@ -9,6 +9,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { StripeService } from './stripe.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -16,7 +17,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 
-@Controller('payments')
+@ApiTags('Payments')
+@Controller('api/v1/payments/stripe')
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
 
@@ -29,7 +31,7 @@ export class StripeController {
   @Roles(UserRole.WORKER)
   async createOnboardingLink(@Request() req: any) {
     const url = await this.stripeService.createConnectOnboardingLink(
-      req.user.sub,
+      req.user.userId || req.user.sub,
     );
     return { url };
   }
@@ -42,7 +44,7 @@ export class StripeController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.WORKER)
   async getOnboardingStatus(@Request() req: any) {
-    return this.stripeService.checkOnboardingStatus(req.user.sub);
+    return this.stripeService.checkOnboardingStatus(req.user.userId || req.user.sub);
   }
 
   /**
@@ -51,15 +53,16 @@ export class StripeController {
    */
   @Post('create-intent')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.EMPLOYER)
+  @Roles(UserRole.EMPLOYER, UserRole.RESIDENTIAL)
   async createPaymentIntent(
     @Request() req: any,
     @Body() dto: CreatePaymentIntentDto,
   ) {
+    // req.user.userId contient l'id interne (ou sub pour clerkId)
     return this.stripeService.createPaymentIntent(
-      req.user.sub,
+      req.user.userId || req.user.sub,
       dto.missionId,
-      dto.amountCents,
+      dto.amount,
     );
   }
 
@@ -71,7 +74,7 @@ export class StripeController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.WORKER)
   async getWorkerPayments(@Request() req: any) {
-    return this.stripeService.getWorkerPayments(req.user.sub);
+    return this.stripeService.getWorkerPayments(req.user.userId || req.user.sub);
   }
 
   /**

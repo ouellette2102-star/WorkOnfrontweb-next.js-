@@ -18,12 +18,14 @@ import {
 import { MissionsLocalService } from './missions-local.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { NearbyMissionsQueryDto } from './dto/nearby-missions-query.dto';
+import { MissionsMapQueryDto } from './dto/missions-map-query.dto';
+import { MissionsMapResponseDto } from './dto/mission-map-item.dto';
 import { MissionResponseDto } from './dto/mission-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { plainToInstance } from 'class-transformer';
 
-@ApiTags('missions')
-@Controller('missions')
+@ApiTags('Missions')
+@Controller('api/v1/missions-local')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class MissionsLocalController {
@@ -57,6 +59,31 @@ export class MissionsLocalController {
     return plainToInstance(MissionResponseDto, mission, {
       excludeExtraneousValues: true,
     });
+  }
+
+  @Get('map')
+  @ApiOperation({
+    summary: 'Get missions for map view',
+    description:
+      'Returns lightweight mission data for rendering map pins within a bounding box. ' +
+      'More efficient than radius-based search for map rendering.',
+  })
+  @ApiQuery({ name: 'north', required: true, example: 45.55, description: 'Northern boundary latitude' })
+  @ApiQuery({ name: 'south', required: true, example: 45.45, description: 'Southern boundary latitude' })
+  @ApiQuery({ name: 'east', required: true, example: -73.5, description: 'Eastern boundary longitude' })
+  @ApiQuery({ name: 'west', required: true, example: -73.7, description: 'Western boundary longitude' })
+  @ApiQuery({ name: 'status', required: false, example: 'open', description: 'Filter by status (default: open)' })
+  @ApiQuery({ name: 'category', required: false, example: 'plumbing', description: 'Filter by category' })
+  @ApiQuery({ name: 'limit', required: false, example: 200, description: 'Max results (default: 200, max: 500)' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of missions within bounding box',
+    type: MissionsMapResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid bounding box parameters' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async findByMap(@Query() query: MissionsMapQueryDto): Promise<MissionsMapResponseDto> {
+    return this.missionsService.findByBbox(query);
   }
 
   @Get('nearby')
@@ -109,6 +136,36 @@ export class MissionsLocalController {
   @ApiResponse({ status: 400, description: 'Mission not available' })
   async accept(@Param('id') id: string, @Request() req: any) {
     const mission = await this.missionsService.accept(
+      id,
+      req.user.sub,
+      req.user.role,
+    );
+
+    return plainToInstance(MissionResponseDto, mission, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  /**
+   * PR-S5: POST /api/v1/missions-local/:id/start
+   * Start a mission (assigned -> in_progress)
+   */
+  @Post(':id/start')
+  @ApiOperation({
+    summary: 'Start a mission',
+    description: 'Worker starts working on an assigned mission',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Mission started successfully',
+    type: MissionResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Only assigned worker can start' })
+  @ApiResponse({ status: 400, description: 'Mission not in assigned status' })
+  @ApiResponse({ status: 404, description: 'Mission not found' })
+  async start(@Param('id') id: string, @Request() req: any) {
+    const mission = await this.missionsService.start(
       id,
       req.user.sub,
       req.user.role,

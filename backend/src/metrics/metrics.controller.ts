@@ -8,8 +8,8 @@ import {
 import { MetricsService } from './metrics.service';
 import { RatioResponseDto } from './dto/ratio-response.dto';
 
-@ApiTags('metrics')
-@Controller('metrics')
+@ApiTags('Metrics')
+@Controller('api/v1/metrics')
 export class MetricsController {
   constructor(private readonly metricsService: MetricsService) {}
 

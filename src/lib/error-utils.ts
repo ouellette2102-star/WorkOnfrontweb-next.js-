@@ -14,6 +14,7 @@ export type ErrorCode =
   | "AUTH_REQUIRED"
   | "NOT_FOUND"
   | "FORBIDDEN"
+  | "CONSENT_REQUIRED"
   | "VALIDATION_ERROR"
   | "RATE_LIMITED"
   | "SERVER_ERROR"
@@ -38,6 +39,7 @@ const USER_MESSAGES: Record<ErrorCode, string> = {
   AUTH_REQUIRED: "Connexion requise.",
   NOT_FOUND: "Cette ressource n'existe pas.",
   FORBIDDEN: "Vous n'avez pas accès à cette ressource.",
+  CONSENT_REQUIRED: "Veuillez accepter les conditions d'utilisation.",
   VALIDATION_ERROR: "Données invalides. Vérifiez votre saisie.",
   RATE_LIMITED: "Trop de requêtes. Patientez un moment.",
   SERVER_ERROR: "Une erreur est survenue. Réessayez.",
@@ -188,4 +190,6 @@ export function isRetryable(error: unknown): boolean {
   const normalized = normalizeError(error);
   return normalized.retryable;
 }
+
+
 

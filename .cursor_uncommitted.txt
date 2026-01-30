@@ -1,0 +1,180 @@
+﻿ M README.md
+ M RELEASE.md
+ M SECURITY.md
+ M backend/.eslintrc.js
+ M backend/.github/workflows/ci.yml
+ M backend/DEV_MODE.md
+ M backend/README.md
+ D backend/build-errors.txt
+ M backend/e2e/contracts.spec.ts
+ M backend/e2e/missions.spec.ts
+ M backend/e2e/payments.spec.ts
+ M backend/env.example
+ M backend/package-lock.json
+ M backend/package.json
+ M backend/prisma/schema.prisma
+ M backend/prisma/seed.ts
+ M backend/src/admin/admin.controller.ts
+ M backend/src/admin/admin.module.ts
+ M backend/src/admin/admin.service.ts
+ M backend/src/app.controller.ts
+ M backend/src/app.module.ts
+ M backend/src/auth/auth.controller.ts
+ M backend/src/auth/auth.module.ts
+ D backend/src/auth/auth.service.spec.ts
+ D backend/src/auth/auth.service.ts
+ M backend/src/auth/dto/auth-response.dto.ts
+ M backend/src/auth/dto/refresh-token.dto.ts
+ M backend/src/auth/guards/jwt-auth.guard.ts
+ D backend/src/auth/local-auth.controller.ts
+ M backend/src/auth/local-auth.service.ts
+ M backend/src/auth/strategies/local.strategy.ts
+ M backend/src/config/env.validation.ts
+ M backend/src/contracts/contracts.controller.ts
+ M backend/src/contracts/contracts.module.ts
+ M backend/src/contracts/contracts.service.ts
+ D backend/src/contracts/dto/sign-contract.dto.ts
+ M backend/src/health/health.controller.ts
+ M backend/src/health/health.module.ts
+ M backend/src/main.ts
+ M backend/src/messages/dto/create-message.dto.ts
+ M backend/src/messages/messages.controller.ts
+ M backend/src/messages/messages.service.ts
+ M backend/src/metrics/metrics.controller.ts
+ M backend/src/mission-photos/mission-photos.controller.ts
+ M backend/src/mission-photos/mission-photos.service.ts
+ M backend/src/mission-time-logs/mission-time-logs.controller.ts
+ M backend/src/mission-time-logs/mission-time-logs.service.ts
+ M backend/src/missions-local/missions-local.controller.ts
+ M backend/src/missions-local/missions-local.repository.ts
+ M backend/src/missions-local/missions-local.service.ts
+ M backend/src/missions/dto/create-mission.dto.ts
+ M backend/src/missions/dto/mission-feed.dto.ts
+ M backend/src/missions/dto/update-mission-status.dto.ts
+ M backend/src/missions/missions.controller.ts
+ M backend/src/missions/missions.module.ts
+ M backend/src/missions/missions.service.spec.ts
+ M backend/src/missions/missions.service.ts
+ M backend/src/notifications/notifications.controller.ts
+ M backend/src/notifications/notifications.module.ts
+ M backend/src/notifications/notifications.service.ts
+ M backend/src/payments-local/payments-local.controller.ts
+ M backend/src/payments-local/payments-local.service.ts
+ M backend/src/payments/dto/create-payment-intent.dto.ts
+ M backend/src/payments/payments.controller.ts
+ M backend/src/payments/payments.module.ts
+ M backend/src/payments/payments.service.ts
+ M backend/src/payments/webhooks.controller.ts
+ M backend/src/profile/profile.controller.ts
+ M backend/src/stripe/dto/create-payment-intent.dto.ts
+ M backend/src/stripe/stripe.controller.ts
+ M backend/src/stripe/stripe.service.ts
+ M backend/src/users/dto/create-user.dto.ts
+ M backend/src/users/dto/user-response.dto.ts
+ M backend/src/users/users.controller.ts
+ M backend/src/users/users.repository.ts
+ M backend/src/users/users.service.ts
+ M backend/tsconfig.json
+ M next.config.ts
+ M package.json
+ M src/app/api/feed/like/route.ts
+ M src/app/api/health/route.ts
+ M src/app/api/missions/[id]/messages/route.ts
+ M src/app/api/payments/create-intent/route.ts
+ M src/app/api/reviews/route.ts
+ M src/app/error.tsx
+ M src/app/layout.tsx
+ M src/app/legal/privacy/page.tsx
+ M src/app/legal/terms/page.tsx
+ M src/app/missions/[id]/page.tsx
+ M src/app/profile/[id]/page.tsx
+ M src/components/premium/premium-badge.tsx
+ M src/components/premium/premium-upgrade-cta.tsx
+ M src/components/reviews/review-form.tsx
+ M src/hooks/use-status-notification.ts
+ M src/lib/error-utils.ts
+ M src/lib/logger.ts
+ M src/lib/mission-status.ts
+ M src/lib/missions-api.ts
+ M src/lib/notification-messages.ts
+ M src/lib/premium.ts
+ M src/middleware.ts
+ M src/types/profile.ts
+ M src/types/review.ts
+?? .cursor_uncommitted.txt
+?? backend/.npmrc
+?? backend/.railwayignore
+?? backend/DIAGNOSTIC_ERROR_500_REGISTER.md
+?? backend/FLUTTERFLOW_API_CONFIG.md
+?? backend/FLUTTERFLOW_MESSAGES_CONTRACTS.md
+?? backend/LOCAL_AUTH_FIXED.md
+?? backend/MISSIONS_MODULE_REALIGNMENT.md
+?? backend/NOTIFICATIONS_MESSAGES_SETUP.md
+?? backend/PAYMENTS_REALIGNMENT_SUMMARY.md
+?? backend/PAYMENTS_STRIPE_SETUP.md
+?? backend/RAILWAY_DEPLOYMENT_STATUS.md
+?? backend/RAILWAY_DEPLOYMENT_SUMMARY.md
+?? backend/RAILWAY_DEPLOY_COMMANDS.md
+?? backend/RAILWAY_REQUIRED_ENV_VARS.md
+?? backend/README_DEPLOY_RAILWAY.md
+?? backend/RESOLUTION_FINALE_RAILWAY.md
+?? backend/SWAGGER_REAL_DATA_FIXED.md
+?? backend/docs/
+?? backend/e2e/compliance.spec.ts
+?? backend/e2e/health.spec.ts
+?? backend/env.production.example
+?? backend/migrate-railway-manual.ps1
+?? backend/nixpacks.toml
+?? backend/playwright-report/
+?? backend/prisma/data/
+?? backend/prisma/migrations/
+?? backend/scripts/backup.sh
+?? backend/scripts/check-api-contracts.ts
+?? backend/scripts/ops/
+?? backend/scripts/railway-start.js
+?? backend/scripts/restore.sh
+?? backend/scripts/smoke_backend.ps1
+?? backend/scripts/smoke_backend.sh
+?? backend/src/auth/auth.controller.delete.spec.ts
+?? backend/src/auth/dto/delete-account.dto.ts
+?? backend/src/auth/dto/forgot-password.dto.ts
+?? backend/src/auth/dto/reset-password.dto.ts
+?? backend/src/auth/local-auth.service.spec.ts
+?? backend/src/catalog/
+?? backend/src/common/audit/
+?? backend/src/common/dto/
+?? backend/src/common/filters/
+?? backend/src/common/guards/
+?? backend/src/common/middleware/
+?? backend/src/compliance/
+?? backend/src/config/env.validation.spec.ts
+?? backend/src/contracts/dto/create-contract.dto.ts
+?? backend/src/contracts/dto/update-contract-status.dto.ts
+?? backend/src/devices/
+?? backend/src/media/
+?? backend/src/messages/dto/conversation-response.dto.ts
+?? backend/src/mission-events/
+?? backend/src/missions-local/dto/mission-map-item.dto.ts
+?? backend/src/missions-local/dto/missions-map-query.dto.ts
+?? backend/src/missions-local/missions-local-map.service.spec.ts
+?? backend/src/missions-map/
+?? backend/src/offers/
+?? backend/src/payments/checkout.controller.ts
+?? backend/src/payments/dto/checkout.dto.ts
+?? backend/src/payments/invoice.service.ts
+?? backend/src/push/
+?? backend/src/reviews/
+?? backend/src/storage/
+?? backend/src/users/users.service.spec.ts
+?? backend/start.err
+?? backend/store-assets/
+?? backend/test-auth-railway.ps1
+?? backend/test-auth-simple.ps1
+?? backend/test/compliance-critical-flows.e2e-spec.ts
+?? backend/tsconfig.eslint.json
+?? src/components/consent-modal.tsx
+?? src/components/consent-provider.tsx
+?? src/components/ui/dialog.tsx
+?? src/hooks/use-consent-action.ts
+?? src/lib/api-consent-handler.ts
+?? src/lib/compliance-api.ts

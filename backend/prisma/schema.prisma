@@ -26,15 +26,16 @@ model AuditEvent {
 }
 
 model Category {
-  id                 String    @id
-  name               String    @unique
+  id                 String                     @id
+  name               String                     @unique
   nameEn             String?
   icon               String?
   legalNotes         String?
-  residentialAllowed Boolean   @default(true)
-  createdAt          DateTime  @default(now())
+  residentialAllowed Boolean                    @default(true)
+  createdAt          DateTime                   @default(now())
   missions           Mission[]
   skills             Skill[]
+  recurringTemplates RecurringMissionTemplate[] // PR-10
 
   @@map("categories")
 }
@@ -71,6 +72,55 @@ model ComplianceDocument {
   @@map("compliance_documents")
 }
 
+// PR-07: Legal Compliance - Terms & Conditions Versioning
+model TermsVersion {
+  id          String                 @id @default(cuid())
+  type        ComplianceDocumentType
+  version     String // Semantic versioning: "1.0.0", "1.1.0", etc.
+  title       String // Human-readable title
+  contentUrl  String // URL to full document (PDF/HTML)
+  contentHash String? // SHA256 hash for integrity verification
+  summary     String? // Brief summary of changes
+  effectiveAt DateTime // When this version becomes active
+  createdAt   DateTime               @default(now())
+  isActive    Boolean                @default(false) // Only one active per type
+
+  @@unique([type, version])
+  @@index([type, isActive])
+  @@index([effectiveAt])
+  @@map("terms_versions")
+}
+
+// PR-07: Legal Compliance - User Consent Tracking
+model UserConsent {
+  id          String      @id @default(cuid())
+  userId      String
+  consentType ConsentType
+  granted     Boolean     @default(false)
+  grantedAt   DateTime?
+  revokedAt   DateTime?
+  ipAddress   String? // IP when consent was given/revoked
+  userAgent   String? // Browser/device info
+  source      String? // Where consent was collected (signup, settings, etc.)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, consentType])
+  @@index([userId])
+  @@index([consentType])
+  @@map("user_consents")
+}
+
+enum ConsentType {
+  MARKETING_EMAIL // Marketing emails
+  MARKETING_PUSH // Marketing push notifications
+  ANALYTICS // Analytics and tracking
+  THIRD_PARTY_SHARING // Sharing data with partners
+  PERSONALIZATION // Personalized recommendations
+}
+
 model Dispute {
   id         String        @id
   missionId  String        @unique
@@ -83,27 +133,35 @@ model Dispute {
   mission    Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
   openedBy   User          @relation(fields: [openedById], references: [id], onDelete: Cascade)
 
+  // PR-00: Trust foundation relations
+  evidence DisputeEvidence[]
+  timeline DisputeTimeline[]
+
   @@index([status])
   @@map("disputes")
 }
 
 model LocalMission {
-  id               String             @id
-  title            String
-  description      String
-  category         String
-  status           LocalMissionStatus @default(open)
-  price            Float
-  latitude         Float
-  longitude        Float
-  city             String
-  address          String?
-  createdByUserId  String
-  assignedToUserId String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime
-  assignedToUser   LocalUser?         @relation("local_missions_assignedToUserIdTolocal_users", fields: [assignedToUserId], references: [id])
-  createdByUser    LocalUser          @relation("local_missions_createdByUserIdTolocal_users", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  id                    String             @id
+  title                 String
+  description           String
+  category              String
+  status                LocalMissionStatus @default(open)
+  price                 Float
+  latitude              Float
+  longitude             Float
+  city                  String
+  address               String?
+  createdByUserId       String
+  assignedToUserId      String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime
+  // PR-6: Payment fields
+  paidAt                DateTime?
+  stripePaymentIntentId String?
+  assignedToUser        LocalUser?         @relation("local_missions_assignedToUserIdTolocal_users", fields: [assignedToUserId], references: [id])
+  createdByUser         LocalUser          @relation("local_missions_createdByUserIdTolocal_users", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  offers                LocalOffer[]
 
   @@index([assignedToUserId])
   @@index([category])
@@ -111,45 +169,122 @@ model LocalMission {
   @@index([createdByUserId])
   @@index([latitude, longitude])
   @@index([status])
+  @@index([stripePaymentIntentId])
   @@map("local_missions")
 }
 
+// ============================================
+// LOCAL OFFERS - Offres pour missions locales
+// ============================================
+
+model LocalOffer {
+  id        String           @id
+  missionId String
+  workerId  String
+  price     Float
+  message   String?
+  status    LocalOfferStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime
+
+  // Relations
+  mission LocalMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  worker  LocalUser    @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  // Unique constraint: one offer per worker per mission
+  @@unique([missionId, workerId])
+  @@index([missionId])
+  @@index([workerId])
+  @@index([status])
+  @@map("local_offers")
+}
+
+enum LocalOfferStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+// PR-06: Identity Verification Enums
+enum IdVerificationStatus {
+  NOT_STARTED // User hasn't initiated verification
+  PENDING // Verification in progress
+  VERIFIED // Successfully verified
+  FAILED // Verification failed
+  EXPIRED // Verification expired, needs renewal
+}
+
+enum TrustTier {
+  BASIC // Default: email verified only
+  VERIFIED // Phone verified
+  TRUSTED // Phone + ID verified
+  PREMIUM // Phone + ID + Bank verified (for workers)
+}
+
 model LocalUser {
-  id               String         @id
-  email            String         @unique
-  hashedPassword   String
-  firstName        String
-  lastName         String
-  phone            String?
-  city             String?
-  role             LocalUserRole  @default(worker)
-  active           Boolean        @default(true)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime
+  id             String        @id
+  email          String        @unique
+  hashedPassword String
+  firstName      String
+  lastName       String
+  phone          String?
+  city           String?
+  pictureUrl     String? // Profile picture URL
+  role           LocalUserRole @default(worker)
+  active         Boolean       @default(true)
+  deletedAt      DateTime? // GDPR: timestamp of account deletion
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime
+
+  // PR-06: Identity Verification Hooks
+  // Phone verification
+  phoneVerified   Boolean   @default(false)
+  phoneVerifiedAt DateTime?
+
+  // ID verification (government ID, passport, etc.)
+  idVerificationStatus   IdVerificationStatus @default(NOT_STARTED)
+  idVerifiedAt           DateTime?
+  idVerificationProvider String? // e.g., "stripe_identity", "jumio"
+  idVerificationRef      String? // External reference ID
+
+  // Bank verification (via Stripe)
+  bankVerified    Boolean   @default(false)
+  bankVerifiedAt  DateTime?
+  stripeAccountId String? // Stripe Connect account ID
+
+  // Trust tier (computed from verifications)
+  trustTier          TrustTier @default(BASIC)
+  trustTierUpdatedAt DateTime?
+
+  // PR-07: Legal Compliance - Terms & Consent
+  termsAcceptedAt    DateTime? // When user accepted current terms
+  termsVersion       String? // Version of terms accepted (e.g., "1.0.0")
+  privacyAcceptedAt  DateTime? // When user accepted privacy policy
+  privacyVersion     String? // Version of privacy policy accepted
+  marketingConsent   Boolean   @default(false) // Marketing communications
+  marketingConsentAt DateTime? // When marketing consent was given/revoked
+
+  // PR-07: Data Retention & GDPR/Loi 25
+  dataRetentionConsent  Boolean   @default(true) // Consent to retain data
+  dataExportRequestedAt DateTime? // Last data export request (GDPR Art. 20)
+  dataExportCompletedAt DateTime? // When last export was completed
+  deletionRequestedAt   DateTime? // When deletion was requested
+  deletionScheduledFor  DateTime? // When data will be deleted (30-day grace)
+
   assignedMissions LocalMission[] @relation("local_missions_assignedToUserIdTolocal_users")
   createdMissions  LocalMission[] @relation("local_missions_createdByUserIdTolocal_users")
+  offers           LocalOffer[]
 
   @@index([active])
   @@index([city])
   @@index([email])
   @@index([role])
+  @@index([deletedAt])
+  @@index([trustTier])
+  @@index([phoneVerified])
+  @@index([idVerificationStatus])
+  @@index([deletionScheduledFor])
   @@map("local_users")
-}
-
-model Match {
-  id            String        @id
-  missionId     String
-  workerId      String
-  score         Float
-  featuresJSON  Json?
-  createdAt     DateTime      @default(now())
-  mission       Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  workerProfile WorkerProfile @relation(fields: [workerId], references: [id], onDelete: Cascade)
-
-  @@index([missionId])
-  @@index([score])
-  @@index([workerId])
-  @@map("matches")
 }
 
 model Mission {
@@ -175,7 +310,6 @@ model Mission {
   deletedAt        DateTime?
   workerProfileId  String?
   dispute          Dispute?
-  matches          Match[]
   assigneeWorker   User?          @relation("missions_assigneeWorkerIdTousers", fields: [assigneeWorkerId], references: [id])
   authorClient     User           @relation("missions_authorClientIdTousers", fields: [authorClientId], references: [id], onDelete: Cascade)
   category         Category       @relation(fields: [categoryId], references: [id])
@@ -184,6 +318,10 @@ model Mission {
   offers           Offer[]
   payments         Payment[]
   reviews          Review[]
+  messages         Message[]
+  contract         Contract?
+  photos           MissionPhoto[]
+  events           MissionEvent[]
 
   @@index([assigneeWorkerId])
   @@index([authorClientId])
@@ -230,13 +368,14 @@ model Offer {
 
 model Payment {
   id                     String        @id
-  missionId              String
+  missionId              String        @unique
   stripePaymentIntentId  String?       @unique
   stripeConnectAccountId String?
   amount                 Float
   currency               String        @default("CAD")
   platformFeePct         Float         @default(10)
-  status                 PaymentStatus @default(REQUIRES_ACTION)
+  status                 PaymentStatus @default(CREATED)
+  lastStripeEventId      String?
   createdAt              DateTime      @default(now())
   updatedAt              DateTime
   mission                Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
@@ -244,35 +383,6 @@ model Payment {
   @@index([missionId])
   @@index([status])
   @@map("payments")
-}
-
-model PostLike {
-  id        String   @id
-  postId    String
-  userId    String
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([postId, userId])
-  @@index([userId])
-  @@map("post_likes")
-}
-
-model Post {
-  id              String        @id
-  workerProfileId String
-  title           String?
-  description     String
-  mediaUrl        String
-  likeCount       Int           @default(0)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime
-  likes           PostLike[]
-  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
-
-  @@index([workerProfileId])
-  @@map("posts")
 }
 
 model Review {
@@ -293,19 +403,6 @@ model Review {
   @@index([moderation])
   @@index([targetUserId])
   @@map("reviews")
-}
-
-model ScheduleSlot {
-  id            String        @id
-  workerId      String
-  startAt       DateTime
-  endAt         DateTime
-  available     Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  workerProfile WorkerProfile @relation(fields: [workerId], references: [id], onDelete: Cascade)
-
-  @@index([workerId, startAt, endAt])
-  @@map("schedule_slots")
 }
 
 model Skill {
@@ -355,46 +452,75 @@ model UserProfile {
 }
 
 model User {
-  id                  String               @id
-  clerkId             String               @unique
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime
-  auditEvents         AuditEvent[]
-  clientOrgs          ClientOrg[]
-  complianceDocuments ComplianceDocument[]
-  disputes            Dispute[]
-  assignedMissions    Mission[]            @relation("missions_assigneeWorkerIdTousers")
-  authoredMissions    Mission[]            @relation("missions_authorClientIdTousers")
-  notifications       Notification[]
-  postLikes           PostLike[]
-  authoredReviews     Review[]             @relation("reviews_authorIdTousers")
-  receivedReviews     Review[]             @relation("reviews_targetUserIdTousers")
-  subscriptions       Subscription[]
-  userProfile         UserProfile?
-  workerProfile       WorkerProfile?
+  id                      String                   @id
+  clerkId                 String                   @unique
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime
+  auditEvents             AuditEvent[]
+  clientOrgs              ClientOrg[]
+  complianceDocuments     ComplianceDocument[]
+  disputes                Dispute[]
+  assignedMissions        Mission[]                @relation("missions_assigneeWorkerIdTousers")
+  authoredMissions        Mission[]                @relation("missions_authorClientIdTousers")
+  notifications           Notification[]
+  authoredReviews         Review[]                 @relation("reviews_authorIdTousers")
+  receivedReviews         Review[]                 @relation("reviews_targetUserIdTousers")
+  subscriptions           Subscription[]
+  userProfile             UserProfile?
+  workerProfile           WorkerProfile?
+  sentMessages            Message[]
+  employerContracts       Contract[]               @relation("contracts_employerIdTousers")
+  workerContracts         Contract[]               @relation("contracts_workerIdTousers")
+  devices                 Device[]
+  consents                UserConsent[] // PR-07: User consent tracking
+  bookings                Booking[]                @relation("bookings_clientIdTousers") // PR-10
+  notificationPreferences NotificationPreference[] // PR-12: Notification preferences
+  notificationQueue       NotificationQueue[] // PR-12: Queued notifications
+  notificationDeliveries  NotificationDelivery[] // PR-12: Delivery logs
 
   @@map("users")
 }
 
+/// Device registration for push notifications
+model Device {
+  id         String   @id @default(uuid())
+  userId     String
+  deviceId   String // Unique device identifier (vendor ID, etc.)
+  platform   String // ios, android, web
+  pushToken  String? // FCM/APNs token
+  appVersion String?
+  active     Boolean  @default(true)
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@index([userId])
+  @@index([active])
+  @@map("devices")
+}
+
 model WorkerProfile {
-  id                 String         @id
-  userId             String         @unique
+  id                 String                     @id
+  userId             String                     @unique
   hourlyRate         Float
   serviceAreas       Json?
-  residentialEnabled Boolean        @default(false)
-  portfolio          Json[]         @default([])
+  residentialEnabled Boolean                    @default(false)
+  portfolio          Json[]                     @default([])
   availability       Json?
-  completedMissions  Int            @default(0)
-  totalEarnings      Float          @default(0)
-  createdAt          DateTime       @default(now())
+  completedMissions  Int                        @default(0)
+  totalEarnings      Float                      @default(0)
+  createdAt          DateTime                   @default(now())
   updatedAt          DateTime
-  matches            Match[]
   missions           Mission[]
   offers             Offer[]
-  posts              Post[]
-  scheduleSlots      ScheduleSlot[]
-  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
   workerSkills       WorkerSkill[]
+  // PR-10: Scheduling relations
+  recurringTemplates RecurringMissionTemplate[]
+  availabilitySlots  AvailabilitySlot[]
+  bookings           Booking[]
 
   @@map("worker_profiles")
 }
@@ -437,6 +563,7 @@ enum LocalMissionStatus {
   assigned
   in_progress
   completed
+  paid
   cancelled
 }
 
@@ -462,7 +589,12 @@ enum OfferStatus {
 }
 
 enum PaymentStatus {
+  CREATED
   REQUIRES_ACTION
+  AUTHORIZED
+  CAPTURED
+  CANCELED
+  FAILED
   SUCCEEDED
   REFUNDED
   DISPUTED
@@ -496,4 +628,746 @@ enum VerificationStatus {
   PENDING
   VERIFIED
   REJECTED
+}
+
+// ============================================
+// MESSAGES MODULE - Chat entre Worker et Employer
+// ============================================
+
+model Message {
+  id         String            @id
+  missionId  String
+  senderId   String
+  senderRole MessageSenderRole
+  content    String
+  status     MessageStatus     @default(SENT)
+  createdAt  DateTime          @default(now())
+
+  // Relations
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  sender  User    @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+enum MessageSenderRole {
+  WORKER
+  EMPLOYER
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+// ============================================
+// CONTRACTS MODULE - Contrats de mission
+// ============================================
+
+model Contract {
+  id               String         @id
+  missionId        String         @unique
+  employerId       String
+  workerId         String
+  status           ContractStatus @default(DRAFT)
+  amount           Float
+  hourlyRate       Float?
+  startAt          DateTime?
+  endAt            DateTime?
+  signedByWorker   Boolean        @default(false)
+  signedByEmployer Boolean        @default(false)
+  signatureNonce   String?
+  contractUrl      String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  // Relations
+  mission  Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  employer User    @relation("contracts_employerIdTousers", fields: [employerId], references: [id], onDelete: Cascade)
+  worker   User    @relation("contracts_workerIdTousers", fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([employerId])
+  @@index([workerId])
+  @@index([status])
+  @@map("contracts")
+}
+
+enum ContractStatus {
+  DRAFT
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+// ============================================
+// MISSION PHOTOS - Photos uploadées par Worker/Employer
+// ============================================
+
+model MissionPhoto {
+  id           String   @id @default(cuid())
+  missionId    String
+  userId       String
+  url          String
+  path         String?
+  mimeType     String?
+  size         Int?
+  originalName String?
+  createdAt    DateTime @default(now())
+
+  // Relations
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+  @@index([userId])
+  @@map("mission_photos")
+}
+
+// ============================================
+// MISSION EVENTS - Journal d'événements (audit + notifications)
+// ============================================
+
+enum MissionEventType {
+  MISSION_CREATED
+  MISSION_PUBLISHED
+  MISSION_ACCEPTED
+  MISSION_STARTED
+  MISSION_COMPLETED
+  MISSION_CANCELED
+  MISSION_EXPIRED
+  PAYMENT_AUTHORIZED
+  PAYMENT_CAPTURED
+  PAYMENT_CANCELED
+  PHOTO_UPLOADED
+  OFFER_SUBMITTED
+  OFFER_ACCEPTED
+  OFFER_DECLINED
+}
+
+model MissionEvent {
+  id           String           @id @default(cuid())
+  missionId    String
+  type         MissionEventType
+  actorUserId  String? // Qui a causé l'action (employer/worker/system)
+  targetUserId String? // User concerné pour "feed" (l'autre partie)
+  payload      Json? // Détails non sensibles (ex: {fromStatus, toStatus})
+  createdAt    DateTime         @default(now())
+
+  // Relations
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId, createdAt])
+  @@index([targetUserId, createdAt])
+  @@index([type, createdAt])
+  @@map("mission_events")
+}
+
+// ============================================
+// INVOICES - Factures pour paiements (source of truth)
+// ============================================
+
+model Invoice {
+  id               String  @id @default(cuid())
+  missionId        String? // Null si LocalMission
+  localMissionId   String? // Null si Mission
+  payerUserId      String // Qui paye (employer/client)
+  payerLocalUserId String? // Si LocalUser
+
+  // Montants (en centimes pour précision)
+  subtotalCents    Int // Montant de base (prix mission)
+  platformFeeCents Int // Frais WorkOn
+  taxesCents       Int    @default(0) // TPS/TVQ si applicable
+  totalCents       Int // Total à payer
+  currency         String @default("CAD")
+
+  // Stripe
+  stripeCheckoutSessionId String? @unique
+  stripePaymentIntentId   String?
+
+  // Status
+  status InvoiceStatus @default(PENDING)
+  paidAt DateTime?
+
+  // Metadata
+  description String?
+  metadata    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([missionId])
+  @@index([localMissionId])
+  @@index([payerUserId])
+  @@index([status])
+  @@index([stripeCheckoutSessionId])
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  PENDING // En attente de paiement
+  PROCESSING // Checkout en cours
+  PAID // Payé avec succès
+  FAILED // Échec du paiement
+  CANCELLED // Annulé
+  REFUNDED // Remboursé
+}
+
+// ============================================
+// STRIPE EVENTS - Idempotence pour webhooks
+// ============================================
+
+model StripeEvent {
+  id          String    @id // Stripe event ID (evt_xxx)
+  type        String // Type d'event (payment_intent.succeeded, etc.)
+  processed   Boolean   @default(false)
+  processedAt DateTime?
+  payload     Json? // Payload complet (optionnel, pour debug)
+  error       String? // Message d'erreur si échec
+  createdAt   DateTime  @default(now())
+
+  @@index([type, processed])
+  @@map("stripe_events")
+}
+
+// ============================================
+// EMAIL OTP - For email change verification
+// ============================================
+
+model EmailOtp {
+  id         String    @id @default(cuid())
+  userId     String // LocalUser ID
+  newEmail   String // New email to verify
+  codeHash   String // HMAC-SHA256 hash of OTP code
+  expiresAt  DateTime // Expiration time (10 min default)
+  attempts   Int       @default(0) // Failed attempts count
+  consumedAt DateTime? // When OTP was successfully used
+  ip         String? // Request IP for audit
+  userAgent  String? // Request user agent for audit
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, newEmail])
+  @@index([expiresAt])
+  @@map("email_otp")
+}
+
+// ============================================
+// PR-00: CORE TRUST FOUNDATION
+// Support Tickets, Dispute Evidence, Device Tracking
+// ============================================
+
+/// Support tickets for in-app customer support
+model SupportTicket {
+  id          String                @id @default(cuid())
+  userId      String // User who opened the ticket
+  missionId   String? // Related mission (optional)
+  subject     String
+  description String
+  category    SupportTicketCategory
+  priority    SupportTicketPriority @default(NORMAL)
+  status      SupportTicketStatus   @default(OPEN)
+  assignedTo  String? // Admin user ID (if assigned)
+  resolvedAt  DateTime?
+  metadata    Json? // Additional context
+
+  // Device/request context for fraud detection
+  deviceId  String? // Hashed device ID
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  messages SupportTicketMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([missionId])
+  @@index([createdAt])
+  @@map("support_tickets")
+}
+
+/// Messages within a support ticket
+model SupportTicketMessage {
+  id          String   @id @default(cuid())
+  ticketId    String
+  senderId    String // User or admin ID
+  senderType  String // "user" or "admin"
+  content     String
+  attachments Json? // Array of attachment URLs
+  createdAt   DateTime @default(now())
+
+  // Relations
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("support_ticket_messages")
+}
+
+enum SupportTicketCategory {
+  PAYMENT
+  MISSION
+  ACCOUNT
+  TECHNICAL
+  DISPUTE
+  OTHER
+}
+
+enum SupportTicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_USER
+  WAITING_ADMIN
+  RESOLVED
+  CLOSED
+}
+
+/// Evidence attached to disputes (photos, videos, documents)
+model DisputeEvidence {
+  id          String              @id @default(cuid())
+  disputeId   String
+  uploadedBy  String // User ID who uploaded
+  type        DisputeEvidenceType
+  url         String // Storage URL
+  filename    String?
+  mimeType    String?
+  size        Int? // File size in bytes
+  description String? // User description
+  metadata    Json? // EXIF, location, timestamp
+
+  // Moderation
+  reviewed   Boolean   @default(false)
+  reviewedBy String? // Admin who reviewed
+  reviewedAt DateTime?
+  flagged    Boolean   @default(false)
+  flagReason String?
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId])
+  @@index([uploadedBy])
+  @@index([reviewed])
+  @@map("dispute_evidence")
+}
+
+enum DisputeEvidenceType {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  SCREENSHOT
+  OTHER
+}
+
+/// Timeline of actions/events in a dispute
+model DisputeTimeline {
+  id        String        @id @default(cuid())
+  disputeId String
+  action    DisputeAction
+  actorId   String? // User or admin who performed action
+  actorType String? // "user", "admin", "system"
+  details   String? // Human-readable description
+  metadata  Json? // Additional structured data
+  createdAt DateTime      @default(now())
+
+  // Relations
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId, createdAt])
+  @@map("dispute_timeline")
+}
+
+enum DisputeAction {
+  OPENED
+  EVIDENCE_ADDED
+  ASSIGNED
+  STATUS_CHANGED
+  MESSAGE_SENT
+  ESCALATED
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+/// Audit log for sensitive operations (price changes, payments, admin actions)
+model TrustAuditLog {
+  id         String        @id @default(cuid())
+  category   AuditCategory
+  action     String // Specific action (e.g., "price_changed", "payment_captured")
+  actorId    String? // User or admin who performed action
+  actorType  String? // "user", "admin", "system", "webhook"
+  targetType String? // "mission", "payment", "user", etc.
+  targetId   String?
+
+  // Before/after state for sensitive changes
+  previousValue Json?
+  newValue      Json?
+
+  // Context
+  reason        String? // Why the action was taken
+  ipAddress     String?
+  userAgent     String?
+  deviceId      String? // Hashed device ID
+  correlationId String? // Request correlation ID
+
+  // Risk signals
+  riskScore Int? // 0-100 risk assessment
+  flagged   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([category, createdAt])
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([flagged])
+  @@map("trust_audit_logs")
+}
+
+enum AuditCategory {
+  PRICE_CHANGE
+  PAYMENT
+  MISSION_STATUS
+  USER_ACCOUNT
+  ADMIN_ACTION
+  SECURITY
+  DISPUTE
+  REFUND
+}
+
+// ============================================
+// PR-10: SCHEDULING & RECURRENCE PRIMITIVES
+// ============================================
+
+/// Recurring mission template
+/// Allows workers to create repeatable service offerings
+model RecurringMissionTemplate {
+  id             String         @id @default(cuid())
+  workerId       String
+  title          String
+  description    String
+  categoryId     String
+  priceType      String // "hourly", "fixed"
+  price          Float
+  duration       Int // Duration in minutes
+  recurrenceRule RecurrenceRule
+  recurrenceData Json? // Additional rule data (days of week, etc.)
+  maxOccurrences Int? // Max times this can be booked
+  validFrom      DateTime? // When template becomes active
+  validUntil     DateTime? // When template expires
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  worker   WorkerProfile @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  category Category      @relation(fields: [categoryId], references: [id])
+  bookings Booking[]
+
+  @@index([workerId, isActive])
+  @@index([categoryId])
+  @@index([validFrom, validUntil])
+  @@map("recurring_mission_templates")
+}
+
+enum RecurrenceRule {
+  ONCE // One-time booking
+  DAILY // Every day
+  WEEKLY // Same day(s) every week
+  BIWEEKLY // Every two weeks
+  MONTHLY // Same day of month
+  CUSTOM // Custom rule in recurrenceData
+}
+
+/// Worker availability slots
+/// Defines when a worker is available for bookings
+model AvailabilitySlot {
+  id           String    @id @default(cuid())
+  workerId     String
+  dayOfWeek    Int // 0 = Sunday, 6 = Saturday
+  startTime    String // "09:00" (24h format)
+  endTime      String // "17:00"
+  timezone     String    @default("America/Toronto")
+  isRecurring  Boolean   @default(true)
+  specificDate DateTime? // For one-time availability
+  isBlocked    Boolean   @default(false) // Block time off
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  worker WorkerProfile @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([workerId, dayOfWeek])
+  @@index([workerId, specificDate])
+  @@map("availability_slots")
+}
+
+/// Booking for a service
+/// Represents a confirmed or pending appointment
+model Booking {
+  id         String  @id @default(cuid())
+  clientId   String
+  workerId   String
+  templateId String? // If booked from a recurring template
+  missionId  String? // Link to actual mission when created
+
+  // Booking details
+  title       String
+  description String?
+  scheduledAt DateTime // When the service is scheduled
+  duration    Int // Duration in minutes
+  endAt       DateTime // Computed: scheduledAt + duration
+  timezone    String   @default("America/Toronto")
+
+  // Status tracking
+  status             BookingStatus @default(PENDING)
+  confirmedAt        DateTime?
+  cancelledAt        DateTime?
+  cancelledBy        String? // User ID who cancelled
+  cancellationReason String?
+
+  // Reminders
+  reminderSent   Boolean   @default(false)
+  reminderSentAt DateTime?
+
+  // Pricing (snapshot at booking time)
+  price     Float
+  priceType String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  client   User                      @relation("bookings_clientIdTousers", fields: [clientId], references: [id], onDelete: Cascade)
+  worker   WorkerProfile             @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  template RecurringMissionTemplate? @relation(fields: [templateId], references: [id])
+
+  @@index([clientId])
+  @@index([workerId, scheduledAt])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING // Awaiting worker confirmation
+  CONFIRMED // Worker confirmed
+  IN_PROGRESS // Service started
+  COMPLETED // Service completed
+  CANCELLED // Cancelled by either party
+  NO_SHOW // Client didn't show up
+}
+
+// ============================================
+// PR-12: NOTIFICATION PRIMITIVES
+// Preferences, Queue, and Delivery Tracking
+// ============================================
+
+/// User notification preferences per type and channel
+model NotificationPreference {
+  id               String           @id @default(cuid())
+  userId           String
+  notificationType NotificationType
+
+  // Channel preferences
+  pushEnabled  Boolean @default(true)
+  emailEnabled Boolean @default(true)
+  inAppEnabled Boolean @default(true)
+  smsEnabled   Boolean @default(false)
+
+  // Timing preferences
+  quietHoursStart String? // "22:00" - start of quiet hours
+  quietHoursEnd   String? // "08:00" - end of quiet hours
+  timezone        String  @default("America/Toronto")
+
+  // Frequency controls
+  digestEnabled   Boolean          @default(false) // Bundle notifications
+  digestFrequency DigestFrequency? // How often to send digest
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationType])
+  @@index([userId])
+  @@map("notification_preferences")
+}
+
+/// Types of notifications (for preference management)
+enum NotificationType {
+  // Mission lifecycle
+  MISSION_NEW_OFFER // New offer on your mission
+  MISSION_OFFER_ACCEPTED // Your offer was accepted
+  MISSION_STARTED // Mission started
+  MISSION_COMPLETED // Mission completed
+  MISSION_CANCELLED // Mission cancelled
+
+  // Messages
+  MESSAGE_NEW // New chat message
+  MESSAGE_UNREAD_REMINDER // Reminder for unread messages
+
+  // Payments
+  PAYMENT_RECEIVED // Payment received (worker)
+  PAYMENT_SENT // Payment sent (client)
+  PAYMENT_FAILED // Payment failed
+  PAYOUT_PROCESSED // Payout to bank processed
+
+  // Reviews
+  REVIEW_RECEIVED // Someone reviewed you
+  REVIEW_REMINDER // Reminder to leave a review
+
+  // Account
+  ACCOUNT_SECURITY // Security alerts (always enabled)
+  ACCOUNT_VERIFICATION // Verification status updates
+
+  // Bookings (PR-10)
+  BOOKING_REQUEST // New booking request
+  BOOKING_CONFIRMED // Booking confirmed
+  BOOKING_REMINDER // Upcoming booking reminder
+  BOOKING_CANCELLED // Booking cancelled
+
+  // Marketing (requires consent)
+  MARKETING_PROMO // Promotions and offers
+  MARKETING_NEWS // News and updates
+}
+
+enum DigestFrequency {
+  IMMEDIATE // Send immediately (no digest)
+  HOURLY // Hourly digest
+  DAILY // Daily digest
+  WEEKLY // Weekly digest
+}
+
+/// Notification queue for reliable delivery
+model NotificationQueue {
+  id               String           @id @default(cuid())
+  userId           String
+  notificationType NotificationType
+
+  // Content
+  title String
+  body  String
+  data  Json? // Additional payload data
+
+  // Delivery channels requested
+  channels String[] @default([]) // ["push", "email", "in_app", "sms"]
+
+  // Scheduling
+  scheduledFor DateTime             @default(now())
+  priority     NotificationPriority @default(NORMAL)
+
+  // Delivery status
+  status        NotificationQueueStatus @default(PENDING)
+  attempts      Int                     @default(0)
+  maxAttempts   Int                     @default(3)
+  lastAttemptAt DateTime?
+  deliveredAt   DateTime?
+  failedAt      DateTime?
+  errorMessage  String?
+
+  // Tracking
+  correlationId  String? // Link to source event
+  idempotencyKey String? @unique // Prevent duplicates
+
+  // Delivery results per channel
+  deliveryResults Json? // { push: { success: true, messageId: "..." }, email: { ... } }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries NotificationDelivery[]
+
+  @@index([userId])
+  @@index([status, scheduledFor])
+  @@index([notificationType])
+  @@index([priority, scheduledFor])
+  @@index([correlationId])
+  @@map("notification_queue")
+}
+
+enum NotificationPriority {
+  LOW // Can be delayed, batched
+  NORMAL // Standard delivery
+  HIGH // Deliver quickly
+  CRITICAL // Security alerts - always deliver immediately
+}
+
+enum NotificationQueueStatus {
+  PENDING // Waiting to be processed
+  PROCESSING // Currently being sent
+  DELIVERED // Successfully delivered (at least one channel)
+  PARTIAL // Some channels failed
+  FAILED // All channels failed
+  CANCELLED // Cancelled before delivery
+  EXPIRED // TTL expired
+}
+
+/// Notification delivery log for analytics and debugging
+model NotificationDelivery {
+  id      String @id @default(cuid())
+  queueId String
+  userId  String
+  channel String // "push", "email", "in_app", "sms"
+
+  // Delivery details
+  status            DeliveryStatus @default(PENDING)
+  provider          String? // "fcm", "apns", "sendgrid", "twilio"
+  providerMessageId String? // External message ID
+
+  // Device info (for push)
+  deviceId  String?
+  pushToken String?
+
+  // Email info
+  emailAddress String?
+
+  // Timing
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  readAt      DateTime?
+  failedAt    DateTime?
+
+  // Error handling
+  errorCode    String?
+  errorMessage String?
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  queue NotificationQueue @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  user  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([queueId])
+  @@index([userId, createdAt])
+  @@index([channel, status])
+  @@index([providerMessageId])
+  @@map("notification_deliveries")
+}
+
+enum DeliveryStatus {
+  PENDING // Queued for delivery
+  SENT // Sent to provider
+  DELIVERED // Confirmed delivered
+  READ // User opened/read
+  FAILED // Delivery failed
+  BOUNCED // Email bounced
+  UNSUBSCRIBED // User unsubscribed
 }

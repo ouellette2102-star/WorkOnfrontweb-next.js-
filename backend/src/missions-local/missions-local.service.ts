@@ -8,6 +8,7 @@ import {
 import { MissionsLocalRepository } from './missions-local.repository';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { NearbyMissionsQueryDto } from './dto/nearby-missions-query.dto';
+import { MissionsMapQueryDto } from './dto/missions-map-query.dto';
 
 /**
  * Missions Service - Business logic for mission management
@@ -117,13 +118,54 @@ export class MissionsLocalService {
   }
 
   /**
+   * PR-S5: Start a mission (assigned -> in_progress)
+   * 
+   * @param missionId Mission ID
+   * @param userId Worker's user ID
+   * @param userRole User role (must be worker)
+   */
+  async start(missionId: string, userId: string, userRole: string) {
+    // Only workers can start missions
+    if (userRole !== 'worker') {
+      throw new ForbiddenException('Only workers can start missions');
+    }
+
+    const mission = await this.missionsRepository.findById(missionId);
+
+    if (!mission) {
+      throw new NotFoundException('Mission not found');
+    }
+
+    // Only assigned worker can start
+    if (mission.assignedToUserId !== userId) {
+      throw new ForbiddenException('Only the assigned worker can start this mission');
+    }
+
+    // Must be in assigned status
+    if (mission.status !== 'assigned') {
+      throw new BadRequestException(
+        `Cannot start mission (current status: ${mission.status})`,
+      );
+    }
+
+    const updated = await this.missionsRepository.updateStatus(
+      missionId,
+      'in_progress',
+    );
+
+    this.logger.log(`Mission ${missionId} started by worker ${userId}`);
+
+    return updated;
+  }
+
+  /**
    * Mark mission as completed
    * 
    * @param missionId Mission ID
    * @param userId User ID (worker or creator)
    * @param userRole User role
    */
-  async complete(missionId: string, userId: string, userRole: string) {
+  async complete(missionId: string, userId: string, _userRole: string) {
     const mission = await this.missionsRepository.findById(missionId);
 
     if (!mission) {
@@ -226,6 +268,53 @@ export class MissionsLocalService {
    */
   async findMyAssignments(userId: string) {
     return this.missionsRepository.findByWorker(userId);
+  }
+
+  /**
+   * Find missions within a bounding box (for map view)
+   * 
+   * @param query Bounding box parameters
+   * @returns Lightweight mission list for map pins
+   */
+  async findByBbox(query: MissionsMapQueryDto) {
+    // Validate bbox: north must be > south
+    if (query.north <= query.south) {
+      throw new BadRequestException(
+        'Invalid bounding box: north must be greater than south',
+      );
+    }
+
+    // Validate bbox: east must be > west (simplified, doesn't handle antimeridian)
+    if (query.east <= query.west) {
+      throw new BadRequestException(
+        'Invalid bounding box: east must be greater than west',
+      );
+    }
+
+    const missions = await this.missionsRepository.findByBbox(
+      query.north,
+      query.south,
+      query.east,
+      query.west,
+      query.status || 'open',
+      query.category,
+      query.limit || 200,
+    );
+
+    this.logger.log(
+      `Map query: found ${missions.length} missions in bbox`,
+    );
+
+    return {
+      missions,
+      count: missions.length,
+      bbox: {
+        north: query.north,
+        south: query.south,
+        east: query.east,
+        west: query.west,
+      },
+    };
   }
 }
 

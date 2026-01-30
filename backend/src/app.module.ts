@@ -1,48 +1,81 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard, ThrottlerModuleOptions } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
+import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
-// import { MissionsModule } from './missions/missions.module';
-// import { PaymentsModule } from './payments/payments.module';
-// import { ContractsModule } from './contracts/contracts.module';
+import { MissionsModule } from './missions/missions.module';
+import { PaymentsModule } from './payments/payments.module';
+import { ContractsModule } from './contracts/contracts.module';
 import { AdminModule } from './admin/admin.module';
 import { LoggerModule } from './logger/logger.module';
 import { ProfileModule } from './profile/profile.module';
-// import { MessagesModule } from './messages';
-// import { NotificationsModule } from './notifications/notifications.module';
+import { MessagesModule } from './messages/messages.module';
+import { NotificationsModule } from './notifications/notifications.module';
 // import { MissionTimeLogsModule } from './mission-time-logs/mission-time-logs.module';
-// import { MissionPhotosModule } from './mission-photos/mission-photos.module';
-// import { StripeModule } from './stripe/stripe.module';
+import { StripeModule } from './stripe/stripe.module';
 import { validate } from './config/env.validation';
 import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
 import { MissionsLocalModule } from './missions-local/missions-local.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { PaymentsLocalModule } from './payments-local/payments-local.module';
+import { CatalogModule } from './catalog/catalog.module';
+import { MissionPhotosModule } from './mission-photos/mission-photos.module';
+import { MediaModule } from './media/media.module';
+import { StorageModule } from './storage/storage.module';
+import { MissionEventsModule } from './mission-events/mission-events.module';
+import { OffersModule } from './offers/offers.module';
+import { ComplianceModule } from './compliance/compliance.module';
+import { AuditModule } from './common/audit/audit.module';
+import { AlertModule } from './common/alerts/alert.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { DevicesModule } from './devices/devices.module';
+import { PushModule } from './push/push.module';
+import { EarningsModule } from './earnings/earnings.module';
+import { SupportModule } from './support/support.module';
+import { IdentityModule } from './identity/identity.module';
+import { SecurityModule } from './common/security/security.module';
+import { SchedulingModule } from './scheduling/scheduling.module';
+import { ProductionConfigModule } from './config/production-config.module';
 
 @Module({
   imports: [
     // Configuration globale avec validation stricte des ENV
     // ⚠️ SÉCURITÉ: Valide les variables requises au démarrage
+    // Charge .env.local en priorité, puis .env (relatif au dossier backend/)
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
-      validate, // Valide DATABASE_URL, CLERK_SECRET_KEY, NODE_ENV, etc.
+      validate, // Valide DATABASE_URL, NODE_ENV (+ JWT_SECRET, CLERK_SECRET_KEY en prod)
     }),
 
     // Rate limiting - Protection contre les abus et attaques par force brute
-    // ⚠️ SÉCURITÉ: Limite globale stricte - 20 requêtes par minute par IP
+    // ⚠️ SÉCURITÉ: Configurable via RATE_LIMIT_* ou THROTTLE_* (legacy)
+    // Disable avec RATE_LIMIT_ENABLED=0
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService): ThrottlerModuleOptions => {
-        const ttl = config.get<number>('THROTTLE_TTL', 60); // 60 secondes
-        const limit = config.get<number>('THROTTLE_LIMIT', 20); // 20 requêtes (réduit de 100)
+        // Feature flag: désactiver complètement le rate limiting si RATE_LIMIT_ENABLED=0
+        const enabled = config.get<string>('RATE_LIMIT_ENABLED', '1') !== '0';
+        
+        // Support des deux formats: RATE_LIMIT_* (nouveau) et THROTTLE_* (legacy)
+        const ttl = config.get<number>('RATE_LIMIT_TTL') 
+          || config.get<number>('THROTTLE_TTL', 60);
+        const limit = config.get<number>('RATE_LIMIT_LIMIT') 
+          || config.get<number>('THROTTLE_LIMIT', 100);
+
+        if (!enabled) {
+          console.log('⚠️  Rate limiting DISABLED (RATE_LIMIT_ENABLED=0)');
+          // Throttler très permissif quand désactivé
+          return { throttlers: [{ name: 'disabled', ttl: 1, limit: 999999 }] };
+        }
 
         return {
           throttlers: [
@@ -98,31 +131,73 @@ import { PaymentsLocalModule } from './payments-local/payments-local.module';
       },
     }),
 
-    // Modules métier
+    // ============================================================
+    // CORE INFRASTRUCTURE (no behavior change)
+    // ============================================================
     PrismaModule,
     LoggerModule,
+    // Audit logging for critical business events (PR-I2)
+    AuditModule,
+    // Alert service for production monitoring (PR-01)
+    AlertModule,
     // Nouveaux modules - Users first (needed by AuthModule)
     UsersModule,
     // Auth module (depends on UsersModule)
     AuthModule,
-    // Old modules (temporarily disabled for Prisma alignment)
-    // TODO: Re-enable after aligning with new Prisma schema
-    // MissionsModule,
-    // PaymentsModule,
-    // ContractsModule,
+    // ============================================================
+    // LEGACY (Clerk-based) MODULES - ACTIVE IN PRODUCTION
+    // NOTE: Do not remove without explicit release decision.
+    // ============================================================
+    // Notifications module (needed by MissionsModule and MessagesModule)
+    NotificationsModule,
+    // Legacy modules (kept active)
+    MissionsModule,
+    MessagesModule,
+    ContractsModule,
+    PaymentsModule,
+    StripeModule,
     AdminModule,
     ProfileModule,
-    // MessagesModule,
-    // NotificationsModule,
     // MissionTimeLogsModule,
-    // MissionPhotosModule,
-    // StripeModule,
     // Health check
     HealthModule,
-    // MVP Marketplace modules (depend on AuthModule)
+    // ============================================================
+    // NATIVE (LocalUser/LocalMission) MODULES - ACTIVE IN PRODUCTION
+    // ============================================================
     MissionsLocalModule,
     MetricsModule,
     PaymentsLocalModule,
+    // Public read-only catalog API (categories + skills)
+    CatalogModule,
+    // Mission photos upload (PR#12)
+    MissionPhotosModule,
+    // Storage abstraction + Media streaming (PR#13)
+    StorageModule,
+    MediaModule,
+    // Mission lifecycle events (audit + notifications)
+    MissionEventsModule,
+    // Offers module (marketplace offers flow)
+    OffersModule,
+    // Compliance module - Consentement légal (Loi 25 / GDPR / Stores)
+    ComplianceModule,
+    // Reviews module - User ratings & reviews
+    ReviewsModule,
+    // Devices module - Push notification tokens & device management
+    DevicesModule,
+    // Push module - Firebase Cloud Messaging (PR-PUSH)
+    PushModule,
+    // Earnings module - Worker earnings & payout tracking (PR-EARNINGS)
+    EarningsModule,
+    // Support module - In-app customer support tickets (PR-00)
+    SupportModule,
+    // Identity module - Verification hooks (PR-06)
+    IdentityModule,
+    // Security module - Log sanitization, input validation (PR-09)
+    SecurityModule,
+    // Scheduling module - Bookings, availability, recurring templates (PR-10)
+    SchedulingModule,
+    // Production configuration - Feature flags, secrets validation, safe defaults (PR-11)
+    ProductionConfigModule,
   ],
   controllers: [AppController],
   providers: [
@@ -132,5 +207,12 @@ import { PaymentsLocalModule } from './payments-local/payments-local.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // PR-00: Request context middleware (language, timezone, currency, device tracking)
+    consumer.apply(RequestContextMiddleware).forRoutes('*');
+    // Appliquer le middleware correlationId sur toutes les routes
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}
 

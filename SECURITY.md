@@ -110,3 +110,5 @@ If you discover a security vulnerability, please report it to:
 | 2026-01 | PR-09 | Fixed Next.js RCE (CRITICAL → 0) |
 | 2026-01 | PR-10 | Documented remaining vulnerabilities |
 
+
+

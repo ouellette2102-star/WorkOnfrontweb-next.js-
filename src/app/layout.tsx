@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs";
 import { Providers } from "@/components/providers";
+import { ConsentProvider } from "@/components/consent-provider";
 import { NotificationBadge } from "@/components/notifications/notification-badge";
 import { Toaster } from "sonner";
 import { isClerkConfigured, logEnvStatus } from "@/lib/env";
@@ -120,7 +121,9 @@ export default function RootLayout({
             closeButton
             theme="dark"
           />
-          <Providers>{children}</Providers>
+          <Providers>
+            <ConsentProvider>{children}</ConsentProvider>
+          </Providers>
         </body>
       </html>
     </ClerkProvider>

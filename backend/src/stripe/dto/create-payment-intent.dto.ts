@@ -1,11 +1,11 @@
-import { IsInt, IsString, Min } from 'class-validator';
+import { IsNumber, IsString, Min } from 'class-validator';
 
 export class CreatePaymentIntentDto {
   @IsString()
   missionId: string;
 
-  @IsInt()
-  @Min(100) // Minimum 1$ CAD
-  amountCents: number;
+  @IsNumber()
+  @Min(1) // Minimum 1$ CAD
+  amount: number; // Montant en dollars CAD
 }
 

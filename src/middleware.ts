@@ -14,6 +14,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/",
+  "/api/health", // Healthcheck endpoint (monitoring/load balancers)
   "/api/webhooks(.*)",
   "/debug(.*)", // Debug routes (health check, etc.)
   "/setup(.*)", // Setup/config page (always public)
@@ -82,6 +83,11 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
  * Exported middleware - chooses between Clerk and fallback based on config
  */
 export default function middleware(req: NextRequest) {
+  // Bypass ALL middleware for healthcheck (monitoring/load balancers)
+  if (req.nextUrl.pathname === "/api/health") {
+    return NextResponse.next();
+  }
+
   // If Clerk is not configured, use fallback (no crash)
   if (!isClerkConfiguredInMiddleware()) {
     return fallbackMiddleware(req);

@@ -1,70 +1,96 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 
+/**
+ * User Response DTO
+ * 
+ * This DTO is returned by auth and user endpoints.
+ * Examples are minimal to avoid showing dummy data in Swagger.
+ * Real API responses will show actual user data from the database.
+ */
 @Exclude()
 export class UserResponseDto {
   @Expose()
   @ApiProperty({
-    example: 'cly123abc...',
     description: 'User unique identifier',
+    type: String,
   })
   id: string;
 
   @Expose()
   @ApiProperty({
-    example: 'john.doe@example.com',
     description: 'User email address',
+    type: String,
   })
   email: string;
 
   @Expose()
   @ApiProperty({
-    example: 'John',
     description: 'User first name',
+    type: String,
   })
   firstName: string;
 
   @Expose()
   @ApiProperty({
-    example: 'Doe',
     description: 'User last name',
+    type: String,
   })
   lastName: string;
 
   @Expose()
   @ApiProperty({
-    example: '+1 514 555 0100',
     description: 'User phone number',
+    type: String,
     nullable: true,
+    required: false,
   })
   phone: string | null;
 
   @Expose()
   @ApiProperty({
-    example: 'Montréal',
     description: 'User city/region',
+    type: String,
     nullable: true,
+    required: false,
   })
   city: string | null;
 
   @Expose()
   @ApiProperty({
-    example: 'worker',
-    description: 'User role',
+    description: 'Profile picture URL',
+    type: String,
+    nullable: true,
+    required: false,
+  })
+  pictureUrl: string | null;
+
+  @Expose()
+  @ApiProperty({
+    description: 'User role (worker, employer, residential_client)',
+    type: String,
   })
   role: string;
 
   @Expose()
   @ApiProperty({
-    example: '2024-01-15T10:00:00.000Z',
+    description: 'Account active status',
+    type: Boolean,
+    required: false,
+  })
+  active?: boolean;
+
+  @Expose()
+  @ApiProperty({
     description: 'Account creation date',
+    type: Date,
   })
   createdAt: Date;
 
   @Expose()
   @ApiProperty({
-    example: '2024-01-15T10:00:00.000Z',
     description: 'Last update date',
+    type: Date,
   })
   updatedAt: Date;
 

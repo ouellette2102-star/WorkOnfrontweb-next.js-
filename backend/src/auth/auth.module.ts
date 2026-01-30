@@ -1,17 +1,25 @@
+/**
+ * Auth Module - Local JWT Authentication
+ *
+ * Current mode: LOCAL JWT (Clerk disabled)
+ * See docs/auth-mode.md for full documentation on:
+ * - Active guards/strategies
+ * - Endpoint status (implemented vs TODO)
+ * - Token structure
+ * - How to re-enable Clerk if needed
+ */
 import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
-import { ClerkAuthService } from './clerk-auth.service';
+// Clerk disabled for local auth only
+// import { ClerkAuthService } from './clerk-auth.service';
+// import { LocalStrategy } from './strategies/local.strategy'; // Not used - login handled directly in controller
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 // Local Auth (email/password)
-import { LocalAuthController } from './local-auth.controller';
 import { LocalAuthService } from './local-auth.service';
 import { JwtLocalStrategy } from './strategies/jwt-local.strategy';
 import { UsersModule } from '../users/users.module';
@@ -32,21 +40,17 @@ import { UsersModule } from '../users/users.module';
       }),
     }),
   ],
-  controllers: [AuthController, LocalAuthController],
+  controllers: [AuthController],
   providers: [
-    AuthService,
     JwtStrategy,
-    JwtRefreshStrategy,
-    LocalStrategy,
-    ClerkAuthService,
+    // LocalStrategy removed - not needed, login handled directly in AuthController
+    // ClerkAuthService removed - local auth only
     JwtAuthGuard,
     // Local Auth
     LocalAuthService,
     JwtLocalStrategy,
   ],
   exports: [
-    AuthService,
-    ClerkAuthService,
     JwtAuthGuard,
     JwtModule, // Export JwtModule so other modules can use JwtService
     PassportModule, // Export PassportModule for strategies
