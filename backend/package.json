@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "prisma": {
-    "schema": "prisma/schema.prisma"
+    "schema": "prisma/schema.prisma",
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "scripts": {
     "build": "nest build",
@@ -32,6 +33,7 @@
     "migrate:prod": "prisma migrate deploy",
     "seed": "ts-node prisma/seed.ts",
     "seed:dev": "ts-node prisma/seed.dev.ts",
+    "seed:review": "ts-node prisma/seed.review.ts",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "prisma:db:push": "prisma db push",
@@ -126,9 +128,26 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/*.module.ts",
+      "!**/main.ts",
+      "!**/index.ts"
     ],
     "coverageDirectory": "../coverage",
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "lcov",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 36,
+        "statements": 36,
+        "functions": 37,
+        "branches": 31
+      }
+    },
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
