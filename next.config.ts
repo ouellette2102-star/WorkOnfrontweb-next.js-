@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
   // React compiler (experimental)
   reactCompiler: true,
 
-  // Standalone output for optimized Docker/production deployments
-  output: "standalone",
-
   // Hide X-Powered-By header for security
   poweredByHeader: false,
 
