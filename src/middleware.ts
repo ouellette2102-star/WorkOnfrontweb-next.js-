@@ -5,8 +5,12 @@ import { NextResponse, type NextRequest } from "next/server";
  * Check if Clerk is configured (without importing env.ts to avoid edge runtime issues)
  */
 function isClerkConfiguredInMiddleware(): boolean {
-  const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  return Boolean(key && key.length > 10 && (key.startsWith("pk_test_") || key.startsWith("pk_live_")));
+  const pubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const secretKey = process.env.CLERK_SECRET_KEY;
+  return Boolean(
+    pubKey && pubKey.length > 10 && (pubKey.startsWith("pk_test_") || pubKey.startsWith("pk_live_")) &&
+    secretKey && secretKey.length > 10 && (secretKey.startsWith("sk_test_") || secretKey.startsWith("sk_live_"))
+  );
 }
 
 // Routes publiques (pas besoin d'auth)
