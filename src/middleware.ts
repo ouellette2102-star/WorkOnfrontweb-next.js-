@@ -14,10 +14,14 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/",
-  "/api/health", // Healthcheck endpoint (monitoring/load balancers)
+  "/pros(.*)",        // Funnel travailleurs
+  "/employeurs(.*)",  // Funnel employeurs
+  "/p/(.*)",          // Profils publics /p/[slug]
+  "/missions",        // Feed missions public (racine seulement)
+  "/api/health",
   "/api/webhooks(.*)",
-  "/debug(.*)", // Debug routes (health check, etc.)
-  "/setup(.*)", // Setup/config page (always public)
+  "/debug(.*)",
+  "/setup(.*)",
 ]);
 
 // Routes d'onboarding (auth requise mais pas de rôle)
