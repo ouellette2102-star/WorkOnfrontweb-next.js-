@@ -6,9 +6,6 @@ const nextConfig: NextConfig = {
   // React strict mode for better development warnings
   reactStrictMode: true,
 
-  // React compiler (experimental)
-  reactCompiler: true,
-
   // Hide X-Powered-By header for security
   poweredByHeader: false,
 
