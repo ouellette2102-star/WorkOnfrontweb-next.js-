@@ -1,0 +1,24 @@
+# WorkOn - robots.txt
+# https://workon.ca
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /debug/
+Disallow: /worker/
+Disallow: /employer/
+Disallow: /onboarding/
+Disallow: /profile/
+Disallow: /sign-in
+Disallow: /sign-up
+
+# Public pages - allow crawling
+Allow: /pros
+Allow: /employeurs
+Allow: /missions
+Allow: /p/
+Allow: /pricing
+Allow: /faq
+Allow: /legal/
+
+Sitemap: https://workon.ca/sitemap.xml

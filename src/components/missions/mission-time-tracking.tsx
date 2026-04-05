@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { getAccessToken } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
 import { frCA } from "date-fns/locale";
 import {
@@ -19,7 +19,6 @@ type MissionTimeTrackingProps = {
 };
 
 export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
-  const { getToken } = useAuth();
   const [logs, setLogs] = useState<MissionTimeLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +36,7 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
 
   const loadLogs = async () => {
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) return;
 
       const data = await getMissionTimeLogs(token, mission.id);
@@ -58,7 +57,7 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
     setSuccessMessage(null);
 
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Impossible de récupérer le token");
         return;
@@ -82,7 +81,7 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
     setSuccessMessage(null);
 
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Impossible de récupérer le token");
         return;

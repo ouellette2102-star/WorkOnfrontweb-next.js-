@@ -192,7 +192,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
 
           <div className="flex-shrink-0">
             <Button className="bg-red-600 hover:bg-red-500 text-white" asChild>
-              <Link href="/sign-up?role=employer">Engager ce pro</Link>
+              <Link href="/register?role=employer">Engager ce pro</Link>
             </Button>
           </div>
         </div>
@@ -276,7 +276,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                 Publiez votre mission et entrez en contact directement.
               </p>
               <Button className="w-full bg-red-600 hover:bg-red-500 text-white" asChild>
-                <Link href="/sign-up?role=employer">Publier une mission</Link>
+                <Link href="/register?role=employer">Publier une mission</Link>
               </Button>
               <p className="text-xs text-white/40 text-center mt-2">Gratuit pendant le lancement</p>
             </div>

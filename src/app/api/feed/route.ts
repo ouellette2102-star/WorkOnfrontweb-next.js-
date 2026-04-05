@@ -7,8 +7,7 @@
  * - { ok: false, data: [], error: { code: string, message: string }, source: "backend" }
  */
 
-import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import type { FeedPost } from "@/types/feed";
 
 const API_BASE_URL =
@@ -105,21 +104,15 @@ function errorResponse(
   );
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { userId, getToken } = await auth();
+    // Auth check — extract token from header or cookie
+    const authHeader = request.headers.get("authorization");
+    const cookieToken = request.cookies.get("workon_token")?.value;
+    const token = authHeader?.replace("Bearer ", "") || cookieToken;
 
-    if (!userId) {
-      return errorResponse("UNAUTHENTICATED", "Authentification requise", 401);
-    }
-
-    const token = await getToken();
     if (!token) {
-      return errorResponse(
-        "TOKEN_UNAVAILABLE",
-        "Impossible de récupérer le token",
-        401
-      );
+      return errorResponse("UNAUTHENTICATED", "Authentification requise", 401);
     }
 
     // Check if API_URL is configured

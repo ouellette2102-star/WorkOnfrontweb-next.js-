@@ -7,8 +7,7 @@
  * - { ok: false, data: [], error: { code: string, message: string }, source: "proxy" }
  */
 
-import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import type { Message } from "@/types/mission-chat";
 
 const API_BASE_URL =
@@ -82,19 +81,17 @@ type RouteContext = {
  * Récupérer les messages d'une mission
  */
 export async function GET(
-  request: Request,
+  request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse<ChatApiResponse>> {
   try {
-    const { userId, getToken } = await auth();
+    // Auth check — extract token from header or cookie
+    const authHeader = request.headers.get("authorization");
+    const cookieToken = request.cookies.get("workon_token")?.value;
+    const token = authHeader?.replace("Bearer ", "") || cookieToken;
 
-    if (!userId) {
-      return errorResponse("AUTH_REQUIRED", "Authentification requise", 401);
-    }
-
-    const token = await getToken();
     if (!token) {
-      return errorResponse("TOKEN_UNAVAILABLE", "Token non disponible", 401);
+      return errorResponse("AUTH_REQUIRED", "Authentification requise", 401);
     }
 
     const { id: missionId } = await context.params;
@@ -178,19 +175,17 @@ export async function GET(
  * Envoyer un nouveau message
  */
 export async function POST(
-  request: Request,
+  request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse<ChatApiResponse | { ok: true; data: Message; source: "backend" }>> {
   try {
-    const { userId, getToken } = await auth();
+    // Auth check — extract token from header or cookie
+    const authHeader = request.headers.get("authorization");
+    const cookieToken = request.cookies.get("workon_token")?.value;
+    const token = authHeader?.replace("Bearer ", "") || cookieToken;
 
-    if (!userId) {
-      return errorResponse("AUTH_REQUIRED", "Authentification requise", 401);
-    }
-
-    const token = await getToken();
     if (!token) {
-      return errorResponse("TOKEN_UNAVAILABLE", "Token non disponible", 401);
+      return errorResponse("AUTH_REQUIRED", "Authentification requise", 401);
     }
 
     const { id: missionId } = await context.params;

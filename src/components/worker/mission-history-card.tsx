@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { getWorkerMissions } from "@/lib/missions-api";
 import { getMissionTimeLogs } from "@/lib/mission-time-logs-api";
 import { MissionStatus, type Mission } from "@/types/mission";
@@ -11,17 +12,17 @@ import { frCA } from "date-fns/locale";
 import { MissionPhotosModal } from "@/components/worker/mission-photos-modal";
 
 export function MissionHistoryCard() {
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
   const [durations, setDurations] = useState<Record<string, number>>({});
 
   const loadMissions = async () => {
-    if (!isLoaded) return;
+    if (authLoading) return;
 
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) return;
 
       const allMissions = await getWorkerMissions(token);
@@ -72,7 +73,7 @@ export function MissionHistoryCard() {
 
   useEffect(() => {
     loadMissions();
-  }, [isLoaded, getToken]);
+  }, [authLoading]);
 
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { updateMissionStatus } from "@/lib/missions-api";
 import type { Mission } from "@/types/mission";
 import { MissionStatus } from "@/types/mission";
@@ -16,7 +17,7 @@ export function MissionStatusActions({
   mission,
   onSuccess,
 }: MissionStatusActionsProps) {
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState<MissionStatus | null>(null);
@@ -37,12 +38,12 @@ export function MissionStatusActions({
 
     startTransition(async () => {
       try {
-        if (!isLoaded) {
+        if (authLoading) {
           setError("Authentification en cours...");
           return;
         }
 
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) {
           setError("Impossible de récupérer le token. Reconnecte-toi.");
           return;

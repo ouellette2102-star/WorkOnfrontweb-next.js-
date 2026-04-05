@@ -7,8 +7,7 @@
  * - { ok: false, error: { code: string, message: string } }
  */
 
-import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
@@ -34,7 +33,7 @@ function errorResponse(code: string, message: string, status: number) {
   );
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Check Stripe configuration
     if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
@@ -54,20 +53,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Auth check
-    const { userId, getToken } = await auth();
+    // Auth check — extract token from header or cookie
+    const authHeader = request.headers.get("authorization");
+    const cookieToken = request.cookies.get("workon_token")?.value;
+    const token = authHeader?.replace("Bearer ", "") || cookieToken;
 
-    if (!userId) {
-      return errorResponse("UNAUTHENTICATED", "Authentification requise", 401);
-    }
-
-    const token = await getToken();
     if (!token) {
-      return errorResponse(
-        "TOKEN_UNAVAILABLE",
-        "Impossible de récupérer le token",
-        401
-      );
+      return errorResponse("UNAUTHENTICATED", "Authentification requise", 401);
     }
 
     // Parse request body

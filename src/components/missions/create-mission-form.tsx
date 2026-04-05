@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { createMission } from "@/lib/missions-api";
 import type { CreateMissionPayload } from "@/types/mission";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ const categories = [
 
 export function CreateMissionForm() {
   const router = useRouter();
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -65,12 +66,12 @@ export function CreateMissionForm() {
 
     startTransition(async () => {
       try {
-        if (!isLoaded) {
-          setError("Clerk n'est pas prêt. Réessaie dans un instant.");
+        if (authLoading) {
+          setError("Authentification en cours. Réessaie dans un instant.");
           return;
         }
 
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) {
           setError("Impossible de récupérer le token. Reconnecte-toi.");
           return;

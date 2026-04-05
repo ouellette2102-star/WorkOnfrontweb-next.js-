@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
 import { useRouter, useParams } from "next/navigation";
+import { getAccessToken } from "@/lib/auth";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { getMissionById } from "@/lib/missions-api";
@@ -31,7 +32,9 @@ type PaymentIntentResponse =
 export default function PayMissionPage() {
   const router = useRouter();
   const params = useParams();
-  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const isLoaded = !authLoading;
+  const isSignedIn = isAuthenticated;
 
   // States
   const [mission, setMission] = useState<Mission | null>(null);
@@ -48,7 +51,7 @@ export default function PayMissionPage() {
     if (!isLoaded) return;
 
     if (!isSignedIn) {
-      router.push("/sign-in");
+      router.push("/login?redirect=/missions/" + missionId + "/pay");
       return;
     }
 
@@ -56,7 +59,7 @@ export default function PayMissionPage() {
     setMissionError(null);
 
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setMissionError("Impossible de récupérer le token d'authentification");
         return;
@@ -80,7 +83,7 @@ export default function PayMissionPage() {
     } finally {
       setIsLoadingMission(false);
     }
-  }, [isLoaded, isSignedIn, getToken, missionId, router]);
+  }, [isLoaded, isSignedIn, missionId, router]);
 
   useEffect(() => {
     loadMission();
@@ -191,7 +194,7 @@ export default function PayMissionPage() {
     return (cents / 100).toFixed(2);
   };
 
-  const feeCents = Math.ceil(mission.priceCents * 0.12);
+  const feeCents = Math.ceil(mission.priceCents * 0.15);
   const totalCents = mission.priceCents;
 
   return (
@@ -237,7 +240,7 @@ export default function PayMissionPage() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/60">Frais plateforme (12%)</span>
+              <span className="text-white/60">Frais plateforme (15%)</span>
               <span className="font-semibold text-white">
                 {formatAmount(feeCents)} $
               </span>

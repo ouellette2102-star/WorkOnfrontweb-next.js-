@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SignOutButton } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
 import { usePrimaryRole } from "@/hooks/use-primary-role";
 
 const roleLabels: Record<string, string> = {
@@ -20,6 +20,7 @@ const links = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { logout } = useAuth();
   const { primaryRole } = usePrimaryRole();
 
   return (
@@ -57,11 +58,12 @@ export function Sidebar() {
         })}
       </nav>
 
-      <SignOutButton redirectUrl="/sign-in">
-        <button className="rounded-2xl border border-white/10 px-4 py-3 text-sm text-white/80 transition hover:text-white">
-          Déconnexion
-        </button>
-      </SignOutButton>
+      <button
+        onClick={() => { logout(); window.location.href = "/sign-in"; }}
+        className="rounded-2xl border border-white/10 px-4 py-3 text-sm text-white/80 transition hover:text-white"
+      >
+        Déconnexion
+      </button>
     </aside>
   );
 }

@@ -1,19 +1,33 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
 import { CreateMissionForm } from "@/components/missions/create-mission-form";
 
-export const dynamic = "force-dynamic";
+export default function NewMissionPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
 
-export const metadata = {
-  title: "Créer une mission - WorkOn",
-  description: "Publie une nouvelle mission pour trouver des travailleurs qualifiés",
-};
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login?redirect=/missions/new");
+    }
+  }, [isLoading, isAuthenticated, router]);
 
-export default async function NewMissionPage() {
-  const session = await auth();
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-neutral-900">
+        <div className="text-center">
+          <div className="mb-4 inline-block h-10 w-10 animate-spin rounded-full border-4 border-red-500 border-t-transparent" />
+          <p className="text-white/70">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (!session.userId) {
-    redirect("/sign-in");
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (
@@ -37,4 +51,3 @@ export default async function NewMissionPage() {
     </div>
   );
 }
-

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   getMissionPhotos,
@@ -20,7 +21,7 @@ type MissionPhotosProps = {
 };
 
 export function MissionPhotos({ mission }: MissionPhotosProps) {
-  const { userId, isLoaded, isSignedIn, getToken } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [photos, setPhotos] = useState<MissionPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,16 +29,16 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<MissionPhoto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isWorkerAssigned = mission.workerId === userId;
-  const isEmployerOwner = mission.employerId === userId;
+  const isWorkerAssigned = mission.workerId === user?.id;
+  const isEmployerOwner = mission.employerId === user?.id;
   const canUpload = isWorkerAssigned || isEmployerOwner;
 
   const loadPhotos = useCallback(async () => {
-    if (!isLoaded || !isSignedIn) return;
+    if (authLoading || !isAuthenticated) return;
 
     try {
       setIsLoading(true);
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Token d'authentification introuvable");
         return;
@@ -54,7 +55,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoaded, isSignedIn, getToken, mission.id]);
+  }, [authLoading, isAuthenticated, mission.id]);
 
   useEffect(() => {
     loadPhotos();
@@ -82,7 +83,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
     try {
       setIsUploading(true);
       setError(null);
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Token d'authentification introuvable");
         return;
@@ -105,7 +106,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
     if (!confirm("Voulez-vous vraiment supprimer cette photo ?")) return;
 
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Token d'authentification introuvable");
         return;
@@ -122,7 +123,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
     }
   };
 
-  if (!isLoaded || !isSignedIn) {
+  if (authLoading || !isAuthenticated) {
     return null;
   }
 
@@ -219,7 +220,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
               </p>
             </div>
             <div className="absolute right-4 top-4 flex gap-2">
-              {(isEmployerOwner || selectedPhoto.userId === userId) && (
+              {(isEmployerOwner || selectedPhoto.userId === user?.id) && (
                 <Button
                   onClick={() => handleDeletePhoto(selectedPhoto.id)}
                   className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { getAccessToken } from "@/lib/auth";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { getMissionTimeLogs } from "@/lib/mission-time-logs-api";
@@ -14,7 +14,6 @@ type MissionTimeViewProps = {
 };
 
 export function MissionTimeView({ mission }: MissionTimeViewProps) {
-  const { getToken } = useAuth();
   const [logs, setLogs] = useState<MissionTimeLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,7 +21,7 @@ export function MissionTimeView({ mission }: MissionTimeViewProps) {
     const loadLogs = async () => {
       try {
         setIsLoading(true);
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) return;
 
         const data = await getMissionTimeLogs(token, mission.id);
@@ -35,7 +34,7 @@ export function MissionTimeView({ mission }: MissionTimeViewProps) {
     };
 
     loadLogs();
-  }, [mission.id, getToken]);
+  }, [mission.id]);
 
   // Calculer la durée totale
   const calculateTotalDuration = () => {

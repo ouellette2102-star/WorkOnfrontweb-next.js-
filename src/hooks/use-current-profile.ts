@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 
 export type ProfileRole = "WORKER" | "EMPLOYER" | "ADMIN" | "CLIENT_RESIDENTIAL";
 
@@ -20,20 +21,20 @@ export type UserProfile = {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function useCurrentProfile() {
-  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
-    if (!isLoaded || !isSignedIn) {
+    if (authLoading || !isAuthenticated) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const token = await getToken();
+      const token = getAccessToken();
 
       if (!token) {
         setError("Token non disponible");
@@ -61,7 +62,7 @@ export function useCurrentProfile() {
     } finally {
       setLoading(false);
     }
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [authLoading, isAuthenticated]);
 
   useEffect(() => {
     loadProfile();

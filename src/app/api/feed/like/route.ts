@@ -3,8 +3,7 @@
  * Proxy HTTP vers le backend NestJS - ZERO Prisma cote frontend
  */
 
-import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const API_BASE_URL =
@@ -21,11 +20,14 @@ interface LikeResponse {
   likeCount: number;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { userId, getToken } = await auth();
+    // Auth check — extract token from header or cookie
+    const authHeader = request.headers.get("authorization");
+    const cookieToken = request.cookies.get("workon_token")?.value;
+    const token = authHeader?.replace("Bearer ", "") || cookieToken;
 
-    if (!userId) {
+    if (!token) {
       return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
     }
 
@@ -36,11 +38,6 @@ export async function POST(request: Request) {
       postId = parsed.postId;
     } catch {
       return NextResponse.json({ error: "Requete invalide" }, { status: 400 });
-    }
-
-    const token = await getToken();
-    if (!token) {
-      return NextResponse.json({ error: "TOKEN_UNAVAILABLE" }, { status: 401 });
     }
 
     const backendUrl = `${API_BASE_URL}/feed/like`;

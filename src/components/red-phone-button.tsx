@@ -19,7 +19,7 @@ export function RedPhoneButton() {
         size="icon"
         className="h-14 w-14 rounded-full bg-red-600 shadow-xl hover:bg-red-500 hover:scale-105 transition-transform"
         aria-label="Téléphone rouge - Publier une mission"
-        onClick={() => router.push("/dashboard/missions/new")}
+        onClick={() => router.push("/missions/new")}
       >
         <Phone className="h-6 w-6" />
       </Button>

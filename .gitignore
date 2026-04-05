@@ -51,3 +51,4 @@ next-env.d.ts
 
 # Backend repo is now at C:\Users\ouell\workon-backend
 backend/
+.vercel

@@ -4,5 +4,5 @@ node_modules/
 .git/
 *.log
 # Flutter mobile app — conflicts with Next.js app dir detection (findPagesDir checks ./app first)
-app/
-app_backup_20260213/
+/app/
+/app_backup_20260213/

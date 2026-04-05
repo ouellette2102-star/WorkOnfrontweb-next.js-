@@ -6,9 +6,10 @@ import { UserNav } from "@/components/navigation/user-nav";
 import { Button } from "@/components/ui/button";
 import type { PublicMission, PublicMissionsResponse, SectorStat } from "@/lib/public-api";
 
-const API_BASE =
+const RAW_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "https://workon-backend-production-8908.up.railway.app/api/v1";
+  "https://workon-backend-production-31db.up.railway.app";
+const API_BASE = `${RAW_BASE}/api/v1`;
 
 // ─── Header ────────────────────────────────────────────────────────────────
 
@@ -73,7 +74,7 @@ function MissionCard({ m }: { m: PublicMission }) {
           Ouverte
         </span>
         <Button size="sm" className="bg-red-600 hover:bg-red-500 text-white text-xs h-7 px-3" asChild>
-          <Link href="/sign-up?role=worker">Postuler</Link>
+          <Link href="/register?role=worker">Postuler</Link>
         </Button>
       </div>
     </div>
@@ -179,7 +180,7 @@ export default function MissionsPage() {
             </p>
           </div>
           <Button className="bg-red-600 hover:bg-red-500 text-white" asChild>
-            <Link href="/sign-up?role=employer">+ Publier une mission</Link>
+            <Link href="/register?role=employer">+ Publier une mission</Link>
           </Button>
         </div>
       </section>
@@ -302,7 +303,7 @@ export default function MissionsPage() {
                 <p className="text-sm text-white/60 mt-0.5">Crée ton profil gratuitement et commence à travailler.</p>
               </div>
               <Button className="bg-red-600 hover:bg-red-500 text-white flex-shrink-0" asChild>
-                <Link href="/sign-up?role=worker">S&apos;inscrire comme pro</Link>
+                <Link href="/register?role=worker">S&apos;inscrire comme pro</Link>
               </Button>
             </div>
           </div>

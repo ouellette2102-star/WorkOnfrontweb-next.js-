@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import Link from "next/link";
 import { fetchUnreadCount } from "@/lib/notifications-api";
 
 export function NotificationBadge() {
-  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const loadUnreadCount = async () => {
-      if (!isLoaded || !isSignedIn) return;
+      if (authLoading || !isAuthenticated) return;
 
       try {
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) return;
 
         const count = await fetchUnreadCount(token);
@@ -30,9 +31,9 @@ export function NotificationBadge() {
     const interval = setInterval(loadUnreadCount, 30000);
 
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [authLoading, isAuthenticated]);
 
-  if (!isLoaded || !isSignedIn) {
+  if (authLoading || !isAuthenticated) {
     return null;
   }
 

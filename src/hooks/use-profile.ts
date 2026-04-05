@@ -1,6 +1,7 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { useCallback, useEffect, useState } from "react";
 import type {
   PrimaryRole,
@@ -19,26 +20,26 @@ type UseProfileState = {
 };
 
 export function useProfile(): UseProfileState {
-  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const withToken = useCallback(async () => {
-    if (!isLoaded || !isSignedIn) {
+  const withToken = useCallback(() => {
+    if (authLoading || !isAuthenticated) {
       throw new Error("Utilisateur non authentifié");
     }
-    const token = await getToken();
+    const token = getAccessToken();
     if (!token) {
-      throw new Error("Impossible de récupérer le token Clerk");
+      throw new Error("Impossible de récupérer le token");
     }
     return token;
-  }, [getToken, isLoaded, isSignedIn]);
+  }, [authLoading, isAuthenticated]);
 
   const loadProfile = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = await withToken();
+      const token = withToken();
       const data = await fetchProfile(token);
       setProfile(data);
       setError(null);
@@ -51,7 +52,7 @@ export function useProfile(): UseProfileState {
 
   const mutateProfile = useCallback(
     async (payload: ProfileUpdatePayload) => {
-      const token = await withToken();
+      const token = withToken();
       const data = await saveProfile(token, payload);
       setProfile(data);
       setError(null);
@@ -93,13 +94,13 @@ export function useProfile(): UseProfileState {
   );
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
+    if (!authLoading && isAuthenticated) {
       loadProfile();
-    } else if (isLoaded && !isSignedIn) {
+    } else if (!authLoading && !isAuthenticated) {
       setIsLoading(false);
       setProfile(null);
     }
-  }, [isLoaded, isSignedIn, loadProfile]);
+  }, [authLoading, isAuthenticated, loadProfile]);
 
   return {
     profile,

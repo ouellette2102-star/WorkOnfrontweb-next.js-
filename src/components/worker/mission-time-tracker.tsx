@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { getAccessToken } from "@/lib/auth";
 import {
   getMissionTimeLogs,
   checkInToMission,
@@ -15,7 +15,6 @@ type Props = {
 };
 
 export function MissionTimeTracker({ missionId }: Props) {
-  const { getToken } = useAuth();
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [totalDuration, setTotalDuration] = useState(0); // en minutes
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +22,7 @@ export function MissionTimeTracker({ missionId }: Props) {
 
   const loadTimeLogs = async () => {
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) return;
 
       const logs = await getMissionTimeLogs(token, missionId);
@@ -56,12 +55,12 @@ export function MissionTimeTracker({ missionId }: Props) {
 
   useEffect(() => {
     loadTimeLogs();
-  }, [missionId, getToken]);
+  }, [missionId]);
 
   const handleCheckIn = async () => {
     setIsActionLoading(true);
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         toast.error("Authentification requise");
         return;
@@ -82,7 +81,7 @@ export function MissionTimeTracker({ missionId }: Props) {
   const handleCheckOut = async () => {
     setIsActionLoading(true);
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         toast.error("Authentification requise");
         return;

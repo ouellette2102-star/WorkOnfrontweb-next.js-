@@ -1,110 +1,67 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Check if Clerk is configured (without importing env.ts to avoid edge runtime issues)
+ * JWT-based middleware (replaces Clerk)
+ * Checks for auth token cookie on protected routes
  */
-function isClerkConfiguredInMiddleware(): boolean {
-  const pubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  const secretKey = process.env.CLERK_SECRET_KEY;
-  return Boolean(
-    pubKey && pubKey.length > 10 && (pubKey.startsWith("pk_test_") || pubKey.startsWith("pk_live_")) &&
-    secretKey && secretKey.length > 10 && (secretKey.startsWith("sk_test_") || secretKey.startsWith("sk_live_"))
+
+const PUBLIC_PATHS = [
+  "/",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/sign-up",
+  "/pros",
+  "/employeurs",
+  "/p/",
+  "/pro/",
+  "/missions",
+  "/pricing",
+  "/legal/",
+  "/faq",
+  "/api/",
+  "/setup",
+];
+
+function isPublicPath(pathname: string): boolean {
+  // Exact matches
+  if (PUBLIC_PATHS.includes(pathname)) return true;
+  // Prefix matches (routes with dynamic segments)
+  return PUBLIC_PATHS.some(
+    (p) => p.endsWith("/") && pathname.startsWith(p),
   );
 }
 
-// Routes publiques (pas besoin d'auth)
-const isPublicRoute = createRouteMatcher([
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/",
-  "/pros(.*)",        // Funnel travailleurs
-  "/employeurs(.*)",  // Funnel employeurs
-  "/p/(.*)",          // Profils publics /p/[slug]
-  "/missions",        // Feed missions public (racine seulement)
-  "/api/health",
-  "/api/webhooks(.*)",
-  "/debug(.*)",
-  "/setup(.*)",
-]);
+export default function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-// Routes d'onboarding (auth requise mais pas de rôle)
-const isOnboardingRoute = createRouteMatcher([
-  "/onboarding(.*)",
-]);
-
-// Routes worker (auth + rôle WORKER requis)
-const isWorkerRoute = createRouteMatcher([
-  "/worker(.*)",
-]);
-
-// Routes employer (auth + rôle EMPLOYER requis)
-const isEmployerRoute = createRouteMatcher([
-  "/employer(.*)",
-  "/missions/new(.*)",
-  "/missions/mine(.*)",
-]);
-
-/**
- * Fallback middleware when Clerk is not configured
- * Allows public routes, redirects protected routes to /setup
- */
-function fallbackMiddleware(req: NextRequest): NextResponse {
-  // Always allow public routes and static files
-  if (isPublicRoute(req)) {
-    return NextResponse.next();
-  }
-  
-  // Redirect protected routes to setup page
-  const setupUrl = new URL("/setup", req.url);
-  setupUrl.searchParams.set("from", req.nextUrl.pathname);
-  return NextResponse.redirect(setupUrl);
-}
-
-/**
- * Main middleware with Clerk auth
- */
-const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-  const url = req.nextUrl;
-
-  // Routes publiques : laisser passer
-  if (isPublicRoute(req)) {
+  // Skip static files and Next.js internals
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname.includes(".")
+  ) {
     return NextResponse.next();
   }
 
-  // Si pas authentifié : rediriger vers sign-in
-  if (!userId) {
-    const signInUrl = new URL("/sign-in", req.url);
-    signInUrl.searchParams.set("redirect_url", url.pathname);
-    return NextResponse.redirect(signInUrl);
+  // Public routes — always pass
+  if (isPublicPath(pathname)) {
+    return NextResponse.next();
   }
 
-  // Si authentifié : récupérer le profil via le backend pour connaître le rôle
-  // Note : en production, on pourrait mettre le rôle dans sessionClaims pour éviter l'appel API
-  // Pour cette implémentation, on laisse passer et les helpers server-side gèrent la redirection
+  // Protected routes — check for token in cookie
+  // (localStorage isn't available in middleware, so we use a cookie set by the client)
+  const token = req.cookies.get("workon_token")?.value;
+
+  if (!token) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
 
   return NextResponse.next();
-});
-
-/**
- * Exported middleware - chooses between Clerk and fallback based on config
- */
-export default function middleware(req: NextRequest) {
-  // Bypass ALL middleware for healthcheck (monitoring/load balancers)
-  if (req.nextUrl.pathname === "/api/health") {
-    return NextResponse.next();
-  }
-
-  // If Clerk is not configured, use fallback (no crash)
-  if (!isClerkConfiguredInMiddleware()) {
-    return fallbackMiddleware(req);
-  }
-  
-  // Use Clerk middleware
-  return clerkAuthMiddleware(req, {} as never);
 }
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.*\\..*|_next).*)"],
 };

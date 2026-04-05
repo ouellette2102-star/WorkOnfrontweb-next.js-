@@ -100,7 +100,7 @@ export default async function EmployeursPage() {
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
-              <Link href="/sign-up?role=employer">Publier ma première mission</Link>
+              <Link href="/register?role=employer">Publier ma première mission</Link>
             </Button>
             <Button variant="outline" size="lg" className="border-white/20 hover:border-white/40" asChild>
               <Link href="/pros">Voir les travailleurs →</Link>
@@ -256,7 +256,7 @@ export default async function EmployeursPage() {
           <h2 className="text-2xl font-bold mb-3">Prêt à publier votre mission ?</h2>
           <p className="text-white/60 mb-6">0% commission pendant le lancement. Inscription en 2 minutes.</p>
           <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
-            <Link href="/sign-up?role=employer">Commencer gratuitement</Link>
+            <Link href="/register?role=employer">Commencer gratuitement</Link>
           </Button>
         </div>
       </section>

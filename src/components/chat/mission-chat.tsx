@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { getMessagesForMission, sendMessage } from "@/lib/mission-chat-api";
 import type { Message } from "@/types/mission-chat";
 import { MessageList } from "./message-list";
@@ -18,7 +19,7 @@ type ChatError = {
 };
 
 export function MissionChat({ missionId }: MissionChatProps) {
-  const { getToken, isLoaded, userId } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<ChatError | null>(null);
@@ -31,7 +32,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
   const isUnavailable = error?.code === "NOT_IMPLEMENTED" || error?.code === "NOT_FOUND";
 
   const loadMessages = useCallback(async () => {
-    if (!isLoaded || !userId || isLoadingRef.current) return;
+    if (authLoading || !user || isLoadingRef.current) return;
     isLoadingRef.current = true;
 
     try {
@@ -39,7 +40,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
       setError(null);
       setSendError(null);
 
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError({ code: "AUTH_ERROR", message: "Impossible de recuperer le token" });
         return;
@@ -63,7 +64,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
       setIsLoading(false);
       isLoadingRef.current = false;
     }
-  }, [isLoaded, userId, getToken, missionId]);
+  }, [authLoading, user, missionId]);
 
   useEffect(() => {
     loadMessages();
@@ -71,14 +72,14 @@ export function MissionChat({ missionId }: MissionChatProps) {
 
   const handleSendMessage = useCallback(
     async (content: string): Promise<{ success: boolean; error?: string }> => {
-      if (!userId) {
+      if (!user) {
         return { success: false, error: "Utilisateur non connecte" };
       }
 
       setSendError(null);
 
       try {
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) {
           return { success: false, error: "Token non disponible" };
         }
@@ -99,11 +100,11 @@ export function MissionChat({ missionId }: MissionChatProps) {
         return { success: false, error: errorMsg };
       }
     },
-    [userId, getToken, missionId]
+    [user, missionId]
   );
 
   // Loading state
-  if (!isLoaded || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="flex h-full items-center justify-center p-8">
         <div className="text-center">
@@ -195,7 +196,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
           </div>
         </div>
       ) : (
-        <MessageList messages={messages} currentUserId={userId ?? ""} />
+        <MessageList messages={messages} currentUserId={user?.id ?? ""} />
       )}
 
       {/* Input */}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { getAvailableMissions, reserveMission } from "@/lib/missions-api";
 import type { Mission } from "@/types/mission";
 import { Button } from "@/components/ui/button";
@@ -9,18 +10,18 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 export function AvailableMissionsCard() {
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reservingId, setReservingId] = useState<string | null>(null);
 
   const loadMissions = async () => {
-    if (!isLoaded) return;
+    if (authLoading) return;
 
     try {
       setError(null);
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Token d'authentification introuvable");
         return;
@@ -40,12 +41,12 @@ export function AvailableMissionsCard() {
 
   useEffect(() => {
     loadMissions();
-  }, [isLoaded, getToken]);
+  }, [authLoading]);
 
   const handleReserve = async (missionId: string) => {
     setReservingId(missionId);
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         toast.error("Authentification requise");
         return;

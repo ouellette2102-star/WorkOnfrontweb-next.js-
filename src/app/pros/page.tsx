@@ -142,7 +142,7 @@ export default async function ProsPage() {
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
-              <Link href="/sign-up?role=worker">S&apos;inscrire comme pro</Link>
+              <Link href="/register?role=worker">S&apos;inscrire comme pro</Link>
             </Button>
             <Button variant="outline" size="lg" className="border-white/20 hover:border-white/40" asChild>
               <Link href="/missions">Voir les missions →</Link>
@@ -225,7 +225,7 @@ export default async function ProsPage() {
           <h2 className="text-2xl font-bold mb-3">Prêt à commencer ?</h2>
           <p className="text-white/60 mb-6">Inscription gratuite. Première mission disponible immédiatement.</p>
           <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
-            <Link href="/sign-up?role=worker">Créer mon profil gratuitement</Link>
+            <Link href="/register?role=worker">Créer mon profil gratuitement</Link>
           </Button>
         </div>
       </section>

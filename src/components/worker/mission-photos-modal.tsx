@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { getAccessToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { MissionPhoto } from "@/types/mission-photo";
@@ -12,7 +12,6 @@ type Props = {
 };
 
 export function MissionPhotosModal({ missionId, onClose }: Props) {
-  const { getToken } = useAuth();
   const [photos, setPhotos] = useState<MissionPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<MissionPhoto | null>(null);
@@ -20,11 +19,11 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
   useEffect(() => {
     const loadPhotos = async () => {
       try {
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) return;
 
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
-        
+
         const response = await fetch(`${API_BASE_URL}/missions/${missionId}/photos`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -43,7 +42,7 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
     };
 
     loadPhotos();
-  }, [missionId, getToken]);
+  }, [missionId]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
