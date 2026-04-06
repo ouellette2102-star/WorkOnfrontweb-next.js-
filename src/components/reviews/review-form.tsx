@@ -102,6 +102,17 @@ export function ReviewForm({
         </div>
       </div>
 
+      {/* Selected rating text */}
+      {rating > 0 && (
+        <p className="text-sm text-white/60">
+          {rating === 1 && "Tres insatisfait"}
+          {rating === 2 && "Insatisfait"}
+          {rating === 3 && "Correct"}
+          {rating === 4 && "Satisfait"}
+          {rating === 5 && "Excellent"}
+        </p>
+      )}
+
       {/* Comment */}
       <div>
         <label className="mb-2 block text-sm font-medium text-white/80">
@@ -109,13 +120,28 @@ export function ReviewForm({
         </label>
         <textarea
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length <= 500) setComment(e.target.value);
+          }}
           placeholder="Partagez votre experience..."
           maxLength={500}
           rows={3}
           className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-white/40 focus:border-red-500 focus:outline-none"
         />
-        <p className="mt-1 text-xs text-white/40">{comment.length}/500</p>
+        <div className="mt-1 flex justify-between">
+          <p className="text-xs text-white/40">
+            {comment.length >= 450 ? (
+              <span className={comment.length >= 490 ? "text-red-400" : "text-yellow-400"}>
+                {comment.length}/500
+              </span>
+            ) : (
+              <span>{comment.length}/500</span>
+            )}
+          </p>
+          {comment.length >= 500 && (
+            <p className="text-xs text-red-400">Limite atteinte</p>
+          )}
+        </div>
       </div>
 
       {/* Error */}

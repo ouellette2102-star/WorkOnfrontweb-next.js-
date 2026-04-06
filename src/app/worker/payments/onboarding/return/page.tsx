@@ -1,25 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { getOnboardingStatus } from "@/lib/stripe-api";
 import { Button } from "@/components/ui/button";
 
 export default function StripeOnboardingReturnPage() {
   const router = useRouter();
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [isChecking, setIsChecking] = useState(true);
   const [isOnboarded, setIsOnboarded] = useState(false);
 
   useEffect(() => {
     const checkStatus = async () => {
-      if (!isLoaded) return;
+      if (authLoading) return;
 
       try {
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) {
-          router.push("/sign-in");
+          router.push("/login");
           return;
         }
 
@@ -35,7 +36,7 @@ export default function StripeOnboardingReturnPage() {
     // Vérifier après un court délai pour laisser Stripe mettre à jour
     const timer = setTimeout(checkStatus, 2000);
     return () => clearTimeout(timer);
-  }, [isLoaded, getToken, router]);
+  }, [authLoading, isAuthenticated, router]);
 
   if (isChecking) {
     return (

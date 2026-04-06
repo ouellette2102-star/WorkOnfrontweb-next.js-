@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
-import { frCA } from "date-fns/locale";
+import { format, formatDistanceToNow, differenceInHours } from "date-fns";
+import { frCA, fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import type { MissionFeedItem } from "@/types/mission";
 
@@ -102,6 +102,18 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
             )}
 
             <div className="h-full overflow-y-auto p-8">
+              {/* Urgency signals */}
+              <div className="mb-4 flex flex-wrap gap-2">
+                {differenceInHours(new Date(), new Date(currentMission.createdAt)) < 24 && (
+                  <span className="inline-flex items-center rounded-full bg-green-500/20 px-3 py-1 text-xs font-semibold text-green-400 border border-green-500/30">
+                    Nouveau
+                  </span>
+                )}
+                <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs text-white/60">
+                  Publiee {formatDistanceToNow(new Date(currentMission.createdAt), { addSuffix: true, locale: fr })}
+                </span>
+              </div>
+
               {/* Titre et employeur */}
               <div className="mb-6">
                 <h2 className="mb-2 text-3xl font-bold text-white">

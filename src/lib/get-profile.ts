@@ -1,9 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-
 /**
- * Type simplifié du profil pour usage côté serveur (SSR).
- * Utilise les mêmes types que workon-api.ts pour la cohérence.
+ * Server-side profile fetching for WorkOn.
+ * Uses JWT cookie auth instead of Clerk.
+ *
+ * Legacy Clerk version archived at: src/legacy/clerk/get-profile-clerk.ts
  */
+
+import { getServerToken } from "./server-auth";
+
 export type ProfileSnapshot = {
   primaryRole: string;
   fullName?: string;
@@ -11,85 +14,40 @@ export type ProfileSnapshot = {
   city?: string;
 };
 
-type MaybePromise<T> = T | Promise<T>;
-
-function isPromise<T>(value: MaybePromise<T>): value is Promise<T> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "then" in value &&
-    typeof (value as Promise<T>).then === "function"
-  );
-}
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+  "http://localhost:3001/api/v1";
 
 /**
- * Récupère le token Clerk côté serveur via auth()
- */
-async function getSessionToken(): Promise<string | null> {
-  const authResultCandidate = auth();
-  const authResult = isPromise(authResultCandidate)
-    ? await authResultCandidate
-    : authResultCandidate;
-
-  if (!authResult || typeof authResult.getToken !== "function") {
-    console.error(
-      "[Clerk] auth().getToken est indisponible dans ce contexte serveur",
-    );
-    return null;
-  }
-
-  try {
-    const token = await authResult.getToken();
-    return token ?? null;
-  } catch (error) {
-    console.error("[Clerk] Échec lors de l'appel getToken()", error);
-    return null;
-  }
-}
-
-/**
- * Va chercher le profil courant dans le backend WorkOn.
- * Cette fonction est conçue pour être appelée côté serveur (Server Components, Server Actions).
- * Pour les appels client, utiliser plutôt le hook useProfile() qui s'appuie sur workon-api.ts.
+ * Get the current user profile from the backend (server-side).
+ * Uses the JWT cookie token instead of Clerk getToken().
  */
 export async function getCurrentProfile(
-  clerkId: string | undefined | null,
+  _userId?: string | undefined | null,
 ): Promise<ProfileSnapshot | null> {
-  if (!clerkId) {
-    return null;
-  }
+  const token = await getServerToken();
+  if (!token) return null;
 
-  const token = await getSessionToken();
-
-  if (!token) {
-    console.error(
-      "[WorkOn] Aucun token Clerk disponible pour l'appel /profile/me",
-    );
-    return null;
-  }
-
-  // Utilise la même base URL que workon-api.ts pour la cohérence
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-    "http://localhost:3001/api/v1";
-
-  const response = await fetch(`${API_BASE_URL}/profile/me`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    console.error("[WorkOn] Erreur lors de la récupération du profil", {
-      status: response.status,
-      clerkId,
+  try {
+    const response = await fetch(`${API_URL}/users/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
     });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return {
+      primaryRole: data.role?.toUpperCase() ?? "",
+      fullName: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || undefined,
+      phone: data.phone ?? undefined,
+      city: data.city ?? undefined,
+    };
+  } catch {
     return null;
   }
-
-  const profile = (await response.json()) as ProfileSnapshot;
-  return profile;
 }

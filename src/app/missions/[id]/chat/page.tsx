@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { MissionChat } from "@/components/chat/mission-chat";
 import Link from "next/link";
 
@@ -17,10 +17,11 @@ export const metadata = {
 };
 
 export default async function MissionChatPage({ params }: ChatPageProps) {
-  const session = await auth();
+  const cookieStore = await cookies();
+  const token = cookieStore.get("workon_token")?.value;
 
-  if (!session.userId) {
-    redirect("/sign-in");
+  if (!token) {
+    redirect("/login");
   }
 
   const missionId = params.id;

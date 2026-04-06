@@ -52,3 +52,21 @@ next-env.d.ts
 # Backend repo is now at C:\Users\ouell\workon-backend
 backend/
 .vercel
+
+# Screenshots and temporary files
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.log
+*.txt
+!src/**/*.ts
+!src/**/*.tsx
+
+# Backup directories
+app_backup_*/
+
+# Agent/debug files
+map_crash_log.txt
+qa_mission_id.txt
+startdev.err

@@ -1,14 +1,15 @@
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/navigation/sidebar";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfileLayout({ children }: { children: React.ReactNode }) {
-  const { userId } = await auth();
+  const cookieStore = await cookies();
+  const token = cookieStore.get("workon_token")?.value;
 
-  if (!userId) {
-    redirect("/sign-in");
+  if (!token) {
+    redirect("/login");
   }
 
   return (
@@ -24,5 +25,3 @@ export default async function ProfileLayout({ children }: { children: React.Reac
     </div>
   );
 }
-
-

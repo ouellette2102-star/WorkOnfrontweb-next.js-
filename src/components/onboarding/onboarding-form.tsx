@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import type { PrimaryRole } from "@/lib/workon-api";
 import { saveProfile } from "@/lib/workon-api";
 
@@ -23,7 +24,7 @@ type FieldErrors = Partial<Record<keyof FormState, string>>;
 
 export function OnboardingForm() {
   const router = useRouter();
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [state, setState] = useState<FormState>({
     role: "",
     name: "",
@@ -64,14 +65,14 @@ export function OnboardingForm() {
     };
     startTransition(async () => {
       try {
-        if (!isLoaded) {
-          setError("Clerk n'est pas prêt. Réessaie dans un instant.");
+        if (authLoading || !isAuthenticated) {
+          setError("Authentification en cours. Réessaie dans un instant.");
           return;
         }
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) {
           setError(
-            "Impossible de récupérer le token Clerk. Réessaie ou reconnecte-toi.",
+            "Impossible de récupérer le token. Réessaie ou reconnecte-toi.",
           );
           return;
         }

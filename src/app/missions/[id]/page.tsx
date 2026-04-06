@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useAuth, useUser } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getMissionById } from "@/lib/missions-api";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import type { Mission } from "@/types/mission";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ReviewForm } from "@/components/reviews/review-form";
+import { OfferList } from "@/components/offers/offer-list";
+import { CreateOfferModal } from "@/components/offers/create-offer-modal";
 
 const statusLabels: Record<string, string> = {
   CREATED: "Disponible",
@@ -30,8 +32,7 @@ const statusColors: Record<string, string> = {
 export default function MissionDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { getToken, isLoaded, isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 
   const [mission, setMission] = useState<Mission | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,14 +40,17 @@ export default function MissionDetailPage() {
   const [notFound, setNotFound] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [showOfferModal, setShowOfferModal] = useState(false);
 
   const missionId = params.id as string;
 
-  const loadMission = useCallback(async () => {
-    if (!isLoaded) return;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
-    if (!isSignedIn) {
-      router.push("/sign-in");
+  const loadMission = useCallback(async () => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      router.push("/login");
       return;
     }
 
@@ -55,19 +59,31 @@ export default function MissionDetailPage() {
     setNotFound(false);
 
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Impossible de récupérer le token d'authentification");
         return;
       }
 
-      const data = await getMissionById(token, missionId);
+      const res = await fetch(`${API_URL}/missions/${missionId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.status === 404) {
+        setNotFound(true);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`Erreur ${res.status}`);
+      }
+
+      const data = await res.json();
       setMission(data);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Erreur lors du chargement";
 
-      // Détecter les 404
       if (message.includes("404") || message.includes("introuvable")) {
         setNotFound(true);
       } else {
@@ -76,14 +92,14 @@ export default function MissionDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoaded, isSignedIn, getToken, missionId, router]);
+  }, [authLoading, isAuthenticated, missionId, router, API_URL]);
 
   useEffect(() => {
     loadMission();
   }, [loadMission]);
 
   // Loading state
-  if (!isLoaded || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-neutral-900 py-12">
         <div className="container mx-auto max-w-3xl px-4">
@@ -196,7 +212,10 @@ export default function MissionDetailPage() {
   
   // Show review button if: mission COMPLETED + current user is employer (not worker)
   const isEmployer = mission.employerId === user?.id;
+  const isWorker = !isEmployer;
   const canReview = mission.status === "COMPLETED" && isEmployer && mission.workerId && !reviewSubmitted;
+  const canMakeOffer = isWorker && ["CREATED", "open"].includes(mission.status);
+  const showOffers = isEmployer && ["CREATED", "open", "RESERVED", "assigned"].includes(mission.status);
 
   return (
     <div className="min-h-screen bg-neutral-900 py-12">
@@ -309,12 +328,37 @@ export default function MissionDetailPage() {
               </Button>
             )}
 
-            {mission.status === "CREATED" && (
+            {canMakeOffer && (
+              <Button
+                onClick={() => setShowOfferModal(true)}
+                className="bg-blue-600 hover:bg-blue-500"
+              >
+                💼 Faire une offre
+              </Button>
+            )}
+
+            {mission.status === "CREATED" && isEmployer && (
               <Link href={`/missions/available`}>
                 <Button variant="outline">🔍 Voir les missions disponibles</Button>
               </Link>
             )}
           </div>
+
+          {/* Offers Section (employer view) */}
+          {showOffers && (
+            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+              <h3 className="mb-4 text-lg font-bold text-white">Offres reçues</h3>
+              <OfferList missionId={mission.id} isEmployer={isEmployer} />
+            </div>
+          )}
+
+          {/* Create Offer Modal */}
+          <CreateOfferModal
+            missionId={mission.id}
+            isOpen={showOfferModal}
+            onClose={() => setShowOfferModal(false)}
+            onSuccess={() => {}}
+          />
 
           {/* Review Form */}
           {showReviewForm && mission.workerId && (

@@ -15,7 +15,8 @@
  */
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { ConsentModal } from "./consent-modal";
 import {
   getConsentStatus,
@@ -59,7 +60,7 @@ type ConsentProviderProps = {
 };
 
 export function ConsentProvider({ children }: ConsentProviderProps) {
-  const { isSignedIn, getToken, isLoaded } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [consentStatus, setConsentStatus] = useState<ConsentStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +73,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
    * Vérifier le statut de consentement
    */
   const checkConsentStatus = useCallback(async () => {
-    if (!isSignedIn) {
+    if (!isAuthenticated) {
       setConsentStatus(null);
       setIsLoading(false);
       setShowModal(false);
@@ -80,7 +81,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
     }
 
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setIsLoading(false);
         return;
@@ -103,7 +104,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isSignedIn, getToken]);
+  }, [isAuthenticated]);
 
   /**
    * Rafraîchir le statut de consentement (exposé via context)
@@ -117,7 +118,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
    * Accepter tous les documents
    */
   const handleAccept = useCallback(async () => {
-    const token = await getToken();
+    const token = getAccessToken();
     if (!token) {
       throw new Error("Non authentifié");
     }
@@ -141,7 +142,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
       );
       throw new Error("Impossible d'enregistrer votre consentement");
     }
-  }, [getToken, checkConsentStatus]);
+  }, [checkConsentStatus]);
 
   /**
    * Déclencher le modal de consentement depuis un gestionnaire d'erreur API.
@@ -163,10 +164,10 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
 
   // Vérifier le consentement au chargement et quand l'auth change
   useEffect(() => {
-    if (isLoaded) {
+    if (!authLoading) {
       checkConsentStatus();
     }
-  }, [isLoaded, isSignedIn, checkConsentStatus]);
+  }, [authLoading, isAuthenticated, checkConsentStatus]);
 
   const isConsentComplete = consentStatus?.isComplete ?? false;
   const missingDocuments = consentStatus?.missing ?? [];
@@ -185,7 +186,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
 
       {/* Modal de consentement bloquant */}
       <ConsentModal
-        isOpen={showModal && isSignedIn === true}
+        isOpen={showModal && isAuthenticated === true}
         onAccept={handleAccept}
         missingDocuments={missingDocuments}
         isLoading={isLoading}

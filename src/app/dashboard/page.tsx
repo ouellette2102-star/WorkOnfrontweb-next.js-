@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/server-auth";
 import { getCurrentProfile } from "@/lib/get-profile";
 
 export const dynamic = "force-dynamic";
@@ -9,13 +9,9 @@ export const dynamic = "force-dynamic";
  * Redirige l'utilisateur vers son dashboard spécifique selon son rôle
  */
 export default async function DashboardPage() {
-  const clerkUser = await currentUser();
+  const user = await requireAuth();
 
-  if (!clerkUser) {
-    redirect("/sign-in");
-  }
-
-  const profileRecord = await getCurrentProfile(clerkUser.id);
+  const profileRecord = await getCurrentProfile(user.id);
 
   if (!profileRecord) {
     redirect("/onboarding");

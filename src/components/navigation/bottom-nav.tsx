@@ -21,7 +21,9 @@ export function BottomNav() {
   const { data: unread } = useQuery({
     queryKey: ["unread-count"],
     queryFn: () => api.getUnreadCount(),
-    refetchInterval: 30_000,
+    refetchInterval: 60_000, // 60s instead of 30s to reduce server load
+    refetchIntervalInBackground: false, // Don't poll when tab is hidden
+    staleTime: 30_000,
   });
 
   return (

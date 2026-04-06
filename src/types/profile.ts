@@ -78,7 +78,7 @@ export interface Review {
 
 export interface User {
   id: string;
-  clerkId: string;
+  clerkId?: string; // Legacy field — will be removed when Clerk cleanup is finalized
   email: string | null;
   createdAt: string;
   updatedAt: string;

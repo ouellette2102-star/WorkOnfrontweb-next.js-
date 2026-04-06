@@ -1,24 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default function OnboardingRolePage() {
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleRoleSelect = async (role: "WORKER" | "EMPLOYER") => {
-    if (!isLoaded) return;
+    if (authLoading || !isAuthenticated) return;
 
     try {
       setIsSubmitting(true);
       setError(null);
 
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Authentification requise");
         return;

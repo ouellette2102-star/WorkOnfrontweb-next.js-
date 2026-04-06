@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCurrentProfile } from "@/hooks/use-current-profile";
 
 export default function OnboardingDetailsPage() {
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const { profile, loading: profileLoading } = useCurrentProfile();
 
@@ -47,7 +48,7 @@ export default function OnboardingDetailsPage() {
       setIsSubmitting(true);
       setError(null);
 
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Authentification requise");
         return;

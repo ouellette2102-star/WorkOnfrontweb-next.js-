@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { RequireWorkerClient } from "@/components/auth/require-worker-client";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,7 @@ export default function WorkerPaymentsPage() {
 }
 
 function WorkerPaymentsContent() {
-  const { getToken, isLoaded } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   const [payments, setPayments] = useState<WorkerPayment[]>([]);
@@ -33,10 +34,10 @@ function WorkerPaymentsContent() {
 
   useEffect(() => {
     const loadStatus = async () => {
-      if (!isLoaded) return;
+      if (authLoading || !isAuthenticated) return;
 
       try {
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) return;
 
         const status = await getOnboardingStatus(token);
@@ -50,17 +51,17 @@ function WorkerPaymentsContent() {
     };
 
     loadStatus();
-  }, [isLoaded, getToken]);
+  }, [authLoading, isAuthenticated]);
 
   useEffect(() => {
     const loadPayments = async () => {
-      if (!isLoaded || !isOnboarded) {
+      if (authLoading || !isAuthenticated || !isOnboarded) {
         setIsLoadingPayments(false);
         return;
       }
 
       try {
-        const token = await getToken();
+        const token = getAccessToken();
         if (!token) return;
 
         const data = await getWorkerPayments(token);
@@ -74,12 +75,12 @@ function WorkerPaymentsContent() {
     };
 
     loadPayments();
-  }, [isLoaded, isOnboarded, getToken]);
+  }, [authLoading, isAuthenticated, isOnboarded]);
 
   const handleStartOnboarding = async () => {
     setIsCreatingLink(true);
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         toast.error("Authentification requise");
         return;

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -17,18 +18,18 @@ import { Button } from "@/components/ui/button";
 
 export default function NotificationsPage() {
   const router = useRouter();
-  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadNotifications = useCallback(async () => {
-    if (!isLoaded || !isSignedIn) return;
+    if (authLoading || !isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Impossible de récupérer le token");
         return;
@@ -45,14 +46,14 @@ export default function NotificationsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [authLoading, isAuthenticated]);
 
   useEffect(() => {
     loadNotifications();
   }, [loadNotifications]);
 
   const handleNotificationClick = async (notification: Notification) => {
-    const token = await getToken();
+    const token = getAccessToken();
     if (!token) return;
 
     // Marquer comme lue
@@ -87,7 +88,7 @@ export default function NotificationsPage() {
   };
 
   const handleMarkAllAsRead = async () => {
-    const token = await getToken();
+    const token = getAccessToken();
     if (!token) return;
 
     try {
@@ -164,7 +165,7 @@ export default function NotificationsPage() {
     }
   };
 
-  if (!isLoaded || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-950">
         <div className="text-center">

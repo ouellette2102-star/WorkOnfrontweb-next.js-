@@ -157,6 +157,147 @@ export interface EarningsSummary {
   commissionRate: number;
 }
 
+export interface WorkerPayment {
+  id: string;
+  missionId: string;
+  missionTitle: string;
+  missionCategory: string | null;
+  amountCents: number;
+  feeCents: number;
+  netAmountCents: number;
+  currency: string;
+  status: "PENDING" | "SUCCEEDED" | "FAILED";
+  completedAt: string | null;
+  createdAt: string;
+}
+
+export interface InvoiceResponse {
+  id: string;
+  localMissionId: string;
+  subtotalCents: number;
+  platformFeeCents: number;
+  taxCents: number;
+  totalCents: number;
+  status: "PENDING" | "PROCESSING" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
+  createdAt: string;
+  paidAt: string | null;
+}
+
+export interface InvoicePreview {
+  subtotalCents: number;
+  platformFeeCents: number;
+  taxCents: number;
+  totalCents: number;
+}
+
+export interface ContractResponse {
+  id: string;
+  missionId: string | null;
+  localMissionId: string | null;
+  status: "DRAFT" | "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED" | "CANCELLED";
+  terms: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DisputeResponse {
+  id: string;
+  missionId: string | null;
+  localMissionId: string | null;
+  reason: string;
+  description: string;
+  status: "OPEN" | "IN_MEDIATION" | "RESOLVED" | "CLOSED";
+  resolution: string | null;
+  evidence: unknown[];
+  timeline: unknown[];
+  createdAt: string;
+}
+
+export interface BookingResponse {
+  id: string;
+  templateId: string | null;
+  clientId: string;
+  workerId: string;
+  scheduledDate: string;
+  status: "PENDING" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface AvailabilitySlot {
+  id: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  isBlocked: boolean;
+}
+
+export interface RecurringTemplate {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  recurrence: "ONCE" | "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "CUSTOM";
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface SwipeCandidate {
+  id: string;
+  firstName: string;
+  lastName: string;
+  city: string | null;
+  pictureUrl: string | null;
+  role: string;
+  averageRating: number | null;
+  categories: string[];
+  distanceKm: number | null;
+}
+
+export interface SwipeMatch {
+  id: string;
+  userId: string;
+  matchedUserId: string;
+  matchedUser: { id: string; firstName: string; lastName: string; city: string | null; pictureUrl: string | null };
+  status: "ACTIVE" | "EXPIRED";
+  createdAt: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  subject: string;
+  description: string;
+  category: string;
+  priority: string;
+  status: "OPEN" | "IN_PROGRESS" | "WAITING_USER" | "WAITING_ADMIN" | "RESOLVED" | "CLOSED";
+  messages: unknown[];
+  createdAt: string;
+}
+
+export interface VerificationStatus {
+  phoneVerified: boolean;
+  idVerified: boolean;
+  trustTier: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
+}
+
+export interface ReviewSummary {
+  averageRating: number;
+  totalReviews: number;
+  distribution: Record<string, number>;
+}
+
+export interface ReviewResponse {
+  id: string;
+  rating: number;
+  comment: string | null;
+  reviewerName: string;
+  createdAt: string;
+}
+
+// Re-export PrimaryRole for backward compat with workon-api.ts consumers
+export type PrimaryRole = "WORKER" | "EMPLOYER" | "CLIENT_RESIDENTIAL" | "ADMIN";
+
 // --- API Methods ---
 
 export const api = {
@@ -246,12 +387,180 @@ export const api = {
 
   // Earnings
   getEarningsSummary: () => apiFetch<EarningsSummary>("/earnings/summary"),
+  getEarningsHistory: (params?: { page?: number; limit?: number }) => {
+    const q = new URLSearchParams();
+    if (params?.page) q.set("page", String(params.page));
+    if (params?.limit) q.set("limit", String(params.limit));
+    const qs = q.toString();
+    return apiFetch<unknown>(`/earnings/history${qs ? `?${qs}` : ""}`);
+  },
+  getEarningsByMission: (missionId: string) => apiFetch<unknown>(`/earnings/by-mission/${missionId}`),
 
   // Payments
   createPaymentIntent: (data: { missionId: string; amount: number }) =>
     apiFetch<{ clientSecret: string }>("/payments-local/intent", { method: "POST", body: JSON.stringify(data) }),
 
+  // Stripe Connect
+  getStripeOnboardingLink: () => apiFetch<{ url: string }>("/payments/connect/onboarding"),
+  getStripeOnboardingStatus: () =>
+    apiFetch<{ onboarded: boolean; chargesEnabled: boolean; payoutsEnabled: boolean; requirementsNeeded: string[] }>(
+      "/payments/connect/status",
+    ),
+  getWorkerPaymentHistory: () => apiFetch<WorkerPayment[]>("/payments/worker/history"),
+
+  // Stripe Checkout
+  createCheckoutSession: (missionId: string) =>
+    apiFetch<{ checkoutUrl: string; invoiceId: string; sessionId: string }>("/payments/checkout", {
+      method: "POST",
+      body: JSON.stringify({ localMissionId: missionId }),
+    }),
+
+  // Invoices
+  getInvoice: (id: string) => apiFetch<InvoiceResponse>(`/payments/invoice/${id}`),
+  previewInvoice: (priceCents: number) =>
+    apiFetch<InvoicePreview>(`/payments/preview?priceCents=${priceCents}`),
+
+  // Notifications
+  getNotifications: (unreadOnly?: boolean) =>
+    apiFetch<unknown[]>(`/notifications${unreadOnly ? "?unreadOnly=true" : ""}`),
+  getNotificationUnreadCount: () => apiFetch<{ count: number }>("/notifications/unread-count"),
+  markNotificationRead: (id: string) => apiFetch<void>(`/notifications/${id}/read`, { method: "PATCH" }),
+  markAllNotificationsRead: () => apiFetch<{ count: number }>("/notifications/read-all", { method: "PATCH" }),
+
+  // Contracts
+  getMyContracts: () => apiFetch<ContractResponse[]>("/contracts/user/me"),
+  getContract: (id: string) => apiFetch<ContractResponse>(`/contracts/${id}`),
+  createContract: (data: { missionId?: string; localMissionId?: string; terms?: string }) =>
+    apiFetch<ContractResponse>("/contracts", { method: "POST", body: JSON.stringify(data) }),
+  updateContractStatus: (id: string, status: string) =>
+    apiFetch<ContractResponse>(`/contracts/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+
+  // Disputes
+  createDispute: (data: { localMissionId?: string; missionId?: string; reason: string; description: string }) =>
+    apiFetch<DisputeResponse>("/disputes", { method: "POST", body: JSON.stringify(data) }),
+  getDispute: (id: string) => apiFetch<DisputeResponse>(`/disputes/${id}`),
+  getDisputeForMission: (missionId: string) => apiFetch<DisputeResponse>(`/disputes/mission/${missionId}`),
+  addDisputeEvidence: (disputeId: string, data: FormData) =>
+    apiFetch<unknown>(`/disputes/${disputeId}/evidence`, { method: "POST", body: data }),
+  resolveDispute: (id: string, data: { resolution: string }) =>
+    apiFetch<DisputeResponse>(`/disputes/${id}/resolve`, { method: "PATCH", body: JSON.stringify(data) }),
+
+  // Bookings
+  createBooking: (data: { templateId?: string; workerId?: string; scheduledDate: string; notes?: string }) =>
+    apiFetch<BookingResponse>("/scheduling/bookings", { method: "POST", body: JSON.stringify(data) }),
+  getMyBookings: (filters?: { status?: string; upcoming?: boolean }) => {
+    const q = new URLSearchParams();
+    if (filters?.status) q.set("status", filters.status);
+    if (filters?.upcoming) q.set("upcoming", "true");
+    const qs = q.toString();
+    return apiFetch<BookingResponse[]>(`/scheduling/bookings/mine${qs ? `?${qs}` : ""}`);
+  },
+  getWorkerBookings: (filters?: { status?: string; upcoming?: boolean }) => {
+    const q = new URLSearchParams();
+    if (filters?.status) q.set("status", filters.status);
+    if (filters?.upcoming) q.set("upcoming", "true");
+    const qs = q.toString();
+    return apiFetch<BookingResponse[]>(`/scheduling/bookings/worker${qs ? `?${qs}` : ""}`);
+  },
+  confirmBooking: (id: string) => apiFetch<BookingResponse>(`/scheduling/bookings/${id}/confirm`, { method: "PATCH" }),
+  cancelBooking: (id: string) => apiFetch<BookingResponse>(`/scheduling/bookings/${id}/cancel`, { method: "PATCH" }),
+  completeBooking: (id: string) => apiFetch<BookingResponse>(`/scheduling/bookings/${id}/complete`, { method: "PATCH" }),
+
+  // Availability
+  getAvailability: () => apiFetch<AvailabilitySlot[]>("/scheduling/availability"),
+  setAvailability: (data: { dayOfWeek: number; startTime: string; endTime: string }) =>
+    apiFetch<AvailabilitySlot>("/scheduling/availability", { method: "POST", body: JSON.stringify(data) }),
+  blockTime: (data: { date: string; reason?: string }) =>
+    apiFetch<unknown>("/scheduling/availability/block", { method: "POST", body: JSON.stringify(data) }),
+
+  // Templates
+  getTemplates: () => apiFetch<RecurringTemplate[]>("/scheduling/templates"),
+  createTemplate: (data: { title: string; description: string; category: string; price: number; recurrence: string }) =>
+    apiFetch<RecurringTemplate>("/scheduling/templates", { method: "POST", body: JSON.stringify(data) }),
+  deactivateTemplate: (id: string) =>
+    apiFetch<RecurringTemplate>(`/scheduling/templates/${id}/deactivate`, { method: "PATCH" }),
+  generateFromTemplate: (id: string) =>
+    apiFetch<unknown>(`/scheduling/templates/${id}/generate`, { method: "POST" }),
+
+  // Swipe Discovery
+  getSwipeCandidates: (filters?: { role?: string; category?: string; latitude?: number; longitude?: number }) => {
+    const q = new URLSearchParams();
+    if (filters?.role) q.set("role", filters.role);
+    if (filters?.category) q.set("category", filters.category);
+    if (filters?.latitude) q.set("latitude", String(filters.latitude));
+    if (filters?.longitude) q.set("longitude", String(filters.longitude));
+    const qs = q.toString();
+    return apiFetch<SwipeCandidate[]>(`/swipe/candidates${qs ? `?${qs}` : ""}`);
+  },
+  recordSwipe: (data: { targetUserId: string; action: "LIKE" | "PASS" | "SUPERLIKE" }) =>
+    apiFetch<{ matched: boolean; matchId?: string }>("/swipe/action", { method: "POST", body: JSON.stringify(data) }),
+  getMatches: () => apiFetch<SwipeMatch[]>("/swipe/matches"),
+  createMissionFromMatch: (matchId: string, data?: { title?: string; description?: string; price?: number }) =>
+    apiFetch<MissionResponse>("/swipe/matches/mission", { method: "POST", body: JSON.stringify({ matchId, ...data }) }),
+
   // Support
-  createTicket: (data: { subject: string; description: string; category?: string }) =>
-    apiFetch<unknown>("/support/tickets", { method: "POST", body: JSON.stringify(data) }),
+  createTicket: (data: { subject: string; description: string; category?: string; priority?: string }) =>
+    apiFetch<SupportTicket>("/support/tickets", { method: "POST", body: JSON.stringify(data) }),
+  getMyTickets: () => apiFetch<SupportTicket[]>("/support/tickets"),
+  getTicket: (id: string) => apiFetch<SupportTicket>(`/support/tickets/${id}`),
+  addTicketMessage: (id: string, data: { content: string }) =>
+    apiFetch<unknown>(`/support/tickets/${id}/messages`, { method: "POST", body: JSON.stringify(data) }),
+  closeTicket: (id: string) => apiFetch<SupportTicket>(`/support/tickets/${id}/close`, { method: "PATCH" }),
+
+  // Identity Verification
+  startPhoneVerification: () => apiFetch<unknown>("/identity/verify/phone", { method: "POST" }),
+  confirmPhoneOtp: (code: string) =>
+    apiFetch<unknown>("/identity/verify/phone/confirm", { method: "POST", body: JSON.stringify({ code }) }),
+  startIdVerification: () => apiFetch<unknown>("/identity/verify/id/start", { method: "POST" }),
+  getVerificationStatus: () => apiFetch<VerificationStatus>("/identity/status"),
+
+  // Devices
+  registerDevice: (data: { token: string; platform: string }) =>
+    apiFetch<unknown>("/devices", { method: "POST", body: JSON.stringify(data) }),
+  getMyDevices: () => apiFetch<unknown[]>("/devices/me"),
+  unregisterDevice: (id: string) => apiFetch<void>(`/devices/${id}`, { method: "DELETE" }),
+
+  // Reviews
+  getReviewSummary: (userId: string) => apiFetch<ReviewSummary>(`/reviews/summary?userId=${userId}`),
+  getReviews: (userId: string, page?: number) => {
+    const q = new URLSearchParams({ userId });
+    if (page) q.set("page", String(page));
+    return apiFetch<ReviewResponse[]>(`/reviews?${q}`);
+  },
+  createReview: (data: { missionId?: string; localMissionId?: string; targetUserId: string; rating: number; comment?: string }) =>
+    apiFetch<ReviewResponse>("/reviews", { method: "POST", body: JSON.stringify(data) }),
+
+  // Mission Events
+  getMissionEvents: (missionId: string) => apiFetch<unknown[]>(`/missions/${missionId}/events`),
+
+  // Legacy Missions (Clerk-era endpoints, kept for backward compatibility)
+  legacy: {
+    getMissions: () => apiFetch<unknown[]>("/missions/mine"),
+    getAvailableMissions: (filters?: { city?: string; category?: string }) => {
+      const q = new URLSearchParams();
+      if (filters?.city) q.set("city", filters.city);
+      if (filters?.category) q.set("category", filters.category);
+      const qs = q.toString();
+      return apiFetch<unknown[]>(`/missions/available${qs ? `?${qs}` : ""}`);
+    },
+    getMissionFeed: (filters?: { category?: string; city?: string; latitude?: number; longitude?: number; maxDistance?: number }) => {
+      const q = new URLSearchParams();
+      if (filters?.category) q.set("category", filters.category);
+      if (filters?.city) q.set("city", filters.city);
+      if (filters?.latitude !== undefined) q.set("latitude", String(filters.latitude));
+      if (filters?.longitude !== undefined) q.set("longitude", String(filters.longitude));
+      if (filters?.maxDistance !== undefined) q.set("maxDistance", String(filters.maxDistance));
+      const qs = q.toString();
+      return apiFetch<unknown[]>(`/missions/feed${qs ? `?${qs}` : ""}`);
+    },
+    getMission: (id: string) => apiFetch<unknown>(`/missions/${id}`),
+    reserveMission: (id: string) => apiFetch<unknown>(`/missions/${id}/reserve`, { method: "POST" }),
+    updateMissionStatus: (id: string, payload: { status: string }) =>
+      apiFetch<unknown>(`/missions/${id}/status`, { method: "PATCH", body: JSON.stringify(payload) }),
+  },
+
+  // Profile (workon-api.ts compat)
+  fetchProfile: () => apiFetch<unknown>("/profile/me"),
+  saveProfile: (data: { primaryRole?: string; fullName?: string; phone?: string; city?: string }) =>
+    apiFetch<unknown>("/profile/me", { method: "PATCH", body: JSON.stringify(data) }),
 };

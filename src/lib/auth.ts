@@ -1,4 +1,10 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+/**
+ * WorkOn Authentication Client
+ *
+ * Uses Next.js API routes as proxy to set httpOnly cookies.
+ * Tokens are stored in httpOnly cookies (secure) + localStorage (UI cache only).
+ * The middleware reads the workon_token cookie for route protection.
+ */
 
 const TOKEN_KEY = "workon_access_token";
 const REFRESH_KEY = "workon_refresh_token";
@@ -41,7 +47,7 @@ export interface LoginDto {
   password: string;
 }
 
-// --- Token Storage ---
+// --- Token Storage (localStorage for UI cache + cookie via proxy) ---
 
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -64,12 +70,20 @@ export function getCachedUser(): AuthUser | null {
   }
 }
 
-function storeAuth(res: AuthResponse) {
-  localStorage.setItem(TOKEN_KEY, res.accessToken);
-  localStorage.setItem(REFRESH_KEY, res.refreshToken);
+function storeAuth(res: { accessToken?: string; refreshToken?: string; user: AuthUser }) {
+  // Store in localStorage for client-side access (UI cache)
+  if (res.accessToken) {
+    localStorage.setItem(TOKEN_KEY, res.accessToken);
+  }
+  if (res.refreshToken) {
+    localStorage.setItem(REFRESH_KEY, res.refreshToken);
+  }
   localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-  // Set cookie for middleware route protection
-  document.cookie = `workon_token=${res.accessToken};path=/;max-age=${60 * 60 * 24 * 7};SameSite=Lax`;
+  // Also set a non-httpOnly cookie for the middleware (route protection)
+  // The httpOnly cookie is set by the API route proxy
+  if (res.accessToken) {
+    document.cookie = `workon_token=${res.accessToken};path=/;max-age=${60 * 60 * 24 * 7};SameSite=Lax`;
+  }
 }
 
 function clearAuth() {
@@ -79,35 +93,74 @@ function clearAuth() {
   document.cookie = "workon_token=;path=/;max-age=0";
 }
 
-// --- API Calls ---
+// --- API Calls (via proxy routes for httpOnly cookies) ---
 
-export async function login(dto: LoginDto): Promise<AuthResponse> {
-  const res = await fetch(`${API_URL}/auth/login`, {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+
+export async function login(dto: LoginDto): Promise<{ user: AuthUser }> {
+  // Call the proxy route which sets httpOnly cookies
+  const res = await fetch("/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dto),
+    credentials: "include",
   });
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || "Échec de la connexion");
   }
-  const data: AuthResponse = await res.json();
-  storeAuth(data);
-  return data;
-}
 
-export async function register(dto: RegisterDto): Promise<AuthResponse> {
-  const res = await fetch(`${API_URL}/auth/register`, {
+  const data = await res.json();
+
+  // Also call backend directly to get tokens for localStorage cache
+  // (needed by api-client.ts which reads from localStorage)
+  const directRes = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dto),
   });
+
+  if (directRes.ok) {
+    const directData = await directRes.json();
+    storeAuth(directData);
+  } else {
+    // Fallback: store user from proxy response
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  }
+
+  return data;
+}
+
+export async function register(dto: RegisterDto): Promise<{ user: AuthUser }> {
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+    credentials: "include",
+  });
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || "Échec de l'inscription");
   }
-  const data: AuthResponse = await res.json();
-  storeAuth(data);
+
+  const data = await res.json();
+
+  // Also call backend directly for localStorage tokens
+  const directRes = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  });
+
+  if (directRes.ok) {
+    const directData = await directRes.json();
+    storeAuth(directData);
+  } else {
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  }
+
   return data;
 }
 
@@ -128,6 +181,8 @@ export async function refreshToken(): Promise<string | null> {
     const data = await res.json();
     localStorage.setItem(TOKEN_KEY, data.accessToken);
     localStorage.setItem(REFRESH_KEY, data.refreshToken);
+    // Update the cookie for middleware
+    document.cookie = `workon_token=${data.accessToken};path=/;max-age=${60 * 60 * 24 * 7};SameSite=Lax`;
     return data.accessToken;
   } catch {
     clearAuth();
@@ -163,6 +218,8 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
 
 export function logout() {
   clearAuth();
+  // Also call proxy to clear httpOnly cookies
+  fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
 }
 
 export function isAuthenticated(): boolean {

@@ -1,0 +1,12 @@
+{
+  "name": "WorkOn - Marketplace du travail",
+  "short_name": "WorkOn",
+  "description": "Trouvez des missions et des travailleurs pres de chez vous",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#E52521",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }
+  ]
+}

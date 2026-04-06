@@ -1,12 +1,14 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "http://localhost:3001/api/v1";
+/**
+ * DEPRECATED: This file is a backward-compatibility shim.
+ * All endpoints have been consolidated into api-client.ts.
+ * Original archived at: src/legacy/api/workon-api.ts
+ *
+ * New code should use: import { api } from "@/lib/api-client"
+ */
 
-export type PrimaryRole =
-  | "WORKER"
-  | "EMPLOYER"
-  | "CLIENT_RESIDENTIAL"
-  | "ADMIN";
+import { api, type PrimaryRole } from "./api-client";
+
+export type { PrimaryRole };
 
 export type ProfileResponse = {
   id: string;
@@ -27,46 +29,13 @@ export type ProfileUpdatePayload = Partial<{
   city: string;
 }>;
 
-async function request<T>(
-  path: string,
-  token: string,
-  init?: RequestInit,
-): Promise<T> {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${API_BASE_URL}${normalizedPath}`;
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(init?.headers ?? {}),
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text().catch(() => "");
-    console.error("[WorkOn API] Request failed", {
-      url,
-      status: response.status,
-      body: errorBody,
-    });
-    throw new Error(`WorkOn API error ${response.status}`);
-  }
-
-  return response.json() as Promise<T>;
-}
-
-export async function fetchProfile(token: string): Promise<ProfileResponse> {
-  return request<ProfileResponse>("/profile/me", token);
+export async function fetchProfile(_token: string): Promise<ProfileResponse> {
+  return api.fetchProfile() as Promise<ProfileResponse>;
 }
 
 export async function saveProfile(
-  token: string,
+  _token: string,
   payload: ProfileUpdatePayload,
 ): Promise<ProfileResponse> {
-  return request<ProfileResponse>("/profile/me", token, {
-    method: "PATCH",
-    body: JSON.stringify(payload),
-  });
+  return api.saveProfile(payload) as Promise<ProfileResponse>;
 }

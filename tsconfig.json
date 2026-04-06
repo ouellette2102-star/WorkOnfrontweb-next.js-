@@ -38,6 +38,8 @@
     "scripts",
     "prisma",
     "scripts/**/*",
-    "prisma/**/*"
+    "prisma/**/*",
+    "src/legacy",
+    "src/legacy/**/*"
   ]
 }

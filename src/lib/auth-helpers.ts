@@ -1,6 +1,20 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+/**
+ * Auth helpers for server components.
+ * Delegates to server-auth.ts (JWT cookie-based).
+ *
+ * Legacy Clerk version archived at: src/legacy/clerk/auth-helpers-clerk.ts
+ */
 
+import {
+  requireAuth,
+  requireWorker as serverRequireWorker,
+  requireEmployer as serverRequireEmployer,
+  getServerUser,
+  getServerToken,
+  type ServerUser,
+} from "./server-auth";
+
+// Re-export types for backward compatibility
 export type ProfileRole = "WORKER" | "EMPLOYER" | "ADMIN" | "CLIENT_RESIDENTIAL";
 
 export type UserProfile = {
@@ -15,99 +29,62 @@ export type UserProfile = {
   isClientResidential: boolean;
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
 /**
- * Récupère le profil de l'utilisateur connecté
- * Utilisé dans les Server Components
+ * Map ServerUser to the legacy UserProfile shape expected by existing components.
  */
-async function fetchCurrentProfile(): Promise<UserProfile | null> {
-  const { getToken } = await auth();
-  const token = await getToken();
+function toUserProfile(user: ServerUser): UserProfile {
+  const roleMap: Record<string, ProfileRole> = {
+    worker: "WORKER",
+    employer: "EMPLOYER",
+    residential_client: "CLIENT_RESIDENTIAL",
+  };
 
-  if (!token) {
-    return null;
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/profile/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return await response.json();
-  } catch {
-    return null;
-  }
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: `${user.firstName} ${user.lastName}`.trim(),
+    phone: user.phone ?? "",
+    city: user.city ?? "",
+    primaryRole: roleMap[user.role] ?? "WORKER",
+    isWorker: user.role === "worker",
+    isEmployer: user.role === "employer",
+    isClientResidential: user.role === "residential_client",
+  };
 }
 
 /**
- * Garantit que l'utilisateur est authentifié et a un profil
- * Redirige vers /onboarding/role si pas de primaryRole
+ * Require authentication and return a UserProfile.
+ * Redirects to /login if not authenticated.
  */
 export async function requireAuthServer(): Promise<UserProfile> {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  const profile = await fetchCurrentProfile();
-
-  if (!profile) {
-    // Utilisateur connecté mais pas de profil backend
-    redirect("/onboarding/role");
-  }
-
-  if (!profile.primaryRole) {
-    // Profil existe mais pas de rôle choisi
-    redirect("/onboarding/role");
-  }
-
-  return profile;
+  const user = await requireAuth();
+  return toUserProfile(user);
 }
 
 /**
- * Garantit que l'utilisateur est un WORKER
- * Redirige vers /employer/dashboard si c'est un employer
- * Redirige vers /onboarding/role si pas de rôle
+ * Require worker role. Redirects to employer dashboard if wrong role.
  */
 export async function requireWorker(): Promise<UserProfile> {
-  const profile = await requireAuthServer();
-
-  if (profile.primaryRole === "EMPLOYER") {
-    redirect("/employer/dashboard");
-  }
-
-  if (profile.primaryRole !== "WORKER") {
-    redirect("/onboarding/role");
-  }
-
-  return profile;
+  const user = await serverRequireWorker();
+  return toUserProfile(user);
 }
 
 /**
- * Garantit que l'utilisateur est un EMPLOYER
- * Redirige vers /worker/dashboard si c'est un worker
- * Redirige vers /onboarding/role si pas de rôle
+ * Require employer role. Redirects to worker dashboard if wrong role.
  */
 export async function requireEmployer(): Promise<UserProfile> {
-  const profile = await requireAuthServer();
-
-  if (profile.primaryRole === "WORKER") {
-    redirect("/worker/dashboard");
-  }
-
-  if (profile.primaryRole !== "EMPLOYER" && profile.primaryRole !== "ADMIN") {
-    redirect("/onboarding/role");
-  }
-
-  return profile;
+  const user = await serverRequireEmployer();
+  return toUserProfile(user);
 }
 
+/**
+ * Get current profile without requiring auth (returns null if not authenticated).
+ */
+export async function fetchCurrentProfile(): Promise<UserProfile | null> {
+  const user = await getServerUser();
+  if (!user) return null;
+  return toUserProfile(user);
+}
+
+// Re-export for convenience
+export { getServerToken, getServerUser };

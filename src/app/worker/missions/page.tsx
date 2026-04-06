@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { RequireWorkerClient } from "@/components/auth/require-worker-client";
 import { MissionFeedList } from "@/components/worker/mission-feed-list";
 import { MissionSwipeCards } from "@/components/worker/mission-swipe-cards";
@@ -31,8 +32,7 @@ export default function WorkerMissionsPage() {
 }
 
 function WorkerMissionsContent() {
-  const { getToken, isLoaded, isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [missions, setMissions] = useState<MissionFeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +44,6 @@ function WorkerMissionsContent() {
   const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // Extraire le prénom de l'utilisateur Clerk
   const firstName = user?.firstName || "Travailleur";
 
   // Demander la géolocalisation au chargement
@@ -76,13 +75,13 @@ function WorkerMissionsContent() {
   }, []);
 
   const loadMissions = useCallback(async () => {
-    if (!isLoaded || !isSignedIn) return;
+    if (authLoading || !isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
 
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Impossible de récupérer le token d'authentification.");
         return;
@@ -108,7 +107,7 @@ function WorkerMissionsContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoaded, isSignedIn, getToken, category, maxDistance, userLocation]);
+  }, [authLoading, isAuthenticated, category, maxDistance, userLocation]);
 
   useEffect(() => {
     loadMissions();
@@ -116,7 +115,7 @@ function WorkerMissionsContent() {
 
   const handleReserve = async (missionId: string) => {
     try {
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         toast.error("Vous devez être connecté pour réserver une mission.");
         return;

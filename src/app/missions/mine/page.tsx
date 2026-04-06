@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/auth-context";
+import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { getMyMissions } from "@/lib/missions-api";
 import type { Mission } from "@/types/mission";
@@ -23,17 +24,17 @@ export default function MyMissionsPage() {
 
 function MyMissionsContent() {
   const router = useRouter();
-  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadMissions = useCallback(async () => {
-    if (!isLoaded || !isSignedIn) return;
+    if (authLoading || !isAuthenticated) return;
 
     try {
       setIsLoading(true);
-      const token = await getToken();
+      const token = getAccessToken();
       if (!token) {
         setError("Impossible de récupérer le token");
         return;
@@ -51,18 +52,18 @@ function MyMissionsContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [authLoading, isAuthenticated]);
 
   useEffect(() => {
-    if (!isLoaded) return;
-    if (!isSignedIn) {
+    if (authLoading) return;
+    if (!isAuthenticated) {
       setError("Tu dois être connecté pour voir tes missions");
       setIsLoading(false);
       return;
     }
 
     loadMissions();
-  }, [isLoaded, isSignedIn, loadMissions]);
+  }, [authLoading, isAuthenticated, loadMissions]);
 
   const handleStatusUpdateSuccess = (updatedMission: Mission) => {
     // Mise à jour optimiste de la liste

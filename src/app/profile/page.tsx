@@ -1,19 +1,15 @@
 import { redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { ProfileRolesCard } from "@/components/profile/profile-roles-card";
+import { requireAuth } from "@/lib/server-auth";
 import { getCurrentProfile } from "@/lib/get-profile";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-  const clerkUser = await currentUser();
+  const user = await requireAuth();
 
-  if (!clerkUser) {
-    redirect("/sign-in");
-  }
-
-  const profile = await getCurrentProfile(clerkUser.id);
+  const profile = await getCurrentProfile(user.id);
   if (!profile) {
     redirect("/onboarding");
   }

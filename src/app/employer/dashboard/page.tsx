@@ -1,6 +1,7 @@
 import { requireEmployer } from "@/lib/auth-helpers";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { EmployerDashboardStats } from "./dashboard-stats";
 
 export default async function EmployerDashboardPage() {
   const profile = await requireEmployer();
@@ -11,20 +12,20 @@ export default async function EmployerDashboardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="mb-2 text-4xl font-bold text-white">
-            Bienvenue, {profile.fullName || "Employeur"} 💼
+            Bienvenue, {profile.fullName || "Employeur"}
           </h1>
           <p className="text-lg text-white/70">
-            Gérez vos missions et travailleurs
+            G&eacute;rez vos missions et travailleurs
           </p>
         </div>
 
         {/* Actions rapides */}
-        <div className="mb-8 grid gap-4 md:grid-cols-4">
+        <div className="mb-8 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
           <Link href="/missions/new">
             <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">➕</div>
+              <div className="mb-3 text-4xl">&#x2795;</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
-                Créer une mission
+                Cr&eacute;er une mission
               </h3>
               <p className="text-sm text-white/70">
                 Publiez une nouvelle mission
@@ -34,7 +35,7 @@ export default async function EmployerDashboardPage() {
 
           <Link href="/missions/mine">
             <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">📋</div>
+              <div className="mb-3 text-4xl">&#x1F4CB;</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Mes missions
               </h3>
@@ -44,21 +45,33 @@ export default async function EmployerDashboardPage() {
             </div>
           </Link>
 
-          <Link href="/notifications">
+          <Link href="/employer/discover">
             <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">🔔</div>
+              <div className="mb-3 text-4xl">&#x1F50D;</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
-                Notifications
+                D&eacute;couvrir
               </h3>
               <p className="text-sm text-white/70">
-                Vos notifications importantes
+                Trouver des travailleurs
+              </p>
+            </div>
+          </Link>
+
+          <Link href="/employer/matches">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
+              <div className="mb-3 text-4xl">&#x1F91D;</div>
+              <h3 className="mb-2 text-xl font-semibold text-white">
+                Mes matches
+              </h3>
+              <p className="text-sm text-white/70">
+                Vos travailleurs compatibles
               </p>
             </div>
           </Link>
 
           <Link href="/messages">
             <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">💬</div>
+              <div className="mb-3 text-4xl">&#x1F4AC;</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Messages
               </h3>
@@ -69,53 +82,8 @@ export default async function EmployerDashboardPage() {
           </Link>
         </div>
 
-        {/* Sections principales */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Missions actives */}
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">
-                Missions actives
-              </h2>
-              <Link href="/missions/mine">
-                <Button className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500">
-                  Voir toutes
-                </Button>
-              </Link>
-            </div>
-            <p className="text-white/70">
-              Vous n'avez pas encore de missions actives
-            </p>
-          </div>
-
-          {/* Missions en attente */}
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">
-                En attente de workers
-              </h2>
-            </div>
-            <p className="text-white/70">
-              Aucune mission en attente pour le moment
-            </p>
-          </div>
-        </div>
-
-        {/* Stats rapides */}
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-            <p className="text-sm text-white/50">Total missions créées</p>
-            <p className="mt-2 text-3xl font-bold text-white">0</p>
-          </div>
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-            <p className="text-sm text-white/50">Missions complétées</p>
-            <p className="mt-2 text-3xl font-bold text-white">0</p>
-          </div>
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-            <p className="text-sm text-white/50">Workers engagés</p>
-            <p className="mt-2 text-3xl font-bold text-white">0</p>
-          </div>
-        </div>
+        {/* Live stats from API */}
+        <EmployerDashboardStats />
 
         {/* Infos profil */}
         <div className="mt-8 rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
@@ -125,11 +93,11 @@ export default async function EmployerDashboardPage() {
           <div className="grid gap-4 md:grid-cols-3">
             <div>
               <p className="text-sm text-white/50">Ville</p>
-              <p className="text-white">{profile.city || "Non renseignée"}</p>
+              <p className="text-white">{profile.city || "Non renseign\u00e9e"}</p>
             </div>
             <div>
-              <p className="text-sm text-white/50">Téléphone</p>
-              <p className="text-white">{profile.phone || "Non renseigné"}</p>
+              <p className="text-sm text-white/50">T&eacute;l&eacute;phone</p>
+              <p className="text-white">{profile.phone || "Non renseign\u00e9"}</p>
             </div>
             <div>
               <p className="text-sm text-white/50">Email</p>
@@ -146,4 +114,3 @@ export default async function EmployerDashboardPage() {
     </div>
   );
 }
-
