@@ -12,7 +12,7 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-900/80 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-red-600 flex items-center justify-center">
+          <div className="h-7 w-7 rounded-full bg-[#FF4D1C] flex items-center justify-center">
             <span className="text-white text-xs font-bold">W</span>
           </div>
           <span className="font-bold tracking-tight">WorkOn</span>
@@ -35,7 +35,7 @@ function WorkerCard({ w }: { w: FeaturedWorker }) {
   return (
     <Link
       href={`/p/${w.slug}`}
-      className="group block rounded-xl border border-white/10 bg-white/5 p-5 hover:border-red-500/50 hover:bg-white/8 transition-all"
+      className="group block rounded-xl border border-white/10 bg-white/5 p-5 hover:border-[#FF4D1C]/50 hover:bg-white/8 transition-all"
     >
       <div className="flex items-center gap-4">
         <div className="relative flex-shrink-0">
@@ -43,12 +43,12 @@ function WorkerCard({ w }: { w: FeaturedWorker }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={w.photoUrl} alt={w.firstName} className="h-14 w-14 rounded-full object-cover" />
           ) : (
-            <div className="h-14 w-14 rounded-full bg-red-600/20 border border-red-600/30 flex items-center justify-center">
-              <span className="text-base font-bold text-red-400">{initials}</span>
+            <div className="h-14 w-14 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center">
+              <span className="text-base font-bold text-[#FF4D1C]">{initials}</span>
             </div>
           )}
           {(w.trustTier === "VERIFIED" || w.trustTier === "TRUSTED" || w.trustTier === "PREMIUM") && (
-            <span className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-red-600 border-2 border-neutral-900 flex items-center justify-center">
+            <span className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-[#FF4D1C] border-2 border-neutral-900 flex items-center justify-center">
               <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
@@ -56,7 +56,7 @@ function WorkerCard({ w }: { w: FeaturedWorker }) {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold truncate group-hover:text-red-400 transition-colors">
+          <p className="font-semibold truncate group-hover:text-[#FF4D1C] transition-colors">
             {w.firstName} {w.lastName[0]}.
           </p>
           {w.sector && <p className="text-sm text-white/50 mt-0.5 truncate">{w.sector}</p>}
@@ -82,14 +82,14 @@ function WorkerCard({ w }: { w: FeaturedWorker }) {
       {w.badges.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {w.badges.map((b) => (
-            <span key={b.type} className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-600/15 text-red-400 border border-red-600/20">
+            <span key={b.type} className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#FF4D1C]/15 text-[#FF4D1C] border border-[#FF4D1C]/20">
               {b.label}
             </span>
           ))}
         </div>
       )}
 
-      <div className="mt-4 text-xs text-red-400 group-hover:text-red-300 transition-colors flex items-center gap-1">
+      <div className="mt-4 text-xs text-[#FF4D1C] group-hover:text-[#FFA37C] transition-colors flex items-center gap-1">
         Voir le profil complet →
       </div>
     </Link>
@@ -129,19 +129,19 @@ export default async function ProsPage() {
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-white/10">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-red-600/30 bg-red-600/10 px-3 py-1 text-xs text-red-400 mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#FF4D1C]/30 bg-[#FF4D1C]/10 px-3 py-1 text-xs text-[#FF4D1C] mb-5">
             ⚡ Inscription gratuite — payé dès ce soir
           </div>
           <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
             Trouve des missions.<br />
-            <span className="text-red-500">Travaille quand tu veux.</span>
+            <span className="text-[#FF4D1C]">Travaille quand tu veux.</span>
           </h1>
           <p className="mt-4 text-white/60 text-lg leading-relaxed">
             Rejoins {workers.length > 0 ? `${workers.length}+ travailleurs` : "des centaines de pros"} qui acceptent des missions payées rapidement.
             Flexible, légal, sécurisé.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
+            <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
               <Link href="/register?role=worker">S&apos;inscrire comme pro</Link>
             </Button>
             <Button variant="outline" size="lg" className="border-white/20 hover:border-white/40" asChild>
@@ -207,7 +207,7 @@ export default async function ProsPage() {
             { n: 4, title: "Reçois ton paiement", desc: "Stripe débloque les fonds dès la confirmation. Rapide et sécurisé." },
           ].map((step) => (
             <li key={step.n} className="flex items-start gap-4">
-              <span className="flex-shrink-0 h-7 w-7 rounded-full bg-red-600/20 border border-red-600/30 flex items-center justify-center text-sm font-bold text-red-400">
+              <span className="flex-shrink-0 h-7 w-7 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center text-sm font-bold text-[#FF4D1C]">
                 {step.n}
               </span>
               <div>
@@ -224,7 +224,7 @@ export default async function ProsPage() {
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-3">Prêt à commencer ?</h2>
           <p className="text-white/60 mb-6">Inscription gratuite. Première mission disponible immédiatement.</p>
-          <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
+          <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
             <Link href="/register?role=worker">Créer mon profil gratuitement</Link>
           </Button>
         </div>
