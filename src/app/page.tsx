@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/navigation/user-nav";
 import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
+import { HeroWorkerCard } from "@/components/worker/hero-worker-card";
 import {
   getPublicStats,
   getFeaturedWorkers,
@@ -436,51 +437,9 @@ function WorkersSection({ workers }: { workers: FeaturedWorker[] }) {
           </Link>
         </div>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {workers.map((w) => {
-            const initials = `${w.firstName[0]}${w.lastName[0]}`.toUpperCase();
-            return (
-              <Link
-                key={w.id}
-                href={`/p/${w.slug}`}
-                className="group block rounded-2xl border border-gray-200 bg-white p-6 hover:border-[#FF4D1C]/40 hover:shadow-lg hover:shadow-[#FF4D1C]/5 transition-all"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="relative flex-shrink-0">
-                    {w.photoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={w.photoUrl} alt={w.firstName} className="h-14 w-14 rounded-full object-cover" />
-                    ) : (
-                      <div className="h-14 w-14 rounded-full bg-[#FF4D1C]/10 border border-[#FF4D1C]/20 flex items-center justify-center">
-                        <span className="text-sm font-bold text-[#FF4D1C]">{initials}</span>
-                      </div>
-                    )}
-                    {(w.trustTier === "VERIFIED" || w.trustTier === "TRUSTED" || w.trustTier === "PREMIUM") && (
-                      <span className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-[#22C55E] border-2 border-white flex items-center justify-center">
-                        <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[15px] text-[#1A1A2E] truncate group-hover:text-[#FF4D1C] transition-colors">
-                      {w.firstName} {w.lastName[0]}.
-                    </p>
-                    {w.sector && <p className="text-sm text-[#6B7280] mt-0.5 truncate">{w.sector}</p>}
-                    {w.city && <p className="text-xs text-[#6B7280]/60 mt-0.5">{w.city}</p>}
-                  </div>
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-yellow-500 text-sm">★</span>
-                    <span className="text-sm font-bold text-[#1A1A2E]">{w.ratingAvg > 0 ? w.ratingAvg.toFixed(1) : "Nouveau"}</span>
-                    {w.ratingCount > 0 && <span className="text-sm text-[#6B7280]">({w.ratingCount})</span>}
-                  </div>
-                  <span className="text-sm text-[#6B7280]">{w.completedMissions} mission{w.completedMissions !== 1 ? "s" : ""}</span>
-                </div>
-              </Link>
-            );
-          })}
+          {workers.map((w) => (
+            <HeroWorkerCard key={w.id} worker={w} />
+          ))}
         </div>
         <div className="mt-10 text-center md:hidden">
           <Link href="/pros" className="text-sm font-semibold text-[#FF4D1C]">Voir tous les profils →</Link>
