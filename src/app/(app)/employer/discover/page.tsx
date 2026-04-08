@@ -146,33 +146,43 @@ export default function EmployerDiscoverPage() {
                     )}
 
                     <div className="mb-6 space-y-3">
-                      {currentCandidate.averageRating !== null && (
+                      {currentCandidate.avgRating > 0 ? (
                         <div className="flex items-center gap-2">
                           <span className="text-lg">&#x2B50;</span>
                           <span className="text-white/80">
-                            {currentCandidate.averageRating.toFixed(1)} / 5
+                            {currentCandidate.avgRating.toFixed(1)} / 5
+                            {currentCandidate.reviewCount > 0 && (
+                              <span className="text-white/40"> ({currentCandidate.reviewCount})</span>
+                            )}
                           </span>
                         </div>
-                      )}
-                      {currentCandidate.distanceKm !== null && (
+                      ) : (
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">&#x1F4CD;</span>
-                          <span className="text-white/80">
-                            {currentCandidate.distanceKm.toFixed(1)} km
+                          <span className="text-lg">&#x2B50;</span>
+                          <span className="text-white/60">Nouveau profil</span>
+                        </div>
+                      )}
+                      {currentCandidate.trustTier !== "BASIC" && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">&#x2705;</span>
+                          <span className="text-white/80 capitalize">
+                            {currentCandidate.trustTier.toLowerCase()}
                           </span>
                         </div>
                       )}
-                      {currentCandidate.categories.length > 0 && (
+                      {currentCandidate.category && (
                         <div className="flex flex-wrap gap-2">
-                          {currentCandidate.categories.map((cat) => (
-                            <span
-                              key={cat}
-                              className="rounded-full bg-green-600/20 px-3 py-1 text-xs font-medium text-green-400"
-                            >
-                              {cat}
-                            </span>
-                          ))}
+                          <span
+                            className="rounded-full bg-green-600/20 px-3 py-1 text-xs font-medium text-green-400"
+                          >
+                            {currentCandidate.category}
+                          </span>
                         </div>
+                      )}
+                      {currentCandidate.bio && (
+                        <p className="text-sm text-white/60 line-clamp-3">
+                          {currentCandidate.bio}
+                        </p>
                       )}
                     </div>
 
