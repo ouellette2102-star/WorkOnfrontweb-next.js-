@@ -10,7 +10,6 @@ import {
   logout as authLogout,
   fetchCurrentUser,
   getCachedUser,
-  isAuthenticated as checkAuth,
 } from "@/lib/auth";
 
 interface AuthContextValue {
@@ -29,27 +28,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check auth on mount
+  // Check auth on mount.
+  //
+  // We always call fetchCurrentUser() (which hits the same-origin
+  // /api/auth/me proxy that uses the httpOnly cookie). We do NOT gate
+  // on localStorage because it can be empty even when the user is
+  // authenticated server-side (e.g. fresh tab, browser cleared local
+  // storage but kept cookies, or hard navigation after a server-set
+  // cookie). The cached user is only used for instant UI hydration.
   useEffect(() => {
+    let cancelled = false;
     async function init() {
-      if (!checkAuth()) {
-        setIsLoading(false);
-        return;
-      }
-      // Try cached user first for instant UI
       const cached = getCachedUser();
       if (cached) setUser(cached);
 
-      // Then verify with backend
       const fresh = await fetchCurrentUser();
-      if (fresh) {
-        setUser(fresh);
-      } else {
-        setUser(null);
-      }
+      if (cancelled) return;
+      setUser(fresh);
       setIsLoading(false);
     }
     init();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = useCallback(async (dto: LoginDto) => {

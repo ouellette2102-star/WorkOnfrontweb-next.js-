@@ -33,9 +33,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Set httpOnly cookies
+    // Return tokens in body so the client (lib/auth.ts) can cache them in
+    // localStorage for api-client.ts. The httpOnly cookies below are set
+    // for the middleware + RSC server-side gate. Both are sources of truth
+    // and must stay in sync — never one without the other.
     const response = NextResponse.json({
       user: data.user,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
     });
 
     response.cookies.set("workon_token", data.accessToken, COOKIE_OPTIONS);

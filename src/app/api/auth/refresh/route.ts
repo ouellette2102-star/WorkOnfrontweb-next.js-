@@ -44,7 +44,12 @@ export async function POST(req: NextRequest) {
 
     const data = await backendRes.json();
 
-    const response = NextResponse.json({ success: true });
+    // Return new tokens in body so the client can update its localStorage
+    // cache. The httpOnly cookies below stay in sync.
+    const response = NextResponse.json({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    });
 
     response.cookies.set("workon_token", data.accessToken, COOKIE_OPTIONS);
     response.cookies.set("workon_refresh", data.refreshToken, {

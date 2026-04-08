@@ -1,41 +1,30 @@
-"use client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { AppShell } from "./_app-shell";
 
-import { useAuth } from "@/contexts/auth-context";
-import { BottomNav } from "@/components/navigation/bottom-nav";
-import { MapPin, Loader2 } from "lucide-react";
+/**
+ * Server-side gate for the authenticated app shell.
+ *
+ * Reading cookies() forces every (app)/* route to be dynamically rendered,
+ * which (a) lets the auth middleware actually run on each request and
+ * (b) prevents Vercel from caching a prerendered HTML skeleton that would
+ * leak the page chrome to unauthenticated visitors.
+ *
+ * If the auth cookie is missing we redirect on the server before any
+ * page content is sent. The client-side AppShell still handles the
+ * post-hydration UX (loading spinner, BottomNav, etc).
+ */
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("workon_token")?.value;
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAuthenticated } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-dvh flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-red-accent" />
-      </div>
-    );
+  if (!token) {
+    redirect("/login");
   }
 
-  if (!isAuthenticated) {
-    // Middleware should handle redirect, but just in case
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
-    }
-    return null;
-  }
-
-  return (
-    <div className="min-h-dvh pb-20">
-      {/* Top header */}
-      <header className="sticky top-0 z-40 flex items-center justify-center h-14 border-b border-white/5 bg-neutral-900/95 backdrop-blur-lg">
-        <div className="flex items-center gap-0.5 text-xl font-bold">
-          <span>Work</span>
-          <MapPin className="h-5 w-5 text-red-accent" />
-          <span>n</span>
-        </div>
-      </header>
-
-      <main>{children}</main>
-      <BottomNav />
-    </div>
-  );
+  return <AppShell>{children}</AppShell>;
 }

@@ -1,9 +1,16 @@
 /**
  * WorkOn Authentication Client
  *
- * Uses Next.js API routes as proxy to set httpOnly cookies.
- * Tokens are stored in httpOnly cookies (secure) + localStorage (UI cache only).
- * The middleware reads the workon_token cookie for route protection.
+ * All auth network traffic goes through the same-origin Next.js proxy
+ * routes under `/api/auth/*`. The proxies set httpOnly cookies for the
+ * server-side gate (middleware + RSC layout) AND return the same tokens
+ * in the JSON body so the client can cache them in localStorage for
+ * `api-client.ts` (which still calls the backend directly with a Bearer
+ * header).
+ *
+ * Both stores stay in sync. Removing the previous dual-call pattern
+ * (proxy then direct cross-origin call) fixes a CORS / SameSite class of
+ * bugs that surfaced as "Échec de la connexion" on Vercel previews.
  */
 
 const TOKEN_KEY = "workon_access_token";
@@ -47,7 +54,7 @@ export interface LoginDto {
   password: string;
 }
 
-// --- Token Storage (localStorage for UI cache + cookie via proxy) ---
+// --- Token Storage (localStorage cache, mirrored from proxy responses) ---
 
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -70,8 +77,14 @@ export function getCachedUser(): AuthUser | null {
   }
 }
 
-function storeAuth(res: { accessToken?: string; refreshToken?: string; user: AuthUser }) {
-  // Store in localStorage for client-side access (UI cache)
+interface ProxyAuthResponse {
+  user: AuthUser;
+  accessToken?: string;
+  refreshToken?: string;
+}
+
+function storeAuth(res: ProxyAuthResponse) {
+  if (typeof window === "undefined") return;
   if (res.accessToken) {
     localStorage.setItem(TOKEN_KEY, res.accessToken);
   }
@@ -79,26 +92,18 @@ function storeAuth(res: { accessToken?: string; refreshToken?: string; user: Aut
     localStorage.setItem(REFRESH_KEY, res.refreshToken);
   }
   localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-  // Also set a non-httpOnly cookie for the middleware (route protection)
-  // The httpOnly cookie is set by the API route proxy
-  if (res.accessToken) {
-    document.cookie = `workon_token=${res.accessToken};path=/;max-age=${60 * 60 * 24 * 7};SameSite=Lax`;
-  }
 }
 
 function clearAuth() {
+  if (typeof window === "undefined") return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
   localStorage.removeItem(USER_KEY);
-  document.cookie = "workon_token=;path=/;max-age=0";
 }
 
-// --- API Calls (via proxy routes for httpOnly cookies) ---
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+// --- API Calls (all via same-origin proxy routes) ---
 
 export async function login(dto: LoginDto): Promise<{ user: AuthUser }> {
-  // Call the proxy route which sets httpOnly cookies
   const res = await fetch("/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -111,25 +116,9 @@ export async function login(dto: LoginDto): Promise<{ user: AuthUser }> {
     throw new Error(err.message || "Échec de la connexion");
   }
 
-  const data = await res.json();
-
-  // Also call backend directly to get tokens for localStorage cache
-  // (needed by api-client.ts which reads from localStorage)
-  const directRes = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dto),
-  });
-
-  if (directRes.ok) {
-    const directData = await directRes.json();
-    storeAuth(directData);
-  } else {
-    // Fallback: store user from proxy response
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-  }
-
-  return data;
+  const data: ProxyAuthResponse = await res.json();
+  storeAuth(data);
+  return { user: data.user };
 }
 
 export async function register(dto: RegisterDto): Promise<{ user: AuthUser }> {
@@ -145,45 +134,27 @@ export async function register(dto: RegisterDto): Promise<{ user: AuthUser }> {
     throw new Error(err.message || "Échec de l'inscription");
   }
 
-  const data = await res.json();
-
-  // Also call backend directly for localStorage tokens
-  const directRes = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dto),
-  });
-
-  if (directRes.ok) {
-    const directData = await directRes.json();
-    storeAuth(directData);
-  } else {
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-  }
-
-  return data;
+  const data: ProxyAuthResponse = await res.json();
+  storeAuth(data);
+  return { user: data.user };
 }
 
 export async function refreshToken(): Promise<string | null> {
-  const refresh = getRefreshTokenValue();
-  if (!refresh) return null;
-
   try {
-    const res = await fetch(`${API_URL}/auth/refresh`, {
+    const res = await fetch("/api/auth/refresh", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: refresh }),
+      credentials: "include",
     });
     if (!res.ok) {
       clearAuth();
       return null;
     }
     const data = await res.json();
-    localStorage.setItem(TOKEN_KEY, data.accessToken);
-    localStorage.setItem(REFRESH_KEY, data.refreshToken);
-    // Update the cookie for middleware
-    document.cookie = `workon_token=${data.accessToken};path=/;max-age=${60 * 60 * 24 * 7};SameSite=Lax`;
-    return data.accessToken;
+    if (typeof window !== "undefined") {
+      if (data.accessToken) localStorage.setItem(TOKEN_KEY, data.accessToken);
+      if (data.refreshToken) localStorage.setItem(REFRESH_KEY, data.refreshToken);
+    }
+    return data.accessToken ?? null;
   } catch {
     clearAuth();
     return null;
@@ -191,34 +162,29 @@ export async function refreshToken(): Promise<string | null> {
 }
 
 export async function fetchCurrentUser(): Promise<AuthUser | null> {
-  const token = getAccessToken();
-  if (!token) return null;
-
-  const res = await fetch(`${API_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (res.status === 401) {
-    const newToken = await refreshToken();
-    if (!newToken) return null;
-    const retry = await fetch(`${API_URL}/auth/me`, {
-      headers: { Authorization: `Bearer ${newToken}` },
+  try {
+    const res = await fetch("/api/auth/me", {
+      credentials: "include",
+      cache: "no-store",
     });
-    if (!retry.ok) return null;
-    const user = await retry.json();
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    if (res.status === 401) {
+      clearAuth();
+      return null;
+    }
+    if (!res.ok) return null;
+    const user = await res.json();
+    if (typeof window !== "undefined") {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
     return user;
+  } catch {
+    return null;
   }
-
-  if (!res.ok) return null;
-  const user = await res.json();
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
-  return user;
 }
 
 export function logout() {
   clearAuth();
-  // Also call proxy to clear httpOnly cookies
+  // Fire-and-forget proxy call to clear httpOnly cookies server-side
   fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
 }
 

@@ -8,14 +8,14 @@ export default function OnboardingSuccessPage() {
           <span className="text-sm uppercase tracking-[0.4em] text-green-500">Profil prêt</span>
           <h1 className="text-4xl font-semibold md:text-5xl">Ton profil est prêt. Bienvenue sur WorkOn.</h1>
           <p className="text-white/70">
-            Accède maintenant au fil en direct, découvre les missions ou publie ta première opportunité.
+            Accède maintenant à ton tableau de bord, découvre les missions ou publie ta première opportunité.
           </p>
         </div>
         <Link
-          href="/feed"
+          href="/home"
           className="rounded-full bg-red-600 px-8 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-red-500"
         >
-          Ouvrir le feed
+          Ouvrir mon espace
         </Link>
       </div>
     </main>

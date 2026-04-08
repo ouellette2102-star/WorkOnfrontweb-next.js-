@@ -6,3 +6,5 @@ node_modules/
 # Flutter mobile app — conflicts with Next.js app dir detection (findPagesDir checks ./app first)
 /app/
 /app_backup_20260213/
+# Archived code preserved for reference, not built or shipped
+/archive/
