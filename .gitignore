@@ -70,3 +70,5 @@ app_backup_*/
 map_crash_log.txt
 qa_mission_id.txt
 startdev.err
+
+.vercel
