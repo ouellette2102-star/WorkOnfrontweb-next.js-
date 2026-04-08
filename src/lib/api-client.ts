@@ -419,13 +419,29 @@ export const api = {
   createPaymentIntent: (data: { missionId: string; amount: number }) =>
     apiFetch<{ clientSecret: string }>("/payments-local/intent", { method: "POST", body: JSON.stringify(data) }),
 
-  // Stripe Connect
-  getStripeOnboardingLink: () => apiFetch<{ url: string }>("/payments/connect/onboarding"),
+  // Stripe Connect.
+  //
+  // Backend canonical paths are namespaced under `/payments/stripe/*`
+  // (verified live 2026-04-08 against workon-backend-production-8908):
+  //
+  //   GET /api/v1/payments/stripe/connect/onboarding   -> 200 (worker role)
+  //   GET /api/v1/payments/stripe/connect/status       -> 200
+  //   GET /api/v1/payments/stripe/worker/history       -> 200 (worker role)
+  //
+  // The previous client paths (`/payments/connect/...`,
+  // `/payments/worker/history`) returned 404 in production, blocking
+  // the entire Stripe Connect onboarding flow for workers and the
+  // payment history view. The fix is purely a path alignment with the
+  // backend's `StripeController` (`backend/src/stripe/stripe.controller.ts`).
+  // No payload, no auth, no schema changes.
+  getStripeOnboardingLink: () =>
+    apiFetch<{ url: string }>("/payments/stripe/connect/onboarding"),
   getStripeOnboardingStatus: () =>
     apiFetch<{ onboarded: boolean; chargesEnabled: boolean; payoutsEnabled: boolean; requirementsNeeded: string[] }>(
-      "/payments/connect/status",
+      "/payments/stripe/connect/status",
     ),
-  getWorkerPaymentHistory: () => apiFetch<WorkerPayment[]>("/payments/worker/history"),
+  getWorkerPaymentHistory: () =>
+    apiFetch<WorkerPayment[]>("/payments/stripe/worker/history"),
 
   // Stripe Checkout
   createCheckoutSession: (missionId: string) =>
