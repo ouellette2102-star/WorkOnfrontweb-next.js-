@@ -578,8 +578,126 @@ export const api = {
       apiFetch<unknown>(`/missions/${id}/status`, { method: "PATCH", body: JSON.stringify(payload) }),
   },
 
-  // Profile (workon-api.ts compat)
-  fetchProfile: () => apiFetch<unknown>("/profile/me"),
-  saveProfile: (data: { primaryRole?: string; fullName?: string; phone?: string; city?: string }) =>
-    apiFetch<unknown>("/profile/me", { method: "PATCH", body: JSON.stringify(data) }),
+  // Profile (workon-api.ts compat layer).
+  //
+  // These two methods exist to back the deprecated `lib/workon-api.ts`
+  // shim used by `hooks/use-profile.ts` and `components/onboarding/
+  // onboarding-form.tsx`. Both originally hit `/profile/me`, which
+  // returns 404 in the deployed Railway backend (the source has a
+  // ProfileController at `backend/src/profile/profile.controller.ts`
+  // but it isn't reachable in production — likely a stale Railway
+  // build, see docs/BACKEND_PIPELINE.md for the broader contract).
+  //
+  // We route both methods through `/users/me`, which is reachable and
+  // returns the canonical user shape. We map the response into the
+  // legacy `ProfileResponse` shape that the consuming hook expects, so
+  // no caller code has to change.
+  //
+  // Known limitation: PATCH `/users/me` does NOT accept the `role`
+  // field (validation rejects it: "property role should not exist").
+  // Role updates therefore silently no-op here. This matches the
+  // pre-fix behavior (the old `/profile/me` 404 also dropped role
+  // updates) and is documented so the next PR that adds role updates
+  // can target the correct backend endpoint when it ships.
+  fetchProfile: async () => {
+    const u = await apiFetch<{
+      id: string;
+      email: string;
+      firstName: string | null;
+      lastName: string | null;
+      phone: string | null;
+      city: string | null;
+      role: string;
+    }>("/users/me");
+    return mapUserToProfileResponse(u);
+  },
+  saveProfile: async (data: {
+    primaryRole?: string;
+    fullName?: string;
+    phone?: string;
+    city?: string;
+  }) => {
+    const patch: {
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      city?: string;
+    } = {};
+    if (typeof data.fullName === "string") {
+      const parts = data.fullName.trim().split(/\s+/);
+      patch.firstName = parts[0] ?? "";
+      patch.lastName = parts.slice(1).join(" ") || "";
+    }
+    if (typeof data.phone === "string") patch.phone = data.phone;
+    if (typeof data.city === "string") patch.city = data.city;
+
+    if (data.primaryRole !== undefined && process.env.NODE_ENV !== "production") {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "[api-client.saveProfile] primaryRole field ignored — backend " +
+          "PATCH /users/me does not accept role updates. Use a dedicated " +
+          "role-update endpoint when one ships.",
+      );
+    }
+
+    const u = await apiFetch<{
+      id: string;
+      email: string;
+      firstName: string | null;
+      lastName: string | null;
+      phone: string | null;
+      city: string | null;
+      role: string;
+    }>("/users/me", { method: "PATCH", body: JSON.stringify(patch) });
+    return mapUserToProfileResponse(u);
+  },
 };
+
+/**
+ * Map the canonical `GET /users/me` shape to the legacy `ProfileResponse`
+ * shape expected by `lib/workon-api.ts` and its consumers (`useProfile`,
+ * `OnboardingForm`). When the deprecated shim and its consumers are
+ * removed (planned for PR 9 of MIGRATION_URL_MAP), this mapper can be
+ * deleted along with `api.fetchProfile` and `api.saveProfile`.
+ */
+function mapUserToProfileResponse(u: {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  city: string | null;
+  role: string;
+}): {
+  id: string;
+  email: string;
+  fullName: string;
+  phone: string;
+  city: string;
+  primaryRole: "WORKER" | "EMPLOYER" | "RESIDENTIAL_CLIENT";
+  isWorker: boolean;
+  isEmployer: boolean;
+  isClientResidential: boolean;
+} {
+  const fullName = `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim();
+  // Backend returns lowercase ("worker"/"employer"/"residential_client").
+  // The legacy ProfileResponse type uses uppercase, so we normalize.
+  const upper = (u.role || "").toUpperCase();
+  const primaryRole: "WORKER" | "EMPLOYER" | "RESIDENTIAL_CLIENT" =
+    upper === "EMPLOYER"
+      ? "EMPLOYER"
+      : upper === "RESIDENTIAL_CLIENT"
+        ? "RESIDENTIAL_CLIENT"
+        : "WORKER";
+  return {
+    id: u.id,
+    email: u.email,
+    fullName,
+    phone: u.phone ?? "",
+    city: u.city ?? "",
+    primaryRole,
+    isWorker: primaryRole === "WORKER",
+    isEmployer: primaryRole === "EMPLOYER",
+    isClientResidential: primaryRole === "RESIDENTIAL_CLIENT",
+  };
+}
