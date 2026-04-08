@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type ChatMessage } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { useMissionChatSocket } from "@/hooks/use-mission-chat-socket";
 import { Send, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { frCA } from "date-fns/locale";
@@ -14,16 +15,38 @@ type Props = {
 };
 
 export function ConversationThread({ missionId, missionTitle }: Props) {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
 
+  // Real-time chat socket. We connect on mount, listen for `new_message`,
+  // and surface the connection status so the polling interval can be
+  // relaxed when the WS path is healthy. The socket NEVER replaces the
+  // HTTP path — sending and the initial fetch still go through `api.*`,
+  // and polling stays on as a fallback that just runs slower when WS
+  // is connected.
+  const handleNewMessage = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["thread", missionId] });
+    queryClient.invalidateQueries({ queryKey: ["conversations"] });
+  }, [missionId, queryClient]);
+
+  const { isConnected: wsConnected } = useMissionChatSocket({
+    missionId,
+    onNewMessage: handleNewMessage,
+    enabled: isAuthenticated,
+  });
+
   const { data: messages, isLoading } = useQuery({
     queryKey: ["thread", missionId],
     queryFn: () => api.getThread(missionId),
-    refetchInterval: 10_000, // Poll every 10s for new messages
+    // When the realtime socket is connected we trust it to push new
+    // messages and slow polling down to 60s as a safety net. When the
+    // socket is not connected (CORS blocked, token expired, network
+    // hostile) we keep the original 10s polling so the user always
+    // sees fresh messages.
+    refetchInterval: wsConnected ? 60_000 : 10_000,
     refetchIntervalInBackground: false,
   });
 

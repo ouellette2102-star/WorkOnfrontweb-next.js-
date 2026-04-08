@@ -63,3 +63,28 @@ export function assertApiUrl(): string {
   }
   return url;
 }
+
+/**
+ * WebSocket / Socket.IO base URL.
+ *
+ * The backend chat gateway lives at the same host as the HTTP API,
+ * but on the root namespace (i.e. NOT under `/api/v1`). Socket.IO uses
+ * its own path (`/socket.io/...`) and a NestJS namespace (`/chat`).
+ *
+ * This helper derives the WS host by stripping the `/api/v1` suffix
+ * from `NEXT_PUBLIC_API_URL`. Callers append `/chat` (the namespace)
+ * when initializing the socket client:
+ *
+ *     io(`${getWebSocketBaseUrl()}/chat`, { query: { token } })
+ *
+ * Local dev:
+ *   NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+ *   -> http://localhost:3001
+ *
+ * Production:
+ *   NEXT_PUBLIC_API_URL=https://workon-backend-production-8908.up.railway.app/api/v1
+ *   -> https://workon-backend-production-8908.up.railway.app
+ */
+export function getWebSocketBaseUrl(): string {
+  return env.NEXT_PUBLIC_API_URL.replace(/\/api\/v\d+$/, "");
+}
