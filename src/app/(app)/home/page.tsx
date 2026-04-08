@@ -20,7 +20,19 @@ export default function HomePage() {
 
   const { data: workersData } = useQuery({
     queryKey: ["featured-workers"],
-    queryFn: () => api.getWorkers({ limit: 6 }),
+    queryFn: () => api.getWorkers({ limit: 12 }),
+  });
+
+  // Filter out obvious test / seed accounts: names that are just a single
+  // letter, blank, "Test ...", or the classic "John Doe" placeholders.
+  const realWorkers = (workersData?.workers ?? []).filter((w) => {
+    const first = (w.firstName ?? "").trim();
+    const last = (w.lastName ?? "").trim();
+    if (first.length < 2 || last.length < 2) return false;
+    const full = `${first} ${last}`.toLowerCase();
+    if (full.startsWith("test") || full.includes("john doe") || full.includes("jane doe"))
+      return false;
+    return true;
   });
 
   const { data: myMissions } = useQuery({
@@ -43,7 +55,7 @@ export default function HomePage() {
         <p className="text-center text-white/60 text-sm mt-1">
           {user?.role === "worker"
             ? "Missions disponibles près de chez vous"
-            : "Professionnel vérifié, disponible sur demande"}
+            : "Une ligne directe vers le travail instantané"}
         </p>
 
         {/* Stats bar */}
@@ -104,16 +116,16 @@ export default function HomePage() {
       )}
 
       {/* Featured workers */}
-      {workersData && workersData.workers.length > 0 && (
+      {realWorkers.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Professionnels vérifiés</h2>
+            <h2 className="font-semibold">Pros disponibles</h2>
             <Link href="/search" className="text-xs text-red-accent hover:underline">
               Voir tout
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {workersData.workers.slice(0, 4).map((w) => (
+            {realWorkers.slice(0, 4).map((w) => (
               <WorkerCard key={w.id} worker={w} compact />
             ))}
           </div>
