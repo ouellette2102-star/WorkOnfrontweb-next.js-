@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Star, Shield } from "lucide-react";
 import type { WorkerProfile } from "@/lib/api-client";
+import { TrustPill } from "@/components/ui/trust-pill";
 import { cn } from "@/lib/utils";
 
 interface WorkerCardProps {
@@ -11,11 +12,13 @@ interface WorkerCardProps {
 }
 
 export function WorkerCard({ worker, compact }: WorkerCardProps) {
+  const hasReviews = (worker.reviewCount ?? 0) > 0;
+
   return (
     <Link
       href={`/worker/${worker.id}`}
       className={cn(
-        "block rounded-xl border border-white/10 bg-neutral-800/80 backdrop-blur overflow-hidden transition-all hover:border-white/20 hover:bg-neutral-700/80",
+        "block rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur overflow-hidden transition-all hover:border-white/20 hover:bg-neutral-700/80 shadow-lg shadow-black/20",
         compact ? "p-3" : "p-0",
       )}
     >
@@ -46,23 +49,32 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
           )}
         </div>
 
-        {/* Stars + completion */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {Array.from({ length: 5 }, (_, i) => (
-              <Star
-                key={i}
-                className={cn(
-                  "h-3.5 w-3.5",
-                  i < Math.round(worker.averageRating)
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "text-white/20",
-                )}
-              />
-            ))}
+        {/* Rating — honest: stars only if there are reviews, else a neutral pill */}
+        {hasReviews ? (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }, (_, i) => (
+                <Star
+                  key={i}
+                  className={cn(
+                    "h-3.5 w-3.5",
+                    i < Math.round(worker.averageRating)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-white/20",
+                  )}
+                />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-white/80">
+              {worker.averageRating.toFixed(1)}
+            </span>
+            <span className="text-xs text-white/40">
+              ({worker.reviewCount} avis)
+            </span>
           </div>
-          <span className="text-sm font-medium">{worker.completionPercentage}%</span>
-        </div>
+        ) : (
+          <TrustPill variant="nouveau" />
+        )}
 
         {/* Badges */}
         {worker.badges && worker.badges.length > 0 && (
@@ -72,7 +84,7 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
                 key={badge.label}
                 className="inline-flex items-center gap-1 rounded-full bg-neutral-700/80 px-2.5 py-0.5 text-xs font-medium text-white/80"
               >
-                <Shield className="h-3 w-3 text-red-accent" />
+                <Shield className="h-3 w-3 text-[#FF4D1C]" />
                 {badge.label}
               </span>
             ))}
