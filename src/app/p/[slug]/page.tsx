@@ -26,7 +26,7 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-900/80 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-red-600 flex items-center justify-center">
+          <div className="h-7 w-7 rounded-full bg-[#FF4D1C] flex items-center justify-center">
             <span className="text-white text-xs font-bold">W</span>
           </div>
           <span className="font-bold tracking-tight">WorkOn</span>
@@ -104,6 +104,44 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  // JSON-LD Person structured data — helps search engines understand
+  // the profile (name, job, location, rating) and surface it in rich
+  // results. Uses the last-name initial to match our privacy-preserving
+  // display (we never leak the full last name to unauthenticated users).
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://workonapp.vercel.app";
+  const personJsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: `${worker.firstName} ${worker.lastName[0]}.`,
+    url: `${siteUrl}/p/${slug}`,
+    ...(worker.photoUrl ? { image: worker.photoUrl } : {}),
+    ...(worker.bio ? { description: worker.bio } : {}),
+    ...(worker.sectors.length > 0
+      ? { jobTitle: worker.sectors[0], knowsAbout: worker.sectors }
+      : {}),
+    ...(worker.city
+      ? {
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: worker.city,
+            addressCountry: "CA",
+          },
+        }
+      : {}),
+    ...(worker.ratingAvg > 0 && worker.ratingCount > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: worker.ratingAvg.toFixed(1),
+            reviewCount: worker.ratingCount,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
+  };
+
   const initials = `${worker.firstName[0]}${worker.lastName[0]}`.toUpperCase();
   const isVerified =
     worker.trustTier === "VERIFIED" ||
@@ -116,6 +154,11 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
 
   return (
     <main className="min-h-screen bg-neutral-900 text-white">
+      {/* JSON-LD Person structured data for SEO / rich results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
       <Header />
 
       <div className="mx-auto max-w-4xl px-4 py-10">
@@ -130,12 +173,12 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                 className="h-24 w-24 rounded-2xl object-cover border border-white/10"
               />
             ) : (
-              <div className="h-24 w-24 rounded-2xl bg-red-600/20 border border-red-600/30 flex items-center justify-center">
-                <span className="text-2xl font-black text-red-400">{initials}</span>
+              <div className="h-24 w-24 rounded-2xl bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center">
+                <span className="text-2xl font-black text-[#FF4D1C]">{initials}</span>
               </div>
             )}
             {isVerified && (
-              <span className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-red-600 border-2 border-neutral-900 flex items-center justify-center">
+              <span className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-[#FF4D1C] border-2 border-neutral-900 flex items-center justify-center">
                 <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
@@ -154,7 +197,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                 )}
               </div>
               {isVerified && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-600/15 text-red-400 border border-red-600/20">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FF4D1C]/15 text-[#FF4D1C] border border-[#FF4D1C]/25">
                   ✓ Vérifié
                 </span>
               )}
@@ -184,7 +227,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                 {worker.badges.map((b) => (
                   <span
                     key={b.type}
-                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-600/15 text-red-400 border border-red-600/20"
+                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#FF4D1C]/15 text-[#FF4D1C] border border-[#FF4D1C]/25"
                   >
                     {b.label}
                   </span>
@@ -194,7 +237,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
           </div>
 
           <div className="flex-shrink-0">
-            <Button className="bg-red-600 hover:bg-red-500 text-white" asChild>
+            <Button className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
               <Link href="/register?role=employer">Engager ce pro</Link>
             </Button>
           </div>
@@ -273,12 +316,12 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
             </div>
 
             {/* CTA */}
-            <div className="rounded-xl border border-red-600/20 bg-red-600/10 p-5">
+            <div className="rounded-3xl border border-[#FF4D1C]/25 bg-[#FF4D1C]/10 p-5">
               <h3 className="font-bold mb-1">Besoin de ce pro ?</h3>
               <p className="text-xs text-white/60 mb-4 leading-relaxed">
                 Publiez votre mission et entrez en contact directement.
               </p>
-              <Button className="w-full bg-red-600 hover:bg-red-500 text-white" asChild>
+              <Button className="w-full bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
                 <Link href="/register?role=employer">Publier une mission</Link>
               </Button>
               <p className="text-xs text-white/40 text-center mt-2">Gratuit pendant le lancement</p>
