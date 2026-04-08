@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "FAQ — WorkOn",
+  description:
+    "Questions fréquentes sur WorkOn : matching, paiements Stripe, statut des travailleurs autonomes, annulations.",
+};
 
 const faqs = [
   {
@@ -23,9 +30,29 @@ const faqs = [
   },
 ];
 
+// JSON-LD structured data — helps Google surface FAQ rich results
+// and future Gemini / SGE answer boxes with the canonical text.
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: f.answer,
+    },
+  })),
+};
+
 export default function FAQPage() {
   return (
     <div className="min-h-screen bg-neutral-900 text-white p-4">
+      {/* JSON-LD FAQPage for search engines */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="max-w-4xl mx-auto py-16">
         <h1 className="text-4xl font-bold mb-8 text-center">
           Questions fréquentes
