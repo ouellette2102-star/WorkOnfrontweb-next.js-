@@ -243,16 +243,35 @@ export interface RecurringTemplate {
   createdAt: string;
 }
 
+/**
+ * Shape returned by `GET /api/v1/swipe/candidates`.
+ *
+ * Aligned with the actual backend response (verified live 2026-04-08
+ * against the workon-backend-production-8908 instance). Previous shape
+ * used field names that did not exist on the backend (`averageRating`,
+ * `categories`, `distanceKm`), which caused the discover page to crash
+ * with `Cannot read properties of undefined (reading 'toFixed')`.
+ *
+ * Backend reference: `src/swipe/swipe.controller.ts` + Prisma `LocalUser`
+ * with `trustTier`, `trustScore`, `completionScore`, `avgRating`,
+ * `reviewCount` columns materialized in PR #183.
+ */
 export interface SwipeCandidate {
   id: string;
   firstName: string;
   lastName: string;
   city: string | null;
-  pictureUrl: string | null;
+  latitude: number | null;
+  longitude: number | null;
   role: string;
-  averageRating: number | null;
-  categories: string[];
-  distanceKm: number | null;
+  category: string | null;
+  bio: string | null;
+  pictureUrl: string | null;
+  trustTier: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
+  trustScore: number | null;
+  completionScore: number;
+  avgRating: number;
+  reviewCount: number;
 }
 
 export interface SwipeMatch {
