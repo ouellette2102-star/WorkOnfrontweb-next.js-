@@ -53,7 +53,7 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
             {stats && stats.openMissions > 0 && (
               <span className="inline-flex items-center gap-2 rounded-full border border-[#FF4D1C]/20 bg-[#FF4D1C]/5 px-4 py-1.5 text-sm text-[#FF4D1C] font-medium">
                 <span className="h-2 w-2 rounded-full bg-[#FF4D1C] animate-pulse" />
-                {stats.openMissions} opportunites disponibles maintenant
+                {stats.openMissions} opportunités disponibles maintenant
               </span>
             )}
             {stats && stats.activeWorkers > 0 && (
@@ -73,12 +73,12 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
 
           <p className="mt-8 text-lg md:text-xl text-[#6B7280] max-w-2xl leading-relaxed">
             WorkOn capte les intentions d&apos;achat dans votre secteur et les transforme
-            en opportunites concretes &mdash; livrees directement a vous.
+            en opportunités concrètes &mdash; livrées directement a vous.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-4">
             <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white h-14 px-8 text-base font-semibold rounded-xl shadow-lg shadow-[#FF4D1C]/25 transition-all hover:shadow-xl hover:shadow-[#FF4D1C]/30 hover:-translate-y-0.5" asChild>
-              <Link href="/register">Recevoir mes premieres opportunites</Link>
+              <Link href="/register">Recevoir mes premières opportunités</Link>
             </Button>
             <Button variant="outline" size="lg" className="border-gray-300 text-[#1A1A2E] hover:bg-gray-50 h-14 px-8 text-base rounded-xl" asChild>
               <Link href="/pros">Voir les professionnels</Link>
@@ -86,7 +86,7 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
           </div>
 
           <p className="mt-5 text-sm text-[#6B7280]/70">
-            Inscription gratuite &middot; Aucun engagement &middot; Premiere opportunite en 48h
+            Inscription gratuite &middot; Aucun engagement &middot; Première opportunite en 48h
           </p>
         </div>
       </div>
@@ -94,7 +94,7 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
   );
 }
 
-// ─── Section 2: Probleme — 3 pain points avec tension emotionnelle ──────────
+// ─── Section 2: Problème — 3 pain points avec tension émotionnelle ─────────
 
 function ProblemSection() {
   const problems = [
@@ -104,7 +104,7 @@ function ProblemSection() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12c1.292 4.338 5.31 7.5 10.066 7.5.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
         </svg>
       ),
-      title: "Pas de presence commerciale",
+      title: "Pas de présence commerciale",
       desc: "Votre entreprise est invisible sur le web. Les clients qui cherchent votre service tombent sur vos concurrents.",
     },
     {
@@ -113,8 +113,8 @@ function ProblemSection() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 3.75 18 6m0 0 2.25 2.25M18 6l2.25-2.25M18 6l-2.25 2.25m1.5 13.5a10.5 10.5 0 1 1-8.25-17.325" />
         </svg>
       ),
-      title: "Dependance au bouche-a-oreille",
-      desc: "Quand les recommandations ralentissent, votre chiffre d'affaires ralentit avec. Pas de systeme, pas de previsibilite.",
+      title: "Dépendance au bouche-a-oreille",
+      desc: "Quand les recommandations ralentissent, votre chiffre d'affaires ralentit avec. Pas de système, pas de prévisibilité.",
     },
     {
       icon: (
@@ -122,8 +122,8 @@ function ProblemSection() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
       ),
-      title: "Aucun systeme en place",
-      desc: "Vous n'avez ni le temps, ni les outils, ni l'equipe pour generer un flux constant de nouvelles demandes.",
+      title: "Aucun système en place",
+      desc: "Vous n'avez ni le temps, ni les outils, ni l'équipe pour générer un flux constant de nouvelles demandes.",
     },
   ];
 
@@ -131,11 +131,11 @@ function ProblemSection() {
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Le probleme que personne ne regle</p>
+          <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Le problème que personne ne règle</p>
           <h2 className="text-3xl md:text-[2.75rem] font-bold text-[#1A1A2E] leading-tight">
-            Vous etes excellent dans votre metier.
+            Vous êtes excellent dans votre métier.
             <br />
-            <span className="text-[#6B7280]">Mais votre telephone ne sonne pas assez.</span>
+            <span className="text-[#6B7280]">Mais votre téléphone ne sonne pas assez.</span>
           </h2>
         </div>
         <div className="grid md:grid-cols-3 gap-10 md:gap-14">
@@ -154,32 +154,32 @@ function ProblemSection() {
   );
 }
 
-// ─── Section 3: Systeme WorkOn — 4 etapes visuelles ────────────────────────
+// ─── Section 3: Système WorkOn — 4 étapes visuelles ───────────────────────
 
 function SystemSection() {
   const steps = [
     {
       num: "01",
       title: "Inscription",
-      desc: "Creez votre profil professionnel en 3 minutes. Vos realisations, votre expertise, votre zone de service.",
+      desc: "Créez votre profil professionnel en 3 minutes. Vos réalisations, votre expertise, votre zone de service.",
       accent: "border-[#FF4D1C]/20 bg-[#FF4D1C]/5 text-[#FF4D1C]",
     },
     {
       num: "02",
       title: "Votre page commerciale",
-      desc: "WorkOn genere automatiquement votre page professionnelle optimisee — votre vitrine commerciale qui travaille 24/7.",
+      desc: "WorkOn génère automatiquement votre page professionnelle optimisée — votre vitrine commerciale qui travaille 24/7.",
       accent: "border-blue-200 bg-blue-50 text-blue-600",
     },
     {
       num: "03",
       title: "Capture de demande",
-      desc: "Notre systeme detecte et capte les intentions d'achat dans votre secteur, sur les plateformes ou vos futurs clients expriment leurs besoins.",
+      desc: "Notre système détecte et capte les intentions d'achat dans votre secteur, sur les plateformes où vos futurs clients expriment leurs besoins.",
       accent: "border-purple-200 bg-purple-50 text-purple-600",
     },
     {
       num: "04",
-      title: "Opportunites livrees",
-      desc: "Chaque demande qualifiee est livree directement sur votre telephone. Vous recevez le nom, le numero et le besoin exact du client.",
+      title: "Opportunités livrées",
+      desc: "Chaque demande qualifiée est livrée directement sur votre téléphone. Vous recevez le nom, le numero et le besoin exact du client.",
       accent: "border-[#22C55E]/20 bg-[#22C55E]/5 text-[#22C55E]",
     },
   ];
@@ -190,7 +190,7 @@ function SystemSection() {
         <div className="text-center max-w-2xl mx-auto mb-16">
           <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Comment WorkOn fonctionne</p>
           <h2 className="text-3xl md:text-[2.75rem] font-bold text-[#1A1A2E] leading-tight">
-            Un systeme qui capte la demande
+            Un système qui capte la demande
             <br />
             <span className="text-[#FF4D1C]">pendant que vous travaillez.</span>
           </h2>
@@ -230,8 +230,8 @@ function DifferentiationSection() {
       desc: "Votre profil n'est pas noye dans une liste de 500 concurrents.",
     },
     {
-      label: "Un reseau social",
-      desc: "Pas de likes, pas de followers, pas de contenu a produire.",
+      label: "Un réseau social",
+      desc: "Pas de likes, pas de followers, pas de contenu à produire.",
     },
   ];
 
@@ -239,11 +239,11 @@ function DifferentiationSection() {
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Ce qui nous differencie</p>
+          <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Ce qui nous différencie</p>
           <h2 className="text-3xl md:text-[2.75rem] font-bold text-[#1A1A2E] leading-tight">
-            Ni une agence. Ni un repertoire.
+            Ni une agence. Ni un répertoire.
             <br />
-            <span className="text-[#6B7280]">Un systeme de captation de demande.</span>
+            <span className="text-[#6B7280]">Un système de captation de demande.</span>
           </h2>
         </div>
 
@@ -272,13 +272,13 @@ function DifferentiationSection() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Ce que WorkOn est</h3>
               <p className="text-white/80 text-lg leading-relaxed">
-                Un systeme de capture de demande qui identifie les clients qui
+                Un système de capture de demande qui identifie les clients qui
                 cherchent <span className="text-[#FF4D1C] font-semibold">activement</span> votre
                 service — et qui vous les livre avant vos concurrents.
               </p>
               <div className="mt-8 flex items-center gap-3">
                 <div className="h-2 w-2 rounded-full bg-[#22C55E]" />
-                <p className="text-sm text-[#22C55E] font-medium">Systeme actif 24/7 dans votre secteur</p>
+                <p className="text-sm text-[#22C55E] font-medium">Système actif 24/7 dans votre secteur</p>
               </div>
             </div>
           </div>
@@ -288,13 +288,13 @@ function DifferentiationSection() {
   );
 }
 
-// ─── Section 5: Cas d'usage — Secteurs actifs au Quebec ─────────────────────
+// ─── Section 5: Cas d'usage — Secteurs actifs au Québec ─────────────────────
 
 function UseCasesSection() {
   const cases = [
     {
-      sector: "Menage residentiel",
-      desc: "Les proprietaires cherchent un service fiable chaque semaine. WorkOn capte ces demandes avant qu'elles atterrissent chez la concurrence.",
+      sector: "Ménage résidentiel",
+      desc: "Les propriétaires cherchent un service fiable chaque semaine. WorkOn capte ces demandes avant qu'elles atterrissent chez la concurrence.",
       demand: "Forte demande",
       icon: "🏠",
       borderColor: "border-blue-200 hover:border-blue-300",
@@ -302,7 +302,7 @@ function UseCasesSection() {
     },
     {
       sector: "Entretien paysager",
-      desc: "Le printemps genere un pic de demande massif. Votre page professionnelle est prete avant la premiere tonte.",
+      desc: "Le printemps génère un pic de demande massif. Votre page professionnelle est prete avant la premiere tonte.",
       demand: "Pic saisonnier",
       icon: "🌿",
       borderColor: "border-green-200 hover:border-green-300",
@@ -310,8 +310,8 @@ function UseCasesSection() {
     },
     {
       sector: "Services saisonniers",
-      desc: "Lavage de vitres, deneigement, nettoyage de gouttieres — chaque saison amene son lot d'opportunites. WorkOn les capte pour vous.",
-      demand: "Toute l'annee",
+      desc: "Lavage de vitres, déneigement, nettoyage de gouttières — chaque saison amène son lot d'opportunités. WorkOn les capte pour vous.",
+      demand: "Toute l'année",
       icon: "🔧",
       borderColor: "border-orange-200 hover:border-orange-300",
       tagColor: "bg-orange-100 text-orange-700",
@@ -322,11 +322,11 @@ function UseCasesSection() {
     <section className="bg-[#F5F3EF]">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Secteurs actifs au Quebec</p>
+          <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Secteurs actifs au Québec</p>
           <h2 className="text-3xl md:text-[2.75rem] font-bold text-[#1A1A2E] leading-tight">
-            Des opportunites dans votre
+            Des opportunités dans votre
             <br />
-            <span className="text-[#FF4D1C]">secteur d&apos;activite.</span>
+            <span className="text-[#FF4D1C]">secteur d&apos;activité.</span>
           </h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
@@ -343,13 +343,13 @@ function UseCasesSection() {
             </div>
           ))}
         </div>
-        {/* Urgence — Places limitees */}
+        {/* Urgence — Places limitées */}
         <div className="mt-10 text-center">
           <p className="inline-flex items-center gap-2 text-sm font-medium text-[#FF4D1C] bg-[#FF4D1C]/5 border border-[#FF4D1C]/15 rounded-full px-5 py-2">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
             </svg>
-            Places limitees par secteur et par ville — inscrivez-vous pendant qu&apos;il est temps
+            Places limitées par secteur et par ville — inscrivez-vous pendant qu&apos;il est temps
           </p>
         </div>
       </div>
@@ -357,13 +357,13 @@ function UseCasesSection() {
   );
 }
 
-// ─── Section 6: Confiance — Chiffres + Avis + Badge Quebec ─────────────────
+// ─── Section 6: Confiance — Chiffres + Avis + Badge Québec ─────────────────
 
 function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: FeaturedReview[] }) {
   const figures = [
     { value: stats?.activeWorkers?.toLocaleString("fr-CA") ?? "100+", label: "Professionnels actifs" },
-    { value: stats?.completedMissions?.toLocaleString("fr-CA") ?? "500+", label: "Missions completees" },
-    { value: stats?.activeCities?.toString() ?? "10+", label: "Villes couvertes au Quebec" },
+    { value: stats?.completedMissions?.toLocaleString("fr-CA") ?? "500+", label: "Missions complétées" },
+    { value: stats?.activeCities?.toString() ?? "10+", label: "Villes couvertes au Québec" },
     { value: "15%", label: "Commission transparente" },
   ];
 
@@ -373,12 +373,12 @@ function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: 
         <div className="text-center max-w-2xl mx-auto mb-16">
           <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Confiance</p>
           <h2 className="text-3xl md:text-[2.75rem] font-bold text-[#1A1A2E] leading-tight">
-            Concu au Quebec,
+            Conçu au Québec,
             <br />
             <span className="text-[#6B7280]">pour les professionnels d&apos;ici.</span>
           </h2>
           <p className="mt-5 text-lg text-[#6B7280]">
-            Conformite Loi 25. Service en francais. Infrastructure canadienne.
+            Conformité Loi 25. Service en français. Infrastructure canadienne.
           </p>
         </div>
 
@@ -392,7 +392,7 @@ function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: 
           ))}
         </div>
 
-        {/* Avis verifies */}
+        {/* Avis vérifiés */}
         {reviews.length > 0 && (
           <>
             <h3 className="text-center text-sm font-semibold text-[#6B7280] uppercase tracking-widest mb-8">Ce qu&apos;ils disent</h3>
@@ -406,7 +406,7 @@ function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: 
                   </div>
                   <p className="text-[15px] text-[#1A1A2E] leading-relaxed line-clamp-4">&laquo;&nbsp;{r.comment}&nbsp;&raquo;</p>
                   <div className="mt-5 flex items-center justify-between text-sm text-[#6B7280]">
-                    <span className="font-semibold">{r.authorName ?? "Client verifie"}</span>
+                    <span className="font-semibold">{r.authorName ?? "Client vérifié"}</span>
                     {r.workerName && <span className="text-[#6B7280]/60">pour {r.workerName}</span>}
                   </div>
                 </div>
@@ -431,7 +431,7 @@ function WorkersSection({ workers }: { workers: FeaturedWorker[] }) {
           <div>
             <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Profils en vedette</p>
             <h2 className="text-3xl md:text-[2.75rem] font-bold text-[#1A1A2E]">Professionnels disponibles</h2>
-            <p className="text-[#6B7280] mt-2 text-lg">Profils verifies &middot; donnees en temps reel</p>
+            <p className="text-[#6B7280] mt-2 text-lg">Profils vérifiés &middot; données en temps réel</p>
           </div>
           <Link href="/pros" className="hidden md:inline-flex text-sm font-semibold text-[#FF4D1C] hover:text-[#E8441A] transition-colors">
             Voir tous les profils →
@@ -514,17 +514,17 @@ function PricingSection() {
               <div className="flex items-baseline justify-center gap-1 mb-2">
                 <span className="text-6xl font-bold text-[#1A1A2E] tracking-tight">15%</span>
               </div>
-              <p className="text-[#6B7280] text-lg">de commission par mission completee</p>
+              <p className="text-[#6B7280] text-lg">de commission par mission complétée</p>
             </div>
 
             <div className="mt-8 space-y-4">
               {[
-                "Page professionnelle optimisee",
-                "Diffusion automatique a votre clientele cible",
-                "Opportunites livrees sur votre telephone",
-                "Paiement securise par Stripe",
+                "Page professionnelle optimisée",
+                "Diffusion automatique à votre clientèle cible",
+                "Opportunités livrées sur votre téléphone",
+                "Paiement sécurisé par Stripe",
                 "Aucun frais mensuel fixe",
-                "Aucun contrat ni exclusivite",
+                "Aucun contrat ni exclusivité",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-3">
                   <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[#22C55E]/10 flex items-center justify-center">
@@ -539,10 +539,10 @@ function PricingSection() {
 
             <div className="mt-8">
               <Button className="w-full bg-[#FF4D1C] hover:bg-[#E8441A] text-white h-14 text-base font-semibold rounded-xl shadow-lg shadow-[#FF4D1C]/20" asChild>
-                <Link href="/register">Creer mon profil gratuitement</Link>
+                <Link href="/register">Créer mon profil gratuitement</Link>
               </Button>
               <p className="text-center text-xs text-[#6B7280] mt-3">
-                Aucune carte de credit requise
+                Aucune carte de crédit requise
               </p>
             </div>
           </div>
@@ -561,17 +561,17 @@ function EmployerSection({ stats }: { stats: PublicStats | null }) {
         <div className="rounded-3xl bg-gradient-to-br from-[#FF4D1C]/5 via-[#FF4D1C]/8 to-[#FF4D1C]/5 border border-[#FF4D1C]/15 p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="max-w-lg">
             <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">Employeurs</p>
-            <h2 className="text-3xl font-bold text-[#1A1A2E]">Vous cherchez du renfort qualifie?</h2>
+            <h2 className="text-3xl font-bold text-[#1A1A2E]">Vous cherchez du renfort qualifié?</h2>
             <p className="mt-4 text-lg text-[#6B7280] leading-relaxed">
-              Zero commission pendant le lancement. Acces a{" "}
+              Zéro commission pendant le lancement. Accès à{" "}
               {stats?.activeWorkers
-                ? `${stats.activeWorkers.toLocaleString("fr-CA")} travailleurs verifies`
-                : "des centaines de travailleurs verifies"}{" "}
-              au Quebec.
+                ? `${stats.activeWorkers.toLocaleString("fr-CA")} travailleurs vérifiés`
+                : "des centaines de travailleurs vérifiés"}{" "}
+              au Québec.
             </p>
           </div>
           <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white h-14 px-10 text-base font-semibold rounded-xl flex-shrink-0 shadow-lg shadow-[#FF4D1C]/20" asChild>
-            <Link href="/employeurs">Decouvrir l&apos;offre employeur →</Link>
+            <Link href="/employeurs">Découvrir l&apos;offre employeur →</Link>
           </Button>
         </div>
       </div>
@@ -587,9 +587,9 @@ function CTASection() {
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
-            Commencez a recevoir des
+            Commencez à recevoir des
             <br />
-            opportunites <span className="text-[#FF4D1C]">cette semaine.</span>
+            opportunités <span className="text-[#FF4D1C]">cette semaine.</span>
           </h2>
           <p className="mt-8 text-xl text-white/60 max-w-xl mx-auto leading-relaxed">
             Inscription gratuite. Aucun engagement.
@@ -598,7 +598,7 @@ function CTASection() {
           </p>
           <div className="mt-10">
             <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white h-16 px-12 text-lg font-semibold rounded-xl shadow-2xl shadow-[#FF4D1C]/30 transition-all hover:shadow-[#FF4D1C]/40 hover:-translate-y-0.5" asChild>
-              <Link href="/register">Creer mon profil professionnel</Link>
+              <Link href="/register">Créer mon profil professionnel</Link>
             </Button>
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/40">
@@ -612,7 +612,7 @@ function CTASection() {
             </span>
             <span className="flex items-center gap-2">
               <svg className="h-4 w-4 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-              Paiement securise
+              Paiement sécurisé
             </span>
           </div>
         </div>
@@ -637,13 +637,13 @@ function Footer() {
           <nav className="flex flex-wrap items-center gap-6 text-sm text-[#6B7280] font-medium">
             <Link href="/faq" className="hover:text-[#1A1A2E] transition-colors">FAQ</Link>
             <Link href="/pricing" className="hover:text-[#1A1A2E] transition-colors">Tarifs</Link>
-            <Link href="/legal/privacy" className="hover:text-[#1A1A2E] transition-colors">Confidentialite</Link>
+            <Link href="/legal/privacy" className="hover:text-[#1A1A2E] transition-colors">Confidentialité</Link>
             <Link href="/legal/terms" className="hover:text-[#1A1A2E] transition-colors">Conditions</Link>
           </nav>
         </div>
         <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#6B7280]">
-          <p>&copy; 2026 WorkOn Inc. Tous droits reserves.</p>
-          <p>Les travailleurs sont des prestataires autonomes, non des employes de WorkOn.</p>
+          <p>&copy; 2026 WorkOn Inc. Tous droits réservés.</p>
+          <p>Les travailleurs sont des prestataires autonomes, non des employés de WorkOn.</p>
         </div>
       </div>
     </footer>
