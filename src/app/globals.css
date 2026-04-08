@@ -3,13 +3,46 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
-  --red-accent: #E52521;
+
+  /* ============================================================
+   * WorkOn brand palette — unified source of truth
+   * ============================================================
+   * Single canonical palette used across both light (landing) and
+   * dark (app) surfaces. Before this unification, the landing used
+   * #FF4D1C directly (see src/app/page.tsx:16-17) while the app
+   * used a generic Tailwind red (#E52521) via `--red-accent`, and
+   * `/pros` + `/employeurs` mixed in `bg-red-600`. Everything now
+   * resolves to the same orange accent.
+   *
+   * Reference (already documented inline in landing):
+   *   Fond: #FAFAFA | Texte: #1A1A2E | Accent: #FF4D1C | Gris: #6B7280
+   *   Creme: #F5F3EF | Vert confiance: #22C55E
+   */
+  --workon-accent: #FF4D1C;
+  --workon-accent-hover: #E8441A;
+  --workon-accent-subtle: rgba(255, 77, 28, 0.08);
+  --workon-accent-ring: rgba(255, 77, 28, 0.25);
+  --workon-ink: #1A1A2E;
+  --workon-bg-light: #FAFAFA;
+  --workon-bg-cream: #F5F3EF;
+  --workon-gray: #6B7280;
+  --workon-trust-green: #22C55E;
+
+  /* Backward-compat alias — keeps `text-red-accent` / `bg-red-accent`
+   * classes working everywhere they were already used, while the
+   * underlying value is now the true WorkOn orange. */
+  --red-accent: var(--workon-accent);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-red-accent: var(--red-accent);
+  --color-workon-accent: var(--workon-accent);
+  --color-workon-accent-hover: var(--workon-accent-hover);
+  --color-workon-ink: var(--workon-ink);
+  --color-workon-gray: var(--workon-gray);
+  --color-workon-trust-green: var(--workon-trust-green);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -22,9 +55,14 @@ body {
   overscroll-behavior: none;
 }
 
-/* Fire gradient (hero sections) */
+/* Fire gradient (hero sections) — orange brand */
 .bg-fire-gradient {
-  background: linear-gradient(180deg, rgba(229, 37, 33, 0.25) 0%, rgba(255, 140, 50, 0.08) 40%, transparent 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 77, 28, 0.25) 0%,
+    rgba(255, 140, 50, 0.08) 40%,
+    transparent 100%
+  );
 }
 
 /* Glass card */
@@ -69,7 +107,7 @@ body {
 
 /* Focus rings */
 *:focus-visible {
-  outline: 2px solid var(--red-accent);
+  outline: 2px solid var(--workon-accent);
   outline-offset: 2px;
 }
 

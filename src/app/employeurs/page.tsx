@@ -10,7 +10,7 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-900/80 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-red-600 flex items-center justify-center">
+          <div className="h-7 w-7 rounded-full bg-[#FF4D1C] flex items-center justify-center">
             <span className="text-white text-xs font-bold">W</span>
           </div>
           <span className="font-bold tracking-tight">WorkOn</span>
@@ -29,7 +29,7 @@ function Header() {
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
-      <p className="text-3xl font-black text-red-500">{value}</p>
+      <p className="text-3xl font-black text-[#FF4D1C]">{value}</p>
       <p className="text-sm font-medium mt-1">{label}</p>
       {sub && <p className="text-xs text-white/40 mt-0.5">{sub}</p>}
     </div>
@@ -48,7 +48,7 @@ function ReviewCard({ r }: { r: FeaturedReview }) {
       <div className="mt-4 flex items-center justify-between text-xs text-white/40">
         <span>{r.authorName ?? "Employeur anonyme"}</span>
         {r.workerName && (
-          <span className="text-red-400/60">Pro : {r.workerName}</span>
+          <span className="text-[#FF4D1C]/60">Pro : {r.workerName}</span>
         )}
       </div>
     </div>
@@ -92,14 +92,14 @@ export default async function EmployeursPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
             Trouvez un renfort qualifié<br />
-            <span className="text-red-500">en moins de 10 minutes.</span>
+            <span className="text-[#FF4D1C]">en moins de 10 minutes.</span>
           </h1>
           <p className="mt-4 text-white/60 text-lg leading-relaxed">
             Publiez votre mission, recevez des candidatures de travailleurs vérifiés.
             Paiement sécurisé, couverture légale incluse.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
+            <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
               <Link href="/register?role=employer">Publier ma première mission</Link>
             </Button>
             <Button variant="outline" size="lg" className="border-white/20 hover:border-white/40" asChild>
@@ -255,7 +255,7 @@ export default async function EmployeursPage() {
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-3">Prêt à publier votre mission ?</h2>
           <p className="text-white/60 mb-6">0% commission pendant le lancement. Inscription en 2 minutes.</p>
-          <Button size="lg" className="bg-red-600 hover:bg-red-500 text-white" asChild>
+          <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
             <Link href="/register?role=employer">Commencer gratuitement</Link>
           </Button>
         </div>
