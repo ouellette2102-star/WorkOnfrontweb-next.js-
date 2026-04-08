@@ -14,8 +14,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://workonapp.vercel.app";
+
 export const metadata: Metadata = {
-  title: "WorkOn - Trouvez votre talent",
+  metadataBase: new URL(SITE_URL),
+  title: "WorkOn — Une ligne directe vers le travail instantané",
   description:
     "Marketplace qui connecte clients et professionnels vérifiés. Réservez en 1 tap, paiement sécurisé par Stripe.",
   keywords: [
@@ -28,6 +32,20 @@ export const metadata: Metadata = {
     "services à domicile",
   ],
   manifest: "/manifest.json",
+  openGraph: {
+    type: "website",
+    locale: "fr_CA",
+    siteName: "WorkOn",
+    title: "WorkOn — Une ligne directe vers le travail instantané",
+    description:
+      "Missions payées rapidement. Travailleurs vérifiés. Paiement sécurisé par Stripe.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WorkOn — Une ligne directe vers le travail instantané",
+    description:
+      "Missions payées rapidement. Travailleurs vérifiés. Paiement sécurisé par Stripe.",
+  },
 };
 
 export const viewport: Viewport = {
