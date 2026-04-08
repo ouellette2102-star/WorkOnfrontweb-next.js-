@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/navigation/user-nav";
+import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
 import {
   getPublicStats,
   getFeaturedWorkers,
@@ -24,11 +25,8 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200/80 bg-white/90 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-[#FF4D1C] flex items-center justify-center">
-            <span className="text-white text-sm font-bold">W</span>
-          </div>
-          <span className="text-[#1A1A2E] font-bold text-lg tracking-tight">WorkOn</span>
+        <Link href="/" className="flex items-center gap-2.5 text-[#1A1A2E]">
+          <WorkOnWordmark size="md" />
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-[#6B7280]">
           <Link href="/pros" className="hover:text-[#1A1A2E] transition-colors">Pour les pros</Link>
@@ -628,11 +626,8 @@ function Footer() {
     <footer className="bg-[#FAFAFA] border-t border-gray-200">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="h-7 w-7 rounded-lg bg-[#FF4D1C] flex items-center justify-center">
-              <span className="text-white text-xs font-bold">W</span>
-            </div>
-            <span className="text-[#1A1A2E] font-bold tracking-tight">WorkOn</span>
+          <div className="flex items-center gap-2.5 text-[#1A1A2E]">
+            <WorkOnWordmark size="md" />
           </div>
           <nav className="flex flex-wrap items-center gap-6 text-sm text-[#6B7280] font-medium">
             <Link href="/faq" className="hover:text-[#1A1A2E] transition-colors">FAQ</Link>
