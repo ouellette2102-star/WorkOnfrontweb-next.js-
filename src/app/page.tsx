@@ -86,7 +86,7 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
           </div>
 
           <p className="mt-5 text-sm text-[#6B7280]/70">
-            Inscription gratuite &middot; Aucun engagement &middot; Première opportunite en 48h
+            Inscription gratuite &middot; Aucun engagement &middot; Premières opportunités en temps réel
           </p>
         </div>
       </div>
