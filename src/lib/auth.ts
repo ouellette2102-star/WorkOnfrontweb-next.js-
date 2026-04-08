@@ -184,8 +184,15 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
 
 export function logout() {
   clearAuth();
-  // Fire-and-forget proxy call to clear httpOnly cookies server-side
-  fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
+  // Fire-and-forget proxy call to clear httpOnly cookies server-side.
+  // The local clearAuth() above is what the UI actually relies on, so we
+  // don't block logout on this — but surface failures in the console so
+  // server-side session drift is observable instead of silently hidden.
+  fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(
+    (err) => {
+      console.warn("[auth] logout server call failed", err);
+    },
+  );
 }
 
 export function isAuthenticated(): boolean {

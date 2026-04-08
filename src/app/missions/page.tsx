@@ -140,7 +140,11 @@ export default function MissionsPage() {
     fetch(`${API_BASE}/public/sectors/stats`)
       .then((r) => r.json())
       .then((data: SectorStat[]) => setSectors(data.slice(0, 10)))
-      .catch(() => {});
+      .catch((err) => {
+        // Non-critical sidebar data — don't toast, but log so the
+        // failure is visible instead of silently hidden.
+        console.warn("[missions] failed to load sector stats", err);
+      });
   }, []);
 
   useEffect(() => {
