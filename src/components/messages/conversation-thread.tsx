@@ -57,7 +57,11 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
 
   // Mark as read when opening thread
   useEffect(() => {
-    api.markRead(missionId).catch(() => {});
+    api.markRead(missionId).catch((err) => {
+      // Background mark-read — don't toast the user, but log so unread
+      // drift is visible during development instead of silently hidden.
+      console.warn("[messages] markRead failed for mission", missionId, err);
+    });
     queryClient.invalidateQueries({ queryKey: ["unread-count"] });
     queryClient.invalidateQueries({ queryKey: ["conversations"] });
   }, [missionId, queryClient]);
