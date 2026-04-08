@@ -36,7 +36,15 @@ export interface FeaturedWorker {
   ratingCount: number;
   completedMissions: number;
   badges: WorkerBadge[];
-  trustTier: string;
+  /**
+   * Trust tier of the worker. Aligned with backend `LocalUser.trustTier`
+   * (Prisma enum) — see `docs/BACKEND_PIPELINE.md`. The four tiers are:
+   * - BASIC:    default, email verified only
+   * - VERIFIED: phone verified
+   * - TRUSTED:  phone + ID verified
+   * - PREMIUM:  phone + ID + bank verified (workers only)
+   */
+  trustTier: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
 }
 
 export interface PublicWorkerProfile extends FeaturedWorker {

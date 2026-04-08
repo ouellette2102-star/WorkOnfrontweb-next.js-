@@ -105,7 +105,10 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
   }
 
   const initials = `${worker.firstName[0]}${worker.lastName[0]}`.toUpperCase();
-  const isVerified = worker.trustTier === "VERIFIED" || worker.trustTier === "ELITE";
+  const isVerified =
+    worker.trustTier === "VERIFIED" ||
+    worker.trustTier === "TRUSTED" ||
+    worker.trustTier === "PREMIUM";
 
   // Use worker's own reviews if available, otherwise show platform featured reviews
   const displayReviews =
@@ -263,7 +266,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-white/60">Statut</span>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVerified ? "bg-green-500/15 text-green-400 border border-green-500/20" : "bg-white/10 text-white/50"}`}>
-                    {isVerified ? "Vérifié" : worker.trustTier}
+                    {isVerified ? "Vérifié" : "Nouveau"}
                   </span>
                 </div>
               </div>
