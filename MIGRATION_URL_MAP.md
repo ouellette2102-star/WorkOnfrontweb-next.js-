@@ -301,3 +301,115 @@ This file tracks every URL move during the migration. Route groups in Next.js do
 - [ ] Phase 9 — Public profile canonical + 301 redirects
 - [ ] Phase 10 — Repo + disk cleanup
 - [ ] Phase 11 — Capacitor wrap (post-PWA polish)
+
+---
+
+## Backend pipeline contract — `*-local` is canonical
+
+> **Decided 2026-04-08. See [`docs/BACKEND_PIPELINE.md`](docs/BACKEND_PIPELINE.md) for the standalone short reference.**
+
+### The decision
+
+This frontend (`workonapp/`, Next.js 16, the WorkOn web canonical app and its
+future Capacitor mobile wrap) **uses the `*-local` API pipeline exclusively**:
+
+- **Missions:** `/api/v1/missions-local/*` (NOT `/api/v1/missions/*`)
+- **Messages:** `/api/v1/messages-local/*` (NOT `/api/v1/messages/*`)
+- **Payments:** `/api/v1/payments-local/*` (NOT `/api/v1/payments/*`)
+
+The non-prefixed routes (`/missions`, `/messages`, `/payments`) are the
+**Clerk-era pipeline** owned by a different consumer (a future separate web
+admin dashboard wired through Clerk SSO). They exist on the same backend
+but are not part of WorkOn's product pipeline.
+
+**This is not a cleanup decision. This is a product evolution decision.**
+
+### Why this matters for product evolution
+
+The choice to standardize on `*-local` is not a stylistic or hygiene call —
+it is the only way to keep WorkOn's product trajectory open:
+
+1. **Map view (Leaflet/geo discovery):** only `missions-local` exposes
+   `GET /missions-local/map` (bbox query) and `GET /missions-local/nearby`
+   (radius query). The Clerk-era `/missions` controller has neither. Without
+   `*-local`, the worker map view, the "missions près de chez toi" feature,
+   and the geo-ranked feed are physically impossible.
+
+2. **Granular mission lifecycle:** only `missions-local` exposes
+   `POST /:id/accept`, `/:id/start`, `/:id/complete`, `/:id/cancel`. The
+   Clerk-era `/missions` only has a generic `PATCH /:id/status`. Granular
+   lifecycle is what makes mission states meaningful (notifications,
+   timestamps, audit trail, payment release triggers).
+
+3. **Mobile-native via Capacitor (Phase 11):** the future iOS/Android wrap
+   uses the SAME JWT custom auth + the SAME `*-local` endpoints as the web
+   PWA. There is no fork in the API surface between web and mobile. The
+   product team can ship a feature once and have it work on both shells.
+
+4. **Trust score, reputation, swipe pipeline (Sprints 2-4):** these recent
+   backend additions all materialize against `LocalUser` and `LocalMission`.
+   Wiring them in the frontend only works through `*-local`.
+
+5. **Webhooks GHL + external API integrations:** the marketing/GHL
+   integration consumes the same `LocalUser` model. Standardizing the
+   frontend on `*-local` means the same accounts created via marketing
+   funnels can immediately log into the product.
+
+### What happens to `/missions/*` (without `-local`)?
+
+The Clerk-era pipeline stays in the backend codebase because the WorkOn
+backend serves multiple consumers. We do not delete it. We simply do not
+call it from this repo.
+
+In the frontend, this is enforced by:
+
+- `src/lib/api-client.ts` — every canonical method (`api.createMission`,
+  `api.getMyMissions`, `api.acceptMission`, etc.) targets `/missions-local/*`.
+- `src/lib/api-client.ts` — Clerk-era endpoints are encapsulated under
+  `api.legacy.*` and explicitly labeled `/* Legacy Missions (Clerk-era
+  endpoints, kept for backward compatibility) */`.
+- `src/lib/missions-api.ts` — deprecated shim wrapping `api.legacy.*`.
+  **Do not import this file in any new code.** It is kept alive only because
+  10 files in the old route universe (`src/app/missions/*`,
+  `src/app/worker/*`) still import from it. When Phase 8 consolidates those
+  routes into `(app)/missions/*`, the shim becomes orphaned and is deleted
+  in the same PR.
+
+### Implication for the migration phases above
+
+- **Phase 1 (dead code removal)** — done. Did not touch the dual pipeline.
+- **Phase 2 (API client consolidation)** — `src/lib/missions-api.ts` is
+  **explicitly out of scope** for Phase 2. It must survive until Phase 8
+  removes its callers.
+- **Phase 8 (migrate Univers A → `(app)/`)** — when this phase removes the
+  legacy mission routes, it also removes the last callers of
+  `src/lib/missions-api.ts`, and the shim is deleted in the same PR. After
+  Phase 8, the only remaining references to non-`*-local` mission routes
+  in the entire frontend should be `getMissionEvents()` and Stripe Connect
+  endpoints — both flagged for backend follow-up.
+- **Phase 11 (Capacitor wrap)** — the wrap is the validation moment for this
+  decision. If the same Next.js code can be wrapped natively without any
+  API rewiring, the contract held.
+
+### Known gaps / follow-ups (intentionally not blocking)
+
+These are tracked separately and will be opened against the backend team:
+
+- `GET /payments-local/worker/history` — does not exist yet. Frontend
+  currently uses `/payments/worker/history` (Clerk pipeline) for payout
+  history. To be aligned when the local equivalent ships.
+- `GET /missions/:missionId/events` — `getMissionEvents()` in api-client
+  still hits the non-local route. Low impact (only used in mission detail
+  audit views) but should migrate when the local equivalent exists.
+- `/payments/connect/*` (Stripe Connect onboarding/status) — Stripe-only,
+  shared by both pipelines. **No `-local` equivalent will exist** because
+  Stripe Connect is account-level, not user-pipeline-level. This is a
+  permanent exception.
+
+### Source of truth this defers to
+
+The backend's `WorkOn Product Canon v2.0` document (introduced via backend
+PR #173, file `docs/product/WORKON_PRODUCT_CANON.md` in the backend repo)
+declares the dual-system architecture as intentional and permanent for the
+MVP horizon. Any change to this contract must be negotiated there first,
+not patched in the frontend.
