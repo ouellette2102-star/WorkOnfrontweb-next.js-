@@ -33,7 +33,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const response = NextResponse.json({ user: data.user });
+    // Tokens returned in body so the client can cache them in localStorage
+    // for api-client.ts. httpOnly cookies below back the middleware gate.
+    const response = NextResponse.json({
+      user: data.user,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    });
 
     response.cookies.set("workon_token", data.accessToken, COOKIE_OPTIONS);
     response.cookies.set("workon_refresh", data.refreshToken, {
