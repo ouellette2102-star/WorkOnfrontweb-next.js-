@@ -96,7 +96,7 @@ export default function HomePage() {
       </div>
 
       {/* Active missions */}
-      {activeMissions && activeMissions.length > 0 && (
+      {activeMissions && activeMissions.length > 0 ? (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">
@@ -113,6 +113,31 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+      ) : (
+        user && activeMissions !== undefined && (
+          <section>
+            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-6 text-center shadow-lg shadow-black/20">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30">
+                <Briefcase className="h-5 w-5 text-[#FF4D1C]" />
+              </div>
+              <h2 className="font-semibold text-base">
+                {user.role === "employer"
+                  ? "Aucune mission en cours"
+                  : "Prêt pour ta prochaine mission ?"}
+              </h2>
+              <p className="mt-1 text-sm text-white/60">
+                {user.role === "employer"
+                  ? "Publie ta première mission — un pro peut répondre en quelques minutes."
+                  : "Des missions payées rapidement t'attendent près de chez toi."}
+              </p>
+              <Button asChild variant="hero" size="hero" className="mt-4">
+                <Link href={user.role === "employer" ? "/missions/new" : "/search"}>
+                  {user.role === "employer" ? "Publier une mission" : "Voir les missions"}
+                </Link>
+              </Button>
+            </div>
+          </section>
+        )
       )}
 
       {/* Featured workers */}
