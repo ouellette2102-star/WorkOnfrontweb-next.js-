@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -57,4 +58,35 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry wraps the final config. When SENTRY_DSN is not set, the
+// runtime stays dormant (see sentry.*.config.ts) but the build plugin
+// still runs harmlessly. When SENTRY_AUTH_TOKEN is set on Vercel the
+// plugin uploads source maps and creates a release automatically.
+const sentryBuildOptions = {
+  // Silence the SDK telemetry in CI logs.
+  silent: !process.env.CI,
+
+  // Only upload source maps when we actually have an auth token; local
+  // `npm run build` on a developer laptop should not try to upload.
+  disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+  disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+
+  // Don't fail the build on source-map upload errors — networking
+  // hiccups between Vercel and Sentry must not block a deploy.
+  errorHandler: (err: unknown) => {
+    // eslint-disable-next-line no-console
+    console.warn("[sentry] source-map upload failed (non-fatal):", err);
+  },
+
+  // Route browser Sentry requests through a Next.js rewrite so
+  // adblockers don't block them.
+  tunnelRoute: "/monitoring",
+
+  // Hide source maps from production browser bundles.
+  hideSourceMaps: true,
+
+  // Tree-shake Sentry debug helpers from the prod bundle.
+  disableLogger: true,
+};
+
+export default withSentryConfig(nextConfig, sentryBuildOptions);
