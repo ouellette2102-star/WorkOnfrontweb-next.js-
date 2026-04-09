@@ -98,7 +98,7 @@ export default function MapPage() {
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-900">
-        <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#FF4D1C]" />
       </div>
     );
   }
@@ -116,7 +116,7 @@ export default function MapPage() {
       {/* Filter bar */}
       <div className="border-b border-white/10 bg-neutral-900/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-3">
-          <MapPin className="h-5 w-5 text-red-500" />
+          <MapPin className="h-5 w-5 text-[#FF4D1C]" />
           <h1 className="text-lg font-bold">Missions à proximité</h1>
 
           <select
@@ -156,7 +156,7 @@ export default function MapPage() {
         {missionsLoading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-neutral-900/80">
             <div className="text-center">
-              <Loader2 className="mx-auto h-8 w-8 animate-spin text-red-500" />
+              <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#FF4D1C]" />
               <p className="mt-2 text-sm text-white/70">Chargement des missions...</p>
             </div>
           </div>
@@ -179,12 +179,12 @@ export default function MapPage() {
             <p className="mb-6 text-white/60">
               Essayez d&apos;élargir votre zone de recherche
             </p>
-            <Link href="/search">
-              <Button className="bg-red-600 hover:bg-red-500">
+            <Button asChild variant="hero" size="hero">
+              <Link href="/search">
                 <List className="mr-2 h-4 w-4" />
                 Voir en liste
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         )}
       </div>
