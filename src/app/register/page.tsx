@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,7 +11,8 @@ import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MapPin, Wrench, Briefcase, CheckCircle2, ChevronRight } from "lucide-react";
+import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
+import { Wrench, Briefcase, CheckCircle2, ChevronRight, Shield, Lock } from "lucide-react";
 import type { UserRole } from "@/lib/auth";
 
 // Step schemas
@@ -30,11 +31,21 @@ const step3Schema = z.object({
 type Step1Data = z.infer<typeof step1Schema>;
 type Step3Data = z.infer<typeof step3Schema>;
 
-export default function RegisterPage() {
+function RegisterInner() {
   const { register: authRegister, user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read ?role=worker|employer from URL — hero CTAs pre-select this so
+  // we can skip step 2 entirely and reduce the funnel from 4 to 3 steps.
+  const presetRoleParam = searchParams.get("role");
+  const presetRole: UserRole | null =
+    presetRoleParam === "worker" || presetRoleParam === "employer"
+      ? (presetRoleParam as UserRole)
+      : null;
+
   const [step, setStep] = useState(1);
-  const [role, setRole] = useState<UserRole>("worker");
+  const [role, setRole] = useState<UserRole>(presetRole ?? "worker");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [credentials, setCredentials] = useState<Step1Data | null>(null);
@@ -45,7 +56,8 @@ export default function RegisterPage() {
   // Step 1: Email + Password
   async function onStep1(data: Step1Data) {
     setCredentials(data);
-    setStep(2);
+    // If role was pre-selected from the URL, jump past step 2.
+    setStep(presetRole ? 3 : 2);
   }
 
   // Step 2: Choose role
@@ -70,7 +82,7 @@ export default function RegisterPage() {
         city: data.city,
       });
 
-      // Auto-accept terms + privacy
+      // Auto-accept terms + privacy (non-blocking)
       try {
         const versions = await api.getConsentVersions();
         if (versions.versions.TERMS) {
@@ -79,8 +91,8 @@ export default function RegisterPage() {
         if (versions.versions.PRIVACY) {
           await api.acceptDocument("PRIVACY", versions.versions.PRIVACY);
         }
-      } catch {
-        // Non-blocking — consent can be done later
+      } catch (err) {
+        console.warn("[register] consent auto-accept failed", err);
       }
 
       setStep(4);
@@ -91,13 +103,15 @@ export default function RegisterPage() {
     }
   }
 
+  // Keep 'back' smart: if we skipped step 2 via preset role, go straight
+  // back to step 1 instead of dropping the user on a step they never saw.
+  const backFromStep3 = () => setStep(presetRole ? 1 : 2);
+
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 bg-gradient-to-b from-neutral-900 via-background to-background">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-neutral-900 via-background to-background">
       {/* Logo */}
-      <div className="mb-6 flex items-center gap-1 text-3xl font-bold">
-        <span>Work</span>
-        <MapPin className="h-7 w-7 text-red-accent" />
-        <span>n</span>
+      <div className="mb-8 text-white">
+        <WorkOnWordmark size="xl" />
       </div>
 
       <div className="w-full max-w-sm">
@@ -105,13 +119,13 @@ export default function RegisterPage() {
         {step === 1 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl font-bold">
-                Rejoignez la communauté Work
-                <span className="text-red-accent">O</span>n
-              </h1>
+              <h1 className="text-2xl font-bold">Créez votre compte</h1>
               <p className="text-white/60 text-sm mt-2">
-                Inscrivez-vous et commencez à offrir ou trouver des talents à la
-                demande, partout, en toute confiance.
+                {presetRole === "worker"
+                  ? "Rejoignez WorkOn et commencez à recevoir des missions près de chez vous."
+                  : presetRole === "employer"
+                    ? "Rejoignez WorkOn et publiez votre première mission en quelques minutes."
+                    : "Inscrivez-vous et commencez à offrir ou trouver des talents à la demande."}
               </p>
             </div>
 
@@ -126,7 +140,7 @@ export default function RegisterPage() {
                   {...step1Form.register("email")}
                 />
                 {step1Form.formState.errors.email && (
-                  <p className="text-red-400 text-xs">
+                  <p className="text-[#FF4D1C] text-xs">
                     {step1Form.formState.errors.email.message}
                   </p>
                 )}
@@ -142,27 +156,39 @@ export default function RegisterPage() {
                   {...step1Form.register("password")}
                 />
                 {step1Form.formState.errors.password && (
-                  <p className="text-red-400 text-xs">
+                  <p className="text-[#FF4D1C] text-xs">
                     {step1Form.formState.errors.password.message}
                   </p>
                 )}
               </div>
 
-              <Button type="submit" className="w-full h-12 text-base">
-                Commencer
+              <Button type="submit" variant="hero" size="hero" className="w-full">
+                Continuer
               </Button>
             </form>
 
+            {/* Trust strip — reduces email+password anxiety */}
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs text-white/60">
+                <Lock className="h-3.5 w-3.5 text-[#22C55E]" />
+                <span>Vos données sont chiffrées et jamais revendues</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-white/60">
+                <Shield className="h-3.5 w-3.5 text-[#22C55E]" />
+                <span>Conformité Loi 25 &middot; Hébergement canadien</span>
+              </div>
+            </div>
+
             <p className="text-center text-sm text-white/60">
               Déjà un compte?{" "}
-              <Link href="/login" className="text-red-accent font-medium hover:underline">
+              <Link href="/login" className="text-[#FF4D1C] font-medium hover:underline">
                 Se connecter
               </Link>
             </p>
           </div>
         )}
 
-        {/* Step 2: Choose role */}
+        {/* Step 2: Choose role (skipped entirely when presetRole is set) */}
         {step === 2 && (
           <div className="space-y-6">
             <div className="text-center">
@@ -175,10 +201,10 @@ export default function RegisterPage() {
             <div className="space-y-3">
               <button
                 onClick={() => selectRole("worker")}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-neutral-800/80 hover:bg-neutral-700/80 transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-neutral-800/80 hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600/20">
-                  <Wrench className="h-6 w-6 text-red-accent" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF4D1C]/15 border border-[#FF4D1C]/25">
+                  <Wrench className="h-6 w-6 text-[#FF4D1C]" />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold">Trouver des missions</p>
@@ -191,10 +217,10 @@ export default function RegisterPage() {
 
               <button
                 onClick={() => selectRole("employer")}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-neutral-800/80 hover:bg-neutral-700/80 transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-neutral-800/80 hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600/20">
-                  <Briefcase className="h-6 w-6 text-red-accent" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF4D1C]/15 border border-[#FF4D1C]/25">
+                  <Briefcase className="h-6 w-6 text-[#FF4D1C]" />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold">Publier des missions</p>
@@ -207,9 +233,9 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2 pt-2">
-              {["Vérification d'identité", "Assurances & conformité", "Contrat sécurisé WorkOn"].map((text) => (
+              {["Vérification d'identité (tiers VERIFIED+)", "Paiement sécurisé par Stripe", "Contrat de service généré automatiquement"].map((text) => (
                 <div key={text} className="flex items-center gap-2 text-sm text-white/70">
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  <CheckCircle2 className="h-4 w-4 text-[#22C55E]" />
                   <span>{text}</span>
                 </div>
               ))}
@@ -230,51 +256,65 @@ export default function RegisterPage() {
             <div className="text-center">
               <h1 className="text-2xl font-bold">Créez votre profil</h1>
               <p className="text-white/60 text-sm mt-2">
-                Complétez votre profil pour commencer à{" "}
-                {role === "worker" ? "recevoir" : "publier"} des missions.
+                Quelques infos pour finaliser votre compte.
+                {role === "worker"
+                  ? " Vous pourrez compléter plus tard."
+                  : " Vous pouvez compléter plus tard."}
               </p>
             </div>
 
             <form onSubmit={step3Form.handleSubmit(onStep3)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">Prénom</Label>
-                <Input id="firstName" placeholder="Prénom" {...step3Form.register("firstName")} />
-                {step3Form.formState.errors.firstName && (
-                  <p className="text-red-400 text-xs">{step3Form.formState.errors.firstName.message}</p>
-                )}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Prénom</Label>
+                  <Input id="firstName" placeholder="Prénom" {...step3Form.register("firstName")} />
+                  {step3Form.formState.errors.firstName && (
+                    <p className="text-[#FF4D1C] text-xs">{step3Form.formState.errors.firstName.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Nom</Label>
+                  <Input id="lastName" placeholder="Nom" {...step3Form.register("lastName")} />
+                  {step3Form.formState.errors.lastName && (
+                    <p className="text-[#FF4D1C] text-xs">{step3Form.formState.errors.lastName.message}</p>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="lastName">Nom</Label>
-                <Input id="lastName" placeholder="Nom" {...step3Form.register("lastName")} />
-                {step3Form.formState.errors.lastName && (
-                  <p className="text-red-400 text-xs">{step3Form.formState.errors.lastName.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone" className="flex items-center gap-2">
+                  Téléphone <span className="text-white/40 text-xs font-normal">(facultatif)</span>
+                </Label>
                 <Input id="phone" type="tel" placeholder="514-555-0000" {...step3Form.register("phone")} />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="city">Ville</Label>
+                <Label htmlFor="city" className="flex items-center gap-2">
+                  Ville <span className="text-white/40 text-xs font-normal">(facultatif)</span>
+                </Label>
                 <Input id="city" placeholder="Montréal" {...step3Form.register("city")} />
               </div>
 
               {error && (
-                <p className="text-red-400 text-sm text-center bg-red-500/10 rounded-lg p-2">
+                <p className="text-[#FF4D1C] text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
                   {error}
                 </p>
               )}
 
-              <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+              <Button
+                type="submit"
+                variant="hero"
+                size="hero"
+                className="w-full"
+                disabled={loading}
+              >
                 {loading ? "Inscription..." : "Finaliser mon inscription"}
               </Button>
             </form>
 
             <button
-              onClick={() => setStep(2)}
+              onClick={backFromStep3}
               className="w-full text-center text-sm text-white/50 hover:text-white/70"
             >
               ← Retour
@@ -285,29 +325,43 @@ export default function RegisterPage() {
         {/* Step 4: Success */}
         {step === 4 && user && (
           <div className="space-y-6 text-center">
-            <h1 className="text-2xl font-bold">Votre profil est prêt!</h1>
+            <h1 className="text-2xl font-bold">Votre profil est prêt !</h1>
             <p className="text-white/60 text-sm">
-              Partagez votre lien unique et commencez à{" "}
-              {role === "worker" ? "recevoir des demandes de contrats" : "publier des missions"}.
+              {role === "worker"
+                ? "Commencez à recevoir des demandes de missions."
+                : "Publiez votre première mission dès maintenant."}
             </p>
 
-            <div className="rounded-xl border border-white/10 bg-neutral-800/80 p-6 space-y-3">
-              <div className="mx-auto h-16 w-16 rounded-full bg-red-600/20 flex items-center justify-center text-2xl font-bold text-red-accent">
+            <div className="rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur-sm p-6 space-y-3 shadow-lg shadow-black/20">
+              <div className="mx-auto h-16 w-16 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center text-2xl font-bold text-[#FF4D1C]">
                 {user.firstName?.[0]}{user.lastName?.[0]}
               </div>
               <p className="font-semibold text-lg">
                 {user.firstName} {user.lastName}
               </p>
               <p className="text-sm text-white/60 capitalize">{user.role}</p>
-              {user.city && <p className="text-sm text-white/60">{user.city}</p>}
+              {user.city && <p className="text-sm text-white/60">📍 {user.city}</p>}
             </div>
 
-            <Button onClick={() => router.push("/home")} className="w-full h-12 text-base">
+            <Button
+              onClick={() => router.push("/home")}
+              variant="hero"
+              size="hero"
+              className="w-full"
+            >
               Commencer
             </Button>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterInner />
+    </Suspense>
   );
 }
