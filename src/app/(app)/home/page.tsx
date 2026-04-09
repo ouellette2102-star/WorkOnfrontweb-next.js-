@@ -6,6 +6,7 @@ import { api } from "@/lib/api-client";
 import { StatsBar } from "@/components/stats-bar";
 import { WorkerCard } from "@/components/worker/worker-card";
 import { MissionCard } from "@/components/mission/mission-card";
+import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { Button } from "@/components/ui/button";
 import { MapPin, Plus, Briefcase, Search } from "lucide-react";
 import Link from "next/link";
@@ -69,6 +70,9 @@ export default function HomePage() {
           </div>
         )}
       </div>
+
+      {/* Stripe Connect gate (workers only — hidden when onboarded) */}
+      {user?.role === "worker" && <StripeConnectGate />}
 
       {/* Quick actions */}
       <div className="flex gap-3">
