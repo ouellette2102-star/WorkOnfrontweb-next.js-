@@ -129,6 +129,43 @@ const STATUS_MAP: Record<MissionResponseLike["status"], MissionStatus> = {
   cancelled: MissionStatus.CANCELLED,
 };
 
+/**
+ * Same idea as `missionResponseToMission`, but produces the legacy
+ * `MissionFeedItem` shape used by the swipe / list / map views in
+ * /worker/missions. `MissionResponse` carries `distanceKm` and
+ * `latitude`/`longitude` directly from /missions-local/nearby, which
+ * cover the feed item's needs. `employerName` is not on the canonical
+ * payload — we fill `null` until a dedicated feed endpoint ships.
+ */
+export function missionResponseToFeedItem(
+  r: MissionResponseLike & {
+    distanceKm?: number | null;
+    latitude?: number | null;
+    longitude?: number | null;
+  },
+): MissionFeedItem {
+  return {
+    id: r.id,
+    title: r.title,
+    description: r.description ?? null,
+    category: r.category ?? null,
+    city: r.city ?? null,
+    address: r.address ?? null,
+    hourlyRate: null,
+    startsAt: null,
+    endsAt: null,
+    status: r.status,
+    employerId: r.createdByUserId,
+    employerName: null,
+    priceCents: Math.round((r.price ?? 0) * 100),
+    currency: "CAD",
+    distance: r.distanceKm ?? null,
+    latitude: r.latitude ?? null,
+    longitude: r.longitude ?? null,
+    createdAt: r.createdAt,
+  };
+}
+
 export function missionResponseToMission(r: MissionResponseLike): Mission {
   return {
     id: r.id,

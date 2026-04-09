@@ -2,10 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
-import { reserveMission } from "@/lib/missions-api";
-import type { Mission } from "@/types/mission";
-import { MissionStatus } from "@/types/mission";
+import { api } from "@/lib/api-client";
+import { missionResponseToMission, MissionStatus, type Mission } from "@/types/mission";
 import { Button } from "@/components/ui/button";
 
 type ReserveMissionButtonProps = {
@@ -33,19 +31,11 @@ export function ReserveMissionButton({
           return;
         }
 
-        const token = getAccessToken();
-        if (!token) {
-          setError("Impossible de récupérer le token. Reconnecte-toi.");
-          return;
-        }
-
-        const updatedMission = await reserveMission(token, mission.id);
-        onSuccess?.(updatedMission);
+        const raw = await api.acceptMission(mission.id);
+        onSuccess?.(missionResponseToMission(raw));
       } catch (err) {
         setError(
-          err instanceof Error
-            ? err.message
-            : "Erreur lors de la réservation",
+          err instanceof Error ? err.message : "Erreur lors de la réservation",
         );
       }
     });
@@ -55,7 +45,9 @@ export function ReserveMissionButton({
     return (
       <Button
         disabled
-        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-semibold text-white/50"
+        variant="outline"
+        size="hero"
+        className="w-full"
       >
         {mission.status === MissionStatus.RESERVED
           ? "Déjà réservée"
@@ -73,14 +65,13 @@ export function ReserveMissionButton({
       <Button
         onClick={handleReserve}
         disabled={isPending}
-        className="w-full rounded-2xl bg-red-600 px-4 py-3 font-semibold text-white transition hover:bg-red-500 disabled:opacity-70"
+        variant="hero"
+        size="hero"
+        className="w-full"
       >
         {isPending ? "Réservation..." : "✓ Réserver cette mission"}
       </Button>
-      {error && (
-        <p className="text-xs text-red-400">{error}</p>
-      )}
+      {error && <p className="text-xs text-[#FF4D1C]">{error}</p>}
     </div>
   );
 }
-

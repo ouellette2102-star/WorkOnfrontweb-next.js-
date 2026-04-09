@@ -2,10 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { getMyMissions } from "@/lib/missions-api";
-import type { Mission } from "@/types/mission";
+import { api } from "@/lib/api-client";
+import { missionResponseToMission, type Mission } from "@/types/mission";
 import { MissionCard } from "@/components/missions/mission-card";
 import { MissionStatusActions } from "@/components/missions/mission-status-actions";
 import { MissionActions } from "@/components/missions/mission-actions";
@@ -34,14 +33,8 @@ function MyMissionsContent() {
 
     try {
       setIsLoading(true);
-      const token = getAccessToken();
-      if (!token) {
-        setError("Impossible de récupérer le token");
-        return;
-      }
-
-      const data = await getMyMissions(token);
-      setMissions(data);
+      const raw = await api.getMyMissions();
+      setMissions(raw.map(missionResponseToMission));
       setError(null);
     } catch (err) {
       setError(

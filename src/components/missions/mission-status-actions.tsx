@@ -2,10 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
-import { updateMissionStatus } from "@/lib/missions-api";
-import type { Mission } from "@/types/mission";
-import { MissionStatus } from "@/types/mission";
+import { api } from "@/lib/api-client";
+import { missionResponseToMission, MissionStatus, type Mission } from "@/types/mission";
 import { Button } from "@/components/ui/button";
 
 type MissionStatusActionsProps = {
@@ -43,16 +41,23 @@ export function MissionStatusActions({
           return;
         }
 
-        const token = getAccessToken();
-        if (!token) {
-          setError("Impossible de récupérer le token. Reconnecte-toi.");
+        // Map the target status to the dedicated backend endpoint.
+        // The canonical api-client exposes action verbs rather than
+        // a single PATCH /status — this keeps state transitions
+        // explicit server-side.
+        let raw;
+        if (newStatus === MissionStatus.IN_PROGRESS) {
+          raw = await api.startMission(mission.id);
+        } else if (newStatus === MissionStatus.COMPLETED) {
+          raw = await api.completeMission(mission.id);
+        } else if (newStatus === MissionStatus.CANCELLED) {
+          raw = await api.cancelMission(mission.id);
+        } else {
+          setError("Transition non supportée");
           return;
         }
 
-        const updatedMission = await updateMissionStatus(token, mission.id, {
-          status: newStatus,
-        });
-        onSuccess?.(updatedMission);
+        onSuccess?.(missionResponseToMission(raw));
       } catch (err) {
         setError(
           err instanceof Error
@@ -115,7 +120,7 @@ export function MissionStatusActions({
 
   if (showConfirm) {
     return (
-      <div className="space-y-3 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+      <div className="space-y-3 rounded-2xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-4">
         <p className="text-sm font-semibold text-white">
           Es-tu sûr de vouloir annuler cette mission ?
         </p>
@@ -123,14 +128,18 @@ export function MissionStatusActions({
           <Button
             onClick={() => executeStatusChange(showConfirm)}
             disabled={isPending}
-            className="flex-1 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
+            variant="hero"
+            size="sm"
+            className="flex-1"
           >
             {isPending ? "Annulation..." : "Oui, annuler"}
           </Button>
           <Button
             onClick={() => setShowConfirm(null)}
             disabled={isPending}
-            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+            variant="outline"
+            size="sm"
+            className="flex-1"
           >
             Non, garder
           </Button>
@@ -147,23 +156,16 @@ export function MissionStatusActions({
             key={action.status}
             onClick={() => handleStatusChange(action.status)}
             disabled={isPending}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              action.variant === "primary"
-                ? "bg-red-600 text-white hover:bg-red-500"
-                : action.variant === "success"
-                  ? "bg-green-600 text-white hover:bg-green-500"
-                  : action.variant === "destructive"
-                    ? "border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                    : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
-            } disabled:opacity-50`}
+            variant={
+              action.variant === "destructive" ? "outline" : "hero"
+            }
+            size="sm"
           >
             {isPending ? "..." : action.label}
           </Button>
         ))}
       </div>
-      {error && (
-        <p className="text-xs text-red-400">{error}</p>
-      )}
+      {error && <p className="text-xs text-[#FF4D1C]">{error}</p>}
     </div>
   );
 }
