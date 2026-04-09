@@ -62,8 +62,8 @@ export default function EmployerDiscoverPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
-        <div className="mx-auto max-w-2xl rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center">
-          <p className="text-red-400">Erreur lors du chargement des profils</p>
+        <div className="mx-auto max-w-2xl rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 text-center shadow-lg shadow-black/20">
+          <p className="text-[#FF4D1C]">Erreur lors du chargement des profils</p>
         </div>
       </div>
     );
@@ -74,7 +74,7 @@ export default function EmployerDiscoverPage() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-8">
           <h1 className="mb-2 text-4xl font-bold text-white">
-            D\u00e9couvrir des travailleurs
+            Découvrir des travailleurs
           </h1>
           <p className="text-lg text-white/70">
             Trouvez les meilleurs profils pour vos missions
@@ -88,7 +88,7 @@ export default function EmployerDiscoverPage() {
               Tous les profils parcourus !
             </h3>
             <p className="text-white/70">
-              Revenez plus tard pour d\u00e9couvrir de nouveaux travailleurs
+              Revenez plus tard pour découvrir de nouveaux travailleurs
             </p>
           </div>
         ) : (
@@ -120,7 +120,7 @@ export default function EmployerDiscoverPage() {
                   className="absolute inset-0 overflow-hidden rounded-3xl border-2 border-white/10 bg-neutral-900 shadow-2xl"
                 >
                   {/* Avatar area */}
-                  <div className="flex h-40 items-center justify-center bg-gradient-to-r from-green-600 to-emerald-500">
+                  <div className="flex h-40 items-center justify-center bg-gradient-to-r from-[#FF4D1C] to-[#FF8C32]">
                     {currentCandidate.pictureUrl ? (
                       <img
                         src={currentCandidate.pictureUrl}
@@ -173,7 +173,7 @@ export default function EmployerDiscoverPage() {
                       {currentCandidate.category && (
                         <div className="flex flex-wrap gap-2">
                           <span
-                            className="rounded-full bg-green-600/20 px-3 py-1 text-xs font-medium text-green-400"
+                            className="rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs font-medium text-[#FF4D1C]"
                           >
                             {currentCandidate.category}
                           </span>
@@ -191,21 +191,21 @@ export default function EmployerDiscoverPage() {
                       <Button
                         onClick={() => handleSwipe("PASS")}
                         disabled={swipeMutation.isPending}
-                        className="flex-1 rounded-xl border-2 border-red-500 bg-transparent py-5 text-base font-bold text-red-500 transition hover:bg-red-500 hover:text-white"
+                        className="flex-1 rounded-xl border-2 border-white/20 bg-transparent py-5 text-base font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
                       >
                         Passer
                       </Button>
                       <Button
                         onClick={() => handleSwipe("LIKE")}
                         disabled={swipeMutation.isPending}
-                        className="flex-1 rounded-xl border-2 border-yellow-500 bg-transparent py-5 text-base font-bold text-yellow-500 transition hover:bg-yellow-500 hover:text-white"
+                        className="flex-1 rounded-xl border-2 border-yellow-500/60 bg-transparent py-5 text-base font-bold text-yellow-400 transition hover:bg-yellow-500/10"
                       >
                         Sauvegarder
                       </Button>
                       <Button
                         onClick={() => handleSwipe("SUPERLIKE")}
                         disabled={swipeMutation.isPending}
-                        className="flex-1 rounded-xl bg-green-600 py-5 text-base font-bold text-white transition hover:bg-green-500"
+                        className="flex-1 rounded-xl bg-[#FF4D1C] py-5 text-base font-bold text-white transition hover:bg-[#E8441A] shadow-lg shadow-[#FF4D1C]/30"
                       >
                         Contacter
                       </Button>
