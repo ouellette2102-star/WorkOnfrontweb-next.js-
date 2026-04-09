@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { api, type SwipeMatch } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -27,30 +27,28 @@ export default function EmployerMatchesPage() {
 
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent" />
           </div>
         )}
 
         {error && (
-          <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-center">
-            <p className="text-red-400">Erreur lors du chargement des matches</p>
+          <div className="rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-6 text-center shadow-lg shadow-black/20">
+            <p className="text-[#FF4D1C]">Erreur lors du chargement des matches</p>
           </div>
         )}
 
         {matches && matches.length === 0 && (
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-12 text-center backdrop-blur">
-            <div className="mb-4 text-6xl">&#x1F91D;</div>
+          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent backdrop-blur-sm p-12 text-center shadow-lg shadow-black/20">
+            <div className="mb-4 text-6xl">🤝</div>
             <h3 className="mb-2 text-xl font-semibold text-white">
               Aucun match pour le moment
             </h3>
             <p className="mb-6 text-white/70">
-              D\u00e9couvrez des travailleurs pour cr\u00e9er des matches
+              Découvrez des travailleurs pour créer des matches
             </p>
-            <Link href="/employer/discover">
-              <Button className="bg-green-600 hover:bg-green-500">
-                D\u00e9couvrir des travailleurs
-              </Button>
-            </Link>
+            <Button asChild variant="hero" size="hero">
+              <Link href="/employer/discover">Découvrir des travailleurs</Link>
+            </Button>
           </div>
         )}
 
@@ -59,17 +57,18 @@ export default function EmployerMatchesPage() {
             {matches.map((match) => (
               <div
                 key={match.id}
-                className="rounded-2xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur"
+                className="rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur-sm p-6 shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/30 hover:shadow-xl hover:shadow-[#FF4D1C]/10"
               >
                 <div className="mb-4 flex items-center gap-4">
                   {match.matchedUser.pictureUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={match.matchedUser.pictureUrl}
                       alt={match.matchedUser.firstName}
                       className="h-14 w-14 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-600/20 text-lg font-bold text-green-400">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 text-lg font-bold text-[#FF4D1C]">
                       {match.matchedUser.firstName[0]}
                       {match.matchedUser.lastName[0]}
                     </div>
@@ -89,24 +88,22 @@ export default function EmployerMatchesPage() {
                 <div className="mb-4 flex items-center gap-2 text-sm text-white/50">
                   <span
                     className={`inline-block h-2 w-2 rounded-full ${
-                      match.status === "ACTIVE" ? "bg-green-500" : "bg-neutral-500"
+                      match.status === "ACTIVE" ? "bg-[#22C55E]" : "bg-white/30"
                     }`}
                   />
                   <span>
-                    {match.status === "ACTIVE" ? "Actif" : "Expir\u00e9"}
+                    {match.status === "ACTIVE" ? "Actif" : "Expiré"}
                   </span>
                   <span>&middot;</span>
                   <span>
-                    Match\u00e9 le{" "}
+                    Matché le{" "}
                     {new Date(match.createdAt).toLocaleDateString("fr-CA")}
                   </span>
                 </div>
 
-                <Link href="/missions/new">
-                  <Button className="w-full rounded-xl bg-green-600 hover:bg-green-500">
-                    Cr\u00e9er une mission
-                  </Button>
-                </Link>
+                <Button asChild variant="hero" size="sm" className="w-full">
+                  <Link href="/missions/new">Créer une mission</Link>
+                </Button>
               </div>
             ))}
           </div>
