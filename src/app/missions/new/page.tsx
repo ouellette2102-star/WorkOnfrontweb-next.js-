@@ -19,7 +19,7 @@ export default function NewMissionPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-900">
         <div className="text-center">
-          <div className="mb-4 inline-block h-10 w-10 animate-spin rounded-full border-4 border-red-500 border-t-transparent" />
+          <div className="mb-4 inline-block h-10 w-10 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent" />
           <p className="text-white/70">Chargement...</p>
         </div>
       </div>
@@ -44,7 +44,7 @@ export default function NewMissionPage() {
         </div>
 
         {/* Formulaire */}
-        <div className="rounded-3xl border border-white/10 bg-black/40 p-8 backdrop-blur">
+        <div className="rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur-sm p-8 shadow-lg shadow-black/20">
           <CreateMissionForm />
         </div>
       </div>
