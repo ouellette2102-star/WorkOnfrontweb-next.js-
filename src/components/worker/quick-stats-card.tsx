@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
-import { getWorkerMissions } from "@/lib/missions-api";
-import { MissionStatus } from "@/types/mission";
+import { api } from "@/lib/api-client";
+import { MissionStatus, missionResponseToMission } from "@/types/mission";
 
 export function QuickStatsCard() {
   const { isLoading: authLoading } = useAuth();
@@ -22,14 +21,10 @@ export function QuickStatsCard() {
 
       try {
         setError(null);
-        const token = getAccessToken();
-        if (!token) {
-          setError("Token d'authentification introuvable");
-          return;
-        }
 
-        const missions = await getWorkerMissions(token);
-        
+        const raw = await api.getMyAssignments();
+        const missions = raw.map(missionResponseToMission);
+
         const active = missions.filter(
           (m) => m.status === MissionStatus.RESERVED || m.status === MissionStatus.IN_PROGRESS
         ).length;

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { getAccessToken } from "@/lib/auth";
-import { getWorkerMissions } from "@/lib/missions-api";
+import { api } from "@/lib/api-client";
 import { getMissionTimeLogs } from "@/lib/mission-time-logs-api";
-import { MissionStatus, type Mission } from "@/types/mission";
+import { MissionStatus, missionResponseToMission, type Mission } from "@/types/mission";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
@@ -25,8 +25,9 @@ export function MissionHistoryCard() {
       const token = getAccessToken();
       if (!token) return;
 
-      const allMissions = await getWorkerMissions(token);
-      
+      const raw = await api.getMyAssignments();
+      const allMissions = raw.map(missionResponseToMission);
+
       // Filtrer pour garder seulement COMPLETED
       const completed = allMissions.filter(
         (m) => m.status === MissionStatus.COMPLETED

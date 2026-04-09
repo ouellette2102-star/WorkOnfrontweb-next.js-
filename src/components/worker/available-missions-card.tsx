@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
-import { getAvailableMissions, reserveMission } from "@/lib/missions-api";
-import type { Mission } from "@/types/mission";
+import { api } from "@/lib/api-client";
+import { missionResponseToMission, type Mission } from "@/types/mission";
+
+// Fallback centroid (Montréal) used when geolocation is unavailable or
+// denied. The /worker/dashboard widget should still show something.
+const MONTREAL_FALLBACK = { latitude: 45.5017, longitude: -73.5673 };
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -21,18 +24,39 @@ export function AvailableMissionsCard() {
 
     try {
       setError(null);
-      const token = getAccessToken();
-      if (!token) {
-        setError("Token d'authentification introuvable");
-        return;
-      }
 
-      const available = await getAvailableMissions(token);
+      // Try to get the user's real location; fall back to Montréal if
+      // geolocation is unavailable or denied so the card still renders.
+      const coords = await new Promise<{ latitude: number; longitude: number }>(
+        (resolve) => {
+          if (typeof window === "undefined" || !("geolocation" in navigator)) {
+            resolve(MONTREAL_FALLBACK);
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            (pos) =>
+              resolve({
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+              }),
+            () => resolve(MONTREAL_FALLBACK),
+            { enableHighAccuracy: false, timeout: 4000 },
+          );
+        },
+      );
+
+      const raw = await api.getNearbyMissions({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        radiusKm: 50,
+      });
+      const available = raw.map(missionResponseToMission);
       // Limiter à 3 pour la version compacte
       setMissions(available.slice(0, 3));
     } catch (error) {
       console.error("Erreur lors du chargement des missions disponibles:", error);
-      const errorMessage = error instanceof Error ? error.message : "Impossible de charger les missions";
+      const errorMessage =
+        error instanceof Error ? error.message : "Impossible de charger les missions";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -46,13 +70,7 @@ export function AvailableMissionsCard() {
   const handleReserve = async (missionId: string) => {
     setReservingId(missionId);
     try {
-      const token = getAccessToken();
-      if (!token) {
-        toast.error("Authentification requise");
-        return;
-      }
-
-      await reserveMission(token, missionId);
+      await api.acceptMission(missionId);
       toast.success("Mission réservée avec succès !");
       loadMissions();
     } catch (error) {
