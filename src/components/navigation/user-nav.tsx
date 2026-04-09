@@ -4,39 +4,50 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 
+/**
+ * UserNav — header auth control.
+ *
+ * Renders on both dark app surfaces (/pros, /employeurs, /p/[slug])
+ * and the light landing page (/), so it has to look decent on both.
+ * We lean on the shared Button variants (outline, hero, ghost)
+ * which handle colors via currentColor and work on either background.
+ */
 export function UserNav() {
   const { isAuthenticated, user, logout } = useAuth();
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center gap-3 text-sm">
-        <Button variant="ghost" size="sm" className="text-[#6B7280] hover:text-[#1A1A2E] hover:bg-gray-100" asChild>
+      <div className="flex items-center gap-2 text-sm">
+        <Button variant="ghost" size="sm" asChild>
           <Link href="/login">Connexion</Link>
         </Button>
-        <Button size="sm" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white rounded-lg" asChild>
+        <Button variant="hero" size="sm" asChild>
           <Link href="/register">S&apos;inscrire</Link>
         </Button>
       </div>
     );
   }
 
+  const firstName = user?.firstName?.trim() || "Mon compte";
+
   return (
-    <div className="flex items-center gap-3 text-sm">
-      <Link
-        href="/home"
-        className="rounded-lg border border-gray-200 px-4 py-1.5 text-[#1A1A2E] font-medium transition hover:bg-gray-50"
-      >
-        Dashboard
-      </Link>
-      <button
+    <div className="flex items-center gap-2 text-sm">
+      <Button variant="outline" size="sm" asChild>
+        <Link href="/home">
+          <span className="hidden sm:inline">{firstName}</span>
+          <span className="sm:hidden">Compte</span>
+        </Link>
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => {
           logout();
           window.location.href = "/";
         }}
-        className="text-[#6B7280] hover:text-[#1A1A2E] text-sm transition-colors"
       >
-        Deconnexion
-      </button>
+        Déconnexion
+      </Button>
     </div>
   );
 }
