@@ -1,83 +1,38 @@
 /**
- * Client API pour le suivi du temps des missions WorkOn
+ * Mission time-logs API client.
+ *
+ * Thin wrapper around `apiFetch` so every time-log call shares the
+ * same Bearer auth + auto-refresh on 401 + error normalization as
+ * the rest of the app. Backward-compatible exports: call sites still
+ * pass a `token` string, but we ignore it — `apiFetch` reads the
+ * current token from localStorage. Tokens stay in the signature to
+ * avoid touching 4+ consumers in the same PR.
+ *
+ * See Phase 5 audit §1.3 "parallel api layers" for the consolidation
+ * rationale (PR #93).
  */
 
+import { apiFetch } from "./api-client";
 import type { MissionTimeLog } from "@/types/mission-time-log";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "http://localhost:3001/api/v1";
-
-/**
- * Helper générique pour les requêtes authentifiées
- */
-async function authenticatedRequest<T>(
-  path: string,
-  token: string,
-  init?: RequestInit,
-): Promise<T> {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${API_BASE_URL}${normalizedPath}`;
-
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(init?.headers ?? {}),
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text().catch(() => "");
-    console.error("[WorkOn Time Logs API] Request failed", {
-      url,
-      status: response.status,
-      body: errorBody,
-    });
-
-    let errorMessage = `Erreur API ${response.status}`;
-    try {
-      const parsed = JSON.parse(errorBody);
-      errorMessage = parsed?.message ?? parsed?.error ?? errorMessage;
-    } catch {
-      // Ignore parse errors
-    }
-
-    throw new Error(errorMessage);
-  }
-
-  return response.json() as Promise<T>;
-}
-
-/**
- * Récupérer les time logs d'une mission
- */
+/** Récupérer les time logs d'une mission. */
 export async function getMissionTimeLogs(
-  token: string,
+  _token: string,
   missionId: string,
 ): Promise<MissionTimeLog[]> {
-  return authenticatedRequest<MissionTimeLog[]>(
-    `/missions/${missionId}/time-logs`,
-    token,
-    {
-      method: "GET",
-    },
-  );
+  void _token;
+  return apiFetch<MissionTimeLog[]>(`/missions/${missionId}/time-logs`);
 }
 
-/**
- * Enregistrer une arrivée (CHECK_IN)
- */
+/** Enregistrer une arrivée (CHECK_IN). */
 export async function checkInToMission(
-  token: string,
+  _token: string,
   missionId: string,
   note?: string,
 ): Promise<MissionTimeLog> {
-  return authenticatedRequest<MissionTimeLog>(
+  void _token;
+  return apiFetch<MissionTimeLog>(
     `/missions/${missionId}/time-logs/check-in`,
-    token,
     {
       method: "POST",
       body: JSON.stringify({ note }),
@@ -85,21 +40,18 @@ export async function checkInToMission(
   );
 }
 
-/**
- * Enregistrer un départ (CHECK_OUT)
- */
+/** Enregistrer un départ (CHECK_OUT). */
 export async function checkOutFromMission(
-  token: string,
+  _token: string,
   missionId: string,
   note?: string,
 ): Promise<MissionTimeLog> {
-  return authenticatedRequest<MissionTimeLog>(
+  void _token;
+  return apiFetch<MissionTimeLog>(
     `/missions/${missionId}/time-logs/check-out`,
-    token,
     {
       method: "POST",
       body: JSON.stringify({ note }),
     },
   );
 }
-
