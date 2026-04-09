@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { OfferList } from "@/components/offers/offer-list";
 import { CreateOfferModal } from "@/components/offers/create-offer-modal";
+import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 
 const statusLabels: Record<string, string> = {
   CREATED: "Disponible",
@@ -295,6 +296,15 @@ export default function MissionDetailPage() {
               </div>
             )}
           </div>
+
+          {/* Stripe Connect gate — surfaces right before the accept
+              CTA for workers looking at an open mission they could
+              book. Hidden when already onboarded or dismissed. */}
+          {canMakeOffer && (
+            <div className="mb-5">
+              <StripeConnectGate />
+            </div>
+          )}
 
           {/* CTA buttons */}
           <div className="flex flex-wrap gap-3">
