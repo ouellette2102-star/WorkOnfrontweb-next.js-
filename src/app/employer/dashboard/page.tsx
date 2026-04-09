@@ -15,17 +15,17 @@ export default async function EmployerDashboardPage() {
             Bienvenue, {profile.fullName || "Employeur"}
           </h1>
           <p className="text-lg text-white/70">
-            G&eacute;rez vos missions et travailleurs
+            Gérez vos missions et vos travailleurs.
           </p>
         </div>
 
         {/* Actions rapides */}
         <div className="mb-8 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
           <Link href="/missions/new">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">&#x2795;</div>
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur-sm shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+              <div className="mb-3 text-4xl">➕</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
-                Cr&eacute;er une mission
+                Créer une mission
               </h3>
               <p className="text-sm text-white/70">
                 Publiez une nouvelle mission
@@ -34,8 +34,8 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/missions/mine">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">&#x1F4CB;</div>
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur-sm shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+              <div className="mb-3 text-4xl">📋</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Mes missions
               </h3>
@@ -46,10 +46,10 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/employer/discover">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">&#x1F50D;</div>
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur-sm shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+              <div className="mb-3 text-4xl">🔍</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
-                D&eacute;couvrir
+                Découvrir
               </h3>
               <p className="text-sm text-white/70">
                 Trouver des travailleurs
@@ -58,8 +58,8 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/employer/matches">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">&#x1F91D;</div>
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur-sm shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+              <div className="mb-3 text-4xl">🤝</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Mes matches
               </h3>
@@ -70,13 +70,13 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/messages">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
-              <div className="mb-3 text-4xl">&#x1F4AC;</div>
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur-sm shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+              <div className="mb-3 text-4xl">💬</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Messages
               </h3>
               <p className="text-sm text-white/70">
-                Communiquez avec les workers
+                Communiquez avec les travailleurs
               </p>
             </div>
           </Link>
@@ -86,29 +86,27 @@ export default async function EmployerDashboardPage() {
         <EmployerDashboardStats />
 
         {/* Infos profil */}
-        <div className="mt-8 rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
+        <div className="mt-8 rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur-sm shadow-lg shadow-black/20">
           <h3 className="mb-4 text-xl font-semibold text-white">
             Vos informations
           </h3>
           <div className="grid gap-4 md:grid-cols-3">
             <div>
               <p className="text-sm text-white/50">Ville</p>
-              <p className="text-white">{profile.city || "Non renseign\u00e9e"}</p>
+              <p className="text-white">{profile.city || "Non renseignée"}</p>
             </div>
             <div>
-              <p className="text-sm text-white/50">T&eacute;l&eacute;phone</p>
-              <p className="text-white">{profile.phone || "Non renseign\u00e9"}</p>
+              <p className="text-sm text-white/50">Téléphone</p>
+              <p className="text-white">{profile.phone || "Non renseigné"}</p>
             </div>
             <div>
               <p className="text-sm text-white/50">Email</p>
               <p className="text-white">{profile.email}</p>
             </div>
           </div>
-          <Link href="/profile">
-            <Button className="mt-4 rounded-xl bg-neutral-700 px-4 py-2 text-sm text-white transition hover:bg-neutral-600">
-              Modifier mon profil
-            </Button>
-          </Link>
+          <Button asChild variant="outline" size="sm" className="mt-4">
+            <Link href="/profile">Modifier mon profil</Link>
+          </Button>
         </div>
       </div>
     </div>
