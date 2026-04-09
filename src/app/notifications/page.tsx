@@ -140,13 +140,13 @@ export default function NotificationsPage() {
   ): string => {
     switch (type) {
       case NotificationType.NEW_MESSAGE:
-        return "bg-blue-600";
+        return "bg-blue-500/15 text-blue-300 border border-blue-500/25";
       case NotificationType.MISSION_STATUS_CHANGED:
-        return "bg-purple-600";
+        return "bg-[#FF4D1C]/15 text-[#FF4D1C] border border-[#FF4D1C]/25";
       case NotificationType.MISSION_TIME_EVENT:
-        return "bg-green-600";
+        return "bg-[#22C55E]/15 text-[#22C55E] border border-[#22C55E]/25";
       default:
-        return "bg-gray-600";
+        return "bg-white/5 text-white/60 border border-white/10";
     }
   };
 
@@ -169,7 +169,7 @@ export default function NotificationsPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-950">
         <div className="text-center">
-          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"></div>
+          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent"></div>
           <p className="text-white/70">Chargement des notifications...</p>
         </div>
       </div>
@@ -179,12 +179,9 @@ export default function NotificationsPage() {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-950 p-6">
-        <div className="max-w-md rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-center">
-          <p className="mb-4 text-red-400">{error}</p>
-          <Button
-            onClick={loadNotifications}
-            className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
-          >
+        <div className="max-w-md rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-6 text-center shadow-lg shadow-black/20">
+          <p className="mb-4 text-[#FF4D1C]">{error}</p>
+          <Button onClick={loadNotifications} variant="hero" size="sm">
             Réessayer
           </Button>
         </div>
@@ -209,10 +206,7 @@ export default function NotificationsPage() {
             )}
           </div>
           {unreadCount > 0 && (
-            <Button
-              onClick={handleMarkAllAsRead}
-              className="rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
-            >
+            <Button onClick={handleMarkAllAsRead} variant="secondary" size="sm">
               Tout marquer comme lu
             </Button>
           )}
@@ -220,9 +214,9 @@ export default function NotificationsPage() {
 
         {/* Liste des notifications */}
         {notifications.length === 0 ? (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
+          <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-12 text-center shadow-lg shadow-black/20">
             <div className="mb-4 text-6xl">🔔</div>
-            <p className="text-lg text-white/70">Aucune notification</p>
+            <p className="text-lg text-white/80 font-semibold">Aucune notification</p>
             <p className="mt-2 text-sm text-white/50">
               Toutes vos notifications apparaîtront ici
             </p>
@@ -233,16 +227,16 @@ export default function NotificationsPage() {
               <button
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification)}
-                className={`w-full rounded-2xl border p-4 text-left transition hover:border-red-500/50 ${
+                className={`w-full rounded-3xl border p-5 text-left transition-all shadow-lg shadow-black/10 hover:-translate-y-0.5 hover:border-[#FF4D1C]/40 ${
                   notification.isRead
-                    ? "border-white/10 bg-white/5"
-                    : "border-red-500/30 bg-red-500/10"
+                    ? "border-white/10 bg-white/5 backdrop-blur-sm"
+                    : "border-[#FF4D1C]/30 bg-gradient-to-br from-[#FF4D1C]/10 via-[#FF4D1C]/5 to-transparent backdrop-blur-sm"
                 }`}
               >
                 <div className="flex items-start gap-4">
                   {/* Badge type */}
                   <div
-                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold text-white ${getNotificationBadgeColor(notification.type)}`}
+                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${getNotificationBadgeColor(notification.type)}`}
                   >
                     {getNotificationBadgeLabel(notification.type)}
                   </div>
@@ -262,7 +256,7 @@ export default function NotificationsPage() {
 
                   {/* Indicateur non lu */}
                   {!notification.isRead && (
-                    <div className="h-3 w-3 shrink-0 rounded-full bg-red-600"></div>
+                    <div className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#FF4D1C] mt-2 shadow-sm shadow-[#FF4D1C]/40"></div>
                   )}
                 </div>
               </button>
@@ -273,10 +267,10 @@ export default function NotificationsPage() {
         {/* Lien retour */}
         <div className="mt-8 text-center">
           <Link
-            href="/dashboard"
-            className="text-sm text-white/70 transition hover:text-red-400"
+            href="/home"
+            className="text-sm text-white/70 transition hover:text-[#FF4D1C]"
           >
-            ← Retour au dashboard
+            ← Retour à l&apos;accueil
           </Link>
         </div>
       </div>
