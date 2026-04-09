@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AlertCircle } from "lucide-react";
 import { useProfile } from "@/hooks/use-profile";
 import type { PrimaryRole } from "@/lib/workon-api";
 
@@ -44,6 +45,8 @@ export function ProfileRolesCard() {
     }
   }, [profile]);
 
+  const isUnchanged = !!profile && selectedRole === profile.primaryRole;
+
   const handleSave = async () => {
     if (!selectedRole) return;
     setIsSubmitting(true);
@@ -65,7 +68,7 @@ export function ProfileRolesCard() {
 
   if (isLoading && !profile) {
     return (
-      <section className="rounded-3xl border border-white/10 bg-neutral-900/80 p-8">
+      <section className="rounded-3xl border border-white/10 bg-neutral-900/80 backdrop-blur-sm p-8 shadow-lg shadow-black/20">
         <p className="text-sm uppercase tracking-[0.4em] text-white/40">Profil</p>
         <h2 className="mt-2 text-2xl font-semibold">Chargement du profil...</h2>
         <p className="mt-4 text-white/60">Nous synchronisons ton compte WorkOn.</p>
@@ -75,21 +78,34 @@ export function ProfileRolesCard() {
 
   if (error && !profile) {
     return (
-      <section className="rounded-3xl border border-red-900/40 bg-red-950/30 p-8">
-        <h2 className="text-xl font-semibold text-red-400">Impossible de charger le profil</h2>
-        <p className="mt-2 text-sm text-red-200">{error}</p>
+      <section className="rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 shadow-lg shadow-black/20">
+        <h2 className="text-xl font-semibold text-[#FF4D1C]">Impossible de charger le profil</h2>
+        <p className="mt-2 text-sm text-white/70">{error}</p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-neutral-900/80 p-8 shadow-2xl shadow-black/30">
-      <p className="text-sm uppercase tracking-[0.4em] text-red-500">Ton rôle WorkOn</p>
+    <section className="rounded-3xl border border-white/10 bg-neutral-900/80 backdrop-blur-sm p-8 shadow-lg shadow-black/20">
+      <p className="text-sm uppercase tracking-[0.4em] text-[#FF4D1C]">Ton rôle WorkOn</p>
       <h2 className="mt-4 text-2xl font-semibold">Sélectionne ton espace principal</h2>
       <p className="mt-3 text-white/70">
         Tu peux activer plusieurs espaces en parallèle (Worker, Employer, Client).
         Choisis simplement celui que tu veux voir en priorité dans le dashboard.
       </p>
+
+      {/* Beta notice — role-change endpoint not yet shipped backend-side */}
+      <div className="mt-5 flex items-start gap-3 rounded-2xl border border-yellow-500/25 bg-yellow-500/5 p-4 text-sm">
+        <AlertCircle className="h-4 w-4 flex-shrink-0 text-yellow-400 mt-0.5" />
+        <div className="text-white/80">
+          <p className="font-medium">Changement de rôle en cours de préparation</p>
+          <p className="mt-1 text-white/60 text-xs leading-relaxed">
+            L&apos;endpoint backend dédié arrive bientôt. En attendant, ton rôle
+            actuel est affiché mais la sauvegarde n&apos;est pas encore active —
+            tu recevras un message clair si tu cliques sur « Sauvegarder ».
+          </p>
+        </div>
+      </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         {ROLE_OPTIONS.map((option) => {
@@ -101,15 +117,15 @@ export function ProfileRolesCard() {
               onClick={() => setSelectedRole(option.key)}
               className={`rounded-2xl border px-4 py-5 text-left transition ${
                 isSelected
-                  ? "border-red-500 bg-red-500/10"
-                  : "border-white/10 bg-white/5 hover:border-red-500/40"
+                  ? "border-[#FF4D1C] bg-[#FF4D1C]/10"
+                  : "border-white/10 bg-white/5 hover:border-[#FF4D1C]/40"
               }`}
             >
               <p className="text-xs uppercase tracking-[0.3em] text-white/40">{option.label}</p>
               <h3 className="mt-2 text-lg font-semibold">{option.label}</h3>
               <p className="mt-2 text-sm text-white/70">{option.description}</p>
               {isSelected ? (
-                <span className="mt-3 inline-flex rounded-full bg-red-600/20 px-3 py-1 text-xs text-red-200">
+                <span className="mt-3 inline-flex rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs text-[#FF4D1C]">
                   Rôle principal
                 </span>
               ) : null}
@@ -121,16 +137,16 @@ export function ProfileRolesCard() {
       <div className="mt-6 flex items-center gap-4">
         <button
           type="button"
-          disabled={!selectedRole || isSubmitting}
+          disabled={!selectedRole || isSubmitting || isUnchanged}
           onClick={handleSave}
-          className="rounded-full bg-red-600 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-red-500 disabled:opacity-60"
+          className="rounded-full bg-[#FF4D1C] px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#E8441A] disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Enregistrement..." : "Sauvegarder mon rôle"}
         </button>
         {statusMessage ? (
           <p
             className={`text-sm ${
-              status === "success" ? "text-green-400" : "text-red-400"
+              status === "success" ? "text-[#22C55E]" : "text-[#FF4D1C]"
             }`}
           >
             {statusMessage}
@@ -153,4 +169,3 @@ export function ProfileRolesCard() {
     </section>
   );
 }
-
