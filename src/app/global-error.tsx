@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 
 /**
- * Global Error Boundary Next.js App Router
- * 
- * Capture les erreurs dans le root layout (layout.tsx).
- * DOIT inclure ses propres <html> et <body> car le layout est hors scope.
- * 
- * SÉCURITÉ: Ne jamais afficher de stack traces ou détails techniques en production.
+ * Global Error Boundary — Next.js App Router.
+ *
+ * Captures errors thrown during render of the root layout. MUST
+ * include its own <html> and <body> because it runs OUTSIDE the
+ * root layout scope.
+ *
+ * Reports the error to Sentry (no-op when SENTRY_DSN is unset).
+ * Security: never exposes stack traces or server details in prod.
  */
 export default function GlobalError({
   error,
@@ -18,7 +21,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log l'erreur critique
+    // Report to Sentry FIRST so even if the console.error is suppressed
+    // in the user's browser, the issue still lands in our dashboard.
+    Sentry.captureException(error);
+    // eslint-disable-next-line no-console
     console.error("[WorkOn Global Error]", error);
   }, [error]);
 
@@ -30,9 +36,9 @@ export default function GlobalError({
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-md w-full text-center space-y-8">
             {/* Icon - Critical error */}
-            <div className="mx-auto w-24 h-24 rounded-full bg-red-600/20 border-2 border-red-500/50 flex items-center justify-center">
+            <div className="mx-auto w-24 h-24 rounded-full bg-[#FF4D1C]/15 border-2 border-[#FF4D1C]/40 flex items-center justify-center">
               <svg
-                className="w-12 h-12 text-red-500"
+                className="w-12 h-12 text-[#FF4D1C]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -67,8 +73,8 @@ export default function GlobalError({
 
             {/* Dev only */}
             {isDev && (
-              <div className="p-4 rounded-xl bg-red-950/50 border border-red-500/30 text-left">
-                <p className="text-sm font-mono text-red-400 break-all">
+              <div className="p-4 rounded-2xl bg-[#FF4D1C]/5 border border-[#FF4D1C]/25 text-left">
+                <p className="text-sm font-mono text-[#FF4D1C] break-all">
                   {error.message}
                 </p>
               </div>
@@ -78,7 +84,7 @@ export default function GlobalError({
             <div className="flex flex-col gap-3 pt-4">
               <button
                 onClick={() => reset()}
-                className="w-full px-6 py-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold transition-colors shadow-lg shadow-red-900/40"
+                className="w-full px-6 py-4 rounded-xl bg-[#FF4D1C] hover:bg-[#E8441A] text-white font-semibold transition-colors shadow-lg shadow-[#FF4D1C]/30"
               >
                 Réessayer
               </button>
