@@ -1,32 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { UserNav } from "@/components/navigation/user-nav";
-import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
+import { MarketingHeader } from "@/components/navigation/marketing-header";
 import { HeroWorkerCard } from "@/components/worker/hero-worker-card";
 import { WhyChooseBlock } from "@/components/marketing/why-choose-block";
 import { getFeaturedWorkers, getSectorStats, type SectorStat } from "@/lib/public-api";
 
 export const revalidate = 120; // ISR — 2 min
 
-// ─── Shared header ──────────────────────────────────────────────────────────
-
-function Header() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-900/80 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-white">
-          <WorkOnWordmark size="md" />
-        </Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
-          <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
-          <Link href="/employeurs" className="hover:text-white transition-colors">Employeurs</Link>
-          <Link href="/missions" className="hover:text-white transition-colors">Missions</Link>
-        </nav>
-        <UserNav />
-      </div>
-    </header>
-  );
-}
+// Header now lives in <MarketingHeader theme="dark" /> — see PR #39.
 
 // ─── Sector Pill ────────────────────────────────────────────────────────────
 
@@ -56,7 +37,11 @@ export default async function ProsPage() {
 
   return (
     <main className="min-h-screen bg-neutral-900 text-white">
-      <Header />
+      <MarketingHeader theme="dark" items={[
+        { href: "/", label: "Accueil" },
+        { href: "/employeurs", label: "Employeurs" },
+        { href: "/missions", label: "Missions" },
+      ]} />
 
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-white/10">

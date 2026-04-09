@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { UserNav } from "@/components/navigation/user-nav";
+import { MarketingHeader } from "@/components/navigation/marketing-header";
 import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
 import { HeroWorkerCard } from "@/components/worker/hero-worker-card";
 import {
@@ -20,25 +20,7 @@ export const revalidate = 300; // ISR — 5 min
 // Typo: titres 48-64px bold | sous-titres 20-24px | corps 16-18px
 // Espacement: 120px entre sections (py-[120px] = py-[7.5rem])
 
-// ─── Header ─────────────────────────────────────────────────────────────────
-
-function Header() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-gray-200/80 bg-white/90 backdrop-blur-md">
-      <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 text-[#1A1A2E]">
-          <WorkOnWordmark size="md" />
-        </Link>
-        <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-[#6B7280]">
-          <Link href="/pros" className="hover:text-[#1A1A2E] transition-colors">Pour les pros</Link>
-          <Link href="/employeurs" className="hover:text-[#1A1A2E] transition-colors">Employeurs</Link>
-          <Link href="/pricing" className="hover:text-[#1A1A2E] transition-colors">Tarifs</Link>
-        </nav>
-        <UserNav />
-      </div>
-    </header>
-  );
-}
+// Header now lives in <MarketingHeader theme="light" /> — see PR #39.
 
 // ─── Section 1: Hero — Tension + Value Prop + CTA ───────────────────────────
 
@@ -619,7 +601,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#FAFAFA] text-[#1A1A2E]">
-      <Header />
+      <MarketingHeader theme="light" />
       <HeroSection stats={stats} />
       <ProblemSection />
       <SystemSection />
