@@ -3,25 +3,64 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
-import { createMission } from "@/lib/missions-api";
-import type { CreateMissionPayload } from "@/types/mission";
+import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-const categories = [
-  "Ménage",
-  "Construction",
-  "Rénovation",
-  "Plomberie",
-  "Électricité",
-  "Peinture",
-  "Jardinage",
-  "Déménagement",
-  "Autre",
-];
+/**
+ * CreateMissionForm — wires straight to `api.createMission` → POST
+ * `/missions-local`, the canonical backend endpoint.
+ *
+ * History: this form used to route through the broken
+ * `missions-api.createMission` shim which did a GET against
+ * `/missions/create` (wrong method, wrong path, dropped payload). The
+ * call returned 404 or a wrong-typed object and the form appeared to
+ * succeed but no mission was ever persisted. Fixed as P0 blocker #2
+ * from the Phase 5 audit.
+ *
+ * Backend contract (verified in api-client.ts:345):
+ *   POST /missions-local
+ *   body: { title, description, category, price, latitude, longitude,
+ *           city, address? }
+ *
+ * Required fields the form MUST collect: title, description, category,
+ * price, city, latitude, longitude. Previously the form silently left
+ * category/city/lat/lng empty, which would have been rejected by the
+ * backend anyway — so the shim bug was masked by a second validation
+ * bug. Both are fixed in this PR.
+ */
+
+const CATEGORIES = [
+  { value: "cleaning", label: "Ménage" },
+  { value: "construction", label: "Construction" },
+  { value: "renovation", label: "Rénovation" },
+  { value: "plumbing", label: "Plomberie" },
+  { value: "electrical", label: "Électricité" },
+  { value: "painting", label: "Peinture" },
+  { value: "gardening", label: "Jardinage" },
+  { value: "moving", label: "Déménagement" },
+  { value: "other", label: "Autre" },
+] as const;
+
+// Fallback centroid (Montréal) used when geolocation is denied or
+// unavailable. The backend uses these for nearby-search so a sensible
+// default is better than rejecting the whole submission.
+const MONTREAL_FALLBACK = { latitude: 45.5017, longitude: -73.5673 };
+
+async function getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+  if (typeof window === "undefined" || !("geolocation" in navigator)) {
+    return MONTREAL_FALLBACK;
+  }
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      () => resolve(MONTREAL_FALLBACK),
+      { enableHighAccuracy: false, timeout: 4000 },
+    );
+  });
+}
 
 export function CreateMissionForm() {
   const router = useRouter();
@@ -36,14 +75,10 @@ export function CreateMissionForm() {
     category: "",
     city: "",
     address: "",
-    hourlyRate: "",
-    startsAt: "",
+    price: "",
   });
 
-  const handleChange = (
-    field: keyof typeof formData,
-    value: string,
-  ) => {
+  const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setError(null);
   };
@@ -53,14 +88,26 @@ export function CreateMissionForm() {
     setError(null);
     setSuccess(false);
 
-    // Validation simple
+    // Validation — match what the backend actually requires.
     if (!formData.title.trim()) {
       setError("Le titre est obligatoire");
       return;
     }
-
-    if (formData.hourlyRate && Number(formData.hourlyRate) <= 0) {
-      setError("Le taux horaire doit être supérieur à 0");
+    if (!formData.description.trim()) {
+      setError("La description est obligatoire");
+      return;
+    }
+    if (!formData.category) {
+      setError("Choisis une catégorie");
+      return;
+    }
+    if (!formData.city.trim()) {
+      setError("La ville est obligatoire");
+      return;
+    }
+    const priceNum = Number(formData.price);
+    if (!formData.price || Number.isNaN(priceNum) || priceNum <= 0) {
+      setError("Le budget doit être un montant supérieur à 0");
       return;
     }
 
@@ -71,28 +118,20 @@ export function CreateMissionForm() {
           return;
         }
 
-        const token = getAccessToken();
-        if (!token) {
-          setError("Impossible de récupérer le token. Reconnecte-toi.");
-          return;
-        }
+        const { latitude, longitude } = await getCurrentLocation();
 
-        const payload: CreateMissionPayload = {
+        await api.createMission({
           title: formData.title.trim(),
-          description: formData.description.trim() || undefined,
-          category: formData.category || undefined,
-          city: formData.city.trim() || undefined,
+          description: formData.description.trim(),
+          category: formData.category,
+          price: priceNum,
+          latitude,
+          longitude,
+          city: formData.city.trim(),
           address: formData.address.trim() || undefined,
-          hourlyRate: formData.hourlyRate
-            ? Number(formData.hourlyRate)
-            : undefined,
-          startsAt: formData.startsAt || undefined,
-        };
+        });
 
-        await createMission(token, payload);
         setSuccess(true);
-
-        // Redirection après 1 seconde
         setTimeout(() => {
           router.push("/missions/mine");
         }, 1000);
@@ -139,33 +178,35 @@ export function CreateMissionForm() {
       {/* Description */}
       <div className="space-y-2">
         <Label htmlFor="description" className="text-white">
-          Description
+          Description *
         </Label>
         <Textarea
           id="description"
           value={formData.description}
           onChange={(e) => handleChange("description", e.target.value)}
-          placeholder="Décris la mission en détail..."
+          placeholder="Décris la mission en détail — ce qu'il y a à faire, le matériel fourni, la durée estimée…"
           className="min-h-[120px] border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
           rows={5}
+          required
         />
       </div>
 
       {/* Catégorie */}
       <div className="space-y-2">
         <Label htmlFor="category" className="text-white">
-          Catégorie
+          Catégorie *
         </Label>
         <select
           id="category"
           value={formData.category}
           onChange={(e) => handleChange("category", e.target.value)}
           className="w-full rounded-2xl border border-white/10 bg-neutral-900 px-4 py-3 text-white focus:border-[#FF4D1C] focus:outline-none"
+          required
         >
           <option value="">Sélectionne une catégorie</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat.toLowerCase()}>
-              {cat}
+          {CATEGORIES.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
             </option>
           ))}
         </select>
@@ -175,7 +216,7 @@ export function CreateMissionForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="city" className="text-white">
-            Ville
+            Ville *
           </Label>
           <Input
             id="city"
@@ -184,11 +225,13 @@ export function CreateMissionForm() {
             onChange={(e) => handleChange("city", e.target.value)}
             placeholder="Montréal"
             className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
+            required
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="address" className="text-white">
-            Adresse
+            Adresse{" "}
+            <span className="text-white/40 text-xs font-normal">(facultatif)</span>
           </Label>
           <Input
             id="address"
@@ -201,35 +244,25 @@ export function CreateMissionForm() {
         </div>
       </div>
 
-      {/* Taux horaire & Date */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="hourlyRate" className="text-white">
-            Taux horaire ($/h)
-          </Label>
-          <Input
-            id="hourlyRate"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.hourlyRate}
-            onChange={(e) => handleChange("hourlyRate", e.target.value)}
-            placeholder="25.00"
-            className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="startsAt" className="text-white">
-            Date de début
-          </Label>
-          <Input
-            id="startsAt"
-            type="date"
-            value={formData.startsAt}
-            onChange={(e) => handleChange("startsAt", e.target.value)}
-            className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
-          />
-        </div>
+      {/* Budget */}
+      <div className="space-y-2">
+        <Label htmlFor="price" className="text-white">
+          Budget ($) *
+        </Label>
+        <Input
+          id="price"
+          type="number"
+          step="0.01"
+          min="0"
+          value={formData.price}
+          onChange={(e) => handleChange("price", e.target.value)}
+          placeholder="150.00"
+          className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
+          required
+        />
+        <p className="text-xs text-white/40">
+          Montant total bloqué en escrow Stripe jusqu&apos;à la validation de la mission.
+        </p>
       </div>
 
       {/* Messages d'erreur */}
@@ -252,4 +285,3 @@ export function CreateMissionForm() {
     </form>
   );
 }
-
