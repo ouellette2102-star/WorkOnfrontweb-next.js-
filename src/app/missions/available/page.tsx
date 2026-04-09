@@ -86,7 +86,7 @@ function AvailableMissionsContent() {
         {isLoading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"></div>
+              <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent"></div>
               <p className="text-white/70">Chargement des missions...</p>
             </div>
           </div>
@@ -94,20 +94,20 @@ function AvailableMissionsContent() {
 
         {/* Erreur */}
         {error && !isLoading && (
-          <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-center">
-            <p className="text-red-400">{error}</p>
+          <div className="rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-6 text-center shadow-lg shadow-black/20">
+            <p className="text-[#FF4D1C]">{error}</p>
           </div>
         )}
 
         {/* Liste des missions */}
         {!isLoading && !error && missions.length === 0 && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
+          <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-12 text-center shadow-lg shadow-black/20">
             <div className="mb-4 text-5xl">🔍</div>
             <h3 className="mb-2 text-xl font-semibold text-white">
               Aucune mission disponible
             </h3>
             <p className="text-white/70">
-              Les nouvelles missions apparaîtront ici dès qu'elles seront publiées
+              Les nouvelles missions apparaîtront ici dès qu&apos;elles seront publiées
             </p>
           </div>
         )}
@@ -117,7 +117,7 @@ function AvailableMissionsContent() {
             {missions.map((mission) => (
               <div
                 key={mission.id}
-                className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur"
+                className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur-sm p-6 shadow-lg shadow-black/20 transition-all hover:border-[#FF4D1C]/30 hover:shadow-xl hover:shadow-[#FF4D1C]/10"
               >
                 <MissionCard mission={mission} />
                 <MissionActions mission={mission} />
