@@ -2,12 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api, type MissionResponse } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import { WorkerCard } from "@/components/worker/worker-card";
+import { MissionCard } from "@/components/mission/mission-card";
 import { Input } from "@/components/ui/input";
-import { Search as SearchIcon, Loader2, Users, Briefcase } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Search as SearchIcon,
+  Loader2,
+  Users,
+  Briefcase,
+  MapPin,
+} from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 
 type Tab = "missions" | "workers";
 
@@ -17,12 +24,15 @@ export default function SearchPage() {
   const [category, setCategory] = useState("");
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-  // Request geolocation once
+  // Request geolocation once (non-blocking)
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => {},
+        (err) => {
+          // Silent permission denied / timeout — fall back to city-based search.
+          console.warn("[search] geolocation unavailable", err.message);
+        },
         { enableHighAccuracy: false, timeout: 5000 },
       );
     }
@@ -46,51 +56,50 @@ export default function SearchPage() {
     enabled: tab === "workers",
   });
 
-  // Missions query
+  // Missions query — only runs when we have a location. No misleading
+  // fallback to /me/assignments (that endpoint shows YOUR missions,
+  // not nearby search results).
   const { data: missions, isLoading: missionsLoading } = useQuery({
     queryKey: ["search-missions", category, userLocation?.lat, userLocation?.lng],
     queryFn: () => {
-      if (userLocation) {
-        return api.getNearbyMissions({
-          latitude: userLocation.lat,
-          longitude: userLocation.lng,
-          radiusKm: 100,
-          category: category || undefined,
-        });
-      }
-      // Fallback: get missions without location
-      return api.getMyAssignments(); // Will be replaced with a proper search endpoint
+      if (!userLocation) return [];
+      return api.getNearbyMissions({
+        latitude: userLocation.lat,
+        longitude: userLocation.lng,
+        radiusKm: 100,
+        category: category || undefined,
+      });
     },
-    enabled: tab === "missions",
+    enabled: tab === "missions" && !!userLocation,
   });
 
   const isLoading = tab === "workers" ? workersLoading : missionsLoading;
 
+  const tabButtonClass = (active: boolean) =>
+    `flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+      active
+        ? "bg-[#FF4D1C] text-white shadow-md shadow-[#FF4D1C]/25"
+        : "text-white/60 hover:text-white"
+    }`;
+
+  const chipClass = (active: boolean) =>
+    `shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border ${
+      active
+        ? "bg-[#FF4D1C]/15 text-[#FF4D1C] border-[#FF4D1C]/30"
+        : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10"
+    }`;
+
   return (
-    <div className="px-4 py-6 space-y-4">
-      <h1 className="text-xl font-bold">Rechercher</h1>
+    <div className="px-4 py-6 space-y-5">
+      <h1 className="text-2xl font-bold">Rechercher</h1>
 
       {/* Tab switcher */}
-      <div className="flex gap-2 rounded-xl bg-neutral-800/50 p-1">
-        <button
-          onClick={() => setTab("missions")}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
-            tab === "missions"
-              ? "bg-red-600 text-white"
-              : "text-white/60 hover:text-white"
-          }`}
-        >
+      <div className="flex gap-1 rounded-2xl bg-neutral-800/60 backdrop-blur-sm border border-white/5 p-1">
+        <button onClick={() => setTab("missions")} className={tabButtonClass(tab === "missions")}>
           <Briefcase className="h-4 w-4" />
           Missions
         </button>
-        <button
-          onClick={() => setTab("workers")}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
-            tab === "workers"
-              ? "bg-red-600 text-white"
-              : "text-white/60 hover:text-white"
-          }`}
-        >
+        <button onClick={() => setTab("workers")} className={tabButtonClass(tab === "workers")}>
           <Users className="h-4 w-4" />
           Travailleurs
         </button>
@@ -112,25 +121,14 @@ export default function SearchPage() {
       {/* Category filter chips */}
       {categories && (
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
-          <button
-            onClick={() => setCategory("")}
-            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              !category
-                ? "bg-red-600 text-white"
-                : "bg-neutral-800 text-white/60 hover:bg-neutral-700"
-            }`}
-          >
+          <button onClick={() => setCategory("")} className={chipClass(!category)}>
             Tous
           </button>
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setCategory(cat.name === category ? "" : cat.name)}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                category === cat.name
-                  ? "bg-red-600 text-white"
-                  : "bg-neutral-800 text-white/60 hover:bg-neutral-700"
-              }`}
+              className={chipClass(category === cat.name)}
             >
               {cat.icon && <span className="mr-1">{cat.icon}</span>}
               {cat.name}
@@ -139,10 +137,24 @@ export default function SearchPage() {
         </div>
       )}
 
+      {/* Missions tab: geolocation gate */}
+      {tab === "missions" && !userLocation && !missionsLoading && (
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-6 text-center shadow-lg shadow-black/20">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30">
+            <MapPin className="h-5 w-5 text-[#FF4D1C]" />
+          </div>
+          <h2 className="font-semibold text-base">Active la géolocalisation</h2>
+          <p className="mt-1 text-sm text-white/60 max-w-sm mx-auto">
+            Pour voir les missions près de chez toi, autorise l&apos;accès à ta
+            position dans les paramètres du navigateur.
+          </p>
+        </div>
+      )}
+
       {/* Results */}
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-red-500" />
+          <Loader2 className="h-6 w-6 animate-spin text-[#FF4D1C]" />
         </div>
       ) : tab === "workers" ? (
         workersData && workersData.workers.length > 0 ? (
@@ -152,44 +164,54 @@ export default function SearchPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-white/50">
-            <p>Aucun professionnel trouvé</p>
-            <p className="text-sm mt-1">Essayez une autre ville ou catégorie</p>
-          </div>
+          <EmptyState
+            title="Aucun professionnel trouvé"
+            subtitle={
+              city || category
+                ? "Essayez une autre ville ou catégorie."
+                : "Commencez à taper un nom de ville ou choisissez une catégorie."
+            }
+          />
         )
       ) : missions && missions.length > 0 ? (
         <div className="space-y-3">
-          {missions.map((m: MissionResponse) => (
-            <Link key={m.id} href={`/missions/${m.id}`}>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-red-500/30">
-                <div className="flex items-start justify-between">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="truncate font-semibold text-white">{m.title}</h3>
-                    <div className="mt-1 flex flex-wrap gap-2 text-xs text-white/50">
-                      {m.category && <span>🏷️ {m.category}</span>}
-                      {m.city && <span>📍 {m.city}</span>}
-                      {m.distanceKm != null && <span>🚗 {m.distanceKm.toFixed(1)} km</span>}
-                    </div>
-                  </div>
-                  <div className="ml-3 text-right">
-                    <p className="text-lg font-bold text-green-400">
-                      {m.price ? `${m.price.toFixed(2)} $` : "—"}
-                    </p>
-                    <Badge className="mt-1 bg-green-500/10 text-green-400 border-green-500/20 text-[10px]">
-                      {m.status}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </Link>
+          {missions.map((m) => (
+            <MissionCard key={m.id} mission={m} />
           ))}
         </div>
-      ) : (
-        <div className="text-center py-12 text-white/50">
-          <p>Aucune mission trouvée</p>
-          <p className="text-sm mt-1">Essayez une autre catégorie</p>
-        </div>
-      )}
+      ) : userLocation ? (
+        <EmptyState
+          title="Aucune mission dans ton rayon"
+          subtitle={
+            category
+              ? "Aucune mission dans cette catégorie. Essayez « Tous »."
+              : "Essayez une autre catégorie ou élargis ta zone depuis la carte."
+          }
+          action={
+            <Button asChild variant="hero" size="sm">
+              <Link href="/map">Voir la carte</Link>
+            </Button>
+          }
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function EmptyState({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center shadow-lg shadow-black/20">
+      <p className="font-semibold text-base">{title}</p>
+      <p className="text-sm text-white/60 mt-1 max-w-sm mx-auto">{subtitle}</p>
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
