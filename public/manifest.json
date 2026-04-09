@@ -11,6 +11,42 @@
   "lang": "fr-CA",
   "categories": ["business", "productivity", "lifestyle"],
   "icons": [
-    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Trouver une mission",
+      "short_name": "Missions",
+      "description": "Parcourir les missions disponibles",
+      "url": "/missions/available",
+      "icons": [
+        { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+      ]
+    },
+    {
+      "name": "Réserver un pro",
+      "short_name": "Réserver",
+      "description": "Trouver un travailleur disponible",
+      "url": "/search",
+      "icons": [
+        { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+      ]
+    }
   ]
 }

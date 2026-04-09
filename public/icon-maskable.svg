@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Full bleed orange background (maskable — no rounded corners, safe zone 80%) -->
+  <rect width="512" height="512" fill="#FF4D1C"/>
+  <!-- Centered "W" wordmark inside the safe zone (51..461) -->
+  <g fill="#FFFFFF">
+    <path d="M152 196 L192 340 L232 228 L272 340 L312 228 L352 340 L392 196 L360 196 L336 296 L296 196 L264 196 L224 296 L200 196 Z"/>
+  </g>
+  <!-- White dot -->
+  <circle cx="396" cy="376" r="16" fill="#FFFFFF"/>
+</svg>
