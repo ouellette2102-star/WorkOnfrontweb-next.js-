@@ -109,19 +109,19 @@ function WorkerPaymentsContent() {
     switch (status) {
       case "SUCCEEDED":
         return (
-          <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-semibold text-green-400">
+          <span className="rounded-full bg-[#22C55E]/15 border border-[#22C55E]/25 px-3 py-1 text-xs font-semibold text-[#22C55E]">
             ✅ Payé
           </span>
         );
       case "PENDING":
         return (
-          <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-semibold text-yellow-400">
+          <span className="rounded-full bg-yellow-500/15 border border-yellow-500/25 px-3 py-1 text-xs font-semibold text-yellow-300">
             ⏳ En attente
           </span>
         );
       case "FAILED":
         return (
-          <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-semibold text-red-400">
+          <span className="rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs font-semibold text-[#FF4D1C]">
             ❌ Échoué
           </span>
         );
@@ -138,7 +138,7 @@ function WorkerPaymentsContent() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
         <div className="text-center">
-          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"></div>
+          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent"></div>
           <p className="text-white/70">Chargement...</p>
         </div>
       </div>
@@ -160,19 +160,21 @@ function WorkerPaymentsContent() {
 
         {/* Banner Onboarding */}
         {!isOnboarded && (
-          <div className="mb-8 rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-900/30 to-neutral-900/70 p-8 backdrop-blur">
+          <div className="mb-8 rounded-3xl border border-[#FF4D1C]/30 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-8 shadow-lg shadow-black/20 backdrop-blur-sm">
             <div className="mb-4 text-6xl">🚀</div>
             <h2 className="mb-3 text-2xl font-bold text-white">
               Complétez votre onboarding Stripe
             </h2>
             <p className="mb-6 text-white/80">
-              Pour recevoir des paiements, vous devez d'abord configurer votre
-              compte Stripe Connect. Ce processus ne prend que quelques minutes.
+              Pour recevoir des paiements, vous devez d&apos;abord configurer
+              votre compte Stripe Connect. Ce processus ne prend que quelques
+              minutes.
             </p>
             <Button
               onClick={handleStartOnboarding}
               disabled={isCreatingLink}
-              className="rounded-xl bg-red-600 px-8 py-3 text-lg font-semibold text-white hover:bg-red-500"
+              variant="hero"
+              size="hero"
             >
               {isCreatingLink
                 ? "Chargement..."
@@ -184,10 +186,10 @@ function WorkerPaymentsContent() {
         {/* Stats Cards */}
         {isOnboarded && (
           <div className="mb-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-green-900/20 to-neutral-900/70 p-6 backdrop-blur">
+            <div className="rounded-3xl border border-[#22C55E]/20 bg-gradient-to-br from-[#22C55E]/10 via-[#22C55E]/5 to-transparent p-6 backdrop-blur-sm shadow-lg shadow-black/20">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">💵</span>
-                <span className="text-3xl font-bold text-green-400">
+                <span className="text-3xl font-bold text-[#22C55E]">
                   {formatAmount(totalEarned)} $
                 </span>
               </div>
@@ -195,10 +197,10 @@ function WorkerPaymentsContent() {
               <p className="text-sm text-white/60">Paiements reçus</p>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-blue-900/20 to-neutral-900/70 p-6 backdrop-blur">
+            <div className="rounded-3xl border border-white/10 bg-neutral-800/80 p-6 backdrop-blur-sm shadow-lg shadow-black/20">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">📊</span>
-                <span className="text-3xl font-bold text-blue-400">
+                <span className="text-3xl font-bold text-white">
                   {payments.filter((p) => p.status === "SUCCEEDED").length}
                 </span>
               </div>
@@ -208,10 +210,10 @@ function WorkerPaymentsContent() {
               <p className="text-sm text-white/60">Missions payées</p>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-yellow-900/20 to-neutral-900/70 p-6 backdrop-blur">
+            <div className="rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent p-6 backdrop-blur-sm shadow-lg shadow-black/20">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">⏳</span>
-                <span className="text-3xl font-bold text-yellow-400">
+                <span className="text-3xl font-bold text-yellow-300">
                   {payments.filter((p) => p.status === "PENDING").length}
                 </span>
               </div>
@@ -223,7 +225,7 @@ function WorkerPaymentsContent() {
 
         {/* Historique Paiements */}
         {isOnboarded && (
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
+          <div className="rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur-sm p-6 shadow-lg shadow-black/20">
             <h2 className="mb-6 text-2xl font-bold text-white">
               Historique des paiements
             </h2>
@@ -252,7 +254,7 @@ function WorkerPaymentsContent() {
                 {payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-center justify-between rounded-xl border border-white/10 bg-neutral-800/50 p-4 transition hover:border-red-500/50"
+                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-neutral-800/60 p-4 transition-all hover:border-[#FF4D1C]/40 hover:-translate-y-0.5"
                   >
                     <div className="flex-1">
                       <h4 className="mb-1 font-semibold text-white">
@@ -274,7 +276,7 @@ function WorkerPaymentsContent() {
                     </div>
 
                     <div className="ml-4 text-right">
-                      <div className="mb-1 text-2xl font-bold text-green-400">
+                      <div className="mb-1 text-2xl font-bold text-[#22C55E]">
                         {formatAmount(payment.netAmountCents)} $
                       </div>
                       <div className="mb-2 text-xs text-white/50">
@@ -293,7 +295,7 @@ function WorkerPaymentsContent() {
         <div className="mt-8 text-center">
           <Link
             href="/worker/dashboard"
-            className="text-sm text-white/70 transition hover:text-red-400"
+            className="text-sm text-white/70 transition hover:text-[#FF4D1C]"
           >
             ← Retour au dashboard
           </Link>
