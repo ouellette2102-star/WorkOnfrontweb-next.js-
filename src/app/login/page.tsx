@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MapPin } from "lucide-react";
+import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
 
 const schema = z.object({
   email: z.string().email("Email invalide"),
@@ -55,12 +55,10 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 bg-gradient-to-b from-neutral-900 via-background to-background">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-neutral-900 via-background to-background">
       {/* Logo */}
-      <div className="mb-8 flex items-center gap-1 text-3xl font-bold">
-        <span>Work</span>
-        <MapPin className="h-7 w-7 text-red-accent" />
-        <span>n</span>
+      <div className="mb-8 text-white">
+        <WorkOnWordmark size="xl" />
       </div>
 
       <div className="w-full max-w-sm space-y-6">
@@ -82,7 +80,7 @@ function LoginForm() {
               {...register("email")}
             />
             {errors.email && (
-              <p className="text-red-400 text-xs">{errors.email.message}</p>
+              <p className="text-[#FF4D1C] text-xs">{errors.email.message}</p>
             )}
           </div>
 
@@ -96,30 +94,42 @@ function LoginForm() {
               {...register("password")}
             />
             {errors.password && (
-              <p className="text-red-400 text-xs">{errors.password.message}</p>
+              <p className="text-[#FF4D1C] text-xs">{errors.password.message}</p>
             )}
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm text-center bg-red-500/10 rounded-lg p-2">
+            <p className="text-[#FF4D1C] text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
               {error}
             </p>
           )}
 
-          <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+          <Button
+            type="submit"
+            variant="hero"
+            size="hero"
+            className="w-full"
+            disabled={loading}
+          >
             {loading ? "Connexion..." : "Se connecter"}
           </Button>
         </form>
 
-        <div className="text-center text-sm text-white/60">
-          <Link href="/forgot-password" className="text-red-accent hover:underline">
-            Mot de passe oublié?
+        <div className="text-center text-sm">
+          <Link
+            href="/forgot-password"
+            className="text-[#FF4D1C] hover:underline"
+          >
+            Mot de passe oublié ?
           </Link>
         </div>
 
         <div className="text-center text-sm text-white/60">
-          Pas encore de compte?{" "}
-          <Link href="/register" className="text-red-accent font-medium hover:underline">
+          Pas encore de compte ?{" "}
+          <Link
+            href="/register"
+            className="text-[#FF4D1C] font-medium hover:underline"
+          >
             Créer un compte
           </Link>
         </div>
