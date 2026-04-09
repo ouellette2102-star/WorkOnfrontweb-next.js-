@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Rounded orange background (maskable safe zone: 409px) -->
+  <rect width="512" height="512" rx="112" fill="#FF4D1C"/>
+  <!-- Simple white "W" wordmark -->
+  <g fill="#FFFFFF">
+    <path d="M128 168 L168 344 L212 216 L256 344 L300 216 L344 344 L384 168 L352 168 L326 288 L284 168 L248 168 L206 288 L180 168 Z"/>
+  </g>
+  <!-- Small white pin dot (echoes the brand wordmark's pin glyph) -->
+  <circle cx="400" cy="384" r="18" fill="#FFFFFF"/>
+</svg>
