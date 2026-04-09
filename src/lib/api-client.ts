@@ -1,4 +1,11 @@
 import { getAccessToken, refreshToken } from "./auth";
+import {
+  conversationListSchema,
+  missionListSchema,
+  parseResponse,
+  stripeConnectStatusSchema,
+  userMeSchema,
+} from "./api-schemas";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
@@ -364,8 +371,22 @@ export const api = {
     return apiFetch<MissionResponse[]>(`/missions-local/nearby?${q}`);
   },
 
-  getMyMissions: () => apiFetch<MissionResponse[]>("/missions-local/my-missions"),
-  getMyAssignments: () => apiFetch<MissionResponse[]>("/missions-local/my-assignments"),
+  getMyMissions: async () => {
+    const raw = await apiFetch<unknown>("/missions-local/my-missions");
+    return parseResponse(
+      missionListSchema,
+      raw,
+      "GET /missions-local/my-missions",
+    ) as MissionResponse[];
+  },
+  getMyAssignments: async () => {
+    const raw = await apiFetch<unknown>("/missions-local/my-assignments");
+    return parseResponse(
+      missionListSchema,
+      raw,
+      "GET /missions-local/my-assignments",
+    ) as MissionResponse[];
+  },
   getMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}`),
 
   acceptMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/accept`, { method: "POST" }),
@@ -382,7 +403,14 @@ export const api = {
   rejectOffer: (id: string) => apiFetch<OfferResponse>(`/offers/${id}/reject`, { method: "PATCH" }),
 
   // Messages
-  getConversations: () => apiFetch<ConversationItem[]>("/messages-local/conversations"),
+  getConversations: async () => {
+    const raw = await apiFetch<unknown>("/messages-local/conversations");
+    return parseResponse(
+      conversationListSchema,
+      raw,
+      "GET /messages-local/conversations",
+    ) as unknown as ConversationItem[];
+  },
   getThread: (missionId: string) => apiFetch<ChatMessage[]>(`/messages-local/thread/${missionId}`),
   sendMessage: (data: { missionId: string; content: string }) =>
     apiFetch<ChatMessage>("/messages-local", { method: "POST", body: JSON.stringify(data) }),
@@ -436,10 +464,14 @@ export const api = {
   // No payload, no auth, no schema changes.
   getStripeOnboardingLink: () =>
     apiFetch<{ url: string }>("/payments/stripe/connect/onboarding"),
-  getStripeOnboardingStatus: () =>
-    apiFetch<{ onboarded: boolean; chargesEnabled: boolean; payoutsEnabled: boolean; requirementsNeeded: string[] }>(
-      "/payments/stripe/connect/status",
-    ),
+  getStripeOnboardingStatus: async () => {
+    const raw = await apiFetch<unknown>("/payments/stripe/connect/status");
+    return parseResponse(
+      stripeConnectStatusSchema,
+      raw,
+      "GET /payments/stripe/connect/status",
+    );
+  },
   getWorkerPaymentHistory: () =>
     apiFetch<WorkerPayment[]>("/payments/stripe/worker/history"),
 
@@ -616,15 +648,8 @@ export const api = {
   // updates) and is documented so the next PR that adds role updates
   // can target the correct backend endpoint when it ships.
   fetchProfile: async () => {
-    const u = await apiFetch<{
-      id: string;
-      email: string;
-      firstName: string | null;
-      lastName: string | null;
-      phone: string | null;
-      city: string | null;
-      role: string;
-    }>("/users/me");
+    const raw = await apiFetch<unknown>("/users/me");
+    const u = parseResponse(userMeSchema, raw, "GET /users/me");
     return mapUserToProfileResponse(u);
   },
   saveProfile: async (data: {
