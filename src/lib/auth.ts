@@ -139,6 +139,22 @@ export async function register(dto: RegisterDto): Promise<{ user: AuthUser }> {
   return { user: data.user };
 }
 
+/**
+ * Emits a browser CustomEvent on the window when the refresh path
+ * fails and the local auth state has been cleared. `AuthProvider`
+ * listens for this and surfaces a toast + redirect — we use an
+ * event instead of importing `sonner` here to keep `lib/auth.ts`
+ * free of React/UI dependencies.
+ */
+function emitSessionExpired() {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(new CustomEvent("workon:session-expired"));
+  } catch (err) {
+    console.warn("[auth] could not dispatch session-expired event", err);
+  }
+}
+
 export async function refreshToken(): Promise<string | null> {
   try {
     const res = await fetch("/api/auth/refresh", {
@@ -147,6 +163,7 @@ export async function refreshToken(): Promise<string | null> {
     });
     if (!res.ok) {
       clearAuth();
+      emitSessionExpired();
       return null;
     }
     const data = await res.json();
@@ -157,6 +174,7 @@ export async function refreshToken(): Promise<string | null> {
     return data.accessToken ?? null;
   } catch {
     clearAuth();
+    emitSessionExpired();
     return null;
   }
 }
