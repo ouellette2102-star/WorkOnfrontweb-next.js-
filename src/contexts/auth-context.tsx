@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { toast } from "sonner";
 import {
   type AuthUser,
   type LoginDto,
@@ -51,6 +52,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Listen for the session-expired event emitted by `refreshToken()` in
+  // lib/auth.ts when the refresh path fails. Drop user state, surface a
+  // clear toast, and redirect to /login. Avoids the silent drop-out
+  // pattern noted in the Phase 5 audit (risk #8).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      setUser(null);
+      toast.error("Session expirée", {
+        description: "Reconnecte-toi pour continuer.",
+      });
+      // Use location.href to force a full reload so every in-memory
+      // query state is cleared. React Router-based push would keep
+      // stale tokens in React Query caches.
+      const currentPath = window.location.pathname + window.location.search;
+      const redirect = encodeURIComponent(currentPath);
+      window.location.href = `/login?redirect=${redirect}&session_expired=1`;
+    };
+    window.addEventListener("workon:session-expired", handler);
+    return () => window.removeEventListener("workon:session-expired", handler);
   }, []);
 
   const login = useCallback(async (dto: LoginDto) => {
