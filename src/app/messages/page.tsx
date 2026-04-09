@@ -29,7 +29,7 @@ export default function MessagesPage() {
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-950">
-        <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#FF4D1C]" />
       </div>
     );
   }
@@ -39,7 +39,7 @@ export default function MessagesPage() {
       <div className="flex min-h-screen items-center justify-center bg-neutral-950">
         <div className="text-center">
           <p className="text-white/70">Connexion requise</p>
-          <Link href="/login" className="mt-2 text-red-400 underline">
+          <Link href="/login" className="mt-2 text-[#FF4D1C] underline">
             Se connecter
           </Link>
         </div>
@@ -60,7 +60,7 @@ export default function MessagesPage() {
         }`}
       >
         <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-          <MessageCircle className="h-5 w-5 text-red-500" />
+          <MessageCircle className="h-5 w-5 text-[#FF4D1C]" />
           <h1 className="text-lg font-bold">Messages</h1>
           {conversations && conversations.length > 0 && (
             <span className="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/60">

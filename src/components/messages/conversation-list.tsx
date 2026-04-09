@@ -32,9 +32,9 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
           <button
             key={conv.missionId}
             onClick={() => onSelect(conv.missionId)}
-            className={`flex w-full items-start gap-3 px-4 py-3 text-left transition ${
+            className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors ${
               isSelected
-                ? "bg-red-500/10 border-l-2 border-red-500"
+                ? "bg-[#FF4D1C]/10 border-l-2 border-[#FF4D1C]"
                 : "hover:bg-white/5"
             }`}
           >
@@ -60,7 +60,7 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
             </div>
 
             {conv.unreadCount > 0 && (
-              <span className="mt-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white">
+              <span className="mt-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF4D1C] px-1.5 text-[10px] font-bold text-white shadow-sm shadow-[#FF4D1C]/40">
                 {conv.unreadCount > 99 ? "99+" : conv.unreadCount}
               </span>
             )}
