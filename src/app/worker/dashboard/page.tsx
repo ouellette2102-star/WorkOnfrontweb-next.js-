@@ -3,6 +3,8 @@ import { ActiveMissionsCard } from "@/components/worker/active-missions-card";
 import { AvailableMissionsCard } from "@/components/worker/available-missions-card";
 import { MissionHistoryCard } from "@/components/worker/mission-history-card";
 import { QuickStatsCard } from "@/components/worker/quick-stats-card";
+import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default async function WorkerDashboardPage() {
@@ -24,13 +26,18 @@ export default async function WorkerDashboardPage() {
           </p>
         </div>
 
+        {/* Stripe Connect gate (hidden when onboarded) */}
+        <div className="mb-6">
+          <StripeConnectGate />
+        </div>
+
         {/* Quick Stats */}
         <QuickStatsCard />
 
         {/* Actions rapides */}
         <div className="mb-8 grid gap-4 md:grid-cols-4">
           <Link href="/worker/missions">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-red-500 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">🔍</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Missions disponibles
@@ -42,7 +49,7 @@ export default async function WorkerDashboardPage() {
           </Link>
 
           <Link href="/worker/payments">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-gradient-to-br from-green-900/20 to-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-gradient-to-br from-green-900/20 to-neutral-900/70 p-6 backdrop-blur transition hover:border-[#22C55E]/50 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">💰</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Paiements
@@ -54,7 +61,7 @@ export default async function WorkerDashboardPage() {
           </Link>
 
           <Link href="/notifications">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-red-500 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">🔔</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Notifications
@@ -66,7 +73,7 @@ export default async function WorkerDashboardPage() {
           </Link>
 
           <Link href="/messages">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-red-500 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
               <div className="mb-3 text-4xl">💬</div>
               <h3 className="mb-2 text-xl font-semibold text-white">
                 Messages
@@ -109,11 +116,9 @@ export default async function WorkerDashboardPage() {
               <p className="text-white">{profile.email}</p>
             </div>
           </div>
-          <Link href="/profile">
-            <button className="mt-4 rounded-xl bg-neutral-700 px-4 py-2 text-sm text-white transition hover:bg-neutral-600">
-              Modifier mon profil
-            </button>
-          </Link>
+          <Button asChild variant="outline" size="sm" className="mt-4">
+            <Link href="/profile">Modifier mon profil</Link>
+          </Button>
         </div>
       </div>
     </div>
