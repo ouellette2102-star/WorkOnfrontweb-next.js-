@@ -10,9 +10,9 @@ interface StatsBarProps {
 
 export function StatsBar({ activeWorkers, completedMissions, nearby }: StatsBarProps) {
   const stats = [
-    { icon: Zap, value: activeWorkers.toLocaleString("fr-CA"), label: "Actifs", color: "text-yellow-400" },
-    { icon: CheckCircle2, value: completedMissions.toLocaleString("fr-CA"), label: "Missions", color: "text-green-400" },
-    { icon: MapPin, value: nearby.toLocaleString("fr-CA"), label: "À proximité", color: "text-red-accent" },
+    { icon: Zap, value: activeWorkers.toLocaleString("fr-CA"), label: "Actifs", color: "text-yellow-300" },
+    { icon: CheckCircle2, value: completedMissions.toLocaleString("fr-CA"), label: "Missions", color: "text-[#22C55E]" },
+    { icon: MapPin, value: nearby.toLocaleString("fr-CA"), label: "À proximité", color: "text-[#FF4D1C]" },
   ];
 
   return (

@@ -49,7 +49,7 @@ export default function HomePage() {
   return (
     <div className="space-y-6 px-4 py-6">
       {/* Hero gradient */}
-      <div className="relative -mx-4 -mt-6 px-4 pt-6 pb-8 bg-gradient-to-b from-red-900/30 via-orange-900/10 to-transparent">
+      <div className="relative -mx-4 -mt-6 px-4 pt-6 pb-8 bg-gradient-to-b from-[#FF4D1C]/20 via-[#FF4D1C]/5 to-transparent">
         <h1 className="text-2xl font-bold text-center">
           {user?.role === "worker" ? "Trouvez des missions" : "Trouvez votre talent"}
         </h1>
@@ -104,10 +104,10 @@ export default function HomePage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">
-              <Briefcase className="inline h-4 w-4 mr-1 text-red-accent" />
+              <Briefcase className="inline h-4 w-4 mr-1 text-[#FF4D1C]" />
               Missions actives
             </h2>
-            <Link href="/missions" className="text-xs text-red-accent hover:underline">
+            <Link href="/missions" className="text-xs text-[#FF4D1C] hover:underline">
               Voir tout
             </Link>
           </div>
@@ -149,7 +149,7 @@ export default function HomePage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">Pros disponibles</h2>
-            <Link href="/search" className="text-xs text-red-accent hover:underline">
+            <Link href="/search" className="text-xs text-[#FF4D1C] hover:underline">
               Voir tout
             </Link>
           </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { usePrimaryRole } from "@/hooks/use-primary-role";
+import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
 
 const roleLabels: Record<string, string> = {
   worker: "Travailleur",
@@ -26,9 +27,8 @@ export function Sidebar() {
   return (
     <aside className="flex h-full flex-col gap-6 border-r border-white/5 bg-neutral-950 px-6 py-8 text-white">
       <div>
-        <Link href="/" className="flex items-center gap-3 text-lg font-semibold text-white">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-white">W</span>
-          WorkOn
+        <Link href="/" className="flex items-center text-white">
+          <WorkOnWordmark size="lg" />
         </Link>
         <p className="mt-2 text-xs uppercase tracking-[0.4em] text-white/40">Dashboard</p>
         {primaryRole ? (
@@ -49,7 +49,9 @@ export function Sidebar() {
               key={link.href}
               href={link.href}
               className={`rounded-2xl px-4 py-3 transition ${
-                active ? "bg-red-600 text-white" : "text-white/70 hover:bg-white/5 hover:text-white"
+                active
+                  ? "bg-[#FF4D1C] text-white shadow-md shadow-[#FF4D1C]/25"
+                  : "text-white/70 hover:bg-white/5 hover:text-white"
               }`}
             >
               {link.label}
