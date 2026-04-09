@@ -108,7 +108,7 @@ export function CreateMissionForm() {
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-8 text-center">
+      <div className="rounded-3xl border border-[#22C55E]/25 bg-[#22C55E]/10 p-8 text-center shadow-lg shadow-black/20">
         <div className="mb-4 text-4xl">✅</div>
         <h3 className="mb-2 text-xl font-semibold text-white">
           Mission créée avec succès !
@@ -131,7 +131,7 @@ export function CreateMissionForm() {
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
           placeholder="Ex: Rénovation de salle de bain"
-          className="border-white/10 bg-neutral-900 text-white focus:border-red-500"
+          className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
           required
         />
       </div>
@@ -146,7 +146,7 @@ export function CreateMissionForm() {
           value={formData.description}
           onChange={(e) => handleChange("description", e.target.value)}
           placeholder="Décris la mission en détail..."
-          className="min-h-[120px] border-white/10 bg-neutral-900 text-white focus:border-red-500"
+          className="min-h-[120px] border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
           rows={5}
         />
       </div>
@@ -160,7 +160,7 @@ export function CreateMissionForm() {
           id="category"
           value={formData.category}
           onChange={(e) => handleChange("category", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-neutral-900 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
+          className="w-full rounded-2xl border border-white/10 bg-neutral-900 px-4 py-3 text-white focus:border-[#FF4D1C] focus:outline-none"
         >
           <option value="">Sélectionne une catégorie</option>
           {categories.map((cat) => (
@@ -183,7 +183,7 @@ export function CreateMissionForm() {
             value={formData.city}
             onChange={(e) => handleChange("city", e.target.value)}
             placeholder="Montréal"
-            className="border-white/10 bg-neutral-900 text-white focus:border-red-500"
+            className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
           />
         </div>
         <div className="space-y-2">
@@ -196,7 +196,7 @@ export function CreateMissionForm() {
             value={formData.address}
             onChange={(e) => handleChange("address", e.target.value)}
             placeholder="123 rue Exemple"
-            className="border-white/10 bg-neutral-900 text-white focus:border-red-500"
+            className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
           />
         </div>
       </div>
@@ -215,7 +215,7 @@ export function CreateMissionForm() {
             value={formData.hourlyRate}
             onChange={(e) => handleChange("hourlyRate", e.target.value)}
             placeholder="25.00"
-            className="border-white/10 bg-neutral-900 text-white focus:border-red-500"
+            className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
           />
         </div>
         <div className="space-y-2">
@@ -227,14 +227,14 @@ export function CreateMissionForm() {
             type="date"
             value={formData.startsAt}
             onChange={(e) => handleChange("startsAt", e.target.value)}
-            className="border-white/10 bg-neutral-900 text-white focus:border-red-500"
+            className="border-white/10 bg-neutral-900 text-white focus:border-[#FF4D1C]"
           />
         </div>
       </div>
 
       {/* Messages d'erreur */}
       {error && (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
+        <div className="rounded-2xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-4 text-sm text-[#FF4D1C]">
           {error}
         </div>
       )}
@@ -243,7 +243,9 @@ export function CreateMissionForm() {
       <Button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-2xl bg-red-600 px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-red-500 disabled:opacity-70"
+        variant="hero"
+        size="hero"
+        className="w-full"
       >
         {isPending ? "Création en cours..." : "Créer la mission"}
       </Button>
