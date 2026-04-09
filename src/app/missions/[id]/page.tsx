@@ -22,11 +22,11 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  CREATED: "bg-green-500/10 text-green-400 border-green-500/20",
-  RESERVED: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  IN_PROGRESS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  COMPLETED: "bg-gray-500/10 text-gray-400 border-gray-500/20",
-  CANCELLED: "bg-red-500/10 text-red-400 border-red-500/20",
+  CREATED:     "bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/25",
+  RESERVED:    "bg-[#FF4D1C]/15 text-[#FF4D1C] border-[#FF4D1C]/25",
+  IN_PROGRESS: "bg-yellow-500/15 text-yellow-300 border-yellow-500/25",
+  COMPLETED:   "bg-purple-500/15 text-purple-300 border-purple-500/25",
+  CANCELLED:   "bg-white/5 text-white/40 border-white/10",
 };
 
 export default function MissionDetailPage() {
@@ -127,7 +127,7 @@ export default function MissionDetailPage() {
     return (
       <div className="min-h-screen bg-neutral-900 py-12">
         <div className="container mx-auto max-w-3xl px-4">
-          <Card className="border-white/10 bg-black/40 p-8 text-center">
+          <Card className="p-10 text-center">
             <div className="mb-4 text-6xl">🔍</div>
             <h1 className="mb-2 text-2xl font-bold text-white">
               Mission introuvable
@@ -135,11 +135,9 @@ export default function MissionDetailPage() {
             <p className="mb-6 text-white/70">
               Cette mission n&apos;existe pas ou a été supprimée.
             </p>
-            <Link href="/missions">
-              <Button className="bg-red-600 hover:bg-red-500">
-                ← Retour aux missions
-              </Button>
-            </Link>
+            <Button asChild variant="hero" size="hero">
+              <Link href="/missions">← Retour aux missions</Link>
+            </Button>
           </Card>
         </div>
       </div>
@@ -151,22 +149,19 @@ export default function MissionDetailPage() {
     return (
       <div className="min-h-screen bg-neutral-900 py-12">
         <div className="container mx-auto max-w-3xl px-4">
-          <Card className="border-red-500/20 bg-red-500/10 p-8 text-center">
+          <Card className="border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-10 text-center">
             <div className="mb-4 text-6xl">⚠️</div>
-            <h1 className="mb-2 text-2xl font-bold text-red-400">
+            <h1 className="mb-2 text-2xl font-bold text-[#FF4D1C]">
               Erreur de chargement
             </h1>
             <p className="mb-6 text-white/70">{error}</p>
-            <div className="flex justify-center gap-4">
-              <Button
-                onClick={loadMission}
-                className="bg-red-600 hover:bg-red-500"
-              >
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button onClick={loadMission} variant="hero" size="hero">
                 🔄 Réessayer
               </Button>
-              <Link href="/missions">
-                <Button variant="outline">← Retour aux missions</Button>
-              </Link>
+              <Button asChild variant="outline" size="hero">
+                <Link href="/missions">← Retour aux missions</Link>
+              </Button>
             </div>
           </Card>
         </div>
@@ -223,13 +218,13 @@ export default function MissionDetailPage() {
         {/* Back link */}
         <Link
           href="/missions"
-          className="mb-6 inline-block text-sm text-white/70 transition hover:text-red-400"
+          className="mb-6 inline-block text-sm text-white/70 transition hover:text-[#FF4D1C]"
         >
           ← Retour aux missions
         </Link>
 
         {/* Main card */}
-        <Card className="border-white/10 bg-black/40 p-8">
+        <Card className="p-8">
           {/* Header */}
           <div className="mb-6 flex items-start justify-between gap-4">
             <h1 className="text-3xl font-bold text-white">{mission.title}</h1>
@@ -255,15 +250,15 @@ export default function MissionDetailPage() {
           {/* Metadata grid */}
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Price */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="mb-1 text-sm text-white/60">💰 Budget</div>
-              <div className="text-xl font-bold text-green-400">
+              <div className="text-xl font-bold text-[#22C55E]">
                 {formattedRate}
               </div>
             </div>
 
             {/* Date */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="mb-1 text-sm text-white/60">📅 Date</div>
               <div className="text-lg font-semibold text-white">
                 {formattedDate}
@@ -272,7 +267,7 @@ export default function MissionDetailPage() {
 
             {/* City */}
             {mission.city && (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="mb-1 text-sm text-white/60">📍 Ville</div>
                 <div className="text-lg font-semibold text-white">
                   {mission.city}
@@ -282,7 +277,7 @@ export default function MissionDetailPage() {
 
             {/* Category */}
             {mission.category && (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="mb-1 text-sm text-white/60">🏷️ Catégorie</div>
                 <div className="text-lg font-semibold capitalize text-white">
                   {mission.category}
@@ -302,45 +297,49 @@ export default function MissionDetailPage() {
           </div>
 
           {/* CTA buttons */}
-          <div className="flex flex-wrap gap-4">
-            {showChat && (
-              <Link href={`/missions/${mission.id}/chat`}>
-                <Button className="bg-blue-600 hover:bg-blue-500">
-                  💬 Ouvrir le chat
-                </Button>
-              </Link>
-            )}
-
+          <div className="flex flex-wrap gap-3">
             {showPay && (
-              <Link href={`/missions/${mission.id}/pay`}>
-                <Button className="bg-green-600 hover:bg-green-500">
+              <Button asChild variant="hero" size="hero">
+                <Link href={`/missions/${mission.id}/pay`}>
                   💳 Payer la mission
-                </Button>
-              </Link>
-            )}
-
-            {canReview && !showReviewForm && (
-              <Button
-                onClick={() => setShowReviewForm(true)}
-                className="bg-yellow-600 hover:bg-yellow-500"
-              >
-                ⭐ Laisser un avis
+                </Link>
               </Button>
             )}
 
             {canMakeOffer && (
               <Button
                 onClick={() => setShowOfferModal(true)}
-                className="bg-blue-600 hover:bg-blue-500"
+                variant="hero"
+                size="hero"
               >
                 💼 Faire une offre
               </Button>
             )}
 
+            {canReview && !showReviewForm && (
+              <Button
+                onClick={() => setShowReviewForm(true)}
+                variant="hero"
+                size="hero"
+              >
+                ⭐ Laisser un avis
+              </Button>
+            )}
+
+            {showChat && (
+              <Button asChild variant="secondary" size="lg">
+                <Link href={`/missions/${mission.id}/chat`}>
+                  💬 Ouvrir le chat
+                </Link>
+              </Button>
+            )}
+
             {mission.status === "CREATED" && isEmployer && (
-              <Link href={`/missions/available`}>
-                <Button variant="outline">🔍 Voir les missions disponibles</Button>
-              </Link>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/missions/available">
+                  🔍 Voir les missions disponibles
+                </Link>
+              </Button>
             )}
           </div>
 
@@ -378,8 +377,8 @@ export default function MissionDetailPage() {
 
           {/* Review submitted confirmation */}
           {reviewSubmitted && (
-            <div className="mt-6 rounded-2xl border border-green-500/20 bg-green-500/10 p-4 text-center">
-              <p className="text-green-400">✅ Merci pour votre avis !</p>
+            <div className="mt-6 rounded-2xl border border-[#22C55E]/25 bg-[#22C55E]/10 p-4 text-center">
+              <p className="text-[#22C55E]">✅ Merci pour votre avis !</p>
               {mission.workerId && (
                 <Link
                   href={`/profile/${mission.workerId}`}
