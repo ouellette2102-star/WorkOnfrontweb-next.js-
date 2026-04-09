@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/navigation/user-nav";
+import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
+import { WhyChooseBlock } from "@/components/marketing/why-choose-block";
 import { getPublicStats, getFeaturedReviews, getSectorStats, type PublicStats, type FeaturedReview, type SectorStat } from "@/lib/public-api";
 
 export const revalidate = 120; // ISR — 2 min
@@ -9,11 +11,8 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-900/80 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-[#FF4D1C] flex items-center justify-center">
-            <span className="text-white text-xs font-bold">W</span>
-          </div>
-          <span className="font-bold tracking-tight">WorkOn</span>
+        <Link href="/" className="flex items-center gap-2 text-white">
+          <WorkOnWordmark size="md" />
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
           <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
@@ -122,50 +121,20 @@ export default async function EmployeursPage() {
         </section>
       )}
 
-      {/* Why WorkOn */}
-      <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-        <h2 className="text-xl font-bold mb-6">Pourquoi WorkOn ?</h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {[
-            {
-              icon: "⚡",
-              title: "Réponse en minutes",
-              desc: "Publiez votre besoin et recevez des candidatures de travailleurs disponibles dans votre secteur.",
-            },
-            {
-              icon: "✅",
-              title: "Profils vérifiés",
-              desc: "Chaque travailleur passe une vérification d'identité. Vous voyez les avis et les missions complétées.",
-            },
-            {
-              icon: "🔒",
-              title: "Paiement sécurisé",
-              desc: "Votre budget est bloqué en escrow. Libéré uniquement quand la mission est confirmée.",
-            },
-            {
-              icon: "📋",
-              title: "Contrat automatique",
-              desc: "Chaque mission génère un contrat de service autonome. Couverture légale complète.",
-            },
-            {
-              icon: "📊",
-              title: "Suivi en temps réel",
-              desc: "Tableau de bord pour suivre vos missions actives, l'historique et les paiements.",
-            },
-            {
-              icon: "💬",
-              title: "Communication directe",
-              desc: "Chat intégré avec le travailleur avant et pendant la mission.",
-            },
-          ].map((item) => (
-            <div key={item.title} className="rounded-xl border border-white/10 bg-white/5 p-5">
-              <span className="text-2xl">{item.icon}</span>
-              <h3 className="font-semibold mt-2 mb-1">{item.title}</h3>
-              <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Why WorkOn for employers */}
+      <WhyChooseBlock
+        eyebrow="Pourquoi WorkOn"
+        title="Du renfort qualifié, tout de suite."
+        theme="dark"
+        items={[
+          { icon: "⚡", title: "Réponse en minutes", desc: "Publiez votre besoin et recevez des candidatures de travailleurs disponibles dans votre secteur." },
+          { icon: "✅", title: "Profils vérifiés", desc: "Les tiers VERIFIED+ passent une vérification d'identité. Vous voyez avis et missions complétées." },
+          { icon: "🔒", title: "Paiement sécurisé", desc: "Votre budget est bloqué en escrow Stripe. Libéré uniquement quand la mission est confirmée." },
+          { icon: "📋", title: "Contrat automatique", desc: "Chaque mission génère un contrat de service autonome. Couverture légale complète." },
+          { icon: "📊", title: "Suivi en temps réel", desc: "Tableau de bord pour suivre vos missions actives, l'historique et les paiements." },
+          { icon: "💬", title: "Communication directe", desc: "Chat intégré avec le travailleur avant et pendant la mission." },
+        ]}
+      />
 
       {/* Sectors available */}
       {sectors.length > 0 && (
