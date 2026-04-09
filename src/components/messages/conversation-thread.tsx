@@ -119,7 +119,7 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                       isOwn
-                        ? "bg-red-600 text-white"
+                        ? "bg-[#FF4D1C] text-white shadow-sm shadow-[#FF4D1C]/30"
                         : "bg-white/10 text-white"
                     }`}
                   >
@@ -151,14 +151,14 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Écrire un message..."
-            className="flex-1 resize-none rounded-xl border border-white/10 bg-neutral-800 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-red-500 focus:outline-none"
+            className="flex-1 resize-none rounded-xl border border-white/10 bg-neutral-800 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-[#FF4D1C] focus:outline-none"
             rows={1}
             style={{ maxHeight: "120px" }}
           />
           <button
             onClick={handleSend}
             disabled={!newMessage.trim() || sending}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white transition hover:bg-red-500 disabled:opacity-40"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FF4D1C] text-white transition hover:bg-[#E8441A] disabled:opacity-40 shadow-md shadow-[#FF4D1C]/25"
           >
             {sending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
