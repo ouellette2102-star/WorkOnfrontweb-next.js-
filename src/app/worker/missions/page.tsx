@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
 import { RequireWorkerClient } from "@/components/auth/require-worker-client";
 import { MissionFeedList } from "@/components/worker/mission-feed-list";
 import { MissionSwipeCards } from "@/components/worker/mission-swipe-cards";
@@ -17,8 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getMissionFeed, reserveMission } from "@/lib/missions-api";
-import type { MissionFeedItem } from "@/types/mission";
+import { api } from "@/lib/api-client";
+import { missionResponseToFeedItem, type MissionFeedItem } from "@/types/mission";
 import { toast } from "sonner";
 
 type ViewMode = "list" | "swipe" | "map";
@@ -76,26 +75,20 @@ function WorkerMissionsContent() {
 
   const loadMissions = useCallback(async () => {
     if (authLoading || !isAuthenticated) return;
+    if (!userLocation) return; // wait until we have coords
 
     try {
       setIsLoading(true);
       setError(null);
 
-      const token = getAccessToken();
-      if (!token) {
-        setError("Impossible de récupérer le token d'authentification.");
-        return;
-      }
-
-      const filters = {
+      const raw = await api.getNearbyMissions({
+        latitude: userLocation.lat,
+        longitude: userLocation.lng,
+        radiusKm:
+          maxDistance === "unlimited" ? undefined : Number(maxDistance),
         category: category || undefined,
-        maxDistance: maxDistance === "unlimited" ? undefined : maxDistance,
-        latitude: userLocation?.lat,
-        longitude: userLocation?.lng,
-      };
-
-      const fetchedMissions = await getMissionFeed(token, filters);
-      setMissions(fetchedMissions);
+      });
+      setMissions(raw.map(missionResponseToFeedItem));
     } catch (err) {
       console.error("Erreur lors du chargement des missions:", err);
       setError(
@@ -115,13 +108,7 @@ function WorkerMissionsContent() {
 
   const handleReserve = async (missionId: string) => {
     try {
-      const token = getAccessToken();
-      if (!token) {
-        toast.error("Vous devez être connecté pour réserver une mission.");
-        return;
-      }
-
-      await reserveMission(token, missionId);
+      await api.acceptMission(missionId);
       toast.success("Mission réservée avec succès !");
       loadMissions(); // Recharger la liste
     } catch (err) {

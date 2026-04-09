@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
-import { getAvailableMissions } from "@/lib/missions-api";
-import type { Mission } from "@/types/mission";
+import { api } from "@/lib/api-client";
+import { missionResponseToMission, type Mission } from "@/types/mission";
+
+// Fallback centroid (Montréal) when geolocation is denied / unavailable.
+const MONTREAL_FALLBACK = { latitude: 45.5017, longitude: -73.5673 };
 import { MissionCard } from "@/components/missions/mission-card";
 import { ReserveMissionButton } from "@/components/missions/reserve-mission-button";
 import { MissionActions } from "@/components/missions/mission-actions";
@@ -31,14 +33,33 @@ function AvailableMissionsContent() {
 
     try {
       setIsLoading(true);
-      const token = getAccessToken();
-      if (!token) {
-        setError("Impossible de récupérer le token");
-        return;
-      }
 
-      const data = await getAvailableMissions(token);
-      setMissions(data);
+      // Get geolocation with Montréal fallback. /missions-local/nearby
+      // requires coordinates, unlike the legacy /missions/available.
+      const coords = await new Promise<{ latitude: number; longitude: number }>(
+        (resolve) => {
+          if (typeof window === "undefined" || !("geolocation" in navigator)) {
+            resolve(MONTREAL_FALLBACK);
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            (pos) =>
+              resolve({
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+              }),
+            () => resolve(MONTREAL_FALLBACK),
+            { enableHighAccuracy: false, timeout: 4000 },
+          );
+        },
+      );
+
+      const raw = await api.getNearbyMissions({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        radiusKm: 50,
+      });
+      setMissions(raw.map(missionResponseToMission));
       setError(null);
     } catch (err) {
       setError(
