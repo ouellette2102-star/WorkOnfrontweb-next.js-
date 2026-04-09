@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/navigation/user-nav";
-import { getFeaturedWorkers, getSectorStats, type FeaturedWorker, type SectorStat } from "@/lib/public-api";
+import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
+import { HeroWorkerCard } from "@/components/worker/hero-worker-card";
+import { WhyChooseBlock } from "@/components/marketing/why-choose-block";
+import { getFeaturedWorkers, getSectorStats, type SectorStat } from "@/lib/public-api";
 
 export const revalidate = 120; // ISR — 2 min
 
@@ -11,11 +14,8 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-900/80 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-[#FF4D1C] flex items-center justify-center">
-            <span className="text-white text-xs font-bold">W</span>
-          </div>
-          <span className="font-bold tracking-tight">WorkOn</span>
+        <Link href="/" className="flex items-center gap-2 text-white">
+          <WorkOnWordmark size="md" />
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
           <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
@@ -25,74 +25,6 @@ function Header() {
         <UserNav />
       </div>
     </header>
-  );
-}
-
-// ─── Worker Card ────────────────────────────────────────────────────────────
-
-function WorkerCard({ w }: { w: FeaturedWorker }) {
-  const initials = `${w.firstName[0]}${w.lastName[0]}`.toUpperCase();
-  return (
-    <Link
-      href={`/p/${w.slug}`}
-      className="group block rounded-xl border border-white/10 bg-white/5 p-5 hover:border-[#FF4D1C]/50 hover:bg-white/8 transition-all"
-    >
-      <div className="flex items-center gap-4">
-        <div className="relative flex-shrink-0">
-          {w.photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={w.photoUrl} alt={w.firstName} className="h-14 w-14 rounded-full object-cover" />
-          ) : (
-            <div className="h-14 w-14 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center">
-              <span className="text-base font-bold text-[#FF4D1C]">{initials}</span>
-            </div>
-          )}
-          {(w.trustTier === "VERIFIED" || w.trustTier === "TRUSTED" || w.trustTier === "PREMIUM") && (
-            <span className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-[#FF4D1C] border-2 border-neutral-900 flex items-center justify-center">
-              <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </span>
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold truncate group-hover:text-[#FF4D1C] transition-colors">
-            {w.firstName} {w.lastName[0]}.
-          </p>
-          {w.sector && <p className="text-sm text-white/50 mt-0.5 truncate">{w.sector}</p>}
-          {w.city && <p className="text-xs text-white/40 mt-1">📍 {w.city}</p>}
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <span className="text-yellow-400">★</span>
-          <span className="text-sm font-semibold">
-            {w.ratingAvg > 0 ? w.ratingAvg.toFixed(1) : "Nouveau"}
-          </span>
-          {w.ratingCount > 0 && (
-            <span className="text-xs text-white/40">({w.ratingCount} avis)</span>
-          )}
-        </div>
-        <div className="text-xs text-white/40">
-          {w.completedMissions} mission{w.completedMissions !== 1 ? "s" : ""}
-        </div>
-      </div>
-
-      {w.badges.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {w.badges.map((b) => (
-            <span key={b.type} className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#FF4D1C]/15 text-[#FF4D1C] border border-[#FF4D1C]/20">
-              {b.label}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div className="mt-4 text-xs text-[#FF4D1C] group-hover:text-[#FFA37C] transition-colors flex items-center gap-1">
-        Voir le profil complet →
-      </div>
-    </Link>
   );
 }
 
@@ -152,23 +84,17 @@ export default async function ProsPage() {
       </section>
 
       {/* Why WorkOn for pros */}
-      <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-        <h2 className="text-xl font-bold mb-6">Pourquoi WorkOn ?</h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { icon: "💸", title: "Payé rapidement", desc: "Virement dès la fin de mission. Pas d'attente de 30 jours." },
-            { icon: "📅", title: "Flexibilité totale", desc: "Tu choisis tes missions, tes horaires, ta ville." },
-            { icon: "🔒", title: "Zéro risque", desc: "Paiement sécurisé via Stripe. Tu es protégé avant de commencer." },
-            { icon: "⭐", title: "Bâtis ta réputation", desc: "Accumule des avis, monte en tier, accède aux meilleures missions." },
-          ].map((item) => (
-            <div key={item.title} className="rounded-xl border border-white/10 bg-white/5 p-4">
-              <span className="text-2xl">{item.icon}</span>
-              <h3 className="font-semibold mt-2 mb-1 text-sm">{item.title}</h3>
-              <p className="text-xs text-white/50 leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <WhyChooseBlock
+        eyebrow="Pourquoi WorkOn"
+        title="Du travail, vraiment simple."
+        theme="dark"
+        items={[
+          { icon: "💸", title: "Payé rapidement", desc: "Virement dès la fin de mission. Pas d'attente de 30 jours." },
+          { icon: "📅", title: "Flexibilité totale", desc: "Tu choisis tes missions, tes horaires, ta ville." },
+          { icon: "🔒", title: "Zéro risque", desc: "Paiement sécurisé via Stripe. Tu es protégé avant de commencer." },
+          { icon: "⭐", title: "Bâtis ta réputation", desc: "Accumule des avis, monte en tier, accède aux meilleures missions." },
+        ]}
+      />
 
       {/* Sectors */}
       {sectors.length > 0 && (
@@ -190,8 +116,8 @@ export default async function ProsPage() {
               <p className="text-sm text-white/50 mt-1">Top travailleurs par missions complétées</p>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {workers.map((w) => <WorkerCard key={w.id} w={w} />)}
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {workers.map((w) => <HeroWorkerCard key={w.id} worker={w} />)}
           </div>
         </section>
       )}
