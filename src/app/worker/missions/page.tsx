@@ -194,7 +194,7 @@ function WorkerMissionsContent() {
           </div>
           <Button
             onClick={loadMissions}
-            className="bg-blue-600 text-white hover:bg-blue-500"
+            className="bg-[#FF4D1C] text-white hover:bg-[#E8441A]"
           >
             Actualiser les missions
           </Button>
@@ -207,7 +207,7 @@ function WorkerMissionsContent() {
             onClick={() => setViewMode("list")}
             className={
               viewMode === "list"
-                ? "bg-blue-600 text-white"
+                ? "bg-[#FF4D1C] text-white"
                 : "border-white/20 text-white/70 hover:bg-neutral-800"
             }
           >
@@ -218,7 +218,7 @@ function WorkerMissionsContent() {
             onClick={() => setViewMode("swipe")}
             className={
               viewMode === "swipe"
-                ? "bg-blue-600 text-white"
+                ? "bg-[#FF4D1C] text-white"
                 : "border-white/20 text-white/70 hover:bg-neutral-800"
             }
           >
@@ -229,7 +229,7 @@ function WorkerMissionsContent() {
             onClick={() => setViewMode("map")}
             className={
               viewMode === "map"
-                ? "bg-blue-600 text-white"
+                ? "bg-[#FF4D1C] text-white"
                 : "border-white/20 text-white/70 hover:bg-neutral-800"
             }
           >
@@ -239,7 +239,7 @@ function WorkerMissionsContent() {
 
         {/* Erreur */}
         {error && (
-          <div className="mb-6 rounded-xl border border-red-500 bg-red-500/20 p-4 text-red-300">
+          <div className="mb-6 rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-4 text-[#FF4D1C] shadow-lg shadow-black/20">
             {error}
           </div>
         )}
@@ -247,7 +247,7 @@ function WorkerMissionsContent() {
         {/* Loading */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent"></div>
             <p className="text-white/70">Chargement des missions...</p>
           </div>
         )}
