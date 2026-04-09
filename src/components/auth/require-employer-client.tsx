@@ -2,36 +2,42 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useCurrentProfile } from "@/hooks/use-current-profile";
+import { useAuth } from "@/contexts/auth-context";
 
+/**
+ * Client-side guard that only renders children when the current user has
+ * the `employer` role. Workers get redirected to their own dashboard;
+ * unauthenticated users are redirected to /login.
+ *
+ * Uses `useAuth()` directly (backed by `/auth/me` via same-origin proxy),
+ * NOT the defunct `useCurrentProfile` hook which called the 404 endpoint
+ * `/profile/me`. Server-side pages continue to use `requireEmployer()`
+ * from `lib/server-auth.ts` — this client guard is only needed on pages
+ * that live outside the `(app)` server-gated layout.
+ */
 export function RequireEmployerClient({ children }: { children: React.ReactNode }) {
-  const { profile, loading } = useCurrentProfile();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return;
+    if (isLoading) return;
 
-    if (!profile) {
-      router.push("/onboarding/role");
+    if (!user) {
+      router.push("/login");
       return;
     }
 
-    if (!profile.primaryRole) {
-      router.push("/onboarding/role");
-      return;
-    }
-
-    if (profile.primaryRole === "WORKER") {
+    if (user.role === "worker") {
       router.push("/worker/dashboard");
       return;
     }
 
-    if (profile.primaryRole !== "EMPLOYER" && profile.primaryRole !== "ADMIN") {
-      router.push("/onboarding/role");
+    if (user.role !== "employer") {
+      router.push("/home");
     }
-  }, [profile, loading, router]);
+  }, [user, isLoading, router]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
         <div className="text-white/70">Chargement...</div>
@@ -39,14 +45,9 @@ export function RequireEmployerClient({ children }: { children: React.ReactNode 
     );
   }
 
-  if (
-    !profile ||
-    !profile.primaryRole ||
-    (profile.primaryRole !== "EMPLOYER" && profile.primaryRole !== "ADMIN")
-  ) {
+  if (!user || user.role !== "employer") {
     return null;
   }
 
   return <>{children}</>;
 }
-
