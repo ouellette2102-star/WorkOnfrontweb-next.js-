@@ -1,36 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-
   /* ============================================================
-   * WorkOn brand palette — unified source of truth
+   * WorkOn brand palette — Convergence (Emergent → Next.js)
    * ============================================================
-   * Single canonical palette used across both light (landing) and
-   * dark (app) surfaces. Before this unification, the landing used
-   * #FF4D1C directly (see src/app/page.tsx:16-17) while the app
-   * used a generic Tailwind red (#E52521) via `--red-accent`, and
-   * `/pros` + `/employeurs` mixed in `bg-red-600`. Everything now
-   * resolves to the same orange accent.
+   * Light organic theme inspired by the Emergent design guidelines:
+   *   Background: #F9F8F5 (oatmeal)
+   *   Text:       #1B1A18 (rich black)
+   *   Primary:    #134021 (forest green — trust/nature)
+   *   Accent:     #B5382A (terracotta — urgency/action)
+   *   Gray:       #706E6A (warm gray)
+   *   Cream:      #EAE6DF (warm border)
    *
-   * Reference (already documented inline in landing):
-   *   Fond: #FAFAFA | Texte: #1A1A2E | Accent: #FF4D1C | Gris: #6B7280
-   *   Creme: #F5F3EF | Vert confiance: #22C55E
+   * Font stack: system-ui sans-serif (Cabinet Grotesk/Manrope
+   * served via next/font in layout.tsx).
    */
-  --workon-accent: #FF4D1C;
-  --workon-accent-hover: #E8441A;
-  --workon-accent-subtle: rgba(255, 77, 28, 0.08);
-  --workon-accent-ring: rgba(255, 77, 28, 0.25);
-  --workon-ink: #1A1A2E;
-  --workon-bg-light: #FAFAFA;
-  --workon-bg-cream: #F5F3EF;
-  --workon-gray: #6B7280;
+  --background: #F9F8F5;
+  --foreground: #1B1A18;
+
+  --workon-primary: #134021;
+  --workon-primary-hover: #0F3319;
+  --workon-primary-subtle: rgba(19, 64, 33, 0.08);
+  --workon-primary-ring: rgba(19, 64, 33, 0.25);
+
+  --workon-accent: #B5382A;
+  --workon-accent-hover: #9A2F23;
+  --workon-accent-subtle: rgba(181, 56, 42, 0.08);
+  --workon-accent-ring: rgba(181, 56, 42, 0.25);
+
+  --workon-ink: #1B1A18;
+  --workon-bg: #F9F8F5;
+  --workon-bg-cream: #F0EDE8;
+  --workon-border: #EAE6DF;
+  --workon-gray: #706E6A;
+  --workon-muted: #9C9A96;
   --workon-trust-green: #22C55E;
 
-  /* Backward-compat alias — keeps `text-red-accent` / `bg-red-accent`
-   * classes working everywhere they were already used, while the
-   * underlying value is now the true WorkOn orange. */
+  /* Backward-compat alias */
   --red-accent: var(--workon-accent);
 }
 
@@ -38,13 +44,18 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-red-accent: var(--red-accent);
+  --color-workon-primary: var(--workon-primary);
+  --color-workon-primary-hover: var(--workon-primary-hover);
   --color-workon-accent: var(--workon-accent);
   --color-workon-accent-hover: var(--workon-accent-hover);
   --color-workon-ink: var(--workon-ink);
+  --color-workon-bg: var(--workon-bg);
+  --color-workon-bg-cream: var(--workon-bg-cream);
+  --color-workon-border: var(--workon-border);
   --color-workon-gray: var(--workon-gray);
+  --color-workon-muted: var(--workon-muted);
   --color-workon-trust-green: var(--workon-trust-green);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
 }
 
 body {
@@ -55,21 +66,21 @@ body {
   overscroll-behavior: none;
 }
 
-/* Fire gradient (hero sections) — orange brand */
+/* Organic gradient (hero sections) — green brand */
 .bg-fire-gradient {
   background: linear-gradient(
     180deg,
-    rgba(255, 77, 28, 0.25) 0%,
-    rgba(255, 140, 50, 0.08) 40%,
+    rgba(19, 64, 33, 0.08) 0%,
+    rgba(19, 64, 33, 0.03) 40%,
     transparent 100%
   );
 }
 
-/* Glass card */
+/* Glass card — light variant */
 .glass-card {
-  background: rgba(38, 38, 38, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--workon-border);
 }
 
 /* Safe area for bottom nav */
@@ -97,17 +108,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #404040;
+  background: #D0CCC5;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #505050;
+  background: #B5B0A8;
 }
 
 /* Focus rings */
 *:focus-visible {
-  outline: 2px solid var(--workon-accent);
+  outline: 2px solid var(--workon-primary);
   outline-offset: 2px;
 }
 

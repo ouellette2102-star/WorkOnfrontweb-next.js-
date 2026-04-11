@@ -2,7 +2,8 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { BottomNav } from "@/components/navigation/bottom-nav";
-import { MapPin, Loader2 } from "lucide-react";
+import { TopBar } from "@/components/navigation/top-bar";
+import { Loader2 } from "lucide-react";
 
 /**
  * Client wrapper for the (app) route group.
@@ -17,16 +18,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-dvh flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-red-accent" />
+      <div className="min-h-dvh flex items-center justify-center bg-workon-bg">
+        <Loader2 className="h-8 w-8 animate-spin text-workon-primary" />
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    // Defensive fallback: server gate should already have redirected, but
-    // if the cookie was cleared client-side after the page loaded, send
-    // the user back to /login.
     if (typeof window !== "undefined") {
       window.location.href = "/login";
     }
@@ -34,16 +32,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-dvh pb-20">
-      {/* Top header */}
-      <header className="sticky top-0 z-40 flex items-center justify-center h-14 border-b border-white/5 bg-neutral-900/95 backdrop-blur-lg">
-        <div className="flex items-center gap-0.5 text-xl font-bold">
-          <span>Work</span>
-          <MapPin className="h-5 w-5 text-red-accent" />
-          <span>n</span>
-        </div>
-      </header>
-
+    <div className="min-h-dvh pb-20 bg-workon-bg">
+      <TopBar />
       <main>{children}</main>
       <BottomNav />
     </div>

@@ -1,0 +1,172 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
+import {
+  MapPin,
+  Bell,
+  Menu,
+  X,
+  Home,
+  User,
+  Briefcase,
+  Heart,
+  BarChart3,
+  CreditCard,
+  Receipt,
+  HelpCircle,
+  LogOut,
+  ChevronRight,
+  Shield,
+} from "lucide-react";
+
+/**
+ * Top navigation bar — Convergence design.
+ *
+ * Features:
+ * - WorkOn logo (Work[pin]n)
+ * - Notification bell with unread count badge
+ * - Hamburger menu with role-aware items
+ */
+export function TopBar() {
+  const { user, logout } = useAuth();
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const { data: notifCount } = useQuery({
+    queryKey: ["notification-unread-count"],
+    queryFn: () => api.getNotificationUnreadCount(),
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
+    staleTime: 15_000,
+  });
+
+  const unread = notifCount?.count ?? 0;
+
+  const roleLabel =
+    user?.role === "worker"
+      ? "Professionnel"
+      : user?.role === "employer"
+        ? "Employeur"
+        : "Client résidentiel";
+
+  const menuItems = [
+    { href: "/home", label: "Tableau de bord", icon: Home },
+    { href: "/profile", label: "Mon profil", icon: User },
+    { href: "/search", label: "Opportunités", icon: Briefcase },
+    ...(user?.role === "worker"
+      ? [
+          { href: "/worker/availability", label: "Disponibilités", icon: BarChart3 },
+          { href: "/payments", label: "Mes revenus", icon: CreditCard },
+        ]
+      : [
+          { href: "/bookings", label: "Mes réservations", icon: Receipt },
+        ]),
+    { href: "/support", label: "Aide & support", icon: HelpCircle },
+    { href: "/profile/verify", label: "Vérification", icon: Shield },
+  ];
+
+  return (
+    <>
+      <header className="sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-workon-border bg-white/90 backdrop-blur-xl">
+        {/* Logo */}
+        <Link href="/home" className="flex items-center gap-0.5 text-xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
+          <span>Work</span>
+          <MapPin className="h-5 w-5 text-workon-primary" />
+          <span>n</span>
+        </Link>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          {/* Notification bell */}
+          <Link
+            href="/notifications"
+            className="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-workon-bg-cream transition-colors"
+            aria-label={`Notifications${unread > 0 ? ` (${unread} non lues)` : ""}`}
+          >
+            <Bell className="h-5 w-5 text-workon-ink" />
+            {unread > 0 && (
+              <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-workon-accent text-[10px] font-bold text-white flex items-center justify-center">
+                {unread > 9 ? "9+" : unread}
+              </span>
+            )}
+          </Link>
+
+          {/* Menu toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex items-center justify-center h-10 w-10 rounded-full hover:bg-workon-bg-cream transition-colors"
+            aria-label="Menu"
+          >
+            {menuOpen ? (
+              <X className="h-5 w-5 text-workon-ink" />
+            ) : (
+              <Menu className="h-5 w-5 text-workon-ink" />
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* Dropdown menu overlay */}
+      {menuOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div className="fixed top-14 right-0 left-0 z-40 bg-white border-b border-workon-border shadow-lg max-h-[70vh] overflow-y-auto">
+            {/* User identity */}
+            <div className="px-4 py-3 border-b border-workon-border">
+              <p className="font-semibold text-workon-ink">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="text-xs text-workon-muted">{roleLabel}</p>
+            </div>
+
+            {/* Menu items */}
+            <nav className="py-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const active = pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                      active
+                        ? "bg-workon-primary-subtle text-workon-primary font-medium"
+                        : "text-workon-ink hover:bg-workon-bg-cream"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 shrink-0" />
+                    <span className="flex-1 text-sm">{item.label}</span>
+                    <ChevronRight className="h-4 w-4 text-workon-muted" />
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Logout */}
+            <div className="border-t border-workon-border py-2">
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  logout();
+                }}
+                className="flex items-center gap-3 px-4 py-3 w-full text-workon-accent hover:bg-workon-accent-subtle transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="text-sm font-medium">Déconnexion</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
