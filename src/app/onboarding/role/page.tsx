@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
+import { apiFetch } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 export default function OnboardingRolePage() {
   const { isLoading: authLoading, isAuthenticated } = useAuth();
@@ -19,27 +18,10 @@ export default function OnboardingRolePage() {
       setIsSubmitting(true);
       setError(null);
 
-      const token = getAccessToken();
-      if (!token) {
-        setError("Authentification requise");
-        return;
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/profile/me`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ primaryRole: role }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'enregistrement du rôle");
-      }
+      await apiFetch("/users/me", {
+        method: "PATCH",
+        body: JSON.stringify({ primaryRole: role }),
+      });
 
       // Rediriger vers l'étape suivante (détails)
       router.push("/onboarding/details");
