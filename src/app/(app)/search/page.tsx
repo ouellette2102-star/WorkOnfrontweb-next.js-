@@ -30,7 +30,6 @@ export default function SearchPage() {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         (err) => {
-          // Silent permission denied / timeout — fall back to city-based search.
           console.warn("[search] geolocation unavailable", err.message);
         },
         { enableHighAccuracy: false, timeout: 5000 },
@@ -44,7 +43,6 @@ export default function SearchPage() {
     staleTime: 300_000,
   });
 
-  // Workers query
   const { data: workersData, isLoading: workersLoading } = useQuery({
     queryKey: ["workers", city, category],
     queryFn: () =>
@@ -56,9 +54,6 @@ export default function SearchPage() {
     enabled: tab === "workers",
   });
 
-  // Missions query — only runs when we have a location. No misleading
-  // fallback to /me/assignments (that endpoint shows YOUR missions,
-  // not nearby search results).
   const { data: missions, isLoading: missionsLoading } = useQuery({
     queryKey: ["search-missions", category, userLocation?.lat, userLocation?.lng],
     queryFn: () => {
@@ -78,23 +73,23 @@ export default function SearchPage() {
   const tabButtonClass = (active: boolean) =>
     `flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
       active
-        ? "bg-[#FF4D1C] text-white shadow-md shadow-[#FF4D1C]/25"
-        : "text-white/60 hover:text-white"
+        ? "bg-workon-primary text-white shadow-sm"
+        : "text-workon-muted hover:text-workon-ink"
     }`;
 
   const chipClass = (active: boolean) =>
     `shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border ${
       active
-        ? "bg-[#FF4D1C]/15 text-[#FF4D1C] border-[#FF4D1C]/30"
-        : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10"
+        ? "bg-workon-primary/10 text-workon-primary border-workon-primary/30"
+        : "bg-workon-bg text-workon-muted border-workon-border hover:bg-workon-border"
     }`;
 
   return (
     <div className="px-4 py-6 space-y-5">
-      <h1 className="text-2xl font-bold">Rechercher</h1>
+      <h1 className="text-2xl font-bold text-workon-ink">Rechercher</h1>
 
       {/* Tab switcher */}
-      <div className="flex gap-1 rounded-2xl bg-neutral-800/60 backdrop-blur-sm border border-white/5 p-1">
+      <div className="flex gap-1 rounded-2xl bg-workon-bg border border-workon-border p-1">
         <button onClick={() => setTab("missions")} className={tabButtonClass(tab === "missions")}>
           <Briefcase className="h-4 w-4" />
           Missions
@@ -108,7 +103,7 @@ export default function SearchPage() {
       {/* Search bar (workers only) */}
       {tab === "workers" && (
         <div className="relative">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-workon-muted" />
           <Input
             placeholder="Rechercher par ville..."
             value={city}
@@ -139,12 +134,12 @@ export default function SearchPage() {
 
       {/* Missions tab: geolocation gate */}
       {tab === "missions" && !userLocation && !missionsLoading && (
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-6 text-center shadow-lg shadow-black/20">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30">
-            <MapPin className="h-5 w-5 text-[#FF4D1C]" />
+        <div className="rounded-2xl border border-workon-border bg-white p-6 text-center shadow-sm">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-workon-primary/10">
+            <MapPin className="h-5 w-5 text-workon-primary" />
           </div>
-          <h2 className="font-semibold text-base">Active la géolocalisation</h2>
-          <p className="mt-1 text-sm text-white/60 max-w-sm mx-auto">
+          <h2 className="font-semibold text-base text-workon-ink">Active la géolocalisation</h2>
+          <p className="mt-1 text-sm text-workon-muted max-w-sm mx-auto">
             Pour voir les missions près de chez toi, autorise l&apos;accès à ta
             position dans les paramètres du navigateur.
           </p>
@@ -154,7 +149,7 @@ export default function SearchPage() {
       {/* Results */}
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-[#FF4D1C]" />
+          <Loader2 className="h-6 w-6 animate-spin text-workon-primary" />
         </div>
       ) : tab === "workers" ? (
         workersData && workersData.workers.length > 0 ? (
@@ -188,7 +183,7 @@ export default function SearchPage() {
               : "Essayez une autre catégorie ou élargis ta zone depuis la carte."
           }
           action={
-            <Button asChild variant="hero" size="sm">
+            <Button asChild size="sm" className="bg-workon-primary hover:bg-workon-primary/90 text-white">
               <Link href="/map">Voir la carte</Link>
             </Button>
           }
@@ -208,9 +203,9 @@ function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center shadow-lg shadow-black/20">
-      <p className="font-semibold text-base">{title}</p>
-      <p className="text-sm text-white/60 mt-1 max-w-sm mx-auto">{subtitle}</p>
+    <div className="rounded-2xl border border-workon-border bg-white p-8 text-center shadow-sm">
+      <p className="font-semibold text-base text-workon-ink">{title}</p>
+      <p className="text-sm text-workon-muted mt-1 max-w-sm mx-auto">{subtitle}</p>
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

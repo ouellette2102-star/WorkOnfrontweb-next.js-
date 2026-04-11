@@ -18,34 +18,34 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
     <Link
       href={`/worker/${worker.id}`}
       className={cn(
-        "block rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur overflow-hidden transition-all hover:border-white/20 hover:bg-neutral-700/80 shadow-lg shadow-black/20",
+        "block rounded-2xl border border-workon-border bg-white overflow-hidden transition-all hover:border-workon-primary/30 hover:shadow-md shadow-sm",
         compact ? "p-3" : "p-0",
       )}
     >
       {/* Photo */}
       {!compact && worker.photoUrl && (
-        <div className="relative h-48 bg-neutral-700">
+        <div className="relative h-48 bg-workon-bg">
           <img
             src={worker.photoUrl}
             alt={worker.fullName || `${worker.firstName} ${worker.lastName}`}
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent" />
         </div>
       )}
 
       <div className={cn("space-y-2", compact ? "" : "p-4")}>
         {/* Name + Rating */}
         <div>
-          <h3 className="font-semibold text-base">
+          <h3 className="font-semibold text-base text-workon-ink">
             {worker.firstName} {worker.lastName}
           </h3>
           {worker.jobTitle && (
-            <p className="text-sm text-white/60">{worker.jobTitle}</p>
+            <p className="text-sm text-workon-muted">{worker.jobTitle}</p>
           )}
           {worker.city && (
-            <p className="text-xs text-white/50">{worker.city}</p>
+            <p className="text-xs text-workon-muted">{worker.city}</p>
           )}
         </div>
 
@@ -59,16 +59,16 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
                   className={cn(
                     "h-3.5 w-3.5",
                     i < Math.round(worker.averageRating)
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-white/20",
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-gray-200",
                   )}
                 />
               ))}
             </div>
-            <span className="text-sm font-medium text-white/80">
+            <span className="text-sm font-medium text-workon-ink">
               {worker.averageRating.toFixed(1)}
             </span>
-            <span className="text-xs text-white/40">
+            <span className="text-xs text-workon-muted">
               ({worker.reviewCount} avis)
             </span>
           </div>
@@ -82,9 +82,9 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
             {worker.badges.map((badge) => (
               <span
                 key={badge.label}
-                className="inline-flex items-center gap-1 rounded-full bg-neutral-700/80 px-2.5 py-0.5 text-xs font-medium text-white/80"
+                className="inline-flex items-center gap-1 rounded-full bg-workon-bg px-2.5 py-0.5 text-xs font-medium text-workon-ink"
               >
-                <Shield className="h-3 w-3 text-[#FF4D1C]" />
+                <Shield className="h-3 w-3 text-workon-primary" />
                 {badge.label}
               </span>
             ))}
