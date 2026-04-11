@@ -77,23 +77,17 @@ export default function ExpressPage() {
     detectGPS();
   }, [detectGPS]);
 
-  // Express dispatch mutation
+  // Express dispatch mutation — calls POST /missions-local/express
   const dispatch = useMutation({
-    mutationFn: async () => {
-      // Use createMission since backend doesn't have /express yet —
-      // this creates the mission. Nearby workers will see it on the map.
-      // When the backend express endpoint is added (PR #103), swap to api.expressDispatch().
-      const mission = await api.createMission({
-        title: `Express: ${category || "Service urgent"}`,
-        description: description || "Besoin urgent d'un professionnel",
+    mutationFn: () =>
+      api.expressDispatch({
         category: category || "general",
-        price: Number(budget) || 50,
+        description: description || "Besoin urgent d'un professionnel",
+        city: city || "Montréal",
+        budget: Number(budget) || 50,
         latitude: latitude ?? 45.5017,
         longitude: longitude ?? -73.5673,
-        city: city || "Montréal",
-      });
-      return { missionId: mission.id, candidatesNotified: 0 } as ExpressResult;
-    },
+      }),
     onSuccess: (data) => {
       setResult(data);
       toast.success("Mission créée avec succès!");

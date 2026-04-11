@@ -352,6 +352,9 @@ export const api = {
   createMission: (data: { title: string; description: string; category: string; price: number; latitude: number; longitude: number; city: string; address?: string }) =>
     apiFetch<MissionResponse>("/missions-local", { method: "POST", body: JSON.stringify(data) }),
 
+  expressDispatch: (data: { category: string; description: string; city: string; budget: number; latitude: number; longitude: number }) =>
+    apiFetch<{ missionId: string; candidatesNotified: number }>("/missions-local/express", { method: "POST", body: JSON.stringify(data) }),
+
   getMissionMapPins: (bbox: { north: number; south: number; east: number; west: number; category?: string }) => {
     const q = new URLSearchParams({
       north: String(bbox.north),
