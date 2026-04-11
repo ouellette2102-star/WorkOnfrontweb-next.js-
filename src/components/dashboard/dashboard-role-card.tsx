@@ -14,27 +14,27 @@ export function DashboardRoleCard() {
   const { profile, isLoading, error } = useProfile();
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-neutral-900/70 p-6">
-      <p className="text-xs uppercase tracking-[0.3em] text-white/50">Ton statut</p>
-      <h2 className="mt-3 text-xl font-semibold">Profil WorkOn</h2>
+    <div className="rounded-2xl border border-workon-border bg-white p-6 shadow-sm">
+      <p className="text-xs uppercase tracking-[0.3em] text-workon-muted">Ton statut</p>
+      <h2 className="mt-3 text-xl font-semibold text-workon-ink">Profil WorkOn</h2>
 
       {isLoading && !profile ? (
-        <p className="mt-3 text-white/60">Chargement du profil...</p>
+        <p className="mt-3 text-workon-muted">Chargement du profil...</p>
       ) : null}
 
       {error ? (
-        <p className="mt-3 text-sm text-red-400">Erreur : {error}</p>
+        <p className="mt-3 text-sm text-red-600">Erreur : {error}</p>
       ) : null}
 
       {profile ? (
         <>
-          <p className="mt-3 text-white/70">
+          <p className="mt-3 text-workon-muted">
             Rôle principal :{" "}
-            <span className="font-semibold">
+            <span className="font-semibold text-workon-ink">
               {ROLE_LABELS[profile.primaryRole] ?? profile.primaryRole}
             </span>
           </p>
-          <ul className="mt-4 space-y-1 text-sm text-white/70">
+          <ul className="mt-4 space-y-1 text-sm text-workon-muted">
             <li>• Accès Worker : {profile.isWorker ? "✅" : "—"}</li>
             <li>• Accès Employer : {profile.isEmployer ? "✅" : "—"}</li>
             <li>• Accès Client résidentiel : {profile.isClientResidential ? "✅" : "—"}</li>
@@ -44,11 +44,10 @@ export function DashboardRoleCard() {
 
       <Link
         href="/profile"
-        className="mt-6 inline-flex rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white/80 transition hover:text-white"
+        className="mt-6 inline-flex rounded-full border border-workon-border px-4 py-2 text-xs font-semibold uppercase tracking-wide text-workon-muted transition hover:text-workon-ink hover:border-workon-ink/30"
       >
         Mettre à jour mes rôles
       </Link>
     </div>
   );
 }
-

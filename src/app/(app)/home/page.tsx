@@ -8,7 +8,7 @@ import { WorkerCard } from "@/components/worker/worker-card";
 import { MissionCard } from "@/components/mission/mission-card";
 import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { Button } from "@/components/ui/button";
-import { MapPin, Plus, Briefcase, Search } from "lucide-react";
+import { MapPin, Plus, Briefcase, Search, Phone } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -24,8 +24,7 @@ export default function HomePage() {
     queryFn: () => api.getWorkers({ limit: 12 }),
   });
 
-  // Filter out obvious test / seed accounts: names that are just a single
-  // letter, blank, "Test ...", or the classic "John Doe" placeholders.
+  // Filter out obvious test / seed accounts
   const realWorkers = (workersData?.workers ?? []).filter((w) => {
     const first = (w.firstName ?? "").trim();
     const last = (w.lastName ?? "").trim();
@@ -48,12 +47,12 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6 px-4 py-6">
-      {/* Hero gradient */}
-      <div className="relative -mx-4 -mt-6 px-4 pt-6 pb-8 bg-gradient-to-b from-[#FF4D1C]/20 via-[#FF4D1C]/5 to-transparent">
-        <h1 className="text-2xl font-bold text-center">
+      {/* Hero — light organic gradient */}
+      <div className="relative -mx-4 -mt-6 px-4 pt-6 pb-8 bg-gradient-to-b from-workon-primary/10 via-workon-primary/5 to-transparent">
+        <h1 className="text-2xl font-bold text-center text-workon-ink">
           {user?.role === "worker" ? "Trouvez des missions" : "Trouvez votre talent"}
         </h1>
-        <p className="text-center text-white/60 text-sm mt-1">
+        <p className="text-center text-workon-muted text-sm mt-1">
           {user?.role === "worker"
             ? "Missions disponibles près de chez vous"
             : "Une ligne directe vers le travail instantané"}
@@ -76,38 +75,48 @@ export default function HomePage() {
 
       {/* Quick actions */}
       <div className="flex gap-3">
-        {user?.role === "employer" ? (
-          <Button asChild className="flex-1 h-12">
-            <Link href="/missions/new">
-              <Plus className="h-4 w-4 mr-1" />
-              Publier une mission
-            </Link>
-          </Button>
+        {user?.role === "employer" || user?.role === "residential_client" ? (
+          <>
+            <Button asChild className="flex-1 h-12 bg-workon-accent hover:bg-workon-accent/90 text-white">
+              <Link href="/express">
+                <Phone className="h-4 w-4 mr-1" />
+                Express Dispatch
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="flex-1 h-12 border-workon-border text-workon-ink">
+              <Link href="/missions/new">
+                <Plus className="h-4 w-4 mr-1" />
+                Mission
+              </Link>
+            </Button>
+          </>
         ) : (
-          <Button asChild className="flex-1 h-12">
-            <Link href="/search">
-              <Search className="h-4 w-4 mr-1" />
-              Trouver des missions
-            </Link>
-          </Button>
+          <>
+            <Button asChild className="flex-1 h-12 bg-workon-primary hover:bg-workon-primary/90 text-white">
+              <Link href="/search">
+                <Search className="h-4 w-4 mr-1" />
+                Trouver des missions
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="flex-1 h-12 border-workon-border text-workon-ink">
+              <Link href="/map">
+                <MapPin className="h-4 w-4 mr-1" />
+                Carte
+              </Link>
+            </Button>
+          </>
         )}
-        <Button asChild variant="outline" className="flex-1 h-12">
-          <Link href="/map">
-            <MapPin className="h-4 w-4 mr-1" />
-            Carte
-          </Link>
-        </Button>
       </div>
 
       {/* Active missions */}
       {activeMissions && activeMissions.length > 0 ? (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">
-              <Briefcase className="inline h-4 w-4 mr-1 text-[#FF4D1C]" />
+            <h2 className="font-semibold text-workon-ink">
+              <Briefcase className="inline h-4 w-4 mr-1 text-workon-primary" />
               Missions actives
             </h2>
-            <Link href="/missions" className="text-xs text-[#FF4D1C] hover:underline">
+            <Link href="/missions" className="text-xs text-workon-primary hover:underline">
               Voir tout
             </Link>
           </div>
@@ -120,23 +129,23 @@ export default function HomePage() {
       ) : (
         user && activeMissions !== undefined && (
           <section>
-            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-6 text-center shadow-lg shadow-black/20">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30">
-                <Briefcase className="h-5 w-5 text-[#FF4D1C]" />
+            <div className="rounded-2xl border border-workon-border bg-white p-6 text-center shadow-sm">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-workon-primary/10">
+                <Briefcase className="h-5 w-5 text-workon-primary" />
               </div>
-              <h2 className="font-semibold text-base">
+              <h2 className="font-semibold text-base text-workon-ink">
                 {user.role === "employer"
                   ? "Aucune mission en cours"
                   : "Prêt pour ta prochaine mission ?"}
               </h2>
-              <p className="mt-1 text-sm text-white/60">
+              <p className="mt-1 text-sm text-workon-muted">
                 {user.role === "employer"
                   ? "Publie ta première mission — un pro peut répondre en quelques minutes."
                   : "Des missions payées rapidement t'attendent près de chez toi."}
               </p>
-              <Button asChild variant="hero" size="hero" className="mt-4">
-                <Link href={user.role === "employer" ? "/missions/new" : "/search"}>
-                  {user.role === "employer" ? "Publier une mission" : "Voir les missions"}
+              <Button asChild className="mt-4 bg-workon-primary hover:bg-workon-primary/90 text-white">
+                <Link href={user.role === "employer" ? "/express" : "/search"}>
+                  {user.role === "employer" ? "Express Dispatch" : "Voir les missions"}
                 </Link>
               </Button>
             </div>
@@ -148,8 +157,8 @@ export default function HomePage() {
       {realWorkers.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Pros disponibles</h2>
-            <Link href="/search" className="text-xs text-[#FF4D1C] hover:underline">
+            <h2 className="font-semibold text-workon-ink">Pros disponibles</h2>
+            <Link href="/search" className="text-xs text-workon-primary hover:underline">
               Voir tout
             </Link>
           </div>
@@ -162,7 +171,7 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <div className="text-center text-xs text-white/40 pt-4 space-y-1">
+      <div className="text-center text-xs text-workon-muted pt-4 space-y-1">
         <p>WorkOn fournit l&apos;infrastructure de mise en relation et paiement.</p>
         <p>Paiement sécurisé par Stripe.</p>
       </div>
