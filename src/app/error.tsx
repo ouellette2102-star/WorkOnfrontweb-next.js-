@@ -44,16 +44,16 @@ export default function Error({
     <div className="min-h-[60vh] flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-6">
         {/* Icon */}
-        <div className="mx-auto w-16 h-16 rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 flex items-center justify-center">
-          <AlertTriangle className="w-8 h-8 text-[#FF4D1C]" />
+        <div className="mx-auto w-16 h-16 rounded-full bg-workon-accent/10 border border-workon-accent/20 flex items-center justify-center">
+          <AlertTriangle className="w-8 h-8 text-workon-accent" />
         </div>
 
         {/* Message */}
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-workon-ink">
             Quelque chose s&apos;est mal passé
           </h2>
-          <p className="text-white/60 text-sm">
+          <p className="text-workon-gray text-sm">
             Cette page a rencontré une erreur. Vous pouvez réessayer ou
             revenir à l&apos;accueil.
           </p>
@@ -61,15 +61,15 @@ export default function Error({
 
         {/* Error reference */}
         {error.digest && (
-          <p className="text-xs text-white/40 font-mono">
+          <p className="text-xs text-workon-muted font-mono">
             Réf : {error.digest}
           </p>
         )}
 
         {/* Dev only: error details */}
         {isDev && (
-          <div className="p-3 rounded-2xl bg-[#FF4D1C]/5 border border-[#FF4D1C]/25 text-left">
-            <p className="text-xs font-mono text-[#FF4D1C] break-all">
+          <div className="p-3 rounded-2xl bg-workon-accent/5 border border-workon-accent/20 text-left">
+            <p className="text-xs font-mono text-workon-accent break-all">
               {error.message}
             </p>
           </div>

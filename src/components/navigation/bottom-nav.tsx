@@ -2,21 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Phone, MessageCircle, User } from "lucide-react";
+import {
+  Home,
+  Users,
+  Phone,
+  Map,
+  MessageCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 
 /**
- * Bottom navigation (mobile shell).
+ * Bottom navigation — Convergence design (5 tabs + Express FAB).
  *
- * Layout matches the target mockups:
- *   [Accueil] [Chercher]  <FAB>  [Messages] [Profil]
+ * Layout:
+ *   [Accueil] [Pros]  📞 Appeler  [Carte] [Messages]
  *
- * The center slot is a raised orange phone FAB ("Réserver"),
- * reinforcing the "ligne directe vers le travail instantané"
- * positioning. The FAB links to /search which is the canonical
- * entry point to browse and reserve a worker.
+ * The center slot is a raised terracotta phone FAB ("Appeler"),
+ * linking to /express — the core Express Dispatch feature that
+ * sends an instant GPS-based request to nearby professionals.
+ *
+ * The Messages tab shows a live unread-count badge (polls every 20s).
  */
 
 type Tab = {
@@ -26,13 +33,13 @@ type Tab = {
 };
 
 const leftTabs: Tab[] = [
-  { href: "/home",   label: "Accueil",  icon: Home },
-  { href: "/search", label: "Chercher", icon: Search },
+  { href: "/home", label: "Accueil", icon: Home },
+  { href: "/search", label: "Pros", icon: Users },
 ];
 
 const rightTabs: Tab[] = [
+  { href: "/map", label: "Carte", icon: Map },
   { href: "/messages", label: "Messages", icon: MessageCircle },
-  { href: "/profile",  label: "Profil",   icon: User },
 ];
 
 export function BottomNav() {
@@ -41,9 +48,9 @@ export function BottomNav() {
   const { data: unread } = useQuery({
     queryKey: ["unread-count"],
     queryFn: () => api.getUnreadCount(),
-    refetchInterval: 60_000,
+    refetchInterval: 20_000,
     refetchIntervalInBackground: false,
-    staleTime: 30_000,
+    staleTime: 10_000,
   });
 
   const isActive = (href: string) =>
@@ -57,45 +64,54 @@ export function BottomNav() {
         key={tab.href}
         href={tab.href}
         className={cn(
-          "flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors",
-          active ? "text-[#FF4D1C]" : "text-white/50 hover:text-white/80",
+          "flex flex-col items-center justify-center gap-0.5 flex-1 h-full pt-2 transition-colors",
+          active ? "text-workon-ink" : "text-workon-muted hover:text-workon-gray",
         )}
       >
         <div className="relative">
-          <Icon className="h-5 w-5" />
+          <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.5 : 1.5} />
           {tab.href === "/messages" && unread && unread.count > 0 && (
-            <span className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 rounded-full bg-[#FF4D1C] text-[10px] font-bold text-white flex items-center justify-center">
-              {unread.count > 99 ? "99+" : unread.count}
+            <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-[16px] px-0.5 rounded-full bg-workon-accent text-[8px] font-bold text-white flex items-center justify-center">
+              {unread.count > 9 ? "9+" : unread.count}
             </span>
           )}
         </div>
         <span className="text-[10px] font-medium">{tab.label}</span>
+        {active && <div className="w-1 h-1 rounded-full bg-workon-ink mt-0.5" />}
       </Link>
     );
   };
 
-  const fabActive = isActive("/search") || isActive("/reserve");
+  const fabActive = isActive("/express");
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-neutral-900/95 backdrop-blur-lg safe-area-bottom">
-      <div className="relative flex items-center justify-around h-16 max-w-lg mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-workon-border bg-white/90 backdrop-blur-xl safe-area-bottom">
+      <div className="relative flex items-end justify-around h-16 max-w-lg mx-auto px-4 pb-4 pt-0">
         {leftTabs.map(renderTab)}
 
-        {/* Center: raised FAB "Réserver" */}
-        <div className="flex-1 flex items-start justify-center">
+        {/* Center: raised Express FAB "Appeler" */}
+        <div className="flex flex-col items-center -mt-5 min-w-[52px]">
           <Link
-            href="/search"
-            aria-label="Réserver un pro"
+            href="/express"
+            aria-label="Appeler un pro — dispatch express"
             className={cn(
-              "flex items-center justify-center h-14 w-14 -mt-6 rounded-full transition-all",
-              "bg-[#FF4D1C] text-white",
-              "shadow-lg shadow-[#FF4D1C]/40 hover:shadow-xl hover:shadow-[#FF4D1C]/50",
-              "ring-4 ring-neutral-900",
-              fabActive && "scale-105",
+              "flex items-center justify-center h-14 w-14 rounded-full transition-all",
+              "bg-workon-accent text-white",
+              "shadow-[0_4px_16px_rgba(181,56,42,0.3)]",
+              "hover:shadow-[0_4px_24px_rgba(181,56,42,0.45)]",
+              fabActive && "shadow-[0_4px_20px_rgba(181,56,42,0.4)]",
             )}
           >
-            <Phone className="h-6 w-6" />
+            <Phone className="h-6 w-6" fill="currentColor" />
           </Link>
+          <span
+            className={cn(
+              "text-[10px] mt-1 font-semibold",
+              fabActive ? "text-workon-accent" : "text-workon-gray",
+            )}
+          >
+            Appeler
+          </span>
         </div>
 
         {rightTabs.map(renderTab)}
