@@ -11,38 +11,33 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Vintage rotary phone icon — full desk phone with handset on top
- * and rotary dial, matching the WorkOn brand ad.
- * Base + cadran + combiné = one unit.
+ * Vintage rotary desk phone — optimised for 28×28 px render inside 56 px FAB.
+ * Design: chunky base with visible dial ring + simplified handset on cradle.
+ * All shapes use whole-pixel coordinates for crisp rendering at small sizes.
  */
 function VintagePhoneIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 32 32"
+      viewBox="0 0 28 28"
       fill="currentColor"
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Phone base — rounded rectangle */}
-      <rect x="4" y="14" width="24" height="14" rx="3" opacity="0.9" />
-      {/* Rotary dial circle */}
-      <circle cx="16" cy="21" r="5" fill="currentColor" />
-      <circle cx="16" cy="21" r="3.2" fill="white" opacity="0.25" />
-      <circle cx="16" cy="21" r="1.5" fill="currentColor" />
-      {/* Dial holes — small circles around the dial */}
-      <circle cx="16" cy="17" r="0.6" fill="white" opacity="0.4" />
-      <circle cx="19.2" cy="18" r="0.6" fill="white" opacity="0.4" />
-      <circle cx="20.5" cy="21" r="0.6" fill="white" opacity="0.4" />
-      <circle cx="19.2" cy="24" r="0.6" fill="white" opacity="0.4" />
-      <circle cx="16" cy="25" r="0.6" fill="white" opacity="0.4" />
-      <circle cx="12.8" cy="24" r="0.6" fill="white" opacity="0.4" />
-      <circle cx="11.5" cy="21" r="0.6" fill="white" opacity="0.4" />
-      <circle cx="12.8" cy="18" r="0.6" fill="white" opacity="0.4" />
-      {/* Handset / combiné — resting on top of the base */}
-      <path
-        d="M7 14C7 14 7 10 7 8.5C7 6.5 8.5 5 10 5H11C11.8 5 12 5.8 12 6.5V9C12 9.5 11.5 10 11 10H10.5C10 10 9.5 10.5 9.5 11V12C9.5 12.5 10 13 10.5 13H21.5C22 13 22.5 12.5 22.5 12V11C22.5 10.5 22 10 21.5 10H21C20.5 10 20 9.5 20 9V6.5C20 5.8 20.2 5 21 5H22C23.5 5 25 6.5 25 8.5C25 10 25 14 25 14"
-        fill="currentColor"
-      />
+      {/* ── Base ── rounded box, bottom 60% of the icon */}
+      <rect x="3" y="12" width="22" height="13" rx="3.5" />
+
+      {/* ── Dial ring ── the signature rotary circle */}
+      <circle cx="14" cy="18.5" r="4.8" fill="white" opacity="0.2" />
+      <circle cx="14" cy="18.5" r="3" fill="currentColor" />
+      <circle cx="14" cy="18.5" r="1.2" fill="white" opacity="0.35" />
+
+      {/* ── Handset ── two ear cups connected by a thick bar on the cradle */}
+      {/* Left ear cup */}
+      <rect x="4.5" y="5" width="5" height="8" rx="2.5" />
+      {/* Right ear cup */}
+      <rect x="18.5" y="5" width="5" height="8" rx="2.5" />
+      {/* Handle bar connecting the two cups */}
+      <rect x="8" y="7.5" width="12" height="3" rx="1.5" />
     </svg>
   );
 }
