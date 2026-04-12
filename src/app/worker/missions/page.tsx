@@ -58,8 +58,10 @@ function WorkerMissionsContent() {
         },
         (error) => {
           console.error("Erreur géolocalisation:", error);
+          // Fallback: Montréal par défaut
+          setUserLocation({ lat: 45.5017, lng: -73.5673 });
           setLocationError(
-            "Impossible d'obtenir votre position. Certaines fonctionnalités (distance) seront limitées."
+            "Impossible d'obtenir votre position. Affichage des missions autour de Montréal."
           );
         },
         {
@@ -69,7 +71,8 @@ function WorkerMissionsContent() {
         }
       );
     } else {
-      setLocationError("Votre navigateur ne supporte pas la géolocalisation.");
+      setUserLocation({ lat: 45.5017, lng: -73.5673 });
+      setLocationError("Géolocalisation non supportée. Affichage autour de Montréal.");
     }
   }, []);
 
