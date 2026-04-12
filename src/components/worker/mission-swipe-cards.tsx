@@ -46,12 +46,12 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
 
   if (!currentMission) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-12">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-[#EAE6DF] bg-white p-12">
         <div className="mb-4 text-6xl">✅</div>
-        <h3 className="mb-2 text-xl font-semibold text-gray-900">
+        <h3 className="mb-2 text-xl font-semibold text-[#1B1A18]">
           Toutes les missions parcourues !
         </h3>
-        <p className="text-gray-500">Revenez plus tard pour de nouvelles opportunités</p>
+        <p className="text-sm text-[#706E6A]">Revenez plus tard pour de nouvelles opportunités</p>
       </div>
     );
   }
@@ -59,7 +59,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
   return (
     <div className="mx-auto max-w-2xl">
       {/* Indicateur de progression */}
-      <div className="mb-4 flex items-center justify-between text-sm text-gray-500">
+      <div className="mb-4 flex items-center justify-between text-sm text-[#706E6A]">
         <span>{currentIndex + 1} / {missions.length}</span>
         <span>{missions.length - currentIndex - 1} restante(s)</span>
       </div>
@@ -90,13 +90,14 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
               duration: 0.3,
               ease: "easeInOut",
             }}
-            className="absolute inset-0 overflow-hidden rounded-3xl border-2 border-gray-200 bg-white shadow-2xl"
+            className="absolute inset-0 overflow-hidden rounded-2xl border border-[#EAE6DF] bg-white shadow-soft"
           >
             {/* Header avec distance */}
             {currentMission.distance !== null && (
-              <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
+              <div className="flex items-center justify-center gap-2 bg-[#134021] px-6 py-3">
+                <span className="text-white">📍</span>
                 <p className="text-center text-lg font-bold text-white">
-                  📍 {currentMission.distance} km de vous
+                  {currentMission.distance} km de vous
                 </p>
               </div>
             )}
@@ -105,21 +106,21 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
               {/* Urgency signals */}
               <div className="mb-4 flex flex-wrap gap-2">
                 {differenceInHours(new Date(), new Date(currentMission.createdAt)) < 24 && (
-                  <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-600 border border-green-500/30">
+                  <span className="inline-flex items-center rounded-xl bg-[#134021]/8 px-2.5 py-1 text-xs font-semibold text-[#134021]">
                     Nouveau
                   </span>
                 )}
-                <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-500">
+                <span className="inline-flex items-center rounded-xl bg-[#F9F8F5] px-2.5 py-1 text-xs text-[#706E6A]">
                   Publiee {formatDistanceToNow(new Date(currentMission.createdAt), { addSuffix: true, locale: fr })}
                 </span>
               </div>
 
               {/* Titre et employeur */}
               <div className="mb-6">
-                <h2 className="mb-2 text-3xl font-bold text-gray-900">
+                <h2 className="font-heading mb-2 text-3xl font-bold text-[#1B1A18]">
                   {currentMission.title}
                 </h2>
-                <p className="text-lg text-gray-500">
+                <p className="text-lg text-[#706E6A]">
                   par {currentMission.employerName || "Employeur"}
                 </p>
               </div>
@@ -127,7 +128,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
               {/* Description */}
               {currentMission.description && (
                 <div className="mb-6">
-                  <p className="text-gray-600">{currentMission.description}</p>
+                  <p className="text-sm text-[#706E6A]">{currentMission.description}</p>
                 </div>
               )}
 
@@ -137,8 +138,8 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🏷️</span>
                     <div>
-                      <p className="text-sm text-gray-400">Catégorie</p>
-                      <p className="font-semibold text-gray-900">{currentMission.category}</p>
+                      <p className="text-sm text-[#706E6A]">Catégorie</p>
+                      <p className="font-semibold text-[#1B1A18]">{currentMission.category}</p>
                     </div>
                   </div>
                 )}
@@ -147,8 +148,8 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">📍</span>
                     <div>
-                      <p className="text-sm text-gray-400">Lieu</p>
-                      <p className="font-semibold text-gray-900">{currentMission.city}</p>
+                      <p className="text-sm text-[#706E6A]">Lieu</p>
+                      <p className="font-semibold text-[#1B1A18]">{currentMission.city}</p>
                     </div>
                   </div>
                 )}
@@ -157,8 +158,8 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">💰</span>
                     <div>
-                      <p className="text-sm text-gray-400">Rémunération</p>
-                      <p className="text-xl font-bold text-green-600">
+                      <p className="text-sm text-[#706E6A]">Rémunération</p>
+                      <p className="text-xl font-bold text-[#2D8B55]">
                         {currentMission.hourlyRate.toFixed(2)} $ / heure
                       </p>
                     </div>
@@ -169,8 +170,8 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">📅</span>
                     <div>
-                      <p className="text-sm text-gray-400">Date de début</p>
-                      <p className="font-semibold text-gray-900">
+                      <p className="text-sm text-[#706E6A]">Date de début</p>
+                      <p className="font-semibold text-[#1B1A18]">
                         {format(new Date(currentMission.startsAt), "PPP", { locale: frCA })}
                       </p>
                     </div>
@@ -182,19 +183,19 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
               <div className="flex gap-4">
                 <Button
                   onClick={handleReject}
-                  className="flex-1 rounded-xl border-2 border-red-500 bg-transparent py-6 text-lg font-bold text-red-500 transition hover:bg-red-500 hover:text-white"
+                  className="flex-1 rounded-xl border-2 border-[#EAE6DF] bg-transparent py-6 text-lg font-bold text-[#706E6A] transition hover:bg-[#F9F8F5] hover:text-[#1B1A18]"
                 >
                   ❌ Passer
                 </Button>
                 <Button
                   onClick={handleSave}
-                  className="flex-1 rounded-xl border-2 border-yellow-500 bg-transparent py-6 text-lg font-bold text-yellow-500 transition hover:bg-yellow-500 hover:text-white"
+                  className="flex-1 rounded-xl border-2 border-[#D4922A] bg-transparent py-6 text-lg font-bold text-[#D4922A] transition hover:bg-[#D4922A]/10"
                 >
                   ⭐ Sauvegarder
                 </Button>
                 <Button
                   onClick={handleReserve}
-                  className="flex-1 rounded-xl bg-green-600 py-6 text-lg font-bold text-white transition hover:bg-green-500"
+                  className="flex-1 rounded-xl bg-[#134021] py-6 text-lg font-bold text-white transition hover:bg-[#0F3319]"
                 >
                   ✅ Réserver
                 </Button>
@@ -209,7 +210,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
         <div className="mt-4 text-center">
           <button
             onClick={() => setCurrentIndex(currentIndex - 1)}
-            className="text-sm text-gray-400 hover:text-gray-900"
+            className="text-sm text-[#706E6A] hover:text-[#1B1A18]"
           >
             ← Mission précédente
           </button>

@@ -134,7 +134,7 @@ export function MissionMap({ missions, userLocation, onReserve }: Props) {
   }, [missions, userLocation, onReserve]);
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-3xl border border-[#EAE6DF] bg-white shadow-card">
       <div
         ref={mapContainerRef}
         className="h-[600px] w-full"

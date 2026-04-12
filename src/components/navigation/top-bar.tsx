@@ -72,12 +72,12 @@ export function TopBar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-workon-border bg-white/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-workon-border/50 bg-white/70 backdrop-blur-xl">
         {/* Logo */}
-        <Link href="/home" className="flex items-center gap-0.5 text-xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
-          <span>Work</span>
-          <MapPin className="h-5 w-5 text-workon-primary" />
-          <span>n</span>
+        <Link href="/home" className="flex items-center gap-0.5 text-xl font-bold font-heading">
+          <span className="text-[#1B1A18]">Work</span>
+          <MapPin className="h-5 w-5 text-[#B5382A]" />
+          <span className="text-[#1B1A18]">n</span>
         </Link>
 
         {/* Right actions */}
@@ -88,7 +88,7 @@ export function TopBar() {
             className="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-workon-bg-cream transition-colors"
             aria-label={`Notifications${unread > 0 ? ` (${unread} non lues)` : ""}`}
           >
-            <Bell className="h-5 w-5 text-workon-ink" />
+            <Bell className="h-5 w-5 text-[#706E6A] hover:text-[#1B1A18] transition-colors" />
             {unread > 0 && (
               <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-workon-accent text-[10px] font-bold text-white flex items-center justify-center">
                 {unread > 9 ? "9+" : unread}
@@ -103,9 +103,9 @@ export function TopBar() {
             aria-label="Menu"
           >
             {menuOpen ? (
-              <X className="h-5 w-5 text-workon-ink" />
+              <X className="h-5 w-5 text-[#706E6A] hover:text-[#1B1A18] transition-colors" />
             ) : (
-              <Menu className="h-5 w-5 text-workon-ink" />
+              <Menu className="h-5 w-5 text-[#706E6A] hover:text-[#1B1A18] transition-colors" />
             )}
           </button>
         </div>
@@ -118,7 +118,7 @@ export function TopBar() {
             className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="fixed top-14 right-0 left-0 z-40 bg-white border-b border-workon-border shadow-lg max-h-[70vh] overflow-y-auto">
+          <div className="fixed top-14 right-0 left-0 z-40 bg-white/95 backdrop-blur-xl border-b border-workon-border/50 shadow-lg max-h-[70vh] overflow-y-auto">
             {/* User identity */}
             <div className="px-4 py-3 border-b border-workon-border">
               <p className="font-semibold text-workon-ink">

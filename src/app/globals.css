@@ -116,6 +116,20 @@ body {
   background: #B5B0A8;
 }
 
+/* Emergent shadows */
+.shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 4px 12px rgba(27,26,24,0.03); }
+.shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
+
+/* Heading font — Cabinet Grotesk with Manrope bold fallback */
+.font-heading {
+  font-family: 'Cabinet Grotesk', var(--font-manrope), system-ui, sans-serif;
+  font-feature-settings: 'ss01';
+}
+
+/* Emergent shadow tokens */
+.shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 4px 12px rgba(27,26,24,0.03); }
+.shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
+
 /* Focus rings */
 *:focus-visible {
   outline: 2px solid var(--workon-primary);
