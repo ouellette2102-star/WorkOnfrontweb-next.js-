@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -64,6 +65,7 @@ export default function RootLayout({
       >
         <Toaster position="top-right" richColors closeButton theme="light" />
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
     </html>
   );
