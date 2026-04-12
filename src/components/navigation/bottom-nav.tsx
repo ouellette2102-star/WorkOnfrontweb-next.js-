@@ -5,11 +5,33 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   Users,
-  Phone,
   Map,
   MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+/**
+ * Vintage handset phone icon — matches the WorkOn brand ad
+ * (classic rotary phone handset on smartphone silhouette).
+ */
+function VintagePhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Handset / combiné */}
+      <path
+        d="M5.5 2C4.4 2 3.5 2.9 3.5 4v2.5c0 1.2 0.6 2.3 1.5 3L7 11v2l-2 1.5c-0.9 0.7-1.5 1.8-1.5 3V20c0 1.1 0.9 2 2 2h1c0.6 0 1-0.4 1-1v-3.5L9.5 16h5l2 1.5V21c0 0.6 0.4 1 1 1h1c1.1 0 2-0.9 2-2v-2.5c0-1.2-0.6-2.3-1.5-3L17 13v-2l2-1.5c0.9-0.7 1.5-1.8 1.5-3V4c0-1.1-0.9-2-2-2h-1c-0.6 0-1 0.4-1 1v3.5L14.5 8h-5L7.5 5.5V3c0-0.6-0.4-1-1-1H5.5Z"
+        fill="currentColor"
+      />
+      {/* Cadran / dial circle */}
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.3" />
+    </svg>
+  );
+}
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 
@@ -102,7 +124,7 @@ export function BottomNav() {
               fabActive && "shadow-[0_4px_20px_rgba(201,102,70,0.4)]",
             )}
           >
-            <Phone className="h-6 w-6" fill="currentColor" />
+            <VintagePhoneIcon className="h-7 w-7" />
           </Link>
           <span
             className={cn(
