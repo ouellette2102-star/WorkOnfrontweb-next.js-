@@ -2,6 +2,7 @@ import { requireWorker } from "@/lib/auth-helpers";
 import { ActiveMissionsCard } from "@/components/worker/active-missions-card";
 import { AvailableMissionsCard } from "@/components/worker/available-missions-card";
 import { MissionHistoryCard } from "@/components/worker/mission-history-card";
+import { ProfileCompletionCard } from "@/components/worker/profile-completion-card";
 import { QuickStatsCard } from "@/components/worker/quick-stats-card";
 import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { TrustScoreRing } from "@/components/worker/trust-score-ring";
@@ -31,6 +32,9 @@ export default async function WorkerDashboardPage() {
         <div className="mb-6">
           <StripeConnectGate />
         </div>
+
+        {/* Profile completion (hidden when 100%) */}
+        <ProfileCompletionCard />
 
         {/* Quick Stats */}
         <QuickStatsCard />

@@ -378,6 +378,12 @@ export const api = {
 
   // Catalog (public)
   getCategories: () => apiFetch<CategoryResponse[]>("/catalog/categories", { skipAuth: true }),
+  getSkills: (params?: { categoryName?: string; q?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.categoryName) q.set("categoryName", params.categoryName);
+    if (params?.q) q.set("q", params.q);
+    return apiFetch<{ data: any[]; meta: any }>(`/catalog/skills?${q}`, { skipAuth: true });
+  },
 
   // Workers (public)
   getWorkers: (params?: { city?: string; category?: string; limit?: number; page?: number }) => {
@@ -465,6 +471,13 @@ export const api = {
   markRead: (missionId: string) => apiFetch<void>(`/messages-local/read/${missionId}`, { method: "PATCH" }),
   getUnreadCount: () => apiFetch<{ count: number }>("/messages-local/unread-count"),
 
+  // Worker Skills
+  getMySkills: () => apiFetch<any[]>("/workers/me/skills"),
+  setMySkills: (skillIds: string[]) => apiFetch<any[]>("/workers/me/skills", {
+    method: "PUT",
+    body: JSON.stringify({ skillIds }),
+  }),
+
   // Profile
   updateProfile: (data: { firstName?: string; lastName?: string; phone?: string; city?: string }) =>
     apiFetch<unknown>("/users/me", { method: "PATCH", body: JSON.stringify(data) }),
@@ -473,6 +486,13 @@ export const api = {
     formData.append("file", file);
     return apiFetch<unknown>("/users/me/picture", { method: "POST", body: formData });
   },
+  updateAvatar: (pictureUrl: string) =>
+    apiFetch<unknown>("/users/me/avatar", {
+      method: "PATCH",
+      body: JSON.stringify({ pictureUrl }),
+    }),
+  getMyCompletion: () =>
+    apiFetch<{ score: number; tier: string; missingFields: string[] }>("/users/me/completion"),
 
   // Compliance
   getConsentStatus: () => apiFetch<ConsentStatus>("/compliance/status"),
@@ -593,6 +613,12 @@ export const api = {
   getAvailability: () => apiFetch<AvailabilitySlot[]>("/scheduling/availability"),
   setAvailability: (data: { dayOfWeek: number; startTime: string; endTime: string }) =>
     apiFetch<AvailabilitySlot>("/scheduling/availability", { method: "POST", body: JSON.stringify(data) }),
+  getMyAvailability: () => apiFetch<AvailabilitySlot[]>("/scheduling/availability"),
+  setMyAvailability: (slots: { dayOfWeek: number; startTime: string; endTime: string }[]) =>
+    apiFetch<AvailabilitySlot[]>("/scheduling/availability", {
+      method: "POST",
+      body: JSON.stringify({ slots }),
+    }),
   blockTime: (data: { date: string; reason?: string }) =>
     apiFetch<unknown>("/scheduling/availability/block", { method: "POST", body: JSON.stringify(data) }),
 
@@ -789,6 +815,7 @@ function mapUserToProfileResponse(u: {
   lastName: string | null;
   phone: string | null;
   city: string | null;
+  pictureUrl?: string | null;
   role: string;
 }): {
   id: string;
@@ -796,6 +823,7 @@ function mapUserToProfileResponse(u: {
   fullName: string;
   phone: string;
   city: string;
+  pictureUrl: string | null;
   primaryRole: "WORKER" | "EMPLOYER" | "RESIDENTIAL_CLIENT";
   isWorker: boolean;
   isEmployer: boolean;
@@ -817,6 +845,7 @@ function mapUserToProfileResponse(u: {
     fullName,
     phone: u.phone ?? "",
     city: u.city ?? "",
+    pictureUrl: u.pictureUrl ?? null,
     primaryRole,
     isWorker: primaryRole === "WORKER",
     isEmployer: primaryRole === "EMPLOYER",

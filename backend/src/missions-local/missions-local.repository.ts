@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 
@@ -19,7 +20,7 @@ export class MissionsLocalRepository {
   async create(createMissionDto: CreateMissionDto, createdByUserId: string) {
     this.logger.log(`Creating mission: ${createMissionDto.title}`);
 
-    const id = `lm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `lm_${crypto.randomUUID().replace(/-/g, '').substring(0, 16)}`;
     return this.prisma.localMission.create({
       data: {
         id,
@@ -39,11 +40,23 @@ export class MissionsLocalRepository {
   }
 
   /**
-   * Find mission by ID
+   * Find mission by ID (includes contract if exists)
    */
   async findById(id: string) {
     return this.prisma.localMission.findUnique({
       where: { id },
+      include: {
+        contract: {
+          select: {
+            id: true,
+            status: true,
+            amount: true,
+            signedByWorker: true,
+            signedByEmployer: true,
+            createdAt: true,
+          },
+        },
+      },
     });
   }
 
@@ -54,46 +67,88 @@ export class MissionsLocalRepository {
    * @param longitude User's longitude
    * @param radiusKm Search radius in kilometers
    */
-  async findNearby(latitude: number, longitude: number, radiusKm: number) {
-    // Use raw SQL for geospatial distance calculation
-    // Haversine formula: calculates distance between two lat/lng points
+  async findNearby(
+    latitude: number,
+    longitude: number,
+    radiusKm: number,
+    options?: { sort?: string; category?: string; query?: string; priceMin?: number; priceMax?: number },
+  ) {
+    const priceMin = options?.priceMin ?? 0;
+    const priceMax = options?.priceMax ?? 999999;
+
+    // Compose WHERE filters dynamically while keeping values parameterized.
+    const conditions: Prisma.Sql[] = [
+      Prisma.sql`lm.status = 'open'`,
+      Prisma.sql`lm.price >= ${priceMin}`,
+      Prisma.sql`lm.price <= ${priceMax}`,
+    ];
+
+    if (options?.category) {
+      conditions.push(Prisma.sql`lm.category = ${options.category}`);
+    }
+    if (options?.query) {
+      const searchPattern = `%${options.query}%`;
+      conditions.push(
+        Prisma.sql`(lm.title ILIKE ${searchPattern} OR lm.description ILIKE ${searchPattern})`,
+      );
+    }
+    const whereClause = Prisma.join(conditions, ' AND ');
+
+    // Dynamic ORDER BY — only whitelisted sort keys reach SQL.
+    // trustScore is NULLS LAST so brand-new creators don't float above
+    // experienced ones, and it falls back on distance for tie-breaking.
+    let orderBy: Prisma.Sql;
+    switch (options?.sort) {
+      case 'price':
+        orderBy = Prisma.sql`price DESC`;
+        break;
+      case 'date':
+        orderBy = Prisma.sql`"createdAt" DESC`;
+        break;
+      case 'trust':
+        orderBy = Prisma.sql`"creatorTrustScore" DESC NULLS LAST, "distanceKm" ASC`;
+        break;
+      case 'distance':
+      default:
+        orderBy = Prisma.sql`"distanceKm" ASC`;
+    }
+
     const missions = await this.prisma.$queryRaw<any[]>`
-      SELECT 
-        id,
-        title,
-        description,
-        category,
-        status,
-        price,
-        latitude,
-        longitude,
-        city,
-        address,
-        "createdByUserId",
-        "assignedToUserId",
-        "createdAt",
-        "updatedAt",
-        (
+      WITH distances AS (
+        SELECT
+          lm.id,
+          lm.title,
+          lm.description,
+          lm.category,
+          lm.status,
+          lm.price,
+          lm.latitude,
+          lm.longitude,
+          lm.city,
+          lm.address,
+          lm."createdByUserId",
+          lm."assignedToUserId",
+          lm."createdAt",
+          lm."updatedAt",
+          lu."trustScore"    AS "creatorTrustScore",
+          lu."trustTier"     AS "creatorTrustTier",
+          lu."ratingAverage" AS "creatorRatingAverage",
           6371 * acos(
-            cos(radians(${latitude})) 
-            * cos(radians(latitude)) 
-            * cos(radians(longitude) - radians(${longitude})) 
-            + sin(radians(${latitude})) 
-            * sin(radians(latitude))
-          )
-        ) AS "distanceKm"
-      FROM local_missions
-      WHERE status = 'open'
-      HAVING (
-        6371 * acos(
-          cos(radians(${latitude})) 
-          * cos(radians(latitude)) 
-          * cos(radians(longitude) - radians(${longitude})) 
-          + sin(radians(${latitude})) 
-          * sin(radians(latitude))
-        )
-      ) <= ${radiusKm}
-      ORDER BY "distanceKm" ASC
+            LEAST(1.0,
+              cos(radians(${latitude}))
+              * cos(radians(lm.latitude))
+              * cos(radians(lm.longitude) - radians(${longitude}))
+              + sin(radians(${latitude}))
+              * sin(radians(lm.latitude))
+            )
+          ) AS "distanceKm"
+        FROM local_missions lm
+        LEFT JOIN local_users lu ON lu.id = lm."createdByUserId"
+        WHERE ${whereClause}
+      )
+      SELECT * FROM distances
+      WHERE "distanceKm" <= ${radiusKm}
+      ORDER BY ${orderBy}
       LIMIT 50
     `;
 

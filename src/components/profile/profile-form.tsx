@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useProfile } from "@/hooks/use-profile";
+import { api } from "@/lib/api-client";
+import { SkillSelector } from "@/components/skills/skill-selector";
+import { AvailabilityEditor } from "@/components/availability/availability-editor";
 
 export function ProfileForm() {
-  const { profile, isLoading, error, updateProfile } = useProfile();
+  const { profile, isLoading, error, updateProfile, refetch } = useProfile();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -12,11 +15,19 @@ export function ProfileForm() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // Avatar state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
+  const [avatarMessageType, setAvatarMessageType] = useState<"success" | "error">("success");
+
   useEffect(() => {
     if (profile) {
       setFullName(profile.fullName ?? "");
       setPhone(profile.phone ?? "");
       setCity(profile.city ?? "");
+      setAvatarPreview(profile.pictureUrl ?? null);
     }
   }, [profile]);
 
@@ -67,8 +78,103 @@ export function ProfileForm() {
     );
   }
 
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Client-side validation
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setAvatarMessage("Format invalide. Utilise JPEG, PNG ou WebP.");
+      setAvatarMessageType("error");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarMessage("Fichier trop volumineux (max 5 Mo).");
+      setAvatarMessageType("error");
+      return;
+    }
+
+    // Show preview immediately
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+    setAvatarMessage(null);
+    setIsUploadingAvatar(true);
+
+    try {
+      await api.uploadProfilePicture(file);
+      await refetch();
+      setAvatarMessage("Photo mise a jour");
+      setAvatarMessageType("success");
+    } catch (uploadError) {
+      setAvatarMessage(
+        uploadError instanceof Error
+          ? uploadError.message
+          : "Impossible de telecharger la photo.",
+      );
+      setAvatarMessageType("error");
+      // Revert preview on error
+      setAvatarPreview(profile?.pictureUrl ?? null);
+    } finally {
+      setIsUploadingAvatar(false);
+      // Reset file input so the same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const initials = (profile?.fullName ?? "?")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Avatar section */}
+      <div className="flex flex-col items-center gap-3 pb-2">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploadingAvatar}
+          className="group relative h-24 w-24 overflow-hidden rounded-full border-2 border-workon-border bg-workon-bg transition hover:border-[#134021] focus:outline-none focus:ring-2 focus:ring-[#134021] focus:ring-offset-2 disabled:opacity-70"
+        >
+          {avatarPreview ? (
+            <img
+              src={avatarPreview}
+              alt="Photo de profil"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-2xl font-bold text-workon-muted">
+              {initials}
+            </span>
+          )}
+          <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
+            {isUploadingAvatar ? "..." : "Modifier"}
+          </span>
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleAvatarChange}
+          className="hidden"
+        />
+        <p className="text-xs text-workon-muted">
+          Clique pour changer ta photo (JPEG, PNG, WebP, max 5 Mo)
+        </p>
+        {avatarMessage ? (
+          <p
+            className={`text-xs ${
+              avatarMessageType === "success" ? "text-[#22C55E]" : "text-workon-accent"
+            }`}
+          >
+            {avatarMessage}
+          </p>
+        ) : null}
+      </div>
+
       <div>
         <label className="text-sm text-workon-muted">Nom complet</label>
         <input
@@ -119,6 +225,30 @@ export function ProfileForm() {
       >
         {isPending ? "Enregistrement..." : "Sauvegarder"}
       </button>
+
+      {/* Skill selector section */}
+      <div className="mt-8 border-t border-workon-border pt-8">
+        <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Competences</p>
+        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Tes competences</h3>
+        <p className="mt-1 text-sm text-workon-muted">
+          Selectionne les competences que tu offres pour apparaitre dans les recherches.
+        </p>
+        <div className="mt-4">
+          <SkillSelector />
+        </div>
+      </div>
+
+      {/* Availability section */}
+      <div className="mt-8 border-t border-workon-border pt-8">
+        <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Horaire</p>
+        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Disponibilites</h3>
+        <p className="mt-1 text-sm text-workon-muted">
+          Configure tes plages horaires pour chaque jour de la semaine.
+        </p>
+        <div className="mt-4">
+          <AvailabilityEditor />
+        </div>
+      </div>
     </form>
   );
 }
