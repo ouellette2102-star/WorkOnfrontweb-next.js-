@@ -45,13 +45,16 @@ export function AvailabilityEditor() {
   const { data: slots, isLoading } = useQuery({
     queryKey: ["my-availability"],
     queryFn: () => api.getMyAvailability(),
+    retry: false,
   });
 
   // Populate state from fetched slots
   useEffect(() => {
     if (!slots) return;
+    // Backend returns { recurring, blocked, specific } — use recurring slots
+    const slotList = Array.isArray(slots) ? slots : (slots as any).recurring ?? [];
     const next: DayState[] = Array.from({ length: 7 }, () => ({ ...DEFAULT_DAY }));
-    for (const slot of slots) {
+    for (const slot of slotList) {
       const displayIdx = DOW_TO_DISPLAY[slot.dayOfWeek];
       if (displayIdx !== undefined) {
         next[displayIdx] = {

@@ -50,11 +50,12 @@ export function SkillSelector() {
   const { data: mySkills, isLoading: loadingMySkills } = useQuery({
     queryKey: ["my-skills"],
     queryFn: () => api.getMySkills(),
+    retry: false,
   });
 
   // Initialize selected IDs from worker's saved skills
   useEffect(() => {
-    if (mySkills && !dirty) {
+    if (mySkills && Array.isArray(mySkills) && !dirty) {
       setSelectedIds(new Set(mySkills.map((s: any) => s.id ?? s.skillId ?? s)));
     }
   }, [mySkills, dirty]);
