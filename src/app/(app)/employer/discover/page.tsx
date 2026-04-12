@@ -53,7 +53,7 @@ export default function EmployerDiscoverPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
+      <div className="flex min-h-screen items-center justify-center bg-workon-bg">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
       </div>
     );
@@ -61,19 +61,19 @@ export default function EmployerDiscoverPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 text-center shadow-lg shadow-black/20">
-          <p className="text-[#FF4D1C]">Erreur lors du chargement des profils</p>
+      <div className="min-h-screen bg-workon-bg p-6">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 text-center shadow-sm">
+          <p className="text-workon-accent">Erreur lors du chargement des profils</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+    <div className="min-h-screen bg-workon-bg p-6">
       <div className="mx-auto max-w-2xl">
         <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold text-white">
+          <h1 className="mb-2 text-4xl font-bold text-workon-ink">
             Découvrir des travailleurs
           </h1>
           <p className="text-lg text-white/70">
@@ -82,19 +82,19 @@ export default function EmployerDiscoverPage() {
         </div>
 
         {!currentCandidate ? (
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-12 text-center backdrop-blur">
+          <div className="rounded-3xl border border-workon-border bg-white p-12 text-center shadow-sm">
             <div className="mb-4 text-6xl">&#x2705;</div>
-            <h3 className="mb-2 text-xl font-semibold text-white">
+            <h3 className="mb-2 text-xl font-semibold text-workon-ink">
               Tous les profils parcourus !
             </h3>
-            <p className="text-white/70">
+            <p className="text-workon-muted">
               Revenez plus tard pour découvrir de nouveaux travailleurs
             </p>
           </div>
         ) : (
           <>
             {/* Progress */}
-            <div className="mb-4 flex items-center justify-between text-sm text-white/70">
+            <div className="mb-4 flex items-center justify-between text-sm text-workon-muted">
               <span>
                 {currentIndex + 1} / {candidates?.length ?? 0}
               </span>
@@ -117,7 +117,7 @@ export default function EmployerDiscoverPage() {
                     rotateZ: direction === "left" ? -30 : direction === "right" ? 30 : 0,
                   }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="absolute inset-0 overflow-hidden rounded-3xl border-2 border-white/10 bg-neutral-900 shadow-2xl"
+                  className="absolute inset-0 overflow-hidden rounded-3xl border-2 border-workon-border bg-white shadow-lg"
                 >
                   {/* Avatar area */}
                   <div className="flex h-40 items-center justify-center bg-gradient-to-r from-[#FF4D1C] to-[#FF8C32]">
@@ -128,7 +128,7 @@ export default function EmployerDiscoverPage() {
                         className="h-24 w-24 rounded-full border-4 border-white object-cover"
                       />
                     ) : (
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-neutral-800 text-3xl font-bold text-white">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-workon-bg text-3xl font-bold text-workon-ink">
                         {currentCandidate.firstName[0]}
                         {currentCandidate.lastName[0]}
                       </div>
@@ -136,11 +136,11 @@ export default function EmployerDiscoverPage() {
                   </div>
 
                   <div className="p-8">
-                    <h2 className="mb-1 text-2xl font-bold text-white">
+                    <h2 className="mb-1 text-2xl font-bold text-workon-ink">
                       {currentCandidate.firstName} {currentCandidate.lastName}
                     </h2>
                     {currentCandidate.city && (
-                      <p className="mb-4 text-white/60">
+                      <p className="mb-4 text-workon-muted">
                         {currentCandidate.city}
                       </p>
                     )}
@@ -149,23 +149,23 @@ export default function EmployerDiscoverPage() {
                       {currentCandidate.avgRating > 0 ? (
                         <div className="flex items-center gap-2">
                           <span className="text-lg">&#x2B50;</span>
-                          <span className="text-white/80">
+                          <span className="text-workon-ink/80">
                             {currentCandidate.avgRating.toFixed(1)} / 5
                             {currentCandidate.reviewCount > 0 && (
-                              <span className="text-white/40"> ({currentCandidate.reviewCount})</span>
+                              <span className="text-workon-muted"> ({currentCandidate.reviewCount})</span>
                             )}
                           </span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
                           <span className="text-lg">&#x2B50;</span>
-                          <span className="text-white/60">Nouveau profil</span>
+                          <span className="text-workon-muted">Nouveau profil</span>
                         </div>
                       )}
                       {currentCandidate.trustTier !== "BASIC" && (
                         <div className="flex items-center gap-2">
                           <span className="text-lg">&#x2705;</span>
-                          <span className="text-white/80 capitalize">
+                          <span className="text-workon-ink/80 capitalize">
                             {currentCandidate.trustTier.toLowerCase()}
                           </span>
                         </div>
@@ -173,14 +173,14 @@ export default function EmployerDiscoverPage() {
                       {currentCandidate.category && (
                         <div className="flex flex-wrap gap-2">
                           <span
-                            className="rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs font-medium text-[#FF4D1C]"
+                            className="rounded-full bg-workon-accent/10 border border-workon-accent/25 px-3 py-1 text-xs font-medium text-workon-accent"
                           >
                             {currentCandidate.category}
                           </span>
                         </div>
                       )}
                       {currentCandidate.bio && (
-                        <p className="text-sm text-white/60 line-clamp-3">
+                        <p className="text-sm text-workon-muted line-clamp-3">
                           {currentCandidate.bio}
                         </p>
                       )}
@@ -191,7 +191,7 @@ export default function EmployerDiscoverPage() {
                       <Button
                         onClick={() => handleSwipe("PASS")}
                         disabled={swipeMutation.isPending}
-                        className="flex-1 rounded-xl border-2 border-white/20 bg-transparent py-5 text-base font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
+                        className="flex-1 rounded-xl border-2 border-workon-border bg-transparent py-5 text-base font-bold text-workon-muted transition hover:bg-workon-bg hover:text-workon-ink"
                       >
                         Passer
                       </Button>
@@ -205,7 +205,7 @@ export default function EmployerDiscoverPage() {
                       <Button
                         onClick={() => handleSwipe("SUPERLIKE")}
                         disabled={swipeMutation.isPending}
-                        className="flex-1 rounded-xl bg-[#FF4D1C] py-5 text-base font-bold text-white transition hover:bg-[#E8441A] shadow-lg shadow-[#FF4D1C]/30"
+                        className="flex-1 rounded-xl bg-workon-primary py-5 text-base font-bold text-white transition hover:bg-workon-primary/90 shadow-sm"
                       >
                         Contacter
                       </Button>

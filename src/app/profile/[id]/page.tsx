@@ -138,7 +138,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const hourlyRate = workerProfile?.hourlyRate ?? 0;
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white">
+    <div className="min-h-screen bg-workon-bg text-workon-ink">
       {/* Sticky Header */}
       <ProfileHeader
         user={{
@@ -159,7 +159,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <div className="max-w-2xl mx-auto px-4 space-y-4">
 
           {/* Quick Stats */}
-          <Card className="border-white/10 bg-neutral-800/50">
+          <Card className="border-workon-border bg-workon-bg0">
             <CardContent className="p-4">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
@@ -169,7 +169,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                       {averageRating > 0 ? averageRating.toFixed(1) : "-"}
                     </span>
                   </div>
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-workon-muted">
                     {reviewCount} avis
                   </p>
                 </div>
@@ -178,13 +178,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     <CheckCircle2 className="h-5 w-5" />
                     <span className="text-xl font-bold">{completedMissions}</span>
                   </div>
-                  <p className="text-xs text-white/60">missions</p>
+                  <p className="text-xs text-workon-muted">missions</p>
                 </div>
                 <div>
                   <div className="flex items-center justify-center gap-1 text-blue-400 mb-1">
                     <Calendar className="h-5 w-5" />
                   </div>
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-workon-muted">
                     {memberSince ? `Depuis ${memberSince}` : "Nouveau membre"}
                   </p>
                 </div>
@@ -194,7 +194,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
           {/* Location (if available) */}
           {userProfile?.city && (
-            <div className="flex items-center gap-2 text-white/70 text-sm px-1">
+            <div className="flex items-center gap-2 text-workon-muted text-sm px-1">
               <MapPin className="h-4 w-4" />
               <span>{userProfile.city}</span>
             </div>
@@ -216,15 +216,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               ))}
             </div>
           ) : (
-            <Card className="border-white/10 bg-neutral-800/30">
+            <Card className="border-workon-border bg-white/30">
               <CardContent className="p-6 text-center">
-                <p className="text-white/50 text-sm">Pas de portfolio pour le moment</p>
+                <p className="text-workon-muted text-sm">Pas de portfolio pour le moment</p>
               </CardContent>
             </Card>
           )}
 
           {/* Services & Rates */}
-          <Card className="border-white/10 bg-neutral-800/50">
+          <Card className="border-workon-border bg-workon-bg0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Services</h2>
@@ -240,11 +240,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   {skills.map((ws: WorkerSkill) => (
                     <div
                       key={ws.id}
-                      className="flex items-center justify-between p-3 bg-neutral-900/50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-white rounded-lg"
                     >
                       <div>
                         <p className="font-medium text-sm">{ws.skill.name}</p>
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs text-workon-muted">
                           {ws.skill.category.name}
                         </p>
                       </div>
@@ -258,7 +258,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   ))}
                 </div>
               ) : (
-                <p className="text-white/50 text-sm text-center py-4">
+                <p className="text-workon-muted text-sm text-center py-4">
                   Services non renseignés
                 </p>
               )}
@@ -266,15 +266,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </Card>
 
           {/* Reviews */}
-          <Card className="border-white/10 bg-neutral-800/50">
+          <Card className="border-workon-border bg-workon-bg0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Avis clients</h2>
                 {reviewCount > 0 && (
-                  <div className="flex items-center gap-1 text-sm text-white/70">
+                  <div className="flex items-center gap-1 text-sm text-workon-muted">
                     <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                     <span>{averageRating.toFixed(1)}</span>
-                    <span className="text-white/50">({reviewCount})</span>
+                    <span className="text-workon-muted">({reviewCount})</span>
                   </div>
                 )}
               </div>
@@ -282,7 +282,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               {recentReviews.length > 0 ? (
                 <div className="space-y-4">
                   {recentReviews.map((review: Review) => (
-                    <div key={review.id} className="border-b border-white/10 pb-4 last:border-0 last:pb-0">
+                    <div key={review.id} className="border-b border-workon-border pb-4 last:border-0 last:pb-0">
                       <div className="flex items-start gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -303,7 +303,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                             </div>
                           </div>
                           {review.comment && (
-                            <p className="text-sm text-white/70">
+                            <p className="text-sm text-workon-muted">
                               {review.comment}
                             </p>
                           )}
@@ -313,13 +313,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   ))}
 
                   {hasMoreReviews && (
-                    <p className="text-center text-sm text-white/50 pt-2">
+                    <p className="text-center text-sm text-workon-muted pt-2">
                       + {reviews.length - MAX_REVIEWS_DISPLAYED} autres avis
                     </p>
                   )}
                 </div>
               ) : (
-                <p className="text-white/50 text-sm text-center py-4">
+                <p className="text-workon-muted text-sm text-center py-4">
                   Aucun avis pour le moment
                 </p>
               )}
@@ -329,7 +329,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       </div>
 
       {/* CTA Bar (Fixed Bottom) - Conforme anti-bypass */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-neutral-900/95 backdrop-blur-sm">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-workon-border bg-workon-bg/95 ">
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex gap-3">
             {/* CTA principal: Créer une mission pour ce worker */}
@@ -344,7 +344,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <MessageCircle className="h-5 w-5" />
             </Button>
           </div>
-          <p className="text-center text-xs text-white/40 mt-2">
+          <p className="text-center text-xs text-workon-muted mt-2">
             Créez une mission pour contacter ce travailleur
           </p>
         </div>

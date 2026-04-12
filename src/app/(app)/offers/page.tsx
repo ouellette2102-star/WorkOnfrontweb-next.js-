@@ -27,7 +27,7 @@ export default function MyOffersPage() {
   if (authLoading || isLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-workon-primary" />
       </div>
     );
   }
@@ -35,22 +35,22 @@ export default function MyOffersPage() {
   return (
     <div className="px-4 py-6 space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-white">Mes offres</h1>
-        <p className="text-sm text-white/50">
+        <h1 className="text-xl font-bold text-workon-ink">Mes offres</h1>
+        <p className="text-sm text-workon-muted">
           Suivez le statut de vos propositions
         </p>
       </div>
 
       {!offers || offers.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <FileText className="mb-4 h-12 w-12 text-white/20" />
-          <h3 className="mb-2 text-lg font-semibold text-white">Aucune offre</h3>
-          <p className="text-sm text-white/50">
+          <FileText className="mb-4 h-12 w-12 text-workon-muted/40" />
+          <h3 className="mb-2 text-lg font-semibold text-workon-ink">Aucune offre</h3>
+          <p className="text-sm text-workon-muted">
             Vos offres apparaîtront ici quand vous proposerez vos services
           </p>
           <Link
             href="/search"
-            className="mt-4 rounded-xl bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-500"
+            className="mt-4 rounded-xl bg-workon-primary px-6 py-2 text-sm font-semibold text-white hover:bg-workon-primary/90"
           >
             Trouver des missions
           </Link>
@@ -61,13 +61,13 @@ export default function MyOffersPage() {
             const status = statusConfig[offer.status] || statusConfig.PENDING;
             return (
               <Link key={offer.id} href={`/missions/${offer.missionId}`}>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-red-500/30">
+                <div className="rounded-2xl border border-workon-border bg-white p-4 transition hover:border-workon-primary/30 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
-                      <h3 className="truncate font-semibold text-white">
+                      <h3 className="truncate font-semibold text-workon-ink">
                         {offer.mission?.title ?? "Mission"}
                       </h3>
-                      <div className="mt-1 flex flex-wrap gap-2 text-xs text-white/50">
+                      <div className="mt-1 flex flex-wrap gap-2 text-xs text-workon-muted">
                         {offer.mission?.category && <span>🏷️ {offer.mission.category}</span>}
                         {offer.mission?.city && <span>📍 {offer.mission.city}</span>}
                         <span>
@@ -78,7 +78,7 @@ export default function MyOffersPage() {
                         </span>
                       </div>
                       {offer.message && (
-                        <p className="mt-2 truncate text-sm text-white/60">
+                        <p className="mt-2 truncate text-sm text-workon-muted">
                           {offer.message}
                         </p>
                       )}

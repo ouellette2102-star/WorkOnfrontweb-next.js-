@@ -121,7 +121,7 @@ function WorkerPaymentsContent() {
         );
       case "FAILED":
         return (
-          <span className="rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs font-semibold text-[#FF4D1C]">
+          <span className="rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs font-semibold text-workon-accent">
             ❌ Échoué
           </span>
         );
@@ -136,33 +136,33 @@ function WorkerPaymentsContent() {
 
   if (isLoadingStatus) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
+      <div className="flex min-h-screen items-center justify-center bg-workon-bg">
         <div className="text-center">
           <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent"></div>
-          <p className="text-white/70">Chargement...</p>
+          <p className="text-workon-muted">Chargement...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+    <div className="min-h-screen bg-workon-bg p-6">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold text-white">
+          <h1 className="mb-2 text-4xl font-bold text-workon-ink">
             💰 Mes Paiements
           </h1>
-          <p className="text-lg text-white/70">
+          <p className="text-lg text-workon-muted">
             Gérez vos paiements et votre compte Stripe
           </p>
         </div>
 
         {/* Banner Onboarding */}
         {!isOnboarded && (
-          <div className="mb-8 rounded-3xl border border-[#FF4D1C]/30 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-8 shadow-lg shadow-black/20 backdrop-blur-sm">
+          <div className="mb-8 rounded-3xl border border-[#FF4D1C]/30 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-8 shadow-sm ">
             <div className="mb-4 text-6xl">🚀</div>
-            <h2 className="mb-3 text-2xl font-bold text-white">
+            <h2 className="mb-3 text-2xl font-bold text-workon-ink">
               Complétez votre onboarding Stripe
             </h2>
             <p className="mb-6 text-white/80">
@@ -186,7 +186,7 @@ function WorkerPaymentsContent() {
         {/* Stats Cards */}
         {isOnboarded && (
           <div className="mb-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-[#22C55E]/20 bg-gradient-to-br from-[#22C55E]/10 via-[#22C55E]/5 to-transparent p-6 backdrop-blur-sm shadow-lg shadow-black/20">
+            <div className="rounded-3xl border border-[#22C55E]/20 bg-gradient-to-br from-[#22C55E]/10 via-[#22C55E]/5 to-transparent p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">💵</span>
                 <span className="text-3xl font-bold text-[#22C55E]">
@@ -194,23 +194,23 @@ function WorkerPaymentsContent() {
                 </span>
               </div>
               <h4 className="text-lg font-semibold text-white">Total gagné</h4>
-              <p className="text-sm text-white/60">Paiements reçus</p>
+              <p className="text-sm text-workon-muted">Paiements reçus</p>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-neutral-800/80 p-6 backdrop-blur-sm shadow-lg shadow-black/20">
+            <div className="rounded-3xl border border-workon-border bg-white p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">📊</span>
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl font-bold text-workon-ink">
                   {payments.filter((p) => p.status === "SUCCEEDED").length}
                 </span>
               </div>
               <h4 className="text-lg font-semibold text-white">
                 Paiements reçus
               </h4>
-              <p className="text-sm text-white/60">Missions payées</p>
+              <p className="text-sm text-workon-muted">Missions payées</p>
             </div>
 
-            <div className="rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent p-6 backdrop-blur-sm shadow-lg shadow-black/20">
+            <div className="rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">⏳</span>
                 <span className="text-3xl font-bold text-yellow-300">
@@ -218,15 +218,15 @@ function WorkerPaymentsContent() {
                 </span>
               </div>
               <h4 className="text-lg font-semibold text-white">En attente</h4>
-              <p className="text-sm text-white/60">À recevoir</p>
+              <p className="text-sm text-workon-muted">À recevoir</p>
             </div>
           </div>
         )}
 
         {/* Historique Paiements */}
         {isOnboarded && (
-          <div className="rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur-sm p-6 shadow-lg shadow-black/20">
-            <h2 className="mb-6 text-2xl font-bold text-white">
+          <div className="rounded-3xl border border-workon-border bg-white  p-6 shadow-sm">
+            <h2 className="mb-6 text-2xl font-bold text-workon-ink">
               Historique des paiements
             </h2>
 
@@ -235,7 +235,7 @@ function WorkerPaymentsContent() {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="h-24 animate-pulse rounded-xl border border-white/10 bg-neutral-800/50"
+                    className="h-24 animate-pulse rounded-xl border border-workon-border bg-workon-bg0"
                   />
                 ))}
               </div>
@@ -245,7 +245,7 @@ function WorkerPaymentsContent() {
                 <p className="mb-2 text-lg font-semibold text-white">
                   Aucun paiement encore
                 </p>
-                <p className="text-white/70">
+                <p className="text-workon-muted">
                   Les paiements de vos missions complétées apparaîtront ici
                 </p>
               </div>
@@ -254,13 +254,13 @@ function WorkerPaymentsContent() {
                 {payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-neutral-800/60 p-4 transition-all hover:border-[#FF4D1C]/40 hover:-translate-y-0.5"
+                    className="flex items-center justify-between rounded-2xl border border-workon-border bg-white/60 p-4 transition-all hover:border-[#FF4D1C]/40 hover:-translate-y-0.5"
                   >
                     <div className="flex-1">
                       <h4 className="mb-1 font-semibold text-white">
                         {payment.missionTitle}
                       </h4>
-                      <div className="flex flex-wrap gap-3 text-sm text-white/60">
+                      <div className="flex flex-wrap gap-3 text-sm text-workon-muted">
                         {payment.missionCategory && (
                           <span>🏷️ {payment.missionCategory}</span>
                         )}
@@ -279,7 +279,7 @@ function WorkerPaymentsContent() {
                       <div className="mb-1 text-2xl font-bold text-[#22C55E]">
                         {formatAmount(payment.netAmountCents)} $
                       </div>
-                      <div className="mb-2 text-xs text-white/50">
+                      <div className="mb-2 text-xs text-workon-muted">
                         (Frais: {formatAmount(payment.feeCents)} $)
                       </div>
                       {getStatusBadge(payment.status)}
@@ -295,7 +295,7 @@ function WorkerPaymentsContent() {
         <div className="mt-8 text-center">
           <Link
             href="/worker/dashboard"
-            className="text-sm text-white/70 transition hover:text-[#FF4D1C]"
+            className="text-sm text-workon-muted transition hover:text-workon-accent"
           >
             ← Retour au dashboard
           </Link>

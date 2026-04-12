@@ -40,25 +40,25 @@ export default function StripeOnboardingReturnPage() {
 
   if (isChecking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
+      <div className="flex min-h-screen items-center justify-center bg-workon-bg">
         <div className="text-center">
           <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"></div>
-          <p className="text-white/70">Vérification de votre onboarding...</p>
+          <p className="text-workon-muted">Vérification de votre onboarding...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
-      <div className="max-w-md rounded-3xl border border-white/10 bg-neutral-900/70 p-8 text-center backdrop-blur">
+    <div className="flex min-h-screen items-center justify-center bg-workon-bg p-6">
+      <div className="max-w-md rounded-3xl border border-workon-border bg-workon-bg/70 p-8 text-center backdrop-blur">
         {isOnboarded ? (
           <>
             <div className="mb-4 text-6xl">🎉</div>
             <h1 className="mb-3 text-3xl font-bold text-white">
               Onboarding complété !
             </h1>
-            <p className="mb-6 text-white/70">
+            <p className="mb-6 text-workon-muted">
               Votre compte Stripe Connect est maintenant actif. Vous pouvez
               recevoir des paiements pour vos missions complétées.
             </p>
@@ -75,7 +75,7 @@ export default function StripeOnboardingReturnPage() {
             <h1 className="mb-3 text-3xl font-bold text-white">
               Onboarding incomplet
             </h1>
-            <p className="mb-6 text-white/70">
+            <p className="mb-6 text-workon-muted">
               Il semble que votre onboarding Stripe n'est pas encore terminé.
               Veuillez compléter toutes les étapes requises.
             </p>

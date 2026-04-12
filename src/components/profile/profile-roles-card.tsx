@@ -68,28 +68,28 @@ export function ProfileRolesCard() {
 
   if (isLoading && !profile) {
     return (
-      <section className="rounded-3xl border border-white/10 bg-neutral-900/80 backdrop-blur-sm p-8 shadow-lg shadow-black/20">
-        <p className="text-sm uppercase tracking-[0.4em] text-white/40">Profil</p>
+      <section className="rounded-3xl border border-workon-border bg-white  p-8 shadow-sm">
+        <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Profil</p>
         <h2 className="mt-2 text-2xl font-semibold">Chargement du profil...</h2>
-        <p className="mt-4 text-white/60">Nous synchronisons ton compte WorkOn.</p>
+        <p className="mt-4 text-workon-muted">Nous synchronisons ton compte WorkOn.</p>
       </section>
     );
   }
 
   if (error && !profile) {
     return (
-      <section className="rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 shadow-lg shadow-black/20">
-        <h2 className="text-xl font-semibold text-[#FF4D1C]">Impossible de charger le profil</h2>
-        <p className="mt-2 text-sm text-white/70">{error}</p>
+      <section className="rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 shadow-sm">
+        <h2 className="text-xl font-semibold text-workon-accent">Impossible de charger le profil</h2>
+        <p className="mt-2 text-sm text-workon-muted">{error}</p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-neutral-900/80 backdrop-blur-sm p-8 shadow-lg shadow-black/20">
-      <p className="text-sm uppercase tracking-[0.4em] text-[#FF4D1C]">Ton rôle WorkOn</p>
+    <section className="rounded-3xl border border-workon-border bg-white  p-8 shadow-sm">
+      <p className="text-sm uppercase tracking-[0.4em] text-workon-accent">Ton rôle WorkOn</p>
       <h2 className="mt-4 text-2xl font-semibold">Sélectionne ton espace principal</h2>
-      <p className="mt-3 text-white/70">
+      <p className="mt-3 text-workon-muted">
         Tu peux activer plusieurs espaces en parallèle (Worker, Employer, Client).
         Choisis simplement celui que tu veux voir en priorité dans le dashboard.
       </p>
@@ -99,7 +99,7 @@ export function ProfileRolesCard() {
         <AlertCircle className="h-4 w-4 flex-shrink-0 text-yellow-400 mt-0.5" />
         <div className="text-white/80">
           <p className="font-medium">Changement de rôle en cours de préparation</p>
-          <p className="mt-1 text-white/60 text-xs leading-relaxed">
+          <p className="mt-1 text-workon-muted text-xs leading-relaxed">
             L&apos;endpoint backend dédié arrive bientôt. En attendant, ton rôle
             actuel est affiché mais la sauvegarde n&apos;est pas encore active —
             tu recevras un message clair si tu cliques sur « Sauvegarder ».
@@ -118,14 +118,14 @@ export function ProfileRolesCard() {
               className={`rounded-2xl border px-4 py-5 text-left transition ${
                 isSelected
                   ? "border-[#FF4D1C] bg-[#FF4D1C]/10"
-                  : "border-white/10 bg-white/5 hover:border-[#FF4D1C]/40"
+                  : "border-workon-border bg-workon-bg hover:border-[#FF4D1C]/40"
               }`}
             >
-              <p className="text-xs uppercase tracking-[0.3em] text-white/40">{option.label}</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-workon-muted">{option.label}</p>
               <h3 className="mt-2 text-lg font-semibold">{option.label}</h3>
-              <p className="mt-2 text-sm text-white/70">{option.description}</p>
+              <p className="mt-2 text-sm text-workon-muted">{option.description}</p>
               {isSelected ? (
-                <span className="mt-3 inline-flex rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs text-[#FF4D1C]">
+                <span className="mt-3 inline-flex rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs text-workon-accent">
                   Rôle principal
                 </span>
               ) : null}
@@ -146,7 +146,7 @@ export function ProfileRolesCard() {
         {statusMessage ? (
           <p
             className={`text-sm ${
-              status === "success" ? "text-[#22C55E]" : "text-[#FF4D1C]"
+              status === "success" ? "text-[#22C55E]" : "text-workon-accent"
             }`}
           >
             {statusMessage}
@@ -155,7 +155,7 @@ export function ProfileRolesCard() {
       </div>
 
       {profile ? (
-        <div className="mt-8 rounded-2xl border border-white/5 bg-neutral-900/60 p-4 text-sm text-white/70">
+        <div className="mt-8 rounded-2xl border border-workon-border bg-workon-bg/60 p-4 text-sm text-workon-muted">
           <p className="font-semibold text-white">Accès actifs :</p>
           <ul className="mt-2 space-y-1">
             <li>• Travailleurs : {profile.isWorker ? "✅ actif" : "—"}</li>

@@ -60,7 +60,7 @@ export default function VerifyPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-workon-primary" />
       </div>
     );
   }
@@ -70,13 +70,13 @@ export default function VerifyPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
-      <Link href="/home" className="mb-4 inline-flex items-center gap-1 text-sm text-white/60 hover:text-white">
+      <Link href="/home" className="mb-4 inline-flex items-center gap-1 text-sm text-workon-muted hover:text-workon-ink">
         <ArrowLeft className="h-4 w-4" />
         Retour
       </Link>
 
-      <h1 className="mb-2 text-2xl font-bold text-white">Verification d&apos;identite</h1>
-      <p className="mb-6 text-white/60">Augmentez votre niveau de confiance pour debloquer plus de fonctionnalites.</p>
+      <h1 className="mb-2 text-2xl font-bold text-workon-ink">Verification d&apos;identite</h1>
+      <p className="mb-6 text-workon-muted">Augmentez votre niveau de confiance pour debloquer plus de fonctionnalites.</p>
 
       {/* Current tier */}
       <div className={`mb-6 rounded-xl border p-4 ${tierConfig.color}`}>
@@ -91,14 +91,14 @@ export default function VerifyPage() {
 
       {/* Progress bar */}
       <div className="mb-8">
-        <div className="mb-2 flex justify-between text-xs text-white/50">
+        <div className="mb-2 flex justify-between text-xs text-workon-muted">
           {TIERS_ORDER.map((tier, i) => (
-            <span key={tier} className={i <= currentTierIndex ? "text-red-400 font-medium" : ""}>
+            <span key={tier} className={i <= currentTierIndex ? "text-workon-accent font-medium" : ""}>
               {TIER_CONFIG[tier].label}
             </span>
           ))}
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-white/10">
+        <div className="h-2 overflow-hidden rounded-full bg-workon-bg">
           <div
             className="h-full rounded-full bg-gradient-to-r from-red-600 to-red-400 transition-all"
             style={{ width: `${((currentTierIndex + 1) / TIERS_ORDER.length) * 100}%` }}
@@ -109,19 +109,19 @@ export default function VerifyPage() {
       {/* Verification steps */}
       <div className="space-y-4">
         {/* Phone verification */}
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        <div className="rounded-xl border border-workon-border bg-white shadow-sm p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.phoneVerified ? "bg-green-500/20" : "bg-white/10"}`}>
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.phoneVerified ? "bg-green-500/20" : "bg-workon-bg"}`}>
                 {status?.phoneVerified ? (
                   <CheckCircle className="h-5 w-5 text-green-400" />
                 ) : (
-                  <Phone className="h-5 w-5 text-white/50" />
+                  <Phone className="h-5 w-5 text-workon-muted" />
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-white">Verification du telephone</h3>
-                <p className="text-sm text-white/50">Confirmez votre numero par SMS</p>
+                <h3 className="font-semibold text-workon-ink">Verification du telephone</h3>
+                <p className="text-sm text-workon-muted">Confirmez votre numero par SMS</p>
               </div>
             </div>
             {status?.phoneVerified && (
@@ -135,7 +135,7 @@ export default function VerifyPage() {
             <Button
               onClick={() => phoneMutation.mutate()}
               disabled={phoneMutation.isPending}
-              className="bg-red-600 hover:bg-red-500"
+              className="bg-workon-primary hover:bg-workon-primary/90"
             >
               {phoneMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Phone className="mr-2 h-4 w-4" />}
               Envoyer le code
@@ -149,7 +149,7 @@ export default function VerifyPage() {
                 onChange={(e) => setOtpCode(e.target.value)}
                 placeholder="Code a 6 chiffres"
                 maxLength={6}
-                className="flex-1 border-white/10 bg-white/5 text-center text-lg tracking-widest text-white placeholder-white/30"
+                className="flex-1 border-workon-border bg-white text-center text-lg tracking-widest text-workon-ink placeholder-workon-muted/50"
               />
               <Button
                 onClick={() => confirmOtpMutation.mutate()}
@@ -163,19 +163,19 @@ export default function VerifyPage() {
         </div>
 
         {/* ID verification */}
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        <div className="rounded-xl border border-workon-border bg-white shadow-sm p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.idVerified ? "bg-green-500/20" : "bg-white/10"}`}>
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.idVerified ? "bg-green-500/20" : "bg-workon-bg"}`}>
                 {status?.idVerified ? (
                   <CheckCircle className="h-5 w-5 text-green-400" />
                 ) : (
-                  <CreditCard className="h-5 w-5 text-white/50" />
+                  <CreditCard className="h-5 w-5 text-workon-muted" />
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-white">Verification d&apos;identite</h3>
-                <p className="text-sm text-white/50">Soumettez une piece d&apos;identite officielle</p>
+                <h3 className="font-semibold text-workon-ink">Verification d&apos;identite</h3>
+                <p className="text-sm text-workon-muted">Soumettez une piece d&apos;identite officielle</p>
               </div>
             </div>
             {status?.idVerified && (
@@ -189,7 +189,7 @@ export default function VerifyPage() {
             <Button
               onClick={() => idMutation.mutate()}
               disabled={idMutation.isPending}
-              className="bg-red-600 hover:bg-red-500"
+              className="bg-workon-primary hover:bg-workon-primary/90"
             >
               {idMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CreditCard className="mr-2 h-4 w-4" />}
               Commencer la verification

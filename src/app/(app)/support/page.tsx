@@ -85,14 +85,14 @@ export default function SupportPage() {
     const status = STATUS_LABELS[selectedTicket.status] || STATUS_LABELS.OPEN;
     return (
       <div className="mx-auto max-w-2xl px-4 py-6">
-        <button onClick={() => setSelectedTicket(null)} className="mb-4 text-sm text-white/60 hover:text-white">
+        <button onClick={() => setSelectedTicket(null)} className="mb-4 text-sm text-workon-muted hover:text-white">
           &larr; Retour aux tickets
         </button>
 
         <div className="mb-4 flex items-start justify-between">
           <div>
-            <h1 className="text-xl font-bold text-white">{selectedTicket.subject}</h1>
-            <p className="text-sm text-white/50">
+            <h1 className="text-xl font-bold text-workon-ink">{selectedTicket.subject}</h1>
+            <p className="text-sm text-workon-muted">
               {CATEGORIES.find((c) => c.value === selectedTicket.category)?.label || selectedTicket.category}
             </p>
           </div>
@@ -101,9 +101,9 @@ export default function SupportPage() {
           </span>
         </div>
 
-        <div className="mb-4 rounded-xl border border-white/10 bg-white/5 p-4">
-          <p className="text-white/80">{selectedTicket.description}</p>
-          <p className="mt-2 text-xs text-white/40">
+        <div className="mb-4 rounded-xl border border-workon-border bg-white shadow-sm p-4">
+          <p className="text-workon-ink/80">{selectedTicket.description}</p>
+          <p className="mt-2 text-xs text-workon-muted">
             {new Date(selectedTicket.createdAt).toLocaleDateString("fr-CA")}
           </p>
         </div>
@@ -117,14 +117,14 @@ export default function SupportPage() {
               return (
                 <div
                   key={i}
-                  className={`rounded-xl p-3 ${isAdmin ? "border border-blue-500/20 bg-blue-500/10" : "border border-white/10 bg-white/5"}`}
+                  className={`rounded-xl p-3 ${isAdmin ? "border border-blue-500/20 bg-blue-500/10" : "border border-workon-border bg-white shadow-sm"}`}
                 >
-                  <p className="mb-1 text-xs font-medium text-white/50">
+                  <p className="mb-1 text-xs font-medium text-workon-muted">
                     {isAdmin ? "Support" : "Vous"}
                   </p>
-                  <p className="text-sm text-white/80">{m.content}</p>
+                  <p className="text-sm text-workon-ink/80">{m.content}</p>
                   {m.createdAt && (
-                    <p className="mt-1 text-xs text-white/30">{new Date(m.createdAt).toLocaleDateString("fr-CA")}</p>
+                    <p className="mt-1 text-xs text-workon-muted/60">{new Date(m.createdAt).toLocaleDateString("fr-CA")}</p>
                   )}
                 </div>
               );
@@ -139,7 +139,7 @@ export default function SupportPage() {
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
               placeholder="Votre message..."
-              className="flex-1 border-white/10 bg-white/5 text-white placeholder-white/30"
+              className="flex-1 border-workon-border bg-white text-workon-ink placeholder-workon-muted/50"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && replyContent.trim()) replyMutation.mutate();
               }}
@@ -147,7 +147,7 @@ export default function SupportPage() {
             <Button
               onClick={() => replyMutation.mutate()}
               disabled={!replyContent.trim() || replyMutation.isPending}
-              className="bg-red-600 hover:bg-red-500"
+              className="bg-workon-primary hover:bg-workon-primary/90"
             >
               {replyMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
@@ -159,7 +159,7 @@ export default function SupportPage() {
             variant="outline"
             onClick={() => closeMutation.mutate(selectedTicket.id)}
             disabled={closeMutation.isPending}
-            className="border-white/10 text-white/60"
+            className="border-workon-border text-workon-muted"
           >
             <CheckCircle className="mr-2 h-4 w-4" />
             Fermer le ticket
@@ -172,8 +172,8 @@ export default function SupportPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Support</h1>
-        <Button onClick={() => setShowCreate(!showCreate)} className="bg-red-600 hover:bg-red-500">
+        <h1 className="text-2xl font-bold text-workon-ink">Support</h1>
+        <Button onClick={() => setShowCreate(!showCreate)} className="bg-workon-primary hover:bg-workon-primary/90">
           <Plus className="mr-2 h-4 w-4" />
           Nouveau ticket
         </Button>
@@ -182,29 +182,29 @@ export default function SupportPage() {
       {/* Create modal */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-neutral-900 p-6">
+          <div className="w-full max-w-lg rounded-2xl border border-workon-border bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white">Nouveau ticket</h2>
-              <button onClick={() => setShowCreate(false)} className="text-white/50 hover:text-white">
+              <h2 className="text-lg font-bold text-workon-ink">Nouveau ticket</h2>
+              <button onClick={() => setShowCreate(false)} className="text-workon-muted hover:text-workon-ink">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm text-white/60">Sujet</label>
+                <label className="mb-1 block text-sm text-workon-muted">Sujet</label>
                 <Input
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="Resume du probleme..."
-                  className="border-white/10 bg-white/5 text-white placeholder-white/30"
+                  className="border-workon-border bg-white text-workon-ink placeholder-workon-muted/50"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-white/60">Categorie</label>
+                <label className="mb-1 block text-sm text-workon-muted">Categorie</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white focus:border-red-500 focus:outline-none"
+                  className="w-full rounded-xl border border-workon-border bg-white shadow-sm p-3 text-white focus:border-red-500 focus:outline-none"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c.value} value={c.value}>{c.label}</option>
@@ -212,20 +212,20 @@ export default function SupportPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-sm text-white/60">Description</label>
+                <label className="mb-1 block text-sm text-workon-muted">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Decrivez votre probleme en detail..."
                   rows={4}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-white/30 focus:border-red-500 focus:outline-none"
+                  className="w-full rounded-xl border border-workon-border bg-white shadow-sm p-3 text-white placeholder-workon-muted/50 focus:border-red-500 focus:outline-none"
                 />
               </div>
               <div className="flex gap-3">
                 <Button
                   onClick={() => createMutation.mutate()}
                   disabled={!subject.trim() || !description.trim() || createMutation.isPending}
-                  className="flex-1 bg-red-600 hover:bg-red-500"
+                  className="flex-1 bg-workon-primary hover:bg-workon-primary/90"
                 >
                   {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Creer le ticket
@@ -242,13 +242,13 @@ export default function SupportPage() {
       {/* Tickets list */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-workon-primary" />
         </div>
       ) : !tickets || tickets.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-12 text-center">
-          <HelpCircle className="mx-auto mb-4 h-12 w-12 text-white/30" />
-          <h3 className="mb-2 text-lg font-semibold text-white">Aucun ticket</h3>
-          <p className="text-white/60">Vous n&apos;avez pas encore cree de ticket de support.</p>
+        <div className="rounded-xl border border-workon-border bg-white shadow-sm p-12 text-center">
+          <HelpCircle className="mx-auto mb-4 h-12 w-12 text-workon-muted/60" />
+          <h3 className="mb-2 text-lg font-semibold text-workon-ink">Aucun ticket</h3>
+          <p className="text-workon-muted">Vous n&apos;avez pas encore cree de ticket de support.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -259,16 +259,16 @@ export default function SupportPage() {
               <button
                 key={ticket.id}
                 onClick={() => setSelectedTicket(ticket)}
-                className="w-full rounded-xl border border-white/10 bg-neutral-900/80 p-4 text-left transition hover:border-white/20"
+                className="w-full rounded-xl border border-workon-border bg-white p-4 shadow-sm text-left transition hover:border-workon-primary/30"
               >
                 <div className="mb-2 flex items-start justify-between">
-                  <h3 className="font-semibold text-white">{ticket.subject}</h3>
+                  <h3 className="font-semibold text-workon-ink">{ticket.subject}</h3>
                   <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
                     {status.label}
                   </span>
                 </div>
-                <p className="mb-2 line-clamp-2 text-sm text-white/50">{ticket.description}</p>
-                <div className="flex items-center gap-3 text-xs text-white/40">
+                <p className="mb-2 line-clamp-2 text-sm text-workon-muted">{ticket.description}</p>
+                <div className="flex items-center gap-3 text-xs text-workon-muted">
                   <span>{CATEGORIES.find((c) => c.value === ticket.category)?.label || ticket.category}</span>
                   {msgCount > 0 && (
                     <span className="flex items-center gap-1">

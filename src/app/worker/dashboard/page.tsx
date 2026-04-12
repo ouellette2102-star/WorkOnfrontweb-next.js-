@@ -14,14 +14,14 @@ export default async function WorkerDashboardPage() {
   const firstName = profile.fullName?.split(" ")[0] || "Travailleur";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+    <div className="min-h-screen bg-workon-bg p-6">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold text-white">
+          <h1 className="mb-2 text-4xl font-bold text-workon-ink">
             Salut {firstName} 👋
           </h1>
-          <p className="text-lg text-white/70">
+          <p className="text-lg text-workon-muted">
             {profile.city ? `Tu es à ${profile.city}` : "Prêt à trouver des missions près de chez toi"}
           </p>
         </div>
@@ -37,48 +37,48 @@ export default async function WorkerDashboardPage() {
         {/* Actions rapides */}
         <div className="mb-8 grid gap-4 md:grid-cols-4">
           <Link href="/worker/missions">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">🔍</div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
+              <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Missions disponibles
               </h3>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-workon-muted">
                 Trouve des missions près de chez toi
               </p>
             </div>
           </Link>
 
           <Link href="/worker/payments">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-gradient-to-br from-green-900/20 to-neutral-900/70 p-6 backdrop-blur transition hover:border-[#22C55E]/50 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-gradient-to-br from-green-900/20 to-neutral-900/70 p-6 backdrop-blur transition hover:border-[#22C55E]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">💰</div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
+              <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Paiements
               </h3>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-workon-muted">
                 Gère tes paiements Stripe
               </p>
             </div>
           </Link>
 
           <Link href="/notifications">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">🔔</div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
+              <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Notifications
               </h3>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-workon-muted">
                 Consulte tes notifications
               </p>
             </div>
           </Link>
 
           <Link href="/messages">
-            <div className="group cursor-pointer rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-neutral-900">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6 backdrop-blur transition hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">💬</div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
+              <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Messages
               </h3>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-workon-muted">
                 Communique avec les employeurs
               </p>
             </div>
@@ -98,22 +98,22 @@ export default async function WorkerDashboardPage() {
         </div>
 
         {/* Infos profil */}
-        <div className="mt-8 rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-          <h3 className="mb-4 text-xl font-semibold text-white">
+        <div className="mt-8 rounded-3xl border border-workon-border bg-workon-bg/70 p-6 backdrop-blur">
+          <h3 className="mb-4 text-xl font-semibold text-workon-ink">
             Tes informations
           </h3>
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <p className="text-sm text-white/50">Ville</p>
-              <p className="text-white">{profile.city || "Non renseignée"}</p>
+              <p className="text-sm text-workon-muted">Ville</p>
+              <p className="text-workon-ink">{profile.city || "Non renseignée"}</p>
             </div>
             <div>
-              <p className="text-sm text-white/50">Téléphone</p>
-              <p className="text-white">{profile.phone || "Non renseigné"}</p>
+              <p className="text-sm text-workon-muted">Téléphone</p>
+              <p className="text-workon-ink">{profile.phone || "Non renseigné"}</p>
             </div>
             <div>
-              <p className="text-sm text-white/50">Email</p>
-              <p className="text-white">{profile.email}</p>
+              <p className="text-sm text-workon-muted">Email</p>
+              <p className="text-workon-ink">{profile.email}</p>
             </div>
           </div>
           <Button asChild variant="outline" size="sm" className="mt-4">

@@ -23,11 +23,11 @@ export default function ContractsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+    <div className="min-h-screen bg-workon-bg p-6">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold text-white">Mes contrats</h1>
-          <p className="text-lg text-white/70">
+          <h1 className="mb-2 text-4xl font-bold text-workon-ink">Mes contrats</h1>
+          <p className="text-lg text-workon-muted">
             Consultez et g\u00e9rez vos contrats
           </p>
         </div>
@@ -45,12 +45,12 @@ export default function ContractsPage() {
         )}
 
         {contracts && contracts.length === 0 && (
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-12 text-center backdrop-blur">
+          <div className="rounded-3xl border border-workon-border bg-white p-12 text-center shadow-sm">
             <div className="mb-4 text-6xl">📄</div>
-            <h3 className="mb-2 text-xl font-semibold text-white">
+            <h3 className="mb-2 text-xl font-semibold text-workon-ink">
               Aucun contrat
             </h3>
-            <p className="text-white/70">
+            <p className="text-workon-muted">
               Vos contrats appara\u00eetront ici une fois cr\u00e9\u00e9s
             </p>
           </div>
@@ -62,18 +62,18 @@ export default function ContractsPage() {
               const status = statusConfig[contract.status];
               return (
                 <Link key={contract.id} href={`/contracts/${contract.id}`}>
-                  <div className="group cursor-pointer rounded-2xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur transition hover:border-green-500/50 hover:bg-neutral-900">
+                  <div className="group cursor-pointer rounded-2xl border border-workon-border bg-white p-6 shadow-sm transition hover:border-workon-primary/50">
                     <div className="flex items-start justify-between">
                       <div className="min-w-0 flex-1">
-                        <h3 className="mb-1 text-lg font-semibold text-white">
+                        <h3 className="mb-1 text-lg font-semibold text-workon-ink">
                           Contrat #{contract.id.slice(0, 8)}
                         </h3>
                         {contract.localMissionId && (
-                          <p className="text-sm text-white/60">
+                          <p className="text-sm text-workon-muted">
                             Mission : {contract.localMissionId.slice(0, 8)}...
                           </p>
                         )}
-                        <p className="mt-2 text-sm text-white/50">
+                        <p className="mt-2 text-sm text-workon-muted">
                           Cr\u00e9\u00e9 le{" "}
                           {new Date(contract.createdAt).toLocaleDateString("fr-CA")}
                         </p>
@@ -85,7 +85,7 @@ export default function ContractsPage() {
                       </span>
                     </div>
                     {contract.terms && (
-                      <p className="mt-3 line-clamp-2 text-sm text-white/60">
+                      <p className="mt-3 line-clamp-2 text-sm text-workon-muted">
                         {contract.terms}
                       </p>
                     )}

@@ -120,7 +120,7 @@ function RegisterInner() {
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="text-2xl font-bold">Créez votre compte</h1>
-              <p className="text-white/60 text-sm mt-2">
+              <p className="text-workon-muted text-sm mt-2">
                 {presetRole === "worker"
                   ? "Rejoignez WorkOn et commencez à recevoir des missions près de chez vous."
                   : presetRole === "employer"
@@ -140,7 +140,7 @@ function RegisterInner() {
                   {...step1Form.register("email")}
                 />
                 {step1Form.formState.errors.email && (
-                  <p className="text-[#FF4D1C] text-xs">
+                  <p className="text-workon-accent text-xs">
                     {step1Form.formState.errors.email.message}
                   </p>
                 )}
@@ -156,7 +156,7 @@ function RegisterInner() {
                   {...step1Form.register("password")}
                 />
                 {step1Form.formState.errors.password && (
-                  <p className="text-[#FF4D1C] text-xs">
+                  <p className="text-workon-accent text-xs">
                     {step1Form.formState.errors.password.message}
                   </p>
                 )}
@@ -168,20 +168,20 @@ function RegisterInner() {
             </form>
 
             {/* Trust strip — reduces email+password anxiety */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-3 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs text-white/60">
+            <div className="rounded-2xl border border-workon-border bg-workon-bg p-3 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs text-workon-muted">
                 <Lock className="h-3.5 w-3.5 text-[#22C55E]" />
                 <span>Vos données sont chiffrées et jamais revendues</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-white/60">
+              <div className="flex items-center gap-2 text-xs text-workon-muted">
                 <Shield className="h-3.5 w-3.5 text-[#22C55E]" />
                 <span>Conformité Loi 25 &middot; Hébergement canadien</span>
               </div>
             </div>
 
-            <p className="text-center text-sm text-white/60">
+            <p className="text-center text-sm text-workon-muted">
               Déjà un compte?{" "}
-              <Link href="/login" className="text-[#FF4D1C] font-medium hover:underline">
+              <Link href="/login" className="text-workon-accent font-medium hover:underline">
                 Se connecter
               </Link>
             </p>
@@ -193,7 +193,7 @@ function RegisterInner() {
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="text-2xl font-bold">Choisissez votre type de compte</h1>
-              <p className="text-white/60 text-sm mt-2">
+              <p className="text-workon-muted text-sm mt-2">
                 Faites-nous savoir comment vous souhaitez utiliser WorkOn.
               </p>
             </div>
@@ -201,40 +201,40 @@ function RegisterInner() {
             <div className="space-y-3">
               <button
                 onClick={() => selectRole("worker")}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-neutral-800/80 hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF4D1C]/15 border border-[#FF4D1C]/25">
-                  <Wrench className="h-6 w-6 text-[#FF4D1C]" />
+                  <Wrench className="h-6 w-6 text-workon-accent" />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold">Trouver des missions</p>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-workon-muted">
                     Recevoir des contrats, offrir vos services
                   </p>
                 </div>
-                <ChevronRight className="h-5 w-5 text-white/40" />
+                <ChevronRight className="h-5 w-5 text-workon-muted" />
               </button>
 
               <button
                 onClick={() => selectRole("employer")}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-neutral-800/80 hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF4D1C]/15 border border-[#FF4D1C]/25">
-                  <Briefcase className="h-6 w-6 text-[#FF4D1C]" />
+                  <Briefcase className="h-6 w-6 text-workon-accent" />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold">Publier des missions</p>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-workon-muted">
                     Engager des professionnels qualifiés
                   </p>
                 </div>
-                <ChevronRight className="h-5 w-5 text-white/40" />
+                <ChevronRight className="h-5 w-5 text-workon-muted" />
               </button>
             </div>
 
             <div className="space-y-2 pt-2">
               {["Vérification d'identité (tiers VERIFIED+)", "Paiement sécurisé par Stripe", "Contrat de service généré automatiquement"].map((text) => (
-                <div key={text} className="flex items-center gap-2 text-sm text-white/70">
+                <div key={text} className="flex items-center gap-2 text-sm text-workon-muted">
                   <CheckCircle2 className="h-4 w-4 text-[#22C55E]" />
                   <span>{text}</span>
                 </div>
@@ -243,7 +243,7 @@ function RegisterInner() {
 
             <button
               onClick={() => setStep(1)}
-              className="w-full text-center text-sm text-white/50 hover:text-white/70"
+              className="w-full text-center text-sm text-workon-muted hover:text-workon-muted"
             >
               ← Retour
             </button>
@@ -255,7 +255,7 @@ function RegisterInner() {
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="text-2xl font-bold">Créez votre profil</h1>
-              <p className="text-white/60 text-sm mt-2">
+              <p className="text-workon-muted text-sm mt-2">
                 Quelques infos pour finaliser votre compte.
                 {role === "worker"
                   ? " Vous pourrez compléter plus tard."
@@ -269,7 +269,7 @@ function RegisterInner() {
                   <Label htmlFor="firstName">Prénom</Label>
                   <Input id="firstName" placeholder="Prénom" {...step3Form.register("firstName")} />
                   {step3Form.formState.errors.firstName && (
-                    <p className="text-[#FF4D1C] text-xs">{step3Form.formState.errors.firstName.message}</p>
+                    <p className="text-workon-accent text-xs">{step3Form.formState.errors.firstName.message}</p>
                   )}
                 </div>
 
@@ -277,27 +277,27 @@ function RegisterInner() {
                   <Label htmlFor="lastName">Nom</Label>
                   <Input id="lastName" placeholder="Nom" {...step3Form.register("lastName")} />
                   {step3Form.formState.errors.lastName && (
-                    <p className="text-[#FF4D1C] text-xs">{step3Form.formState.errors.lastName.message}</p>
+                    <p className="text-workon-accent text-xs">{step3Form.formState.errors.lastName.message}</p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="flex items-center gap-2">
-                  Téléphone <span className="text-white/40 text-xs font-normal">(facultatif)</span>
+                  Téléphone <span className="text-workon-muted text-xs font-normal">(facultatif)</span>
                 </Label>
                 <Input id="phone" type="tel" placeholder="514-555-0000" {...step3Form.register("phone")} />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="city" className="flex items-center gap-2">
-                  Ville <span className="text-white/40 text-xs font-normal">(facultatif)</span>
+                  Ville <span className="text-workon-muted text-xs font-normal">(facultatif)</span>
                 </Label>
                 <Input id="city" placeholder="Montréal" {...step3Form.register("city")} />
               </div>
 
               {error && (
-                <p className="text-[#FF4D1C] text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
+                <p className="text-workon-accent text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
                   {error}
                 </p>
               )}
@@ -315,7 +315,7 @@ function RegisterInner() {
 
             <button
               onClick={backFromStep3}
-              className="w-full text-center text-sm text-white/50 hover:text-white/70"
+              className="w-full text-center text-sm text-workon-muted hover:text-workon-muted"
             >
               ← Retour
             </button>
@@ -326,21 +326,21 @@ function RegisterInner() {
         {step === 4 && user && (
           <div className="space-y-6 text-center">
             <h1 className="text-2xl font-bold">Votre profil est prêt !</h1>
-            <p className="text-white/60 text-sm">
+            <p className="text-workon-muted text-sm">
               {role === "worker"
                 ? "Commencez à recevoir des demandes de missions."
                 : "Publiez votre première mission dès maintenant."}
             </p>
 
-            <div className="rounded-3xl border border-white/10 bg-neutral-800/80 backdrop-blur-sm p-6 space-y-3 shadow-lg shadow-black/20">
-              <div className="mx-auto h-16 w-16 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center text-2xl font-bold text-[#FF4D1C]">
+            <div className="rounded-3xl border border-workon-border bg-white backdrop-blur-sm p-6 space-y-3 shadow-sm">
+              <div className="mx-auto h-16 w-16 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center text-2xl font-bold text-workon-accent">
                 {user.firstName?.[0]}{user.lastName?.[0]}
               </div>
               <p className="font-semibold text-lg">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-sm text-white/60 capitalize">{user.role}</p>
-              {user.city && <p className="text-sm text-white/60">📍 {user.city}</p>}
+              <p className="text-sm text-workon-muted capitalize">{user.role}</p>
+              {user.city && <p className="text-sm text-workon-muted">📍 {user.city}</p>}
             </div>
 
             <Button

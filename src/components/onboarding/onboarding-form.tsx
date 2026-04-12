@@ -106,11 +106,11 @@ export function OnboardingForm() {
               className={`rounded-2xl border px-4 py-3 text-left transition ${
                 state.role === role.value
                   ? "border-red-500 bg-red-500/10 text-white"
-                  : "border-white/10 bg-white/5 text-white/70 hover:border-white/30"
+                  : "border-workon-border bg-workon-bg text-workon-muted hover:border-white/30"
               }`}
             >
               <p className="font-semibold">{role.label}</p>
-              <p className="text-xs text-white/50">Accès dédié et outils adaptés</p>
+              <p className="text-xs text-workon-muted">Accès dédié et outils adaptés</p>
             </button>
           ))}
         </div>
@@ -118,34 +118,34 @@ export function OnboardingForm() {
 
       <div className="space-y-5">
         <div>
-          <label className="text-sm text-white/70">Nom complet</label>
+          <label className="text-sm text-workon-muted">Nom complet</label>
           <input
             type="text"
             value={state.name}
             onChange={(event) => handleChange("name")(event.target.value)}
-            className="mt-2 w-full rounded-2xl border border-white/10 bg-neutral-900 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
+            className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
             placeholder="Ex: Alex Tremblay"
           />
           {fieldErrors.name ? <p className="mt-1 text-xs text-red-400">{fieldErrors.name}</p> : null}
         </div>
         <div>
-          <label className="text-sm text-white/70">Téléphone</label>
+          <label className="text-sm text-workon-muted">Téléphone</label>
           <input
             type="tel"
             value={state.phone}
             onChange={(event) => handleChange("phone")(event.target.value)}
-            className="mt-2 w-full rounded-2xl border border-white/10 bg-neutral-900 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
+            className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
             placeholder="+1 514 555 1234"
           />
           {fieldErrors.phone ? <p className="mt-1 text-xs text-red-400">{fieldErrors.phone}</p> : null}
         </div>
         <div>
-          <label className="text-sm text-white/70">Ville</label>
+          <label className="text-sm text-workon-muted">Ville</label>
           <input
             type="text"
             value={state.city}
             onChange={(event) => handleChange("city")(event.target.value)}
-            className="mt-2 w-full rounded-2xl border border-white/10 bg-neutral-900 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
+            className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
             placeholder="Montréal, QC"
           />
           {fieldErrors.city ? <p className="mt-1 text-xs text-red-400">{fieldErrors.city}</p> : null}

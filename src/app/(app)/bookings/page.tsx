@@ -70,18 +70,18 @@ export default function BookingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
-      <h1 className="mb-6 text-2xl font-bold text-white">Mes reservations</h1>
+      <h1 className="mb-6 text-2xl font-bold text-workon-ink">Mes reservations</h1>
 
       {/* Filter tabs */}
-      <div className="mb-6 flex gap-2 rounded-xl bg-white/5 p-1">
+      <div className="mb-6 flex gap-2 rounded-xl bg-workon-bg p-1">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
-                ? "bg-red-600 text-white"
-                : "text-white/60 hover:text-white"
+                ? "bg-workon-primary text-white"
+                : "text-workon-muted hover:text-workon-ink"
             }`}
           >
             {tab.label}
@@ -92,13 +92,13 @@ export default function BookingsPage() {
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-workon-primary" />
         </div>
       ) : !bookings || bookings.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-12 text-center">
-          <Calendar className="mx-auto mb-4 h-12 w-12 text-white/30" />
-          <h3 className="mb-2 text-lg font-semibold text-white">Aucune reservation</h3>
-          <p className="text-white/60">
+        <div className="rounded-xl border border-workon-border bg-white p-12 text-center shadow-sm">
+          <Calendar className="mx-auto mb-4 h-12 w-12 text-workon-muted/40" />
+          <h3 className="mb-2 text-lg font-semibold text-workon-ink">Aucune reservation</h3>
+          <p className="text-workon-muted">
             {isWorker
               ? "Vous n'avez pas encore de reservations de clients."
               : "Vous n'avez pas encore effectue de reservations."}
@@ -147,17 +147,17 @@ function BookingCard({
   const statusConfig = STATUS_CONFIG[booking.status] || STATUS_CONFIG.PENDING;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-neutral-900/80 p-4">
+    <div className="rounded-xl border border-workon-border bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-            <User className="h-5 w-5 text-white/60" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-workon-bg">
+            <User className="h-5 w-5 text-workon-muted" />
           </div>
           <div>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-workon-muted">
               {isWorker ? "Client" : "Travailleur"}
             </p>
-            <p className="font-medium text-white">
+            <p className="font-medium text-workon-ink">
               {isWorker ? booking.clientId : booking.workerId}
             </p>
           </div>
@@ -168,7 +168,7 @@ function BookingCard({
         </span>
       </div>
 
-      <div className="mb-3 flex items-center gap-2 text-sm text-white/70">
+      <div className="mb-3 flex items-center gap-2 text-sm text-workon-muted">
         <Calendar className="h-4 w-4" />
         <span>
           {format(new Date(booking.scheduledDate), "EEEE d MMMM yyyy", { locale: fr })}
@@ -176,7 +176,7 @@ function BookingCard({
       </div>
 
       {booking.notes && (
-        <p className="mb-3 text-sm text-white/50">{booking.notes}</p>
+        <p className="mb-3 text-sm text-workon-muted">{booking.notes}</p>
       )}
 
       {/* Action buttons */}
