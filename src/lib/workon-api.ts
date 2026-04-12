@@ -16,6 +16,7 @@ export type ProfileResponse = {
   fullName: string;
   phone: string;
   city: string;
+  pictureUrl: string | null;
   primaryRole: PrimaryRole;
   isWorker: boolean;
   isEmployer: boolean;
