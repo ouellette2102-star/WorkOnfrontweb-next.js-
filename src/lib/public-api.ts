@@ -5,7 +5,7 @@
 
 const RAW_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "https://workon-backend-production-31db.up.railway.app";
+  "https://workon-backend-production-8908.up.railway.app";
 const API_BASE = `${RAW_BASE}/api/v1`;
 
 // ─── DTOs ──────────────────────────────────────────────────────────────────
