@@ -17,6 +17,7 @@ import {
   Heart,
   Target,
   BarChart3,
+  Calendar,
   CreditCard,
   Receipt,
   HelpCircle,
@@ -66,6 +67,7 @@ export function TopBar() {
       ? [
           { href: "/leads", label: "Mes leads", icon: Target },
           { href: "/worker/availability", label: "Disponibilités", icon: BarChart3 },
+          { href: "/calendar", label: "Calendrier", icon: Calendar },
           { href: "/earnings", label: "Mes revenus", icon: CreditCard },
         ]
       : [
