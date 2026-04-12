@@ -11,24 +11,19 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Vintage handset phone icon — matches the WorkOn brand ad
- * (classic rotary phone handset on smartphone silhouette).
+ * Vintage handset phone icon — classic curved receiver
+ * matching the WorkOn brand ad (rotary phone combiné).
  */
 function VintagePhoneIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="none"
+      fill="currentColor"
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Handset / combiné */}
-      <path
-        d="M5.5 2C4.4 2 3.5 2.9 3.5 4v2.5c0 1.2 0.6 2.3 1.5 3L7 11v2l-2 1.5c-0.9 0.7-1.5 1.8-1.5 3V20c0 1.1 0.9 2 2 2h1c0.6 0 1-0.4 1-1v-3.5L9.5 16h5l2 1.5V21c0 0.6 0.4 1 1 1h1c1.1 0 2-0.9 2-2v-2.5c0-1.2-0.6-2.3-1.5-3L17 13v-2l2-1.5c0.9-0.7 1.5-1.8 1.5-3V4c0-1.1-0.9-2-2-2h-1c-0.6 0-1 0.4-1 1v3.5L14.5 8h-5L7.5 5.5V3c0-0.6-0.4-1-1-1H5.5Z"
-        fill="currentColor"
-      />
-      {/* Cadran / dial circle */}
-      <circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.3" />
+      {/* Classic curved handset — earpiece top-left, mouthpiece bottom-right */}
+      <path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z" />
     </svg>
   );
 }
