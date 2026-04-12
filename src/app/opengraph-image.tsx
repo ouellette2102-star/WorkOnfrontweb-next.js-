@@ -81,7 +81,7 @@ export default async function Image() {
             }}
           >
             Une ligne directe vers le{" "}
-            <span style={{ color: "#B5382A" }}>travail instantané</span>.
+            <span style={{ color: "#C96646" }}>travail instantané</span>.
           </div>
           <div
             style={{

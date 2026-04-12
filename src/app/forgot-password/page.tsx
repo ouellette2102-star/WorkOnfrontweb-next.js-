@@ -39,18 +39,18 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-[#134021]/10 via-background to-background">
-      <div className="mb-8 text-[#1B1A18]">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-workon-bg">
+      <div className="mb-8 text-workon-ink">
         <WorkOnWordmark size="xl" />
       </div>
 
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm rounded-3xl border border-workon-border bg-white p-8 shadow-sm space-y-6">
         {sent ? (
           <div className="text-center space-y-4">
             <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-[#22C55E]/15 border border-[#22C55E]/25 text-2xl">
               ✉️
             </div>
-            <h1 className="text-2xl font-bold">Email envoyé</h1>
+            <h1 className="text-2xl font-bold text-workon-ink">Email envoyé</h1>
             <p className="text-workon-muted text-sm">
               Si un compte existe avec cet email, vous recevrez un lien de
               réinitialisation dans quelques instants.
@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
         ) : (
           <>
             <div className="text-center">
-              <h1 className="text-2xl font-bold">Mot de passe oublié ?</h1>
+              <h1 className="text-2xl font-bold text-workon-ink">Mot de passe oublié ?</h1>
               <p className="text-workon-muted text-sm mt-1">
                 Entrez votre email pour recevoir un lien de réinitialisation
               </p>
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
               </div>
 
               {error && (
-                <p className="text-workon-accent text-sm text-center bg-[#B5382A]/10 border border-[#B5382A]/25 rounded-xl p-3">
+                <p className="text-workon-accent text-sm text-center bg-workon-accent/10 border border-workon-accent/25 rounded-xl p-3">
                   {error}
                 </p>
               )}

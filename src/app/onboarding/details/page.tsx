@@ -97,7 +97,7 @@ export default function OnboardingDetailsPage() {
     <div className="flex min-h-screen items-center justify-center bg-workon-bg p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-white">
+          <h1 className="mb-4 text-4xl font-bold text-workon-ink">
             Complétez votre profil
           </h1>
           <p className="text-lg text-workon-muted">
@@ -106,7 +106,7 @@ export default function OnboardingDetailsPage() {
         </div>
 
         {error && (
-          <div className="mb-6 rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-4 text-center text-workon-accent shadow-sm">
+          <div className="mb-6 rounded-2xl border border-workon-accent/30 bg-workon-accent/5 p-4 text-center text-workon-accent shadow-sm">
             {error}
           </div>
         )}

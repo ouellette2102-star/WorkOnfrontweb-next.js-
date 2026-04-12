@@ -78,7 +78,7 @@ export function ProfileRolesCard() {
 
   if (error && !profile) {
     return (
-      <section className="rounded-3xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-8 shadow-sm">
+      <section className="rounded-3xl border border-workon-accent/30 bg-workon-accent/5 p-8 shadow-sm">
         <h2 className="text-xl font-semibold text-workon-accent">Impossible de charger le profil</h2>
         <p className="mt-2 text-sm text-workon-muted">{error}</p>
       </section>

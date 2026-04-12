@@ -22,7 +22,7 @@ export function MissionFeedList({ missions, onReserve }: Props) {
           {/* Badge de distance */}
           {mission.distance !== null && (
             <div className="mb-3 flex items-center gap-1.5">
-              <span className="text-[#B5382A]">📍</span>
+              <span className="text-workon-accent">📍</span>
               <p className="text-sm text-[#706E6A]">
                 {mission.distance} km
               </p>
@@ -58,7 +58,7 @@ export function MissionFeedList({ missions, onReserve }: Props) {
 
             {mission.city && (
               <div className="flex items-center gap-2">
-                <span className="text-[#B5382A]">📍</span>
+                <span className="text-workon-accent">📍</span>
                 <span className="text-sm text-[#706E6A]">{mission.city}</span>
               </div>
             )}

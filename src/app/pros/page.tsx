@@ -42,12 +42,12 @@ export default async function ProsPage() {
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-[#EAE6DF]">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#B5382A]/30 bg-[#B5382A]/10 px-3 py-1 text-xs text-[#B5382A] mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-workon-accent/30 bg-workon-accent/10 px-3 py-1 text-xs text-workon-accent mb-5">
             ⚡ Inscription gratuite — payé dès ce soir
           </div>
           <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight tracking-tight">
             Trouve des missions.<br />
-            <span className="text-[#B5382A]">Travaille quand tu veux.</span>
+            <span className="text-workon-accent">Travaille quand tu veux.</span>
           </h1>
           <p className="mt-4 text-[#706E6A] text-lg leading-relaxed">
             Rejoins {workers.length > 0 ? `${workers.length}+ travailleurs` : "des centaines de pros"} qui acceptent des missions payées rapidement.
@@ -114,7 +114,7 @@ export default async function ProsPage() {
             { n: 4, title: "Reçois ton paiement", desc: "Stripe débloque les fonds dès la confirmation. Rapide et sécurisé." },
           ].map((step) => (
             <li key={step.n} className="flex items-start gap-4">
-              <span className="flex-shrink-0 h-7 w-7 rounded-full bg-[#B5382A]/10 border border-[#B5382A]/20 flex items-center justify-center text-sm font-bold text-[#B5382A]">
+              <span className="flex-shrink-0 h-7 w-7 rounded-full bg-workon-accent/10 border border-workon-accent/20 flex items-center justify-center text-sm font-bold text-workon-accent">
                 {step.n}
               </span>
               <div>

@@ -36,9 +36,9 @@ export default function GlobalError({
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-md w-full text-center space-y-8">
             {/* Icon - Critical error */}
-            <div className="mx-auto w-24 h-24 rounded-full bg-[#B5382A]/10 border-2 border-[#B5382A]/30 flex items-center justify-center">
+            <div className="mx-auto w-24 h-24 rounded-full bg-workon-accent/10 border-2 border-workon-accent/30 flex items-center justify-center">
               <svg
-                className="w-12 h-12 text-[#B5382A]"
+                className="w-12 h-12 text-workon-accent"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -73,8 +73,8 @@ export default function GlobalError({
 
             {/* Dev only */}
             {isDev && (
-              <div className="p-4 rounded-2xl bg-[#B5382A]/5 border border-[#B5382A]/25 text-left">
-                <p className="text-sm font-mono text-[#B5382A] break-all">
+              <div className="p-4 rounded-2xl bg-workon-accent/5 border border-workon-accent/25 text-left">
+                <p className="text-sm font-mono text-workon-accent break-all">
                   {error.message}
                 </p>
               </div>

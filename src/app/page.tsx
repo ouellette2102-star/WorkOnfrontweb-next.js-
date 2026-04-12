@@ -15,8 +15,8 @@ import {
 export const revalidate = 300; // ISR — 5 min
 
 // ─── Design tokens (emergent) ───────────────────────────────────────────────
-// Fond: #F9F8F5 (oatmeal) | Texte: #1B1A18 (ink) | Accent: #B5382A (terracotta)
-// Hover: #9A2F23 | Gris: #706E6A (warm gray) | Crème: #F0EDE8
+// Fond: #F9F8F5 (oatmeal) | Texte: #1B1A18 (ink) | Accent: #C96646 (rich terracotta)
+// Hover: #B5553A | Gris: #706E6A (warm gray) | Crème: #F0EDE8
 // Bordures: #EAE6DF | Vert confiance: #22C55E | Forêt: #134021
 // Gold: #D4922A | Typo: titres font-heading 48-64px bold
 // Espacement: 120px entre sections (py-[120px] = py-[7.5rem])
@@ -33,8 +33,8 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
           {/* Urgence + Social proof */}
           <div className="flex flex-wrap items-center gap-3 mb-10">
             {stats && stats.openMissions > 0 && (
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#B5382A]/20 bg-[#B5382A]/5 px-4 py-1.5 text-sm text-[#B5382A] font-medium">
-                <span className="h-2 w-2 rounded-full bg-[#B5382A] animate-pulse" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-workon-accent/20 bg-workon-accent/5 px-4 py-1.5 text-sm text-workon-accent font-medium">
+                <span className="h-2 w-2 rounded-full bg-workon-accent animate-pulse" />
                 {stats.openMissions} opportunités disponibles maintenant
               </span>
             )}
@@ -48,7 +48,7 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
 
           <h1 className="font-heading text-[2.75rem] md:text-[3.5rem] lg:text-[4rem] font-bold leading-[1.08] tracking-tight text-[#1B1A18]">
             Les clients cherchent votre service{" "}
-            <span className="text-[#B5382A]">en ce moment.</span>
+            <span className="text-workon-accent">en ce moment.</span>
             <br />
             <span className="text-[#706E6A] font-semibold">Ils ne vous trouvent pas.</span>
           </h1>
@@ -113,7 +113,7 @@ function ProblemSection() {
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Le problème que personne ne règle</p>
+          <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Le problème que personne ne règle</p>
           <h2 className="font-heading text-3xl md:text-[2.75rem] font-bold text-[#1B1A18] leading-tight">
             Vous êtes excellent dans votre métier.
             <br />
@@ -123,7 +123,7 @@ function ProblemSection() {
         <div className="grid md:grid-cols-3 gap-10 md:gap-14">
           {problems.map((p) => (
             <div key={p.title}>
-              <div className="h-14 w-14 rounded-2xl bg-[#B5382A]/8 flex items-center justify-center text-[#B5382A] mb-5">
+              <div className="h-14 w-14 rounded-2xl bg-workon-accent/8 flex items-center justify-center text-workon-accent mb-5">
                 {p.icon}
               </div>
               <h3 className="text-xl font-bold text-[#1B1A18] mb-3">{p.title}</h3>
@@ -144,7 +144,7 @@ function SystemSection() {
       num: "01",
       title: "Inscription",
       desc: "Créez votre profil professionnel en 3 minutes. Vos réalisations, votre expertise, votre zone de service.",
-      accent: "border-[#B5382A]/20 bg-[#B5382A]/5 text-[#B5382A]",
+      accent: "border-workon-accent/20 bg-workon-accent/5 text-workon-accent",
     },
     {
       num: "02",
@@ -170,11 +170,11 @@ function SystemSection() {
     <section className="bg-[#F0EDE8]">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Comment WorkOn fonctionne</p>
+          <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Comment WorkOn fonctionne</p>
           <h2 className="font-heading text-3xl md:text-[2.75rem] font-bold text-[#1B1A18] leading-tight">
             Un système qui capte la demande
             <br />
-            <span className="text-[#B5382A]">pendant que vous travaillez.</span>
+            <span className="text-workon-accent">pendant que vous travaillez.</span>
           </h2>
         </div>
         <div className="grid md:grid-cols-4 gap-6">
@@ -221,7 +221,7 @@ function DifferentiationSection() {
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Ce qui nous différencie</p>
+          <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Ce qui nous différencie</p>
           <h2 className="font-heading text-3xl md:text-[2.75rem] font-bold text-[#1B1A18] leading-tight">
             Ni une agence. Ni un répertoire.
             <br />
@@ -247,7 +247,7 @@ function DifferentiationSection() {
           {/* Ce que WorkOn est */}
           <div className="flex items-center">
             <div className="rounded-2xl bg-[#1B1A18] p-8 md:p-10 w-full">
-              <div className="h-14 w-14 rounded-2xl bg-[#B5382A] flex items-center justify-center mb-6">
+              <div className="h-14 w-14 rounded-2xl bg-workon-accent flex items-center justify-center mb-6">
                 <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                 </svg>
@@ -255,7 +255,7 @@ function DifferentiationSection() {
               <h3 className="text-2xl font-bold text-white mb-4">Ce que WorkOn est</h3>
               <p className="text-white/80 text-lg leading-relaxed">
                 Un système de capture de demande qui identifie les clients qui
-                cherchent <span className="text-[#B5382A] font-semibold">activement</span> votre
+                cherchent <span className="text-workon-accent font-semibold">activement</span> votre
                 service — et qui vous les livre avant vos concurrents.
               </p>
               <div className="mt-8 flex items-center gap-3">
@@ -304,11 +304,11 @@ function UseCasesSection() {
     <section className="bg-[#F0EDE8]">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Secteurs actifs au Québec</p>
+          <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Secteurs actifs au Québec</p>
           <h2 className="font-heading text-3xl md:text-[2.75rem] font-bold text-[#1B1A18] leading-tight">
             Des opportunités dans votre
             <br />
-            <span className="text-[#B5382A]">secteur d&apos;activité.</span>
+            <span className="text-workon-accent">secteur d&apos;activité.</span>
           </h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
@@ -327,7 +327,7 @@ function UseCasesSection() {
         </div>
         {/* Urgence — Places limitées */}
         <div className="mt-10 text-center">
-          <p className="inline-flex items-center gap-2 text-sm font-medium text-[#B5382A] bg-[#B5382A]/5 border border-[#B5382A]/15 rounded-full px-5 py-2">
+          <p className="inline-flex items-center gap-2 text-sm font-medium text-workon-accent bg-workon-accent/5 border border-workon-accent/15 rounded-full px-5 py-2">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
             </svg>
@@ -353,7 +353,7 @@ function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: 
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Confiance</p>
+          <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Confiance</p>
           <h2 className="font-heading text-3xl md:text-[2.75rem] font-bold text-[#1B1A18] leading-tight">
             Conçu au Québec,
             <br />
@@ -368,7 +368,7 @@ function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-16">
           {figures.map((f) => (
             <div key={f.label} className="text-center p-7 rounded-2xl bg-[#F9F8F5] border border-[#EAE6DF]">
-              <p className="text-3xl md:text-4xl font-bold text-[#B5382A] tracking-tight">{f.value}</p>
+              <p className="text-3xl md:text-4xl font-bold text-workon-accent tracking-tight">{f.value}</p>
               <p className="text-sm text-[#706E6A] mt-2 font-medium">{f.label}</p>
             </div>
           ))}
@@ -411,11 +411,11 @@ function WorkersSection({ workers }: { workers: FeaturedWorker[] }) {
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="flex items-end justify-between mb-12">
           <div>
-            <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Profils en vedette</p>
+            <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Profils en vedette</p>
             <h2 className="font-heading text-3xl md:text-[2.75rem] font-bold text-[#1B1A18]">Professionnels disponibles</h2>
             <p className="text-[#706E6A] mt-2 text-lg">Profils vérifiés &middot; données en temps réel</p>
           </div>
-          <Link href="/pros" className="hidden md:inline-flex text-sm font-semibold text-[#B5382A] hover:text-[#9A2F23] transition-colors">
+          <Link href="/pros" className="hidden md:inline-flex text-sm font-semibold text-workon-accent hover:text-workon-accent-hover transition-colors">
             Voir tous les profils →
           </Link>
         </div>
@@ -425,7 +425,7 @@ function WorkersSection({ workers }: { workers: FeaturedWorker[] }) {
           ))}
         </div>
         <div className="mt-10 text-center md:hidden">
-          <Link href="/pros" className="text-sm font-semibold text-[#B5382A]">Voir tous les profils →</Link>
+          <Link href="/pros" className="text-sm font-semibold text-workon-accent">Voir tous les profils →</Link>
         </div>
       </div>
     </section>
@@ -439,7 +439,7 @@ function PricingSection() {
     <section className="bg-[#F0EDE8]">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Tarification</p>
+          <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Tarification</p>
           <h2 className="font-heading text-3xl md:text-[2.75rem] font-bold text-[#1B1A18] leading-tight">
             Transparent. Simple.
             <br />
@@ -448,7 +448,7 @@ function PricingSection() {
         </div>
 
         <div className="max-w-lg mx-auto">
-          <div className="rounded-2xl bg-white border-2 border-[#B5382A]/20 p-8 md:p-10 shadow-card">
+          <div className="rounded-2xl bg-white border-2 border-workon-accent/20 p-8 md:p-10 shadow-card">
             <div className="text-center">
               <p className="text-sm font-semibold text-[#22C55E] uppercase tracking-wide mb-2">Inscription gratuite</p>
               <div className="flex items-baseline justify-center gap-1 mb-2">
@@ -498,9 +498,9 @@ function EmployerSection({ stats }: { stats: PublicStats | null }) {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
-        <div className="rounded-3xl bg-gradient-to-br from-[#B5382A]/5 via-[#B5382A]/8 to-[#B5382A]/5 border border-[#B5382A]/15 p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
+        <div className="rounded-3xl bg-gradient-to-br from-workon-accent/5 via-workon-accent/8 to-workon-accent/5 border border-workon-accent/15 p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="max-w-lg">
-            <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">Employeurs</p>
+            <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Employeurs</p>
             <h2 className="font-heading text-3xl font-bold text-[#1B1A18]">Vous cherchez du renfort qualifié?</h2>
             <p className="mt-4 text-lg text-[#706E6A] leading-relaxed">
               Zéro commission pendant le lancement. Accès à{" "}
@@ -529,7 +529,7 @@ function CTASection() {
           <h2 className="font-heading text-3xl md:text-5xl font-bold text-white leading-tight">
             Commencez à recevoir des
             <br />
-            opportunités <span className="text-[#B5382A]">cette semaine.</span>
+            opportunités <span className="text-workon-accent">cette semaine.</span>
           </h2>
           <p className="mt-8 text-xl text-white/60 max-w-xl mx-auto leading-relaxed">
             Inscription gratuite. Aucun engagement.
@@ -537,7 +537,7 @@ function CTASection() {
             Vous payez uniquement quand une demande se transforme en contrat.
           </p>
           <div className="mt-10">
-            <Button size="lg" className="bg-[#B5382A] hover:bg-[#9A2F23] text-white h-16 px-12 text-lg font-semibold rounded-xl shadow-2xl shadow-[#B5382A]/30 transition-all hover:shadow-[#B5382A]/40 hover:-translate-y-0.5" asChild>
+            <Button size="lg" className="bg-workon-accent hover:bg-workon-accent-hover text-white h-16 px-12 text-lg font-semibold rounded-xl shadow-2xl shadow-workon-accent/30 transition-all hover:shadow-workon-accent/40 hover:-translate-y-0.5" asChild>
               <Link href="/register">Créer mon profil professionnel</Link>
             </Button>
           </div>

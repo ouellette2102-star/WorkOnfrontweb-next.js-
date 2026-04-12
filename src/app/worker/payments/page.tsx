@@ -121,7 +121,7 @@ function WorkerPaymentsContent() {
         );
       case "FAILED":
         return (
-          <span className="rounded-full bg-[#B5382A]/15 border border-[#B5382A]/25 px-3 py-1 text-xs font-semibold text-workon-accent">
+          <span className="rounded-full bg-workon-accent/15 border border-workon-accent/25 px-3 py-1 text-xs font-semibold text-workon-accent">
             ❌ Échoué
           </span>
         );
@@ -165,7 +165,7 @@ function WorkerPaymentsContent() {
             <h2 className="mb-3 text-2xl font-bold text-workon-ink">
               Complétez votre onboarding Stripe
             </h2>
-            <p className="mb-6 text-white/80">
+            <p className="mb-6 text-workon-muted">
               Pour recevoir des paiements, vous devez d&apos;abord configurer
               votre compte Stripe Connect. Ce processus ne prend que quelques
               minutes.
@@ -193,7 +193,7 @@ function WorkerPaymentsContent() {
                   {formatAmount(totalEarned)} $
                 </span>
               </div>
-              <h4 className="text-lg font-semibold text-white">Total gagné</h4>
+              <h4 className="text-lg font-semibold text-workon-ink">Total gagné</h4>
               <p className="text-sm text-workon-muted">Paiements reçus</p>
             </div>
 
@@ -204,7 +204,7 @@ function WorkerPaymentsContent() {
                   {payments.filter((p) => p.status === "SUCCEEDED").length}
                 </span>
               </div>
-              <h4 className="text-lg font-semibold text-white">
+              <h4 className="text-lg font-semibold text-workon-ink">
                 Paiements reçus
               </h4>
               <p className="text-sm text-workon-muted">Missions payées</p>
@@ -213,11 +213,11 @@ function WorkerPaymentsContent() {
             <div className="rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">⏳</span>
-                <span className="text-3xl font-bold text-yellow-300">
+                <span className="text-3xl font-bold text-yellow-600">
                   {payments.filter((p) => p.status === "PENDING").length}
                 </span>
               </div>
-              <h4 className="text-lg font-semibold text-white">En attente</h4>
+              <h4 className="text-lg font-semibold text-workon-ink">En attente</h4>
               <p className="text-sm text-workon-muted">À recevoir</p>
             </div>
           </div>
@@ -242,7 +242,7 @@ function WorkerPaymentsContent() {
             ) : payments.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <span className="mb-4 text-6xl">💸</span>
-                <p className="mb-2 text-lg font-semibold text-white">
+                <p className="mb-2 text-lg font-semibold text-workon-ink">
                   Aucun paiement encore
                 </p>
                 <p className="text-workon-muted">
@@ -257,7 +257,7 @@ function WorkerPaymentsContent() {
                     className="flex items-center justify-between rounded-2xl border border-workon-border bg-white/60 p-4 transition-all hover:border-[#134021]/40 hover:-translate-y-0.5"
                   >
                     <div className="flex-1">
-                      <h4 className="mb-1 font-semibold text-white">
+                      <h4 className="mb-1 font-semibold text-workon-ink">
                         {payment.missionTitle}
                       </h4>
                       <div className="flex flex-wrap gap-3 text-sm text-workon-muted">

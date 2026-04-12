@@ -26,7 +26,7 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-[#EAE6DF] bg-[#F9F8F5]/90 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-[#B5382A] flex items-center justify-center">
+          <div className="h-7 w-7 rounded-full bg-workon-accent flex items-center justify-center">
             <span className="text-white text-xs font-bold">W</span>
           </div>
           <span className="font-bold tracking-tight">WorkOn</span>

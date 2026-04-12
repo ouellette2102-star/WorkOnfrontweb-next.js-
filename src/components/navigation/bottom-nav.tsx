@@ -96,10 +96,10 @@ export function BottomNav() {
             aria-label="Appeler un pro — dispatch express"
             className={cn(
               "flex items-center justify-center h-14 w-14 rounded-full transition-all",
-              "bg-[#B5382A] text-white",
-              "shadow-[0_4px_16px_rgba(181,56,42,0.3)]",
-              "hover:shadow-[0_4px_24px_rgba(181,56,42,0.45)]",
-              fabActive && "shadow-[0_4px_20px_rgba(181,56,42,0.4)]",
+              "bg-workon-accent text-white",
+              "shadow-[0_4px_16px_rgba(201,102,70,0.3)]",
+              "hover:shadow-[0_4px_24px_rgba(201,102,70,0.45)]",
+              fabActive && "shadow-[0_4px_20px_rgba(201,102,70,0.4)]",
             )}
           >
             <Phone className="h-6 w-6" fill="currentColor" />

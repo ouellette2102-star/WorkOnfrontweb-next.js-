@@ -108,18 +108,18 @@ function RegisterInner() {
   const backFromStep3 = () => setStep(presetRole ? 1 : 2);
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-[#134021]/10 via-background to-background">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-workon-bg">
       {/* Logo */}
-      <div className="mb-8 text-white">
+      <div className="mb-8 text-workon-ink">
         <WorkOnWordmark size="xl" />
       </div>
 
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm rounded-3xl border border-workon-border bg-white p-8 shadow-sm">
         {/* Step 1: Credentials */}
         {step === 1 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl font-bold">Créez votre compte</h1>
+              <h1 className="text-2xl font-bold text-workon-ink">Créez votre compte</h1>
               <p className="text-workon-muted text-sm mt-2">
                 {presetRole === "worker"
                   ? "Rejoignez WorkOn et commencez à recevoir des missions près de chez vous."
@@ -192,7 +192,7 @@ function RegisterInner() {
         {step === 2 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl font-bold">Choisissez votre type de compte</h1>
+              <h1 className="text-2xl font-bold text-workon-ink">Choisissez votre type de compte</h1>
               <p className="text-workon-muted text-sm mt-2">
                 Faites-nous savoir comment vous souhaitez utiliser WorkOn.
               </p>
@@ -203,7 +203,7 @@ function RegisterInner() {
                 onClick={() => selectRole("worker")}
                 className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#134021]/30 hover:bg-[#F0EDE8] transition-all text-left"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#B5382A]/10 border border-[#B5382A]/25">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-workon-accent/10 border border-workon-accent/25">
                   <Wrench className="h-6 w-6 text-workon-accent" />
                 </div>
                 <div className="flex-1">
@@ -219,7 +219,7 @@ function RegisterInner() {
                 onClick={() => selectRole("employer")}
                 className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#134021]/30 hover:bg-[#F0EDE8] transition-all text-left"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#B5382A]/10 border border-[#B5382A]/25">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-workon-accent/10 border border-workon-accent/25">
                   <Briefcase className="h-6 w-6 text-workon-accent" />
                 </div>
                 <div className="flex-1">
@@ -254,7 +254,7 @@ function RegisterInner() {
         {step === 3 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h1 className="text-2xl font-bold">Créez votre profil</h1>
+              <h1 className="text-2xl font-bold text-workon-ink">Créez votre profil</h1>
               <p className="text-workon-muted text-sm mt-2">
                 Quelques infos pour finaliser votre compte.
                 {role === "worker"
@@ -297,7 +297,7 @@ function RegisterInner() {
               </div>
 
               {error && (
-                <p className="text-workon-accent text-sm text-center bg-[#B5382A]/10 border border-[#B5382A]/25 rounded-xl p-3">
+                <p className="text-workon-accent text-sm text-center bg-workon-accent/10 border border-workon-accent/25 rounded-xl p-3">
                   {error}
                 </p>
               )}
@@ -325,7 +325,7 @@ function RegisterInner() {
         {/* Step 4: Success */}
         {step === 4 && user && (
           <div className="space-y-6 text-center">
-            <h1 className="text-2xl font-bold">Votre profil est prêt !</h1>
+            <h1 className="text-2xl font-bold text-workon-ink">Votre profil est prêt !</h1>
             <p className="text-workon-muted text-sm">
               {role === "worker"
                 ? "Commencez à recevoir des demandes de missions."
@@ -333,7 +333,7 @@ function RegisterInner() {
             </p>
 
             <div className="rounded-3xl border border-workon-border bg-white backdrop-blur-sm p-6 space-y-3 shadow-sm">
-              <div className="mx-auto h-16 w-16 rounded-full bg-[#B5382A]/10 border border-[#B5382A]/20 flex items-center justify-center text-2xl font-bold text-workon-accent">
+              <div className="mx-auto h-16 w-16 rounded-full bg-workon-accent/10 border border-workon-accent/20 flex items-center justify-center text-2xl font-bold text-workon-accent">
                 {user.firstName?.[0]}{user.lastName?.[0]}
               </div>
               <p className="font-semibold text-lg">

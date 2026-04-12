@@ -115,7 +115,7 @@ export default function ContractDetailPage() {
             )}
             <div>
               <p className="text-sm text-workon-muted">Derni\u00e8re mise \u00e0 jour</p>
-              <p className="text-white">
+              <p className="text-workon-muted">
                 {new Date(contract.updatedAt).toLocaleDateString("fr-CA")}
               </p>
             </div>

@@ -27,7 +27,7 @@ export default function WorkerProfilePage() {
 
   if (!worker) {
     return (
-      <div className="text-center py-12 text-white/60">Professionnel non trouvé</div>
+      <div className="text-center py-12 text-workon-muted">Professionnel non trouvé</div>
     );
   }
 

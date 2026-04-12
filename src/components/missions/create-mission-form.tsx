@@ -267,7 +267,7 @@ export function CreateMissionForm() {
 
       {/* Messages d'erreur */}
       {error && (
-        <div className="rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-4 text-sm text-[#B5382A]">
+        <div className="rounded-2xl border border-workon-accent/30 bg-workon-accent/5 p-4 text-sm text-workon-accent">
           {error}
         </div>
       )}

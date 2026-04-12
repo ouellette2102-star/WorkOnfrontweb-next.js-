@@ -8,7 +8,7 @@
    *   Background: #F9F8F5 (oatmeal)
    *   Text:       #1B1A18 (rich black)
    *   Primary:    #134021 (forest green — trust/nature)
-   *   Accent:     #B5382A (terracotta — urgency/action)
+   *   Accent:     #C96646 (rich terracotta — urgency/action)
    *   Gray:       #706E6A (warm gray)
    *   Cream:      #EAE6DF (warm border)
    *
@@ -23,10 +23,10 @@
   --workon-primary-subtle: rgba(19, 64, 33, 0.08);
   --workon-primary-ring: rgba(19, 64, 33, 0.25);
 
-  --workon-accent: #B5382A;
-  --workon-accent-hover: #9A2F23;
-  --workon-accent-subtle: rgba(181, 56, 42, 0.08);
-  --workon-accent-ring: rgba(181, 56, 42, 0.25);
+  --workon-accent: #C96646;
+  --workon-accent-hover: #B5553A;
+  --workon-accent-subtle: rgba(201, 102, 70, 0.08);
+  --workon-accent-ring: rgba(201, 102, 70, 0.25);
 
   --workon-ink: #1B1A18;
   --workon-bg: #F9F8F5;

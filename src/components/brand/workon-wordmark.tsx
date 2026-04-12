@@ -56,7 +56,7 @@ export function WorkOnWordmark({
       )}
     >
       <span aria-hidden>Work</span>
-      <PinGlyph className={cn("inline-block self-center mx-[0.03em] text-[#B5382A]", pin, pinClassName)} />
+      <PinGlyph className={cn("inline-block self-center mx-[0.03em] text-workon-accent", pin, pinClassName)} />
       <span aria-hidden>n</span>
     </span>
   );
