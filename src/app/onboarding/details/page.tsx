@@ -87,33 +87,33 @@ export default function OnboardingDetailsPage() {
 
   if (authLoading || profileLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
-        <div className="text-white/70">Chargement...</div>
+      <div className="flex min-h-screen items-center justify-center bg-workon-bg">
+        <div className="text-workon-muted">Chargement...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-workon-bg p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="mb-4 text-4xl font-bold text-white">
             Complétez votre profil
           </h1>
-          <p className="text-lg text-white/70">
+          <p className="text-lg text-workon-muted">
             Ces informations nous aideront à personnaliser votre expérience
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 rounded-2xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-4 text-center text-[#FF4D1C] shadow-lg shadow-black/20">
+          <div className="mb-6 rounded-2xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-4 text-center text-workon-accent shadow-sm">
             {error}
           </div>
         )}
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-white/10 bg-neutral-900/80 backdrop-blur-sm p-8 shadow-lg shadow-black/20"
+          className="rounded-3xl border border-workon-border bg-white backdrop-blur-sm p-8 shadow-sm"
         >
           <div className="space-y-5">
             <div className="space-y-2">

@@ -35,13 +35,13 @@ export default function OnboardingRolePage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-workon-bg p-4">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
           <h1 className="mb-4 text-4xl font-bold text-white">
             Bienvenue sur WorkOn
           </h1>
-          <p className="text-lg text-white/70">
+          <p className="text-lg text-workon-muted">
             Pour commencer, dites-nous qui vous êtes
           </p>
         </div>
@@ -57,14 +57,14 @@ export default function OnboardingRolePage() {
           <button
             onClick={() => handleRoleSelect("WORKER")}
             disabled={isSubmitting}
-            className="group relative overflow-hidden rounded-3xl border-2 border-white/10 bg-neutral-900/70 p-8 text-left backdrop-blur transition-all hover:border-blue-500 hover:bg-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative overflow-hidden rounded-3xl border-2 border-workon-border bg-workon-bg/70 p-8 text-left backdrop-blur transition-all hover:border-blue-500 hover:bg-workon-bg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="relative z-10">
               <div className="mb-4 text-6xl">👷</div>
               <h2 className="mb-3 text-2xl font-bold text-white">
                 Je suis Travailleur
               </h2>
-              <p className="text-white/70">
+              <p className="text-workon-muted">
                 Je cherche des missions et je veux gagner de l'argent en
                 travaillant
               </p>
@@ -76,14 +76,14 @@ export default function OnboardingRolePage() {
           <button
             onClick={() => handleRoleSelect("EMPLOYER")}
             disabled={isSubmitting}
-            className="group relative overflow-hidden rounded-3xl border-2 border-white/10 bg-neutral-900/70 p-8 text-left backdrop-blur transition-all hover:border-green-500 hover:bg-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative overflow-hidden rounded-3xl border-2 border-workon-border bg-workon-bg/70 p-8 text-left backdrop-blur transition-all hover:border-green-500 hover:bg-workon-bg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="relative z-10">
               <div className="mb-4 text-6xl">💼</div>
               <h2 className="mb-3 text-2xl font-bold text-white">
                 Je suis Employeur
               </h2>
-              <p className="text-white/70">
+              <p className="text-workon-muted">
                 Je publie des missions et je cherche des travailleurs qualifiés
               </p>
             </div>
@@ -92,7 +92,7 @@ export default function OnboardingRolePage() {
         </div>
 
         {isSubmitting && (
-          <div className="mt-6 text-center text-white/70">
+          <div className="mt-6 text-center text-workon-muted">
             Enregistrement en cours...
           </div>
         )}

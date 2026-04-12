@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Star, Shield } from "lucide-react";
+import { Star, Shield, CalendarDays } from "lucide-react";
 import type { WorkerProfile } from "@/lib/api-client";
 import { TrustPill } from "@/components/ui/trust-pill";
 import { cn } from "@/lib/utils";
@@ -90,6 +90,16 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
             ))}
           </div>
         )}
+
+        {/* Reserve button */}
+        <Link
+          href={`/reserve/${worker.id}`}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center justify-center gap-1.5 w-full rounded-lg bg-workon-primary text-white text-sm font-medium py-2 hover:bg-workon-primary/90 transition-colors"
+        >
+          <CalendarDays className="h-3.5 w-3.5" />
+          Réserver
+        </Link>
       </div>
     </Link>
   );

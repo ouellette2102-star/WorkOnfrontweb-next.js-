@@ -49,7 +49,7 @@ export default function ContractDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
+      <div className="flex min-h-screen items-center justify-center bg-workon-bg">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
       </div>
     );
@@ -57,7 +57,7 @@ export default function ContractDetailPage() {
 
   if (error || !contract) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+      <div className="min-h-screen bg-workon-bg p-6">
         <div className="mx-auto max-w-2xl rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center">
           <p className="mb-4 text-red-400">Contrat introuvable</p>
           <Link href="/contracts">
@@ -71,23 +71,23 @@ export default function ContractDetailPage() {
   const status = statusConfig[contract.status];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+    <div className="min-h-screen bg-workon-bg p-6">
       <div className="mx-auto max-w-2xl">
         <Link
           href="/contracts"
-          className="mb-6 inline-block text-sm text-white/70 transition hover:text-green-400"
+          className="mb-6 inline-block text-sm text-workon-muted transition hover:text-workon-primary"
         >
           &larr; Retour aux contrats
         </Link>
 
-        <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-8 backdrop-blur">
+        <div className="rounded-3xl border border-workon-border bg-white p-8 shadow-sm">
           {/* Header */}
           <div className="mb-6 flex items-start justify-between">
             <div>
-              <h1 className="mb-1 text-2xl font-bold text-white">
+              <h1 className="mb-1 text-2xl font-bold text-workon-ink">
                 Contrat #{contract.id.slice(0, 8)}
               </h1>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-workon-muted">
                 Cr\u00e9\u00e9 le{" "}
                 {new Date(contract.createdAt).toLocaleDateString("fr-CA")}
               </p>
@@ -103,18 +103,18 @@ export default function ContractDetailPage() {
           <div className="mb-6 space-y-4">
             {contract.localMissionId && (
               <div>
-                <p className="text-sm text-white/50">Mission associ\u00e9e</p>
-                <p className="text-white">{contract.localMissionId}</p>
+                <p className="text-sm text-workon-muted">Mission associ\u00e9e</p>
+                <p className="text-workon-ink">{contract.localMissionId}</p>
               </div>
             )}
             {contract.missionId && (
               <div>
-                <p className="text-sm text-white/50">Mission (legacy)</p>
-                <p className="text-white">{contract.missionId}</p>
+                <p className="text-sm text-workon-muted">Mission (legacy)</p>
+                <p className="text-workon-ink">{contract.missionId}</p>
               </div>
             )}
             <div>
-              <p className="text-sm text-white/50">Derni\u00e8re mise \u00e0 jour</p>
+              <p className="text-sm text-workon-muted">Derni\u00e8re mise \u00e0 jour</p>
               <p className="text-white">
                 {new Date(contract.updatedAt).toLocaleDateString("fr-CA")}
               </p>
@@ -123,11 +123,11 @@ export default function ContractDetailPage() {
 
           {/* Terms */}
           {contract.terms && (
-            <div className="mb-6 rounded-2xl border border-white/10 bg-neutral-800/50 p-4">
-              <h3 className="mb-2 text-sm font-semibold text-white/70">
+            <div className="mb-6 rounded-2xl border border-workon-border bg-workon-bg p-4">
+              <h3 className="mb-2 text-sm font-semibold text-workon-muted">
                 Termes du contrat
               </h3>
-              <p className="whitespace-pre-wrap text-white/80">
+              <p className="whitespace-pre-wrap text-workon-ink/80">
                 {contract.terms}
               </p>
             </div>

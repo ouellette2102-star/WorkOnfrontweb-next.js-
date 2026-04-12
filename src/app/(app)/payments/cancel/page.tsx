@@ -1,25 +1,44 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { XCircle, ArrowLeft, RotateCcw } from "lucide-react";
 
 export default function PaymentCancelPage() {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
-      <div className="mx-auto max-w-2xl">
-        <div className="rounded-3xl border border-yellow-500/20 bg-neutral-900/70 p-12 text-center backdrop-blur shadow-lg shadow-black/20">
-          <div className="mb-6 text-7xl">❌</div>
-          <h1 className="mb-3 text-3xl font-bold text-white">
+    <div className="min-h-screen bg-workon-bg p-6 flex items-center justify-center">
+      <div className="mx-auto max-w-md w-full">
+        <div className="rounded-2xl border border-amber-200 bg-white p-10 text-center shadow-sm">
+          <div className="mb-5 flex justify-center">
+            <XCircle className="h-16 w-16 text-amber-500" />
+          </div>
+          <h1 className="mb-2 text-2xl font-bold text-workon-ink">
             Paiement annulé
           </h1>
-          <p className="mb-8 text-lg text-white/70">
-            Le paiement a été annulé. Aucun montant n&apos;a été débité.
+          <p className="mb-6 text-base text-workon-muted">
+            Le paiement a été annulé. Aucun montant n&apos;a été débité de votre compte.
           </p>
           <div className="flex flex-col items-center gap-3">
-            <Button asChild variant="hero" size="hero">
-              <Link href="/missions/mine">Retour aux missions</Link>
+            <Button
+              onClick={() => router.back()}
+              className="w-full inline-flex items-center justify-center gap-2"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Réessayer le paiement
             </Button>
-            <Link href="/home" className="text-sm text-white/50 hover:text-white">
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/missions/mine" className="inline-flex items-center justify-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Voir mes missions
+              </Link>
+            </Button>
+            <Link
+              href="/home"
+              className="text-sm text-workon-muted hover:text-workon-ink transition-colors"
+            >
               Retour à l&apos;accueil
             </Link>
           </div>

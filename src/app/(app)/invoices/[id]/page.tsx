@@ -37,7 +37,7 @@ export default function InvoiceDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
+      <div className="flex min-h-screen items-center justify-center bg-workon-bg">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
       </div>
     );
@@ -45,7 +45,7 @@ export default function InvoiceDetailPage() {
 
   if (error || !invoice) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+      <div className="min-h-screen bg-workon-bg p-6">
         <div className="mx-auto max-w-2xl rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center">
           <p className="mb-4 text-red-400">Facture introuvable</p>
           <Link href="/missions/mine">
@@ -59,23 +59,23 @@ export default function InvoiceDetailPage() {
   const status = statusConfig[invoice.status];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-6">
+    <div className="min-h-screen bg-workon-bg p-6">
       <div className="mx-auto max-w-2xl">
         <Link
           href="/missions/mine"
-          className="mb-6 inline-block text-sm text-white/70 transition hover:text-green-400"
+          className="mb-6 inline-block text-sm text-workon-muted transition hover:text-workon-primary"
         >
           &larr; Retour aux missions
         </Link>
 
-        <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-8 backdrop-blur">
+        <div className="rounded-3xl border border-workon-border bg-white p-8 shadow-sm">
           {/* Header */}
           <div className="mb-6 flex items-start justify-between">
             <div>
-              <h1 className="mb-1 text-2xl font-bold text-white">
+              <h1 className="mb-1 text-2xl font-bold text-workon-ink">
                 Facture #{invoice.id.slice(0, 8)}
               </h1>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-workon-muted">
                 Cr\u00e9\u00e9e le{" "}
                 {new Date(invoice.createdAt).toLocaleDateString("fr-CA")}
               </p>
@@ -90,38 +90,38 @@ export default function InvoiceDetailPage() {
           {/* Mission reference */}
           {invoice.localMissionId && (
             <div className="mb-6">
-              <p className="text-sm text-white/50">Mission associ\u00e9e</p>
-              <p className="text-white">{invoice.localMissionId}</p>
+              <p className="text-sm text-workon-muted">Mission associ\u00e9e</p>
+              <p className="text-workon-ink">{invoice.localMissionId}</p>
             </div>
           )}
 
           {/* Amount breakdown */}
-          <div className="mb-6 rounded-2xl border border-white/10 bg-neutral-800/50 p-6">
-            <h3 className="mb-4 text-lg font-semibold text-white">
+          <div className="mb-6 rounded-2xl border border-workon-border bg-workon-bg p-6">
+            <h3 className="mb-4 text-lg font-semibold text-workon-ink">
               D\u00e9tail du montant
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-white/60">Sous-total</span>
-                <span className="font-semibold text-white">
+                <span className="text-workon-muted">Sous-total</span>
+                <span className="font-semibold text-workon-ink">
                   {formatCents(invoice.subtotalCents)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/60">Frais plateforme (15%)</span>
-                <span className="font-semibold text-white">
+                <span className="text-workon-muted">Frais plateforme (15%)</span>
+                <span className="font-semibold text-workon-ink">
                   {formatCents(invoice.platformFeeCents)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/60">Taxes</span>
-                <span className="font-semibold text-white">
+                <span className="text-workon-muted">Taxes</span>
+                <span className="font-semibold text-workon-ink">
                   {formatCents(invoice.taxCents)}
                 </span>
               </div>
-              <div className="my-3 border-t border-white/10" />
+              <div className="my-3 border-t border-workon-border" />
               <div className="flex justify-between text-lg">
-                <span className="font-bold text-white">Total</span>
+                <span className="font-bold text-workon-ink">Total</span>
                 <span className="font-bold text-green-400">
                   {formatCents(invoice.totalCents)}
                 </span>
@@ -132,7 +132,7 @@ export default function InvoiceDetailPage() {
           {/* Paid date */}
           {invoice.paidAt && (
             <div className="mb-6">
-              <p className="text-sm text-white/50">Pay\u00e9e le</p>
+              <p className="text-sm text-workon-muted">Pay\u00e9e le</p>
               <p className="text-white">
                 {new Date(invoice.paidAt).toLocaleDateString("fr-CA")}
               </p>
@@ -142,7 +142,7 @@ export default function InvoiceDetailPage() {
           {/* Download placeholder */}
           <Button
             variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
+            className="border-workon-border text-workon-ink hover:bg-workon-bg"
             disabled
           >
             T\u00e9l\u00e9charger (bient\u00f4t disponible)

@@ -64,7 +64,7 @@ function LoginForm() {
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold">Connexion</h1>
-          <p className="text-white/60 text-sm mt-1">
+          <p className="text-workon-muted text-sm mt-1">
             Connectez-vous à votre compte WorkOn
           </p>
         </div>
@@ -80,7 +80,7 @@ function LoginForm() {
               {...register("email")}
             />
             {errors.email && (
-              <p className="text-[#FF4D1C] text-xs">{errors.email.message}</p>
+              <p className="text-workon-accent text-xs">{errors.email.message}</p>
             )}
           </div>
 
@@ -94,12 +94,12 @@ function LoginForm() {
               {...register("password")}
             />
             {errors.password && (
-              <p className="text-[#FF4D1C] text-xs">{errors.password.message}</p>
+              <p className="text-workon-accent text-xs">{errors.password.message}</p>
             )}
           </div>
 
           {error && (
-            <p className="text-[#FF4D1C] text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
+            <p className="text-workon-accent text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
               {error}
             </p>
           )}
@@ -118,17 +118,17 @@ function LoginForm() {
         <div className="text-center text-sm">
           <Link
             href="/forgot-password"
-            className="text-[#FF4D1C] hover:underline"
+            className="text-workon-accent hover:underline"
           >
             Mot de passe oublié ?
           </Link>
         </div>
 
-        <div className="text-center text-sm text-white/60">
+        <div className="text-center text-sm text-workon-muted">
           Pas encore de compte ?{" "}
           <Link
             href="/register"
-            className="text-[#FF4D1C] font-medium hover:underline"
+            className="text-workon-accent font-medium hover:underline"
           >
             Créer un compte
           </Link>

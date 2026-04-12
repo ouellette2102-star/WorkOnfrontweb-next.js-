@@ -34,9 +34,9 @@ export default function WorkerProfilePage() {
   const fullName = worker.fullName || `${worker.firstName} ${worker.lastName}`;
 
   return (
-    <div className="pb-6">
+    <div className="pb-6 bg-workon-bg min-h-screen">
       {/* Hero photo */}
-      <div className="relative h-72 bg-gradient-to-b from-red-900/40 to-neutral-900">
+      <div className="relative h-72 bg-gradient-to-b from-workon-primary/10 to-workon-bg">
         {worker.photoUrl ? (
           <img
             src={worker.photoUrl}
@@ -44,20 +44,20 @@ export default function WorkerProfilePage() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl font-bold text-white/20">
+          <div className="w-full h-full flex items-center justify-center text-6xl font-bold text-workon-muted/30">
             {worker.firstName[0]}
             {worker.lastName[0]}
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-workon-bg via-workon-bg/50 to-transparent" />
       </div>
 
       <div className="px-4 -mt-16 relative space-y-4">
         {/* Name + rating */}
         <div>
-          <h1 className="text-2xl font-bold">{fullName}</h1>
+          <h1 className="text-2xl font-bold text-workon-ink">{fullName}</h1>
           {worker.jobTitle && (
-            <p className="text-white/60">
+            <p className="text-workon-muted">
               {worker.jobTitle}
               {worker.city && ` à ${worker.city}`}
             </p>
@@ -71,15 +71,15 @@ export default function WorkerProfilePage() {
                   className={cn(
                     "h-4 w-4",
                     i < Math.round(worker.averageRating)
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-white/20",
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-gray-200",
                   )}
                 />
               ))}
             </div>
-            <span className="font-semibold">{worker.completionPercentage}%</span>
+            <span className="font-semibold text-workon-ink">{worker.completionPercentage}%</span>
             {worker.badges?.some((b) => b.type === "top_performer") && (
-              <span className="rounded-full bg-red-600/20 text-red-accent px-2.5 py-0.5 text-xs font-semibold">
+              <span className="rounded-full bg-workon-primary/10 text-workon-primary px-2.5 py-0.5 text-xs font-semibold">
                 Top Performer
               </span>
             )}
@@ -92,30 +92,30 @@ export default function WorkerProfilePage() {
             {worker.badges.map((badge) => (
               <span
                 key={badge.label}
-                className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-neutral-800/80 px-3 py-1 text-sm"
+                className="inline-flex items-center gap-1 rounded-full border border-workon-border bg-white px-3 py-1 text-sm text-workon-ink"
               >
-                <Shield className="h-3.5 w-3.5 text-red-accent" />
+                <Shield className="h-3.5 w-3.5 text-workon-primary" />
                 {badge.label}
               </span>
             ))}
           </div>
         )}
 
-        {/* CTA */}
+        {/* CTA — Réserver ce professionnel */}
         <Button
           onClick={() => router.push(`/reserve/${worker.id}`)}
           className="w-full h-12 text-base"
         >
-          <Shield className="h-4 w-4 mr-1" />
-          Réserver
+          <Shield className="h-4 w-4 mr-2" />
+          Réserver ce professionnel
         </Button>
 
         {/* Why choose section */}
         <div className="space-y-2 pt-2">
-          <h2 className="font-semibold">Pourquoi choisir {worker.firstName}:</h2>
+          <h2 className="font-semibold text-workon-ink">Pourquoi choisir {worker.firstName}:</h2>
           {["Identité vérifiée", "Assurances & conformité", "Contrat sécurisé WorkOn"].map(
             (text) => (
-              <div key={text} className="flex items-center gap-2 text-sm text-white/70">
+              <div key={text} className="flex items-center gap-2 text-sm text-workon-muted">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
                 <span>{text}</span>
               </div>
@@ -125,18 +125,18 @@ export default function WorkerProfilePage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="rounded-xl bg-neutral-800/80 border border-white/10 p-3 text-center">
-            <p className="text-2xl font-bold">{worker.completedMissions}</p>
-            <p className="text-xs text-white/50">Missions complétées</p>
+          <div className="rounded-xl bg-white border border-workon-border p-3 text-center shadow-sm">
+            <p className="text-2xl font-bold text-workon-ink">{worker.completedMissions}</p>
+            <p className="text-xs text-workon-muted">Missions complétées</p>
           </div>
-          <div className="rounded-xl bg-neutral-800/80 border border-white/10 p-3 text-center">
-            <p className="text-2xl font-bold">{worker.reviewCount}</p>
-            <p className="text-xs text-white/50">Avis clients</p>
+          <div className="rounded-xl bg-white border border-workon-border p-3 text-center shadow-sm">
+            <p className="text-2xl font-bold text-workon-ink">{worker.reviewCount}</p>
+            <p className="text-xs text-workon-muted">Avis clients</p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-center text-xs text-white/40 pt-4 space-y-1">
+        <div className="text-center text-xs text-workon-muted pt-4 space-y-1">
           <p>WorkOn fournit l&apos;infrastructure de mise en relation et paiement.</p>
           <p>WorkOn n&apos;est pas partie au contrat de service.</p>
           <p>Paiement sécurisé par Stripe.</p>
