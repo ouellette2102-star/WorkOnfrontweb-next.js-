@@ -39,6 +39,7 @@ export const userMeSchema = z.object({
   lastName: z.string().nullable(),
   phone: z.string().nullable(),
   city: z.string().nullable(),
+  pictureUrl: z.string().nullable().optional(),
   role: z.string(),
 });
 

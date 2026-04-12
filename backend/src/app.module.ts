@@ -52,6 +52,8 @@ import { ProsModule } from './pros/pros.module';
 import { SwipeModule } from './swipe/swipe.module';
 import { MissionsMapModule } from './missions-map/missions-map.module';
 import { GhlModule } from './ghl/ghl.module';
+import { AppCacheModule } from './cache/cache.module';
+import { WorkerSkillsModule } from './worker-skills/worker-skills.module';
 
 @Module({
   imports: [
@@ -144,6 +146,8 @@ import { GhlModule } from './ghl/ghl.module';
     // CORE INFRASTRUCTURE (no behavior change)
     // ============================================================
     PrismaModule,
+    // Global cache module (Redis or in-memory fallback)
+    AppCacheModule,
     LoggerModule,
     // Audit logging for critical business events (PR-I2)
     AuditModule,
@@ -225,6 +229,8 @@ import { GhlModule } from './ghl/ghl.module';
     MissionsMapModule,
     // GHL module - GoHighLevel webhook integration
     GhlModule,
+    // Worker skills management (select skills from catalog)
+    WorkerSkillsModule,
   ],
   controllers: [AppController],
   providers: [

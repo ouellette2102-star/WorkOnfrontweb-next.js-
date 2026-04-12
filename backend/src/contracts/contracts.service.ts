@@ -5,6 +5,7 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { ContractStatus } from '@prisma/client';
 import { CreateContractDto } from './dto/create-contract.dto';
@@ -127,8 +128,8 @@ export class ContractsService {
 
     // Vérifier l'accès
     if (
-      contract.employer.clerkId !== clerkUserId &&
-      contract.worker.clerkId !== clerkUserId
+      contract.employer?.clerkId !== clerkUserId &&
+      contract.worker?.clerkId !== clerkUserId
     ) {
       throw new ForbiddenException('Accès non autorisé à ce contrat');
     }
@@ -187,8 +188,8 @@ export class ContractsService {
       throw new NotFoundException('Contrat non trouvé');
     }
 
-    const isEmployer = contract.employer.clerkId === clerkUserId;
-    const isWorker = contract.worker.clerkId === clerkUserId;
+    const isEmployer = contract.employer?.clerkId === clerkUserId;
+    const isWorker = contract.worker?.clerkId === clerkUserId;
 
     if (!isEmployer && !isWorker) {
       throw new ForbiddenException('Accès non autorisé');
@@ -264,6 +265,44 @@ export class ContractsService {
     if (newStatus === ContractStatus.COMPLETED && !isEmployer) {
       throw new ForbiddenException('Seul l\'employer peut marquer le contrat comme complété');
     }
+  }
+
+  /**
+   * Create a contract for a LocalMission (auto-created on worker acceptance).
+   *
+   * Uses LocalUser IDs instead of Clerk User IDs.
+   * Idempotent: returns existing contract if one already exists.
+   */
+  async createLocalContract(
+    localMissionId: string,
+    localEmployerId: string,
+    localWorkerId: string,
+    amount: number,
+  ) {
+    // Idempotent — don't duplicate
+    const existing = await this.prisma.contract.findUnique({
+      where: { localMissionId },
+    });
+
+    if (existing) {
+      this.logger.warn(`Contract already exists for LocalMission ${localMissionId}`);
+      return existing;
+    }
+
+    const contract = await this.prisma.contract.create({
+      data: {
+        id: `contract_${crypto.randomUUID().replace(/-/g, '')}`,
+        localMissionId,
+        localEmployerId,
+        localWorkerId,
+        amount,
+        status: ContractStatus.PENDING,
+        signedByEmployer: true, // Employer implicitly signs by creating the mission
+      },
+    });
+
+    this.logger.log(`Local contract created: ${contract.id} for LocalMission ${localMissionId}`);
+    return contract;
   }
 
   /**

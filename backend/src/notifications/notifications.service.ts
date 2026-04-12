@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PushService } from '../push/push.service';
 import { DevicesService } from '../devices/devices.service';
@@ -50,7 +51,7 @@ export class NotificationsService {
       // Create in-app notification
       await this.prisma.notification.create({
         data: {
-          id: `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          id: `notif_${crypto.randomUUID().replace(/-/g, '')}`,
           userId: user.id,
           type: 'NEW_MESSAGE',
           payloadJSON: {
@@ -130,7 +131,7 @@ export class NotificationsService {
 
       await this.prisma.notification.create({
         data: {
-          id: `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          id: `notif_${crypto.randomUUID().replace(/-/g, '')}`,
           userId: user.id,
           type: 'MISSION_STATUS_CHANGED',
           payloadJSON: {
@@ -167,7 +168,7 @@ export class NotificationsService {
 
       await this.prisma.notification.create({
         data: {
-          id: `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          id: `notif_${crypto.randomUUID().replace(/-/g, '')}`,
           userId: user.id,
           type: 'MISSION_TIME_EVENT',
           payloadJSON: {
@@ -241,6 +242,84 @@ export class NotificationsService {
         userId,
         readAt: null,
       },
+    });
+  }
+
+  // ============================================
+  // LOCAL NOTIFICATION METHODS (for LocalUser / native JWT auth)
+  // ============================================
+
+  /**
+   * Create a local notification for a LocalUser.
+   */
+  async createLocalNotification(
+    userId: string,
+    type: string,
+    title: string,
+    body: string,
+    data?: any,
+  ) {
+    return this.prisma.localNotification.create({
+      data: {
+        userId,
+        type,
+        title,
+        body,
+        data: data ?? undefined,
+      },
+    });
+  }
+
+  /**
+   * Get notifications for a LocalUser
+   */
+  async getLocalNotifications(userId: string, unreadOnly = false) {
+    const notifications = await this.prisma.localNotification.findMany({
+      where: {
+        userId,
+        ...(unreadOnly ? { read: false } : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return notifications.map((n) => ({
+      id: n.id,
+      userId: n.userId,
+      type: n.type,
+      title: n.title,
+      body: n.body,
+      data: n.data,
+      isRead: n.read,
+      createdAt: n.createdAt.toISOString(),
+    }));
+  }
+
+  /**
+   * Count unread local notifications
+   */
+  async countLocalUnread(userId: string): Promise<number> {
+    return this.prisma.localNotification.count({
+      where: { userId, read: false },
+    });
+  }
+
+  /**
+   * Mark a single local notification as read
+   */
+  async markLocalAsRead(notificationId: string): Promise<void> {
+    await this.prisma.localNotification.update({
+      where: { id: notificationId },
+      data: { read: true },
+    });
+  }
+
+  /**
+   * Mark all local notifications as read for a user
+   */
+  async markAllLocalAsRead(userId: string): Promise<void> {
+    await this.prisma.localNotification.updateMany({
+      where: { userId, read: false },
+      data: { read: true },
     });
   }
 }
