@@ -35,31 +35,31 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-neutral-900 p-6">
+      <div className="w-full max-w-lg rounded-2xl border border-[#EAE6DF] bg-white p-6 shadow-card">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-400" />
-            <h2 className="text-lg font-bold text-white">Ouvrir un litige</h2>
+            <h2 className="text-lg font-bold text-[#1B1A18]">Ouvrir un litige</h2>
           </div>
-          <button onClick={onClose} className="text-white/50 hover:text-white">
+          <button onClick={onClose} className="text-[#9C9A96] hover:text-[#1B1A18]">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-white/80">
+            <label className="mb-1 block text-sm font-medium text-[#1B1A18]">
               Raison *
             </label>
             <Input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Ex: Travail non effectue, qualite insuffisante..."
-              className="border-white/10 bg-white/5 text-white placeholder-white/30"
+              className="border-[#EAE6DF] bg-[#F9F8F5] text-[#1B1A18] placeholder-[#9C9A96]"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-white/80">
+            <label className="mb-1 block text-sm font-medium text-[#1B1A18]">
               Description *
             </label>
             <textarea
@@ -67,7 +67,7 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Decrivez le probleme en detail..."
               rows={4}
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-white/30 focus:border-red-500 focus:outline-none"
+              className="w-full rounded-xl border border-[#EAE6DF] bg-[#F9F8F5] p-3 text-[#1B1A18] placeholder-[#9C9A96] focus:border-[#134021] focus:outline-none"
             />
           </div>
 

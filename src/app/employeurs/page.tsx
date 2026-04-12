@@ -6,31 +6,31 @@ import { getPublicStats, getFeaturedReviews, getSectorStats, type PublicStats, t
 
 export const revalidate = 120; // ISR — 2 min
 
-// Header now lives in <MarketingHeader theme="dark" /> — see PR #39.
+// Header now lives in <MarketingHeader theme="light" /> — see PR #39.
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
-      <p className="text-3xl font-black text-[#FF4D1C]">{value}</p>
-      <p className="text-sm font-medium mt-1">{label}</p>
-      {sub && <p className="text-xs text-white/40 mt-0.5">{sub}</p>}
+    <div className="rounded-2xl border border-[#EAE6DF] bg-white p-6 text-center shadow-card">
+      <p className="text-3xl font-black text-[#B5382A]">{value}</p>
+      <p className="text-sm font-medium mt-1 text-[#706E6A]">{label}</p>
+      {sub && <p className="text-xs text-[#9C9A96] mt-0.5">{sub}</p>}
     </div>
   );
 }
 
 function ReviewCard({ r }: { r: FeaturedReview }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+    <div className="rounded-2xl border border-[#EAE6DF] bg-white p-5 shadow-card">
       <div className="flex gap-0.5 mb-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <span key={i} className={i < r.rating ? "text-yellow-400" : "text-white/20"}>★</span>
+          <span key={i} className={i < r.rating ? "text-yellow-400" : "text-[#EAE6DF]"}>★</span>
         ))}
       </div>
-      <p className="text-sm text-white/80 leading-relaxed line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
-      <div className="mt-4 flex items-center justify-between text-xs text-white/40">
+      <p className="text-sm text-[#1B1A18] leading-relaxed line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
+      <div className="mt-4 flex items-center justify-between text-xs text-[#706E6A]">
         <span>{r.authorName ?? "Employeur anonyme"}</span>
         {r.workerName && (
-          <span className="text-[#FF4D1C]/60">Pro : {r.workerName}</span>
+          <span className="text-[#B5382A]/60">Pro : {r.workerName}</span>
         )}
       </div>
     </div>
@@ -39,12 +39,12 @@ function ReviewCard({ r }: { r: FeaturedReview }) {
 
 function SectorRow({ s }: { s: SectorStat }) {
   return (
-    <div className="flex items-center gap-3 py-2 border-b border-white/5 last:border-0">
+    <div className="flex items-center gap-3 py-2 border-b border-[#EAE6DF] last:border-0">
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{s.category}</p>
+        <p className="text-sm font-medium truncate text-[#1B1A18]">{s.category}</p>
       </div>
-      <div className="flex items-center gap-4 text-xs text-white/50 flex-shrink-0">
-        <span className="text-green-400 font-medium">{s.workerCount} pros dispo</span>
+      <div className="flex items-center gap-4 text-xs text-[#706E6A] flex-shrink-0">
+        <span className="text-[#22C55E] font-medium">{s.workerCount} pros dispo</span>
         <span>{s.missionCount} missions</span>
       </div>
     </div>
@@ -63,32 +63,32 @@ export default async function EmployeursPage() {
   const sectors: SectorStat[] = sectorsRes.status === "fulfilled" ? sectorsRes.value.slice(0, 6) : [];
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-white">
-      <MarketingHeader theme="dark" items={[
+    <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
+      <MarketingHeader theme="light" items={[
         { href: "/", label: "Accueil" },
         { href: "/pros", label: "Pour les pros" },
         { href: "/missions", label: "Missions" },
       ]} />
 
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-white/10">
+      <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-[#EAE6DF]">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-xs text-green-400 mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#134021]/20 bg-[#134021]/10 px-3 py-1 text-xs text-[#134021] mb-5">
             🚀 0% commission pendant le lancement
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight tracking-tight">
             Trouvez un renfort qualifié<br />
-            <span className="text-[#FF4D1C]">en moins de 10 minutes.</span>
+            <span className="text-[#B5382A]">en moins de 10 minutes.</span>
           </h1>
-          <p className="mt-4 text-white/60 text-lg leading-relaxed">
+          <p className="mt-4 text-[#706E6A] text-lg leading-relaxed">
             Publiez votre mission, recevez des candidatures de travailleurs vérifiés.
             Paiement sécurisé, couverture légale incluse.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
+            <Button size="lg" className="bg-[#134021] hover:bg-[#0F3319] text-white" asChild>
               <Link href="/register?role=employer">Publier ma première mission</Link>
             </Button>
-            <Button variant="outline" size="lg" className="border-white/20 hover:border-white/40" asChild>
+            <Button variant="outline" size="lg" className="border-[#EAE6DF] hover:border-[#1B1A18]/20 text-[#1B1A18]" asChild>
               <Link href="/pros">Voir les travailleurs →</Link>
             </Button>
           </div>
@@ -97,8 +97,8 @@ export default async function EmployeursPage() {
 
       {/* Live stats */}
       {stats && (
-        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-          <h2 className="text-xl font-bold mb-6">La plateforme en chiffres</h2>
+        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF] bg-white">
+          <h2 className="font-heading text-xl font-bold mb-6">La plateforme en chiffres</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="Travailleurs actifs" value={stats.activeWorkers.toLocaleString("fr-CA")} sub="profils vérifiés" />
             <StatCard label="Missions complétées" value={stats.completedMissions.toLocaleString("fr-CA")} />
@@ -112,7 +112,7 @@ export default async function EmployeursPage() {
       <WhyChooseBlock
         eyebrow="Pourquoi WorkOn"
         title="Du renfort qualifié, tout de suite."
-        theme="dark"
+        theme="light"
         items={[
           { icon: "⚡", title: "Réponse en minutes", desc: "Publiez votre besoin et recevez des candidatures de travailleurs disponibles dans votre secteur." },
           { icon: "✅", title: "Profils vérifiés", desc: "Les tiers VERIFIED+ passent une vérification d'identité. Vous voyez avis et missions complétées." },
@@ -125,41 +125,41 @@ export default async function EmployeursPage() {
 
       {/* Sectors available */}
       {sectors.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
+        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF] bg-white">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Secteurs disponibles</h2>
-            <span className="text-xs text-white/40">Mis à jour en temps réel</span>
+            <h2 className="font-heading text-xl font-bold">Secteurs disponibles</h2>
+            <span className="text-xs text-[#9C9A96]">Mis à jour en temps réel</span>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-2">
+          <div className="rounded-2xl border border-[#EAE6DF] bg-white px-5 py-2 shadow-card">
             {sectors.map((s) => <SectorRow key={s.category} s={s} />)}
           </div>
         </section>
       )}
 
       {/* Pricing */}
-      <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-        <h2 className="text-xl font-bold mb-2">Tarification transparente</h2>
-        <p className="text-sm text-white/50 mb-6">Pas d'abonnement. Vous payez seulement pour les missions complétées.</p>
+      <section className="mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF] bg-[#F0EDE8]">
+        <h2 className="font-heading text-xl font-bold mb-2">Tarification transparente</h2>
+        <p className="text-sm text-[#706E6A] mb-6">Pas d'abonnement. Vous payez seulement pour les missions complétées.</p>
         <div className="grid md:grid-cols-2 gap-5">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+          <div className="rounded-2xl border border-[#134021]/25 bg-white p-6 shadow-card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-lg">Lancement</h3>
-              <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/15 text-green-400 border border-green-500/20">Actif maintenant</span>
+              <span className="px-2 py-0.5 rounded-full text-xs bg-[#134021]/10 text-[#134021] border border-[#134021]/20">Actif maintenant</span>
             </div>
-            <p className="text-4xl font-black">0%</p>
-            <p className="text-sm text-white/50 mt-1">de commission sur chaque mission</p>
-            <ul className="mt-4 space-y-2 text-sm text-white/70">
-              <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Missions illimitées</li>
-              <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Accès tous les travailleurs</li>
-              <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Contrats automatiques</li>
-              <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Support prioritaire</li>
+            <p className="text-4xl font-black text-[#B5382A]">0%</p>
+            <p className="text-sm text-[#706E6A] mt-1">de commission sur chaque mission</p>
+            <ul className="mt-4 space-y-2 text-sm text-[#1B1A18]/70">
+              <li className="flex items-center gap-2"><span className="text-[#22C55E]">✓</span> Missions illimitées</li>
+              <li className="flex items-center gap-2"><span className="text-[#22C55E]">✓</span> Accès tous les travailleurs</li>
+              <li className="flex items-center gap-2"><span className="text-[#22C55E]">✓</span> Contrats automatiques</li>
+              <li className="flex items-center gap-2"><span className="text-[#22C55E]">✓</span> Support prioritaire</li>
             </ul>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6 opacity-60">
+          <div className="rounded-2xl border border-[#EAE6DF] bg-white p-6 shadow-card opacity-60">
             <h3 className="font-bold text-lg mb-4">Post-lancement</h3>
-            <p className="text-4xl font-black">15%</p>
-            <p className="text-sm text-white/50 mt-1">de commission sur chaque mission</p>
-            <p className="text-xs text-white/40 mt-4">
+            <p className="text-4xl font-black text-[#B5382A]">15%</p>
+            <p className="text-sm text-[#706E6A] mt-1">de commission sur chaque mission</p>
+            <p className="text-xs text-[#9C9A96] mt-4">
               Uniquement sur les missions complétées. Aucune charge si la mission n&apos;aboutit pas.
             </p>
           </div>
@@ -168,9 +168,9 @@ export default async function EmployeursPage() {
 
       {/* Reviews */}
       {reviews.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-          <h2 className="text-xl font-bold mb-1">Témoignages</h2>
-          <p className="text-sm text-white/50 mb-6">Avis réels de missions complétées</p>
+        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF] bg-[#F9F8F5]">
+          <h2 className="font-heading text-xl font-bold mb-1">Témoignages</h2>
+          <p className="text-sm text-[#706E6A] mb-6">Avis réels de missions complétées</p>
           <div className="grid md:grid-cols-3 gap-4">
             {reviews.slice(0, 3).map((r) => <ReviewCard key={r.id} r={r} />)}
           </div>
@@ -178,8 +178,8 @@ export default async function EmployeursPage() {
       )}
 
       {/* FAQ */}
-      <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-        <h2 className="text-xl font-bold mb-6">Questions fréquentes</h2>
+      <section className="mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF] bg-white">
+        <h2 className="font-heading text-xl font-bold mb-6">Questions fréquentes</h2>
         <div className="space-y-4">
           {[
             {
@@ -195,33 +195,33 @@ export default async function EmployeursPage() {
               a: "Chaque travailleur passe une vérification d'identité et de documents. Leur score de confiance est visible sur leur profil.",
             },
           ].map((item) => (
-            <details key={item.q} className="group rounded-lg border border-white/10 bg-white/5 p-4">
-              <summary className="cursor-pointer font-medium text-sm list-none flex items-center justify-between">
+            <details key={item.q} className="group rounded-2xl border border-[#EAE6DF] bg-white p-4 shadow-card">
+              <summary className="cursor-pointer font-medium text-sm list-none flex items-center justify-between text-[#1B1A18]">
                 {item.q}
-                <span className="text-white/40 group-open:rotate-180 transition-transform">▼</span>
+                <span className="text-[#9C9A96] group-open:rotate-180 transition-transform">▼</span>
               </summary>
-              <p className="mt-3 text-sm text-white/60 leading-relaxed">{item.a}</p>
+              <p className="mt-3 text-sm text-[#706E6A] leading-relaxed">{item.a}</p>
             </details>
           ))}
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="mx-auto max-w-6xl px-4 py-12">
+      <section className="mx-auto max-w-6xl px-4 py-12 bg-[#F0EDE8]">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-3">Prêt à publier votre mission ?</h2>
-          <p className="text-white/60 mb-6">0% commission pendant le lancement. Inscription en 2 minutes.</p>
-          <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
+          <h2 className="font-heading text-2xl font-bold mb-3">Prêt à publier votre mission ?</h2>
+          <p className="text-[#706E6A] mb-6">0% commission pendant le lancement. Inscription en 2 minutes.</p>
+          <Button size="lg" className="bg-[#134021] hover:bg-[#0F3319] text-white" asChild>
             <Link href="/register?role=employer">Commencer gratuitement</Link>
           </Button>
         </div>
       </section>
 
-      <footer className="border-t border-white/10">
-        <div className="mx-auto max-w-6xl px-4 py-6 flex items-center justify-between text-xs text-white/40">
-          <Link href="/" className="hover:text-white/70">WorkOn</Link>
+      <footer className="border-t border-[#EAE6DF] bg-[#F9F8F5]">
+        <div className="mx-auto max-w-6xl px-4 py-6 flex items-center justify-between text-xs text-[#9C9A96]">
+          <Link href="/" className="hover:text-[#706E6A]">WorkOn</Link>
           <p>Les travailleurs sont des prestataires autonomes, non des employés de WorkOn.</p>
-          <Link href="/pros" className="hover:text-white/70">Côté travailleur →</Link>
+          <Link href="/pros" className="hover:text-[#706E6A]">Côté travailleur →</Link>
         </div>
       </footer>
     </main>

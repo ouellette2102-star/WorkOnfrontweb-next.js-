@@ -27,7 +27,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
     .slice(0, 2);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-900/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-[#EAE6DF] bg-white/95 backdrop-blur">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex flex-col items-center text-center">
           <Avatar className="h-24 w-24 mb-4">
@@ -40,7 +40,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
           <div className="flex items-center gap-2 mb-3">
             <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
             <span className="font-semibold">{user.rating.toFixed(1)}</span>
-            <span className="text-sm text-white/50">
+            <span className="text-sm text-[#9C9A96]">
               ({user.ratingCount} avis)
             </span>
           </div>
@@ -54,14 +54,14 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
             ))}
           </div>
 
-          <div className="flex items-center gap-4 text-sm text-white/70 mb-3">
+          <div className="flex items-center gap-4 text-sm text-[#706E6A] mb-3">
             <div className="flex items-center gap-1">
               <Award className="h-4 w-4" />
               <span>{user.completedMissions} missions</span>
             </div>
             <a
               href="#"
-              className="flex items-center gap-1 hover:text-white transition"
+              className="flex items-center gap-1 hover:text-[#1B1A18] transition"
             >
               <FileText className="h-4 w-4" />
               <span>CV PDF</span>
@@ -69,7 +69,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
           </div>
 
           {user.bio && (
-            <p className="text-sm text-white/70 max-w-md">{user.bio}</p>
+            <p className="text-sm text-[#706E6A] max-w-md">{user.bio}</p>
           )}
         </div>
       </div>

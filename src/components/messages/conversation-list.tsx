@@ -15,9 +15,9 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
   if (conversations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <MessageCircle className="mb-4 h-12 w-12 text-white/20" />
-        <h3 className="mb-2 text-lg font-semibold text-white">Aucune conversation</h3>
-        <p className="text-sm text-white/50">
+        <MessageCircle className="mb-4 h-12 w-12 text-[#EAE6DF]" />
+        <h3 className="mb-2 text-lg font-semibold text-[#1B1A18]">Aucune conversation</h3>
+        <p className="text-sm text-[#706E6A]">
           Vos conversations apparaîtront ici lorsque vous réserverez une mission
         </p>
       </div>
@@ -25,7 +25,7 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
   }
 
   return (
-    <div className="divide-y divide-white/5">
+    <div className="divide-y divide-[#EAE6DF]">
       {conversations.map((conv) => {
         const isSelected = conv.missionId === selectedMissionId;
         return (
@@ -34,33 +34,33 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
             onClick={() => onSelect(conv.missionId)}
             className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors ${
               isSelected
-                ? "bg-[#FF4D1C]/10 border-l-2 border-[#FF4D1C]"
-                : "hover:bg-white/5"
+                ? "bg-[#134021]/10 border-l-2 border-[#134021]"
+                : "hover:bg-[#F0EDE8]"
             }`}
           >
             {/* Avatar placeholder */}
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F0EDE8] text-sm font-bold text-[#1B1A18]">
               {conv.otherUser.firstName?.[0]?.toUpperCase() ?? "?"}
             </div>
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <p className="truncate text-sm font-semibold text-white">
+                <p className="truncate text-sm font-semibold text-[#1B1A18]">
                   {conv.otherUser.firstName} {conv.otherUser.lastName}
                 </p>
-                <span className="shrink-0 text-xs text-white/40">
+                <span className="shrink-0 text-xs text-[#9C9A96]">
                   {formatDistanceToNow(new Date(conv.lastMessageAt), {
                     addSuffix: true,
                     locale: frCA,
                   })}
                 </span>
               </div>
-              <p className="truncate text-xs text-white/50">{conv.missionTitle}</p>
-              <p className="mt-0.5 truncate text-sm text-white/70">{conv.lastMessage}</p>
+              <p className="truncate text-xs text-[#706E6A]">{conv.missionTitle}</p>
+              <p className="mt-0.5 truncate text-sm text-[#706E6A]">{conv.lastMessage}</p>
             </div>
 
             {conv.unreadCount > 0 && (
-              <span className="mt-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF4D1C] px-1.5 text-[10px] font-bold text-white shadow-sm shadow-[#FF4D1C]/40">
+              <span className="mt-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#B5382A] px-1.5 text-[10px] font-bold text-white shadow-sm shadow-[#B5382A]/40">
                 {conv.unreadCount > 99 ? "99+" : conv.unreadCount}
               </span>
             )}

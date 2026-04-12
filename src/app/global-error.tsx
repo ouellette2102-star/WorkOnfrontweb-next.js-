@@ -32,13 +32,13 @@ export default function GlobalError({
 
   return (
     <html lang="fr-CA">
-      <body className="bg-neutral-950 text-white antialiased">
+      <body className="bg-[#F9F8F5] text-[#1B1A18] antialiased">
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-md w-full text-center space-y-8">
             {/* Icon - Critical error */}
-            <div className="mx-auto w-24 h-24 rounded-full bg-[#FF4D1C]/15 border-2 border-[#FF4D1C]/40 flex items-center justify-center">
+            <div className="mx-auto w-24 h-24 rounded-full bg-[#B5382A]/10 border-2 border-[#B5382A]/30 flex items-center justify-center">
               <svg
-                className="w-12 h-12 text-[#FF4D1C]"
+                className="w-12 h-12 text-[#B5382A]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -54,10 +54,10 @@ export default function GlobalError({
 
             {/* Message */}
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold font-heading text-[#1B1A18]">
                 Erreur critique
               </h1>
-              <p className="text-white/60 leading-relaxed">
+              <p className="text-[#706E6A] leading-relaxed">
                 L&apos;application a rencontré une erreur inattendue.
                 <br />
                 Veuillez réessayer ou recharger la page.
@@ -66,15 +66,15 @@ export default function GlobalError({
 
             {/* Error digest */}
             {error.digest && (
-              <p className="text-xs text-white/40 font-mono">
+              <p className="text-xs text-[#9C9A96] font-mono">
                 Référence: {error.digest}
               </p>
             )}
 
             {/* Dev only */}
             {isDev && (
-              <div className="p-4 rounded-2xl bg-[#FF4D1C]/5 border border-[#FF4D1C]/25 text-left">
-                <p className="text-sm font-mono text-[#FF4D1C] break-all">
+              <div className="p-4 rounded-2xl bg-[#B5382A]/5 border border-[#B5382A]/25 text-left">
+                <p className="text-sm font-mono text-[#B5382A] break-all">
                   {error.message}
                 </p>
               </div>
@@ -84,28 +84,28 @@ export default function GlobalError({
             <div className="flex flex-col gap-3 pt-4">
               <button
                 onClick={() => reset()}
-                className="w-full px-6 py-4 rounded-xl bg-[#FF4D1C] hover:bg-[#E8441A] text-white font-semibold transition-colors shadow-lg shadow-[#FF4D1C]/30"
+                className="w-full px-6 py-4 rounded-xl bg-[#134021] hover:bg-[#0F3319] text-white font-semibold transition-colors shadow-lg shadow-[#134021]/30"
               >
                 Réessayer
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="w-full px-6 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold transition-colors"
+                className="w-full px-6 py-4 rounded-xl bg-[#F0EDE8] hover:bg-[#EAE6DF] border border-[#EAE6DF] text-[#1B1A18] font-semibold transition-colors"
               >
                 Recharger la page
               </button>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Link ne fonctionne pas dans global-error (pas de context router) */}
               <a
                 href="/"
-                className="w-full px-6 py-4 rounded-xl bg-transparent text-white/60 hover:text-white font-medium transition-colors"
+                className="w-full px-6 py-4 rounded-xl bg-transparent text-[#706E6A] hover:text-[#1B1A18] font-medium transition-colors"
               >
                 Retour à l&apos;accueil
               </a>
             </div>
 
             {/* Branding */}
-            <div className="pt-8 border-t border-white/10">
-              <p className="text-sm text-white/40">
+            <div className="pt-8 border-t border-[#EAE6DF]">
+              <p className="text-sm text-[#9C9A96]">
                 WorkOn — Marketplace de services
               </p>
             </div>

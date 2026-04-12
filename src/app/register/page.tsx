@@ -108,7 +108,7 @@ function RegisterInner() {
   const backFromStep3 = () => setStep(presetRole ? 1 : 2);
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-neutral-900 via-background to-background">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-[#134021]/10 via-background to-background">
       {/* Logo */}
       <div className="mb-8 text-white">
         <WorkOnWordmark size="xl" />
@@ -201,9 +201,9 @@ function RegisterInner() {
             <div className="space-y-3">
               <button
                 onClick={() => selectRole("worker")}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#134021]/30 hover:bg-[#F0EDE8] transition-all text-left"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF4D1C]/15 border border-[#FF4D1C]/25">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#B5382A]/10 border border-[#B5382A]/25">
                   <Wrench className="h-6 w-6 text-workon-accent" />
                 </div>
                 <div className="flex-1">
@@ -217,9 +217,9 @@ function RegisterInner() {
 
               <button
                 onClick={() => selectRole("employer")}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#FF4D1C]/40 hover:bg-neutral-700/80 transition-all text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#134021]/30 hover:bg-[#F0EDE8] transition-all text-left"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF4D1C]/15 border border-[#FF4D1C]/25">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#B5382A]/10 border border-[#B5382A]/25">
                   <Briefcase className="h-6 w-6 text-workon-accent" />
                 </div>
                 <div className="flex-1">
@@ -297,7 +297,7 @@ function RegisterInner() {
               </div>
 
               {error && (
-                <p className="text-workon-accent text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
+                <p className="text-workon-accent text-sm text-center bg-[#B5382A]/10 border border-[#B5382A]/25 rounded-xl p-3">
                   {error}
                 </p>
               )}
@@ -333,7 +333,7 @@ function RegisterInner() {
             </p>
 
             <div className="rounded-3xl border border-workon-border bg-white backdrop-blur-sm p-6 space-y-3 shadow-sm">
-              <div className="mx-auto h-16 w-16 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center text-2xl font-bold text-workon-accent">
+              <div className="mx-auto h-16 w-16 rounded-full bg-[#B5382A]/10 border border-[#B5382A]/20 flex items-center justify-center text-2xl font-bold text-workon-accent">
                 {user.firstName?.[0]}{user.lastName?.[0]}
               </div>
               <p className="font-semibold text-lg">

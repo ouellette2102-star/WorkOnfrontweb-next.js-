@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
               </div>
 
               {error && (
-                <p className="text-workon-accent text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
+                <p className="text-workon-accent text-sm text-center bg-[#B5382A]/10 border border-[#B5382A]/25 rounded-xl p-3">
                   {error}
                 </p>
               )}

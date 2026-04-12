@@ -132,7 +132,7 @@ function WorkerMissionsContent() {
           <h1 className="mb-2 text-3xl font-bold text-workon-ink">
             Salut {firstName} 👋
           </h1>
-          <p className="text-workon-muted">
+          <p className="text-sm text-[#706E6A]">
             {userLocation
               ? `${missions.length} mission(s) près de vous`
               : "Active la géolocalisation pour voir les distances"}
@@ -147,9 +147,9 @@ function WorkerMissionsContent() {
         )}
 
         {/* Filtres */}
-        <div className="mb-6 flex flex-col gap-4 rounded-xl border border-workon-border bg-workon-bg/70 p-4 backdrop-blur md:flex-row md:items-end">
+        <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-[#EAE6DF] bg-white p-4 md:flex-row md:items-end">
           <div className="flex-1">
-            <Label htmlFor="category" className="text-workon-muted">
+            <Label htmlFor="category" className="text-sm text-[#706E6A]">
               Catégorie de mission
             </Label>
             <Input
@@ -157,11 +157,11 @@ function WorkerMissionsContent() {
               placeholder="Ex: Ménage, Plomberie..."
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="mt-1 bg-white text-white placeholder:text-workon-muted"
+              className="mt-1 border-[#EAE6DF] bg-white text-[#1B1A18] placeholder:text-[#706E6A]"
             />
           </div>
           <div className="flex-1">
-            <Label htmlFor="distance" className="text-workon-muted">
+            <Label htmlFor="distance" className="text-sm text-[#706E6A]">
               Distance maximale
             </Label>
             <Select
@@ -170,10 +170,10 @@ function WorkerMissionsContent() {
                 setMaxDistance(value === "unlimited" ? "unlimited" : Number(value))
               }
             >
-              <SelectTrigger className="mt-1 w-full bg-white text-white">
+              <SelectTrigger className="mt-1 w-full border-[#EAE6DF] bg-white text-[#1B1A18]">
                 <SelectValue placeholder="Sélectionner une distance" />
               </SelectTrigger>
-              <SelectContent className="bg-white text-white">
+              <SelectContent className="border-[#EAE6DF] bg-white text-[#1B1A18]">
                 <SelectItem value="5">5 km</SelectItem>
                 <SelectItem value="10">10 km</SelectItem>
                 <SelectItem value="20">20 km</SelectItem>
@@ -184,7 +184,7 @@ function WorkerMissionsContent() {
           </div>
           <Button
             onClick={loadMissions}
-            className="bg-[#FF4D1C] text-white hover:bg-[#E8441A]"
+            className="bg-[#B5382A] text-white hover:bg-[#9A2F24] rounded-xl"
           >
             Actualiser les missions
           </Button>
@@ -197,8 +197,8 @@ function WorkerMissionsContent() {
             onClick={() => setViewMode("list")}
             className={
               viewMode === "list"
-                ? "bg-[#FF4D1C] text-white"
-                : "border-white/20 text-workon-muted hover:bg-white"
+                ? "bg-[#134021] text-white rounded-xl"
+                : "text-[#706E6A] hover:bg-[#F0EDE7] rounded-xl border-transparent"
             }
           >
             📋 Liste
@@ -208,8 +208,8 @@ function WorkerMissionsContent() {
             onClick={() => setViewMode("swipe")}
             className={
               viewMode === "swipe"
-                ? "bg-[#FF4D1C] text-white"
-                : "border-white/20 text-workon-muted hover:bg-white"
+                ? "bg-[#134021] text-white rounded-xl"
+                : "text-[#706E6A] hover:bg-[#F0EDE7] rounded-xl border-transparent"
             }
           >
             💫 Swipe
@@ -219,8 +219,8 @@ function WorkerMissionsContent() {
             onClick={() => setViewMode("map")}
             className={
               viewMode === "map"
-                ? "bg-[#FF4D1C] text-white"
-                : "border-white/20 text-workon-muted hover:bg-white"
+                ? "bg-[#134021] text-white rounded-xl"
+                : "text-[#706E6A] hover:bg-[#F0EDE7] rounded-xl border-transparent"
             }
           >
             🗺️ Carte
@@ -229,7 +229,7 @@ function WorkerMissionsContent() {
 
         {/* Erreur */}
         {error && (
-          <div className="mb-6 rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-4 text-workon-accent shadow-sm">
+          <div className="mb-6 rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-4 text-[#B5382A] shadow-sm">
             {error}
           </div>
         )}
@@ -237,19 +237,19 @@ function WorkerMissionsContent() {
         {/* Loading */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent"></div>
-            <p className="text-workon-muted">Chargement des missions...</p>
+            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[#134021] border-t-transparent"></div>
+            <p className="text-sm text-[#706E6A]">Chargement des missions...</p>
           </div>
         )}
 
         {/* Empty state */}
         {!isLoading && !error && missions.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-workon-border bg-workon-bg/70 p-12 backdrop-blur">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-[#EAE6DF] bg-white p-12">
             <span className="mb-4 text-6xl">🔍</span>
-            <h3 className="mb-2 text-xl font-semibold text-workon-ink">
+            <h3 className="mb-2 text-xl font-semibold text-[#1B1A18]">
               Aucune mission disponible
             </h3>
-            <p className="text-center text-workon-muted">
+            <p className="text-center text-sm text-[#706E6A]">
               Essayez d'élargir votre rayon de recherche ou de modifier les filtres.
             </p>
           </div>

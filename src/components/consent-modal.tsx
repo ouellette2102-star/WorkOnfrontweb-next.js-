@@ -66,7 +66,7 @@ export function ConsentModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="sm:max-w-lg bg-neutral-900 border-white/10 text-white [&>button]:hidden"
+        className="sm:max-w-lg bg-white border-[#EAE6DF] text-[#1B1A18] [&>button]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
@@ -80,7 +80,7 @@ export function ConsentModal({
             Acceptation requise
           </DialogTitle>
 
-          <DialogDescription className="text-center text-white/70">
+          <DialogDescription className="text-center text-[#706E6A]">
             Pour continuer à utiliser WorkOn, veuillez accepter nos conditions
             d&apos;utilisation et notre politique de confidentialité.
           </DialogDescription>
@@ -109,9 +109,9 @@ export function ConsentModal({
           </div>
 
           {/* Résumé */}
-          <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-            <h4 className="font-medium text-white mb-2">En acceptant, vous confirmez :</h4>
-            <ul className="text-sm text-white/70 space-y-1.5">
+          <div className="p-4 bg-[#F9F8F5] rounded-lg border border-[#EAE6DF]">
+            <h4 className="font-medium text-[#1B1A18] mb-2">En acceptant, vous confirmez :</h4>
+            <ul className="text-sm text-[#706E6A] space-y-1.5">
               <li className="flex items-start gap-2">
                 <span className="text-amber-400 mt-0.5">•</span>
                 Avoir lu et compris les documents légaux
@@ -153,7 +153,7 @@ export function ConsentModal({
             )}
           </Button>
 
-          <p className="text-xs text-white/40 text-center mt-4">
+          <p className="text-xs text-[#9C9A96] text-center mt-4">
             Version TERMS v{ACTIVE_LEGAL_VERSIONS.TERMS} • Version PRIVACY v
             {ACTIVE_LEGAL_VERSIONS.PRIVACY}
           </p>
@@ -181,16 +181,16 @@ function DocumentCard({
     <Link
       href={href}
       target="_blank"
-      className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors group"
+      className="flex items-center gap-4 p-4 bg-[#F9F8F5] hover:bg-[#EAE6DF] rounded-lg border border-[#EAE6DF] transition-colors group"
     >
       <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
         {icon}
       </div>
       <div className="flex-1">
-        <p className="font-medium text-white group-hover:text-amber-400 transition-colors">
+        <p className="font-medium text-[#1B1A18] group-hover:text-amber-600 transition-colors">
           {title}
         </p>
-        <p className="text-sm text-white/50">Version {version}</p>
+        <p className="text-sm text-[#9C9A96]">Version {version}</p>
       </div>
       <span className="text-sm text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity">
         Lire →

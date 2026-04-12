@@ -17,21 +17,21 @@ export type TrustPillVariant =
   | "fiable";
 
 const VARIANT_CLASSES: Record<TrustPillVariant, string> = {
-  // "Nouveau profil" — neutral, honest, no fake stars
+  // "Nouveau profil" — neutral, honest
   nouveau:
-    "bg-white/10 text-white/80 border border-white/15",
-  // VERIFIED tier — first trust step
+    "bg-[#F0EDE8] text-[#706E6A] border border-[#EAE6DF]",
+  // VERIFIED tier — first trust step (terracotta)
   verified:
-    "bg-[#FF4D1C]/10 text-[#FF4D1C] border border-[#FF4D1C]/25",
-  // TRUSTED tier — solid track record
+    "bg-[#B5382A]/10 text-[#B5382A] border border-[#B5382A]/25",
+  // TRUSTED tier — solid track record (green)
   trusted:
     "bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/25",
-  // PREMIUM / top performer
+  // PREMIUM / top performer (gold)
   premium:
-    "bg-gradient-to-r from-[#FF4D1C]/20 to-[#FF8C32]/20 text-[#FFA37C] border border-[#FF4D1C]/40",
+    "bg-gradient-to-r from-[#D4922A]/15 to-[#D4922A]/10 text-[#D4922A] border border-[#D4922A]/30",
   // "Fiable" / "Ponctuel" behavioural badge
   fiable:
-    "bg-white/5 text-white/70 border border-white/10",
+    "bg-[#F9F8F5] text-[#706E6A] border border-[#EAE6DF]",
 };
 
 const DEFAULT_LABEL: Record<TrustPillVariant, string> = {

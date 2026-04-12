@@ -57,7 +57,7 @@ export function QuickStatsCard() {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-32 animate-pulse rounded-3xl border border-gray-200 bg-white"
+            className="h-32 animate-pulse rounded-3xl border border-[#EAE6DF] bg-white shadow-card"
           />
         ))}
       </div>
@@ -87,35 +87,35 @@ export function QuickStatsCard() {
   return (
     <div className="mb-8 grid gap-4 md:grid-cols-3">
       {/* Missions actives */}
-      <div className="rounded-3xl border border-orange-200 bg-orange-50 p-6">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-3xl">🔥</span>
-          <span className="text-3xl font-bold text-orange-600">{stats.active}</span>
+      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-2xl text-[#B5382A]">🔥</span>
+          <span className="font-heading font-bold text-lg text-[#1B1A18]">{stats.active}</span>
         </div>
-        <h4 className="text-lg font-semibold text-gray-900">Missions actives</h4>
-        <p className="text-sm text-gray-500">En cours ou réservées</p>
+        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Missions actives</p>
+        <p className="text-xs text-[#706E6A] mt-1">En cours ou réservées</p>
       </div>
 
       {/* Missions complétées */}
-      <div className="rounded-3xl border border-green-200 bg-green-50 p-6">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-3xl">✅</span>
-          <span className="text-3xl font-bold text-green-600">{stats.completed}</span>
+      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-2xl text-[#2D8B55]">✅</span>
+          <span className="font-heading font-bold text-lg text-[#1B1A18]">{stats.completed}</span>
         </div>
-        <h4 className="text-lg font-semibold text-gray-900">Complétées</h4>
-        <p className="text-sm text-gray-500">Missions terminées</p>
+        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Complétées</p>
+        <p className="text-xs text-[#706E6A] mt-1">Missions terminées</p>
       </div>
 
       {/* Gains totaux */}
-      <div className="rounded-3xl border border-amber-200 bg-amber-50 p-6">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-3xl">💰</span>
-          <span className="text-3xl font-bold text-amber-600">
+      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-2xl text-[#D4922A]">💰</span>
+          <span className="font-heading font-bold text-lg text-[#1B1A18]">
             {stats.totalEarnings.toFixed(0)}$
           </span>
         </div>
-        <h4 className="text-lg font-semibold text-gray-900">Gains estimés</h4>
-        <p className="text-sm text-gray-500">Missions complétées</p>
+        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Gains estimés</p>
+        <p className="text-xs text-[#706E6A] mt-1">Missions complétées</p>
       </div>
     </div>
   );

@@ -23,16 +23,16 @@ export const metadata = {
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-neutral-900 text-white">
+    <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
       <section className="mx-auto max-w-4xl px-4 py-16">
         <header className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#22C55E]/30 bg-[#22C55E]/10 px-3 py-1 text-xs text-[#22C55E] mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#134021]/30 bg-[#134021]/10 px-3 py-1 text-xs text-[#134021] mb-5">
             🚀 0% commission pendant le lancement
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight font-heading">
             Tarification transparente
           </h1>
-          <p className="mt-4 text-white/60 text-lg">
+          <p className="mt-4 text-[#706E6A] text-lg">
             Pas d&apos;abonnement. Pas de frais cachés. Vous payez seulement
             pour les missions complétées.
           </p>
@@ -40,18 +40,18 @@ export default function PricingPage() {
 
         <div className="grid md:grid-cols-2 gap-5">
           {/* Current — launch */}
-          <div className="rounded-3xl border border-[#22C55E]/25 bg-[#22C55E]/5 p-7 shadow-lg shadow-black/20 backdrop-blur-sm">
+          <div className="rounded-3xl border border-[#134021]/25 bg-[#134021]/5 p-7 shadow-card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-xl">Lancement</h2>
-              <span className="px-2 py-0.5 rounded-full text-xs bg-[#22C55E]/15 text-[#22C55E] border border-[#22C55E]/30">
+              <h2 className="font-bold text-xl font-heading">Lancement</h2>
+              <span className="px-2 py-0.5 rounded-full text-xs bg-[#134021]/15 text-[#134021] border border-[#134021]/30">
                 Actif maintenant
               </span>
             </div>
-            <p className="text-5xl font-black text-[#22C55E]">0%</p>
-            <p className="text-sm text-white/60 mt-1">
+            <p className="text-5xl font-bold text-[#134021]">0%</p>
+            <p className="text-sm text-[#706E6A] mt-1">
               de commission sur chaque mission
             </p>
-            <ul className="mt-6 space-y-3 text-sm text-white/80">
+            <ul className="mt-6 space-y-3 text-sm text-[#1B1A18]">
               <li className="flex items-start gap-2">
                 <Check className="h-4 w-4 text-[#22C55E] flex-shrink-0 mt-0.5" />
                 <span>Missions illimitées</span>
@@ -79,29 +79,29 @@ export default function PricingPage() {
           </div>
 
           {/* Post-launch */}
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-7 shadow-lg shadow-black/20 backdrop-blur-sm opacity-80">
-            <h2 className="font-bold text-xl mb-4">Post-lancement</h2>
-            <p className="text-5xl font-black">15%</p>
-            <p className="text-sm text-white/60 mt-1">
+          <div className="rounded-3xl bg-white border border-[#EAE6DF] p-7 shadow-card opacity-80">
+            <h2 className="font-bold text-xl mb-4 font-heading">Post-lancement</h2>
+            <p className="text-5xl font-bold">15%</p>
+            <p className="text-sm text-[#706E6A] mt-1">
               de commission sur chaque mission
             </p>
-            <ul className="mt-6 space-y-3 text-sm text-white/70">
+            <ul className="mt-6 space-y-3 text-sm text-[#706E6A]">
               <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-white/50 flex-shrink-0 mt-0.5" />
+                <Check className="h-4 w-4 text-[#9C9A96] flex-shrink-0 mt-0.5" />
                 <span>Mêmes fonctionnalités que la période de lancement</span>
               </li>
               <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-white/50 flex-shrink-0 mt-0.5" />
+                <Check className="h-4 w-4 text-[#9C9A96] flex-shrink-0 mt-0.5" />
                 <span>Facturé uniquement sur les missions complétées</span>
               </li>
               <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-white/50 flex-shrink-0 mt-0.5" />
+                <Check className="h-4 w-4 text-[#9C9A96] flex-shrink-0 mt-0.5" />
                 <span>
                   Aucune charge si la mission n&apos;aboutit pas
                 </span>
               </li>
             </ul>
-            <p className="mt-6 text-xs text-white/40 leading-relaxed">
+            <p className="mt-6 text-xs text-[#9C9A96] leading-relaxed">
               Le passage au modèle 15% sera annoncé au moins 30 jours à
               l&apos;avance. Les utilisateurs inscrits pendant la période de
               lancement conservent leurs conditions actuelles sur une période
@@ -111,21 +111,21 @@ export default function PricingPage() {
         </div>
 
         {/* Worker note */}
-        <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-white/70">
-          <p className="font-semibold text-white mb-1">Pour les travailleurs</p>
+        <div className="mt-10 rounded-3xl bg-white border border-[#EAE6DF] p-6 text-sm text-[#706E6A]">
+          <p className="font-semibold text-[#1B1A18] mb-1">Pour les travailleurs</p>
           <p>
             L&apos;inscription est et restera <strong>gratuite</strong>. Aucun
             abonnement. Le paiement est transféré via Stripe dès la
             confirmation de la mission.{" "}
-            <Link href="/pros" className="text-[#FF4D1C] hover:underline">
+            <Link href="/pros" className="text-[#B5382A] hover:underline">
               En savoir plus →
             </Link>
           </p>
         </div>
 
         {/* Footer nav */}
-        <div className="mt-10 text-center text-xs text-white/40">
-          <Link href="/" className="hover:text-white/70">
+        <div className="mt-10 text-center text-xs text-[#9C9A96]">
+          <Link href="/" className="hover:text-[#706E6A]">
             Retour à l&apos;accueil
           </Link>
         </div>

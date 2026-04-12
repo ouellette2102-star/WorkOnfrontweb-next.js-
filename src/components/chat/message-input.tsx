@@ -46,7 +46,7 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
   };
 
   return (
-    <div className="border-t border-white/10 bg-neutral-900/50 p-4">
+    <div className="border-t border-[#EAE6DF] bg-white/80 p-4">
       {/* Error message */}
       {error && (
         <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-400">
@@ -67,17 +67,17 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
           onKeyPress={handleKeyPress}
           disabled={isSending || disabled}
           placeholder="Ecris ton message... (Entree pour envoyer)"
-          className={`flex-1 resize-none rounded-2xl border px-4 py-3 text-white placeholder:text-white/50 focus:outline-none disabled:opacity-50 ${
+          className={`flex-1 resize-none rounded-2xl border px-4 py-3 text-[#1B1A18] placeholder:text-[#9C9A96] focus:outline-none disabled:opacity-50 ${
             error
-              ? "border-red-500/30 bg-red-500/5 focus:border-red-500"
-              : "border-white/10 bg-neutral-900 focus:border-red-500"
+              ? "border-red-500/30 bg-red-500/5 focus:border-[#134021]"
+              : "border-[#EAE6DF] bg-white focus:border-[#134021]"
           }`}
           rows={2}
         />
         <Button
           onClick={handleSend}
           disabled={!content.trim() || isSending || disabled}
-          className="self-end rounded-2xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-500 disabled:opacity-50"
+          className="self-end rounded-2xl bg-[#134021] px-6 py-3 font-semibold text-white transition hover:bg-[#1a5a2e] disabled:opacity-50"
         >
           {isSending ? (
             <span className="flex items-center gap-2">
@@ -91,7 +91,7 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
 
       {/* Character count */}
       {content.length > 0 && (
-        <p className="mt-2 text-xs text-white/40">
+        <p className="mt-2 text-xs text-[#9C9A96]">
           {content.length} caractère{content.length > 1 ? "s" : ""}
         </p>
       )}

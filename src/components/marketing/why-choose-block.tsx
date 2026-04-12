@@ -48,21 +48,21 @@ export function WhyChooseBlock({
   return (
     <section
       className={cn(
-        isDark ? "bg-neutral-900 text-white" : "bg-white text-[#1A1A2E]",
+        isDark ? "bg-[#F9F8F5] text-[#1B1A18]" : "bg-white text-[#1B1A18]",
         className,
       )}
     >
       <div className="mx-auto max-w-6xl px-4 py-20 md:py-[6.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-14">
           {eyebrow && (
-            <p className="text-sm font-semibold text-[#FF4D1C] uppercase tracking-widest mb-4">
+            <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">
               {eyebrow}
             </p>
           )}
           <h2
             className={cn(
               "text-3xl md:text-[2.5rem] font-bold leading-tight tracking-tight",
-              isDark ? "text-white" : "text-[#1A1A2E]",
+              isDark ? "text-[#1B1A18]" : "text-[#1B1A18]",
             )}
           >
             {title}
@@ -71,7 +71,7 @@ export function WhyChooseBlock({
             <p
               className={cn(
                 "mt-4 text-lg leading-relaxed",
-                isDark ? "text-white/60" : "text-[#6B7280]",
+                isDark ? "text-[#706E6A]" : "text-[#706E6A]",
               )}
             >
               {subtitle}
@@ -86,16 +86,16 @@ export function WhyChooseBlock({
               className={cn(
                 "rounded-3xl border p-6 transition-all hover:-translate-y-0.5",
                 isDark
-                  ? "border-white/10 bg-white/5 hover:border-[#FF4D1C]/30 backdrop-blur-sm shadow-lg shadow-black/20"
-                  : "border-gray-200 bg-[#FAFAFA] hover:border-[#FF4D1C]/30 hover:shadow-lg hover:shadow-[#FF4D1C]/5",
+                  ? "bg-white border-[#EAE6DF] hover:border-[#134021]/30 shadow-card"
+                  : "border-[#EAE6DF] bg-[#F9F8F5] hover:border-[#134021]/30 hover:shadow-lg hover:shadow-[#134021]/5",
               )}
             >
               <div
                 className={cn(
                   "inline-flex h-12 w-12 items-center justify-center rounded-2xl mb-4 text-2xl",
                   isDark
-                    ? "bg-[#FF4D1C]/15 border border-[#FF4D1C]/25"
-                    : "bg-[#FF4D1C]/10 border border-[#FF4D1C]/20",
+                    ? "bg-[#B5382A]/15 border border-[#B5382A]/25"
+                    : "bg-[#B5382A]/10 border border-[#B5382A]/20",
                 )}
               >
                 {item.icon}
@@ -103,7 +103,7 @@ export function WhyChooseBlock({
               <h3
                 className={cn(
                   "font-bold text-base mb-2",
-                  isDark ? "text-white" : "text-[#1A1A2E]",
+                  isDark ? "text-[#1B1A18]" : "text-[#1B1A18]",
                 )}
               >
                 {item.title}
@@ -111,7 +111,7 @@ export function WhyChooseBlock({
               <p
                 className={cn(
                   "text-sm leading-relaxed",
-                  isDark ? "text-white/60" : "text-[#6B7280]",
+                  isDark ? "text-[#706E6A]" : "text-[#706E6A]",
                 )}
               >
                 {item.desc}

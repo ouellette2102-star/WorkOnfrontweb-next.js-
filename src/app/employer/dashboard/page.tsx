@@ -22,7 +22,7 @@ export default async function EmployerDashboardPage() {
         {/* Actions rapides */}
         <div className="mb-8 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
           <Link href="/missions/new">
-            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#134021]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">➕</div>
               <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Créer une mission
@@ -34,7 +34,7 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/missions/mine">
-            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#134021]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">📋</div>
               <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Mes missions
@@ -46,7 +46,7 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/employer/discover">
-            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#134021]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">🔍</div>
               <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Découvrir
@@ -58,7 +58,7 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/employer/matches">
-            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#134021]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">🤝</div>
               <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Mes matches
@@ -70,7 +70,7 @@ export default async function EmployerDashboardPage() {
           </Link>
 
           <Link href="/messages">
-            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#FF4D1C]/50 hover:bg-workon-bg">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-workon-bg/70 p-6  shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#134021]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">💬</div>
               <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Messages

@@ -18,12 +18,12 @@ export function EmptyState({
   actionHref,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm px-6 py-12 text-center shadow-lg shadow-black/20">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25">
-        <Icon className="h-8 w-8 text-[#FF4D1C]" />
+    <div className="flex flex-col items-center justify-center rounded-3xl border border-[#EAE6DF] bg-white px-6 py-12 text-center shadow-card">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#134021]/10 border border-[#134021]/20">
+        <Icon className="h-8 w-8 text-[#134021]" />
       </div>
-      <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-      <p className="mb-6 max-w-sm text-sm text-white/60">{description}</p>
+      <h3 className="mb-2 text-lg font-semibold text-[#1B1A18]">{title}</h3>
+      <p className="mb-6 max-w-sm text-sm text-[#706E6A]">{description}</p>
       {actionLabel && actionHref && (
         <Button asChild variant="hero" size="hero">
           <Link href={actionHref}>{actionLabel}</Link>

@@ -71,7 +71,7 @@ export function ReserveMissionButton({
       >
         {isPending ? "Réservation..." : "✓ Réserver cette mission"}
       </Button>
-      {error && <p className="text-xs text-[#FF4D1C]">{error}</p>}
+      {error && <p className="text-xs text-[#B5382A]">{error}</p>}
     </div>
   );
 }

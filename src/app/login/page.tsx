@@ -55,7 +55,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-neutral-900 via-background to-background">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-[#134021]/10 via-background to-background">
       {/* Logo */}
       <div className="mb-8 text-white">
         <WorkOnWordmark size="xl" />
@@ -99,7 +99,7 @@ function LoginForm() {
           </div>
 
           {error && (
-            <p className="text-workon-accent text-sm text-center bg-[#FF4D1C]/10 border border-[#FF4D1C]/25 rounded-xl p-3">
+            <p className="text-workon-accent text-sm text-center bg-[#B5382A]/10 border border-[#B5382A]/25 rounded-xl p-3">
               {error}
             </p>
           )}

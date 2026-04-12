@@ -52,8 +52,8 @@ export function MarketingHeader({
       className={cn(
         "sticky top-0 z-50 backdrop-blur-md",
         isDark
-          ? "border-b border-white/10 bg-neutral-900/80 text-white"
-          : "border-b border-gray-200/80 bg-white/90 text-[#1A1A2E]",
+          ? "border-b border-[#EAE6DF] bg-[#F9F8F5]/90 text-[#1B1A18]"
+          : "border-b border-[#EAE6DF]/80 bg-white/90 text-[#1B1A18]",
         className,
       )}
     >
@@ -62,7 +62,7 @@ export function MarketingHeader({
           href="/"
           className={cn(
             "flex items-center gap-2.5",
-            isDark ? "text-white" : "text-[#1A1A2E]",
+            isDark ? "text-[#1B1A18]" : "text-[#1B1A18]",
           )}
         >
           <WorkOnWordmark size="md" />
@@ -71,7 +71,7 @@ export function MarketingHeader({
         <nav
           className={cn(
             "hidden md:flex items-center gap-8 text-[15px] font-medium",
-            isDark ? "text-white/70" : "text-[#6B7280]",
+            isDark ? "text-[#706E6A]" : "text-[#706E6A]",
           )}
         >
           {items.map((item) => (
@@ -80,7 +80,7 @@ export function MarketingHeader({
               href={item.href}
               className={cn(
                 "transition-colors",
-                isDark ? "hover:text-white" : "hover:text-[#1A1A2E]",
+                isDark ? "hover:text-[#1B1A18]" : "hover:text-[#1B1A18]",
               )}
             >
               {item.label}

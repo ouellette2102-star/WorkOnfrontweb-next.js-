@@ -8,13 +8,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#FF4D1C] text-white hover:bg-[#E8441A] shadow-sm shadow-[#FF4D1C]/20",
-        destructive: "bg-[#FF4D1C] text-white hover:bg-[#E8441A]",
-        outline: "border border-white/15 bg-transparent hover:bg-white/5",
-        secondary: "bg-white/10 text-white hover:bg-white/20",
-        ghost: "hover:bg-white/5",
-        link: "text-[#FF4D1C] underline-offset-4 hover:underline",
-        hero: "bg-[#FF4D1C] text-white hover:bg-[#E8441A] shadow-lg shadow-[#FF4D1C]/30 hover:shadow-[#FF4D1C]/40 transition-all",
+        default: "bg-[#134021] text-white hover:bg-[#0F3319] shadow-sm shadow-[#134021]/20",
+        destructive: "bg-[#B5382A] text-white hover:bg-[#9A2F23]",
+        outline: "border border-[#EAE6DF] bg-transparent text-[#1B1A18] hover:bg-[#F0EDE8]",
+        secondary: "bg-[#F0EDE8] text-[#1B1A18] hover:bg-[#EAE6DF]",
+        ghost: "text-[#706E6A] hover:bg-[#F0EDE8] hover:text-[#1B1A18]",
+        link: "text-[#B5382A] underline-offset-4 hover:underline",
+        hero: "bg-[#134021] text-white hover:bg-[#0F3319] shadow-lg shadow-[#134021]/30 hover:shadow-[#134021]/40 transition-all",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -47,14 +47,14 @@ const faqJsonLd = {
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-neutral-900 text-white p-4">
+    <div className="min-h-screen bg-[#F9F8F5] text-[#1B1A18] p-4">
       {/* JSON-LD FAQPage for search engines */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div className="max-w-4xl mx-auto py-16">
-        <h1 className="text-4xl font-bold mb-8 text-center">
+        <h1 className="text-4xl font-bold mb-8 text-center font-heading">
           Questions fréquentes
         </h1>
         <div className="space-y-4">
@@ -64,7 +64,7 @@ export default function FAQPage() {
                 <CardTitle>{faq.question}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-white/70">{faq.answer}</p>
+                <p className="text-[#706E6A]">{faq.answer}</p>
               </CardContent>
             </Card>
           ))}

@@ -45,12 +45,12 @@ export function HeroWorkerCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-3xl bg-white border border-gray-200 shadow-lg shadow-black/5 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-[#FF4D1C]/10 hover:border-[#FF4D1C]/30",
+        "group relative overflow-hidden rounded-3xl bg-white border border-[#EAE6DF] shadow-card transition-all hover:-translate-y-1 hover:shadow-soft hover:border-[#134021]/30",
         className,
       )}
     >
       {/* Photo / avatar */}
-      <div className="relative h-56 bg-gradient-to-br from-[#FF4D1C]/10 via-[#FF4D1C]/5 to-transparent">
+      <div className="relative h-56 bg-gradient-to-br from-[#134021]/10 via-[#134021]/5 to-transparent">
         {worker.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -60,7 +60,7 @@ export function HeroWorkerCard({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <span className="text-5xl font-bold text-[#FF4D1C]/70">
+            <span className="text-5xl font-bold text-[#134021]/70">
               {initials}
             </span>
           </div>
@@ -75,14 +75,14 @@ export function HeroWorkerCard({
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="font-bold text-[17px] text-[#1A1A2E] truncate">
+            <p className="font-bold text-[17px] text-[#1B1A18] truncate">
               {worker.firstName} {worker.lastName[0]}.
             </p>
             {worker.sector && (
-              <p className="text-sm text-[#6B7280] truncate">{worker.sector}</p>
+              <p className="text-sm text-[#706E6A] truncate">{worker.sector}</p>
             )}
             {worker.city && (
-              <p className="text-xs text-[#6B7280]/70 mt-0.5">
+              <p className="text-xs text-[#706E6A]/70 mt-0.5">
                 📍 {worker.city}
               </p>
             )}
@@ -90,10 +90,10 @@ export function HeroWorkerCard({
           {hasReviews && (
             <div className="flex items-center gap-1 flex-shrink-0">
               <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-              <span className="text-sm font-bold text-[#1A1A2E]">
+              <span className="text-sm font-bold text-[#1B1A18]">
                 {worker.ratingAvg.toFixed(1)}
               </span>
-              <span className="text-xs text-[#6B7280]">
+              <span className="text-xs text-[#706E6A]">
                 ({worker.ratingCount})
               </span>
             </div>
@@ -101,14 +101,14 @@ export function HeroWorkerCard({
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-2">
-          <span className="text-xs text-[#6B7280]">
+          <span className="text-xs text-[#706E6A]">
             {worker.completedMissions} mission
             {worker.completedMissions !== 1 ? "s" : ""} complétée
             {worker.completedMissions !== 1 ? "s" : ""}
           </span>
           <Link
             href={`/p/${worker.slug}`}
-            className="inline-flex items-center justify-center rounded-xl bg-[#FF4D1C] hover:bg-[#E8441A] text-white text-sm font-semibold h-10 px-5 shadow-md shadow-[#FF4D1C]/25 transition-all group-hover:shadow-lg group-hover:shadow-[#FF4D1C]/35"
+            className="inline-flex items-center justify-center rounded-xl bg-[#134021] hover:bg-[#0F3319] text-white text-sm font-semibold h-10 px-5 shadow-md shadow-[#134021]/25 transition-all group-hover:shadow-lg group-hover:shadow-[#134021]/35"
           >
             Réserver
           </Link>

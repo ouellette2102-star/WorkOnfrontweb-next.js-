@@ -125,10 +125,10 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 <img
                   src={pro.pictureUrl}
                   alt={pro.fullName}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-[#FF4D1C]"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-[#B5382A]"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-[#FF4D1C] flex items-center justify-center text-3xl font-bold">
+                <div className="w-24 h-24 rounded-full bg-[#134021] flex items-center justify-center text-3xl font-bold">
                   {pro.firstName[0]}
                   {pro.lastName[0]}
                 </div>
@@ -144,7 +144,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                   </span>
                 )}
               </div>
-              <p className="text-[#FF4D1C] font-medium text-lg">
+              <p className="text-[#B5382A] font-medium text-lg">
                 {categoryLabel}
               </p>
               {pro.city && (
@@ -161,19 +161,19 @@ export function ProProfile({ pro }: { pro: ProData }) {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mt-8">
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#FF4D1C]">
+              <p className="text-2xl font-bold text-[#B5382A]">
                 {pro.demandCount}
               </p>
               <p className="text-gray-400 text-sm">Demandes reçues</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#FF4D1C]">
+              <p className="text-2xl font-bold text-[#B5382A]">
                 {pro.completionScore || 0}%
               </p>
               <p className="text-gray-400 text-sm">Profil complété</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#FF4D1C]">
+              <p className="text-2xl font-bold text-[#B5382A]">
                 {new Date(pro.memberSince).getFullYear()}
               </p>
               <p className="text-gray-400 text-sm">Membre depuis</p>
@@ -184,7 +184,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
           <div className="mt-8 text-center">
             <a
               href="#demande"
-              className="inline-block bg-[#FF4D1C] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[#E5441A] transition-colors text-lg"
+              className="inline-block bg-[#134021] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[#0F3319] transition-colors text-lg"
             >
               Demander une soumission
             </a>
@@ -274,7 +274,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, clientName: e.target.value });
                       if (errors.clientName) setErrors({ ...errors, clientName: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FF4D1C] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
                       errors.clientName ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="Jean Tremblay"
@@ -297,7 +297,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, clientPhone: e.target.value });
                       if (errors.clientPhone) setErrors({ ...errors, clientPhone: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FF4D1C] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
                       errors.clientPhone ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="514-555-1234"
@@ -319,7 +319,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, clientEmail: e.target.value });
                       if (errors.clientEmail) setErrors({ ...errors, clientEmail: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FF4D1C] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
                       errors.clientEmail ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="jean@example.com"
@@ -342,7 +342,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, serviceRequested: e.target.value });
                       if (errors.serviceRequested) setErrors({ ...errors, serviceRequested: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FF4D1C] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
                       errors.serviceRequested ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="Entretien paysager"
@@ -361,7 +361,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#FF4D1C] focus:border-transparent outline-none resize-none text-gray-900"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none resize-none text-gray-900"
                     placeholder="Décrivez votre besoin..."
                   />
                 </div>
@@ -375,7 +375,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-[#FF4D1C] text-white font-semibold py-4 rounded-lg hover:bg-[#E5441A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                  className="w-full bg-[#134021] text-white font-semibold py-4 rounded-lg hover:bg-[#0F3319] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                 >
                   {submitting ? "Envoi en cours..." : "Envoyer ma demande"}
                 </button>
@@ -393,7 +393,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
       <footer className="bg-[#1A1A2E] text-gray-500 text-center py-6 mt-10">
         <p className="text-sm">
           Propulsé par{" "}
-          <span className="text-[#FF4D1C] font-medium">WorkOn</span> —
+          <span className="text-[#B5382A] font-medium">WorkOn</span> —
           Système de capture de demande au Québec
         </p>
       </footer>

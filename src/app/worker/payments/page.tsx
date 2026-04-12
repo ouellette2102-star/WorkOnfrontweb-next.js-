@@ -121,7 +121,7 @@ function WorkerPaymentsContent() {
         );
       case "FAILED":
         return (
-          <span className="rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs font-semibold text-workon-accent">
+          <span className="rounded-full bg-[#B5382A]/15 border border-[#B5382A]/25 px-3 py-1 text-xs font-semibold text-workon-accent">
             ❌ Échoué
           </span>
         );
@@ -138,7 +138,7 @@ function WorkerPaymentsContent() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-workon-bg">
         <div className="text-center">
-          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#FF4D1C] border-t-transparent"></div>
+          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#134021] border-t-transparent"></div>
           <p className="text-workon-muted">Chargement...</p>
         </div>
       </div>
@@ -160,7 +160,7 @@ function WorkerPaymentsContent() {
 
         {/* Banner Onboarding */}
         {!isOnboarded && (
-          <div className="mb-8 rounded-3xl border border-[#FF4D1C]/30 bg-gradient-to-br from-[#FF4D1C]/15 via-[#FF4D1C]/5 to-transparent p-8 shadow-sm ">
+          <div className="mb-8 rounded-3xl border border-[#134021]/30 bg-gradient-to-br from-[#134021]/15 via-[#134021]/5 to-transparent p-8 shadow-sm ">
             <div className="mb-4 text-6xl">🚀</div>
             <h2 className="mb-3 text-2xl font-bold text-workon-ink">
               Complétez votre onboarding Stripe
@@ -254,7 +254,7 @@ function WorkerPaymentsContent() {
                 {payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-center justify-between rounded-2xl border border-workon-border bg-white/60 p-4 transition-all hover:border-[#FF4D1C]/40 hover:-translate-y-0.5"
+                    className="flex items-center justify-between rounded-2xl border border-workon-border bg-white/60 p-4 transition-all hover:border-[#134021]/40 hover:-translate-y-0.5"
                   >
                     <div className="flex-1">
                       <h4 className="mb-1 font-semibold text-white">

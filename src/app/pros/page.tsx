@@ -7,15 +7,15 @@ import { getFeaturedWorkers, getSectorStats, type SectorStat } from "@/lib/publi
 
 export const revalidate = 120; // ISR — 2 min
 
-// Header now lives in <MarketingHeader theme="dark" /> — see PR #39.
+// Header now lives in <MarketingHeader theme="light" /> — see PR #39.
 
 // ─── Sector Pill ────────────────────────────────────────────────────────────
 
 function SectorPill({ sector }: { sector: SectorStat }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3">
-      <span className="text-sm font-medium truncate">{sector.category}</span>
-      <div className="flex items-center gap-3 text-xs text-white/50 flex-shrink-0 ml-2">
+    <div className="flex items-center justify-between rounded-lg border border-[#EAE6DF] bg-white px-4 py-3">
+      <span className="text-sm font-medium truncate text-[#1B1A18]">{sector.category}</span>
+      <div className="flex items-center gap-3 text-xs text-[#706E6A] flex-shrink-0 ml-2">
         <span>{sector.workerCount} pros</span>
         <span>·</span>
         <span>{sector.missionCount} missions</span>
@@ -36,32 +36,32 @@ export default async function ProsPage() {
   const sectors = sectorsRes.status === "fulfilled" ? sectorsRes.value.slice(0, 8) : [];
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-white">
-      <MarketingHeader theme="dark" items={[
+    <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
+      <MarketingHeader theme="light" items={[
         { href: "/", label: "Accueil" },
         { href: "/employeurs", label: "Employeurs" },
         { href: "/missions", label: "Missions" },
       ]} />
 
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-white/10">
+      <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-[#EAE6DF]">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FF4D1C]/30 bg-[#FF4D1C]/10 px-3 py-1 text-xs text-[#FF4D1C] mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#B5382A]/30 bg-[#B5382A]/10 px-3 py-1 text-xs text-[#B5382A] mb-5">
             ⚡ Inscription gratuite — payé dès ce soir
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight tracking-tight">
             Trouve des missions.<br />
-            <span className="text-[#FF4D1C]">Travaille quand tu veux.</span>
+            <span className="text-[#B5382A]">Travaille quand tu veux.</span>
           </h1>
-          <p className="mt-4 text-white/60 text-lg leading-relaxed">
+          <p className="mt-4 text-[#706E6A] text-lg leading-relaxed">
             Rejoins {workers.length > 0 ? `${workers.length}+ travailleurs` : "des centaines de pros"} qui acceptent des missions payées rapidement.
             Flexible, légal, sécurisé.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
+            <Button size="lg" className="bg-[#134021] hover:bg-[#0F3319] text-white" asChild>
               <Link href="/register?role=worker">S&apos;inscrire comme pro</Link>
             </Button>
-            <Button variant="outline" size="lg" className="border-white/20 hover:border-white/40" asChild>
+            <Button variant="outline" size="lg" className="border-[#EAE6DF] hover:border-[#706E6A] text-[#1B1A18]" asChild>
               <Link href="/missions">Voir les missions →</Link>
             </Button>
           </div>
@@ -72,7 +72,7 @@ export default async function ProsPage() {
       <WhyChooseBlock
         eyebrow="Pourquoi WorkOn"
         title="Du travail, vraiment simple."
-        theme="dark"
+        theme="light"
         items={[
           { icon: "💸", title: "Payé rapidement", desc: "Virement dès la fin de mission. Pas d'attente de 30 jours." },
           { icon: "📅", title: "Flexibilité totale", desc: "Tu choisis tes missions, tes horaires, ta ville." },
@@ -83,9 +83,9 @@ export default async function ProsPage() {
 
       {/* Sectors */}
       {sectors.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-          <h2 className="text-xl font-bold mb-4">Secteurs actifs</h2>
-          <p className="text-sm text-white/50 mb-5">Missions ouvertes par catégorie — mis à jour toutes les 2 minutes</p>
+        <section className="bg-white mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF]">
+          <h2 className="font-heading text-xl font-bold mb-4 text-[#1B1A18]">Secteurs actifs</h2>
+          <p className="text-sm text-[#706E6A] mb-5">Missions ouvertes par catégorie — mis à jour toutes les 2 minutes</p>
           <div className="grid sm:grid-cols-2 gap-2">
             {sectors.map((s) => <SectorPill key={s.category} sector={s} />)}
           </div>
@@ -94,11 +94,11 @@ export default async function ProsPage() {
 
       {/* Featured workers */}
       {workers.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
+        <section className="mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF]">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold">Profils en vedette</h2>
-              <p className="text-sm text-white/50 mt-1">Top travailleurs par missions complétées</p>
+              <h2 className="font-heading text-xl font-bold text-[#1B1A18]">Profils en vedette</h2>
+              <p className="text-sm text-[#706E6A] mt-1">Top travailleurs par missions complétées</p>
             </div>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
@@ -108,8 +108,8 @@ export default async function ProsPage() {
       )}
 
       {/* Steps */}
-      <section className="mx-auto max-w-6xl px-4 py-10 border-b border-white/10">
-        <h2 className="text-xl font-bold mb-6">Comment ça marche</h2>
+      <section className="bg-white mx-auto max-w-6xl px-4 py-10 border-b border-[#EAE6DF]">
+        <h2 className="font-heading text-xl font-bold mb-6 text-[#1B1A18]">Comment ça marche</h2>
         <ol className="space-y-4">
           {[
             { n: 1, title: "Crée ton profil en 2 min", desc: "Nom, secteur, ville. Photo optionnelle." },
@@ -118,12 +118,12 @@ export default async function ProsPage() {
             { n: 4, title: "Reçois ton paiement", desc: "Stripe débloque les fonds dès la confirmation. Rapide et sécurisé." },
           ].map((step) => (
             <li key={step.n} className="flex items-start gap-4">
-              <span className="flex-shrink-0 h-7 w-7 rounded-full bg-[#FF4D1C]/20 border border-[#FF4D1C]/30 flex items-center justify-center text-sm font-bold text-[#FF4D1C]">
+              <span className="flex-shrink-0 h-7 w-7 rounded-full bg-[#B5382A]/10 border border-[#B5382A]/20 flex items-center justify-center text-sm font-bold text-[#B5382A]">
                 {step.n}
               </span>
               <div>
-                <p className="font-semibold text-sm">{step.title}</p>
-                <p className="text-xs text-white/50 mt-0.5">{step.desc}</p>
+                <p className="font-semibold text-sm text-[#1B1A18]">{step.title}</p>
+                <p className="text-xs text-[#706E6A] mt-0.5">{step.desc}</p>
               </div>
             </li>
           ))}
@@ -133,19 +133,19 @@ export default async function ProsPage() {
       {/* Final CTA */}
       <section className="mx-auto max-w-6xl px-4 py-12">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-3">Prêt à commencer ?</h2>
-          <p className="text-white/60 mb-6">Inscription gratuite. Première mission disponible immédiatement.</p>
-          <Button size="lg" className="bg-[#FF4D1C] hover:bg-[#E8441A] text-white" asChild>
+          <h2 className="font-heading text-2xl font-bold mb-3 text-[#1B1A18]">Prêt à commencer ?</h2>
+          <p className="text-[#706E6A] mb-6">Inscription gratuite. Première mission disponible immédiatement.</p>
+          <Button size="lg" className="bg-[#134021] hover:bg-[#0F3319] text-white" asChild>
             <Link href="/register?role=worker">Créer mon profil gratuitement</Link>
           </Button>
         </div>
       </section>
 
-      <footer className="border-t border-white/10">
-        <div className="mx-auto max-w-6xl px-4 py-6 flex items-center justify-between text-xs text-white/40">
-          <Link href="/" className="hover:text-white/70">WorkOn</Link>
+      <footer className="border-t border-[#EAE6DF] bg-[#F9F8F5]">
+        <div className="mx-auto max-w-6xl px-4 py-6 flex items-center justify-between text-xs text-[#9C9A96]">
+          <Link href="/" className="hover:text-[#706E6A]">WorkOn</Link>
           <p>Les travailleurs sont des prestataires autonomes.</p>
-          <Link href="/employeurs" className="hover:text-white/70">Côté employeur →</Link>
+          <Link href="/employeurs" className="hover:text-[#706E6A]">Côté employeur →</Link>
         </div>
       </footer>
     </main>

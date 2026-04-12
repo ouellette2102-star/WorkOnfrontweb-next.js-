@@ -119,7 +119,7 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                       isOwn
-                        ? "bg-[#FF4D1C] text-white shadow-sm shadow-[#FF4D1C]/30"
+                        ? "bg-[#134021] text-white shadow-sm shadow-[#134021]/30"
                         : "bg-gray-100 text-[#1B1A18]"
                     }`}
                   >
@@ -151,14 +151,14 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Écrire un message..."
-            className="flex-1 resize-none rounded-xl border border-[#EAE6DF] bg-gray-100 px-4 py-2.5 text-sm text-[#1B1A18] placeholder-gray-400 focus:border-[#FF4D1C] focus:outline-none"
+            className="flex-1 resize-none rounded-xl border border-[#EAE6DF] bg-gray-100 px-4 py-2.5 text-sm text-[#1B1A18] placeholder-gray-400 focus:border-[#134021] focus:outline-none"
             rows={1}
             style={{ maxHeight: "120px" }}
           />
           <button
             onClick={handleSend}
             disabled={!newMessage.trim() || sending}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FF4D1C] text-white transition hover:bg-[#E8441A] disabled:opacity-40 shadow-md shadow-[#FF4D1C]/25"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#134021] text-white transition hover:bg-[#E8441A] disabled:opacity-40 shadow-md shadow-[#134021]/25"
           >
             {sending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

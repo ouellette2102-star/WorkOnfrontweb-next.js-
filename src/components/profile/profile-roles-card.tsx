@@ -78,7 +78,7 @@ export function ProfileRolesCard() {
 
   if (error && !profile) {
     return (
-      <section className="rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 shadow-sm">
+      <section className="rounded-3xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-8 shadow-sm">
         <h2 className="text-xl font-semibold text-workon-accent">Impossible de charger le profil</h2>
         <p className="mt-2 text-sm text-workon-muted">{error}</p>
       </section>
@@ -117,15 +117,15 @@ export function ProfileRolesCard() {
               onClick={() => setSelectedRole(option.key)}
               className={`rounded-2xl border px-4 py-5 text-left transition ${
                 isSelected
-                  ? "border-[#FF4D1C] bg-[#FF4D1C]/10"
-                  : "border-workon-border bg-workon-bg hover:border-[#FF4D1C]/40"
+                  ? "border-[#134021] bg-[#134021]/10"
+                  : "border-workon-border bg-workon-bg hover:border-[#134021]/40"
               }`}
             >
               <p className="text-xs uppercase tracking-[0.3em] text-workon-muted">{option.label}</p>
               <h3 className="mt-2 text-lg font-semibold">{option.label}</h3>
               <p className="mt-2 text-sm text-workon-muted">{option.description}</p>
               {isSelected ? (
-                <span className="mt-3 inline-flex rounded-full bg-[#FF4D1C]/15 border border-[#FF4D1C]/25 px-3 py-1 text-xs text-workon-accent">
+                <span className="mt-3 inline-flex rounded-full bg-[#134021]/15 border border-[#134021]/25 px-3 py-1 text-xs text-workon-accent">
                   Rôle principal
                 </span>
               ) : null}
@@ -139,7 +139,7 @@ export function ProfileRolesCard() {
           type="button"
           disabled={!selectedRole || isSubmitting || isUnchanged}
           onClick={handleSave}
-          className="rounded-full bg-[#FF4D1C] px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#E8441A] disabled:opacity-60 disabled:cursor-not-allowed"
+          className="rounded-full bg-[#134021] px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#0F3319] disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Enregistrement..." : "Sauvegarder mon rôle"}
         </button>

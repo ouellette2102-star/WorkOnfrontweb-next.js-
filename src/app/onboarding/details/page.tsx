@@ -106,7 +106,7 @@ export default function OnboardingDetailsPage() {
         </div>
 
         {error && (
-          <div className="mb-6 rounded-2xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-4 text-center text-workon-accent shadow-sm">
+          <div className="mb-6 rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-4 text-center text-workon-accent shadow-sm">
             {error}
           </div>
         )}

@@ -132,7 +132,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
   }
 
   return (
-    <div className="rounded-xl border border-white/10 bg-neutral-900/70 p-4 text-white">
+    <div className="rounded-xl border border-[#EAE6DF] bg-white p-4 text-[#1B1A18]">
       <div className="mb-3 flex items-center justify-between">
         <h4 className="text-lg font-semibold">Photos de la mission</h4>
         {canUpload && (
@@ -162,15 +162,15 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
       )}
 
       {isLoading ? (
-        <p className="text-white/70">Chargement des photos...</p>
+        <p className="text-[#706E6A]">Chargement des photos...</p>
       ) : photos.length === 0 ? (
-        <p className="text-white/70">Aucune photo pour le moment.</p>
+        <p className="text-[#706E6A]">Aucune photo pour le moment.</p>
       ) : (
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo) => (
             <div
               key={photo.id}
-              className="group relative cursor-pointer overflow-hidden rounded-xl border border-white/10 transition hover:border-white/30"
+              className="group relative cursor-pointer overflow-hidden rounded-xl border border-[#EAE6DF] transition hover:border-[#9C9A96]"
               onClick={() => setSelectedPhoto(photo)}
             >
               <div className="relative aspect-square">
@@ -182,8 +182,8 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
                   sizes="(max-width: 768px) 33vw, 200px"
                 />
               </div>
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition group-hover:opacity-100">
-                <span className="text-sm font-semibold text-white">
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
+                <span className="text-sm font-semibold text-white/95">
                   Voir en grand
                 </span>
               </div>
@@ -199,7 +199,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
           onClick={() => setSelectedPhoto(null)}
         >
           <div
-            className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-xl bg-neutral-900"
+            className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-xl bg-white"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative h-full w-full">
@@ -212,7 +212,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
               />
             </div>
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-white/90">
                 Uploadée le{" "}
                 {format(new Date(selectedPhoto.createdAt), "PPP à HH:mm", {
                   locale: frCA,
@@ -230,7 +230,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
               )}
               <Button
                 onClick={() => setSelectedPhoto(null)}
-                className="rounded-xl bg-neutral-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-600"
+                className="rounded-xl bg-[#EAE6DF] px-4 py-2 text-sm font-semibold text-[#1B1A18] transition hover:bg-[#DDD9D2]"
               >
                 Fermer
               </Button>

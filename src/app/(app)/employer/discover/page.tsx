@@ -62,7 +62,7 @@ export default function EmployerDiscoverPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-workon-bg p-6">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-8 text-center shadow-sm">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-8 text-center shadow-sm">
           <p className="text-workon-accent">Erreur lors du chargement des profils</p>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function EmployerDiscoverPage() {
                   className="absolute inset-0 overflow-hidden rounded-3xl border-2 border-workon-border bg-white shadow-lg"
                 >
                   {/* Avatar area */}
-                  <div className="flex h-40 items-center justify-center bg-gradient-to-r from-[#FF4D1C] to-[#FF8C32]">
+                  <div className="flex h-40 items-center justify-center bg-gradient-to-r from-[#134021] to-[#1A5C2E]">
                     {currentCandidate.pictureUrl ? (
                       <img
                         src={currentCandidate.pictureUrl}

@@ -39,7 +39,7 @@ export default async function Image() {
               width: "56px",
               height: "56px",
               borderRadius: "14px",
-              background: "#FF4D1C",
+              background: "#134021",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -81,7 +81,7 @@ export default async function Image() {
             }}
           >
             Une ligne directe vers le{" "}
-            <span style={{ color: "#FF4D1C" }}>travail instantané</span>.
+            <span style={{ color: "#B5382A" }}>travail instantané</span>.
           </div>
           <div
             style={{

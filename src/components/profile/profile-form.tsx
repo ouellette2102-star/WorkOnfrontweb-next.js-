@@ -61,7 +61,7 @@ export function ProfileForm() {
 
   if (error && !profile) {
     return (
-      <div className="rounded-2xl border border-[#FF4D1C]/30 bg-[#FF4D1C]/5 p-6 text-sm text-workon-accent">
+      <div className="rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-6 text-sm text-workon-accent">
         Erreur : {error}
       </div>
     );
@@ -75,7 +75,7 @@ export function ProfileForm() {
           type="text"
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-white focus:border-[#FF4D1C] focus:outline-none"
+          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-[#1B1A18] focus:border-[#134021] focus:outline-none"
           placeholder="Alex Tremblay"
         />
       </div>
@@ -86,7 +86,7 @@ export function ProfileForm() {
           type="tel"
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-white focus:border-[#FF4D1C] focus:outline-none"
+          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-[#1B1A18] focus:border-[#134021] focus:outline-none"
           placeholder="+1 514 555 1234"
         />
       </div>
@@ -97,7 +97,7 @@ export function ProfileForm() {
           type="text"
           value={city}
           onChange={(event) => setCity(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-white focus:border-[#FF4D1C] focus:outline-none"
+          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-[#1B1A18] focus:border-[#134021] focus:outline-none"
           placeholder="Montréal, QC"
         />
       </div>
@@ -115,7 +115,7 @@ export function ProfileForm() {
       <button
         type="submit"
         disabled={isPending || !profile}
-        className="w-full rounded-2xl bg-[#FF4D1C] px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#E8441A] disabled:opacity-70 shadow-md shadow-[#FF4D1C]/25"
+        className="w-full rounded-2xl bg-[#134021] px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#0F3319] disabled:opacity-70 shadow-md shadow-[#134021]/25"
       >
         {isPending ? "Enregistrement..." : "Sauvegarder"}
       </button>
