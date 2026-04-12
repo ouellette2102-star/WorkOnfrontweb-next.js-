@@ -57,7 +57,7 @@ export function QuickStatsCard() {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-32 animate-pulse rounded-3xl border border-white/10 bg-neutral-900/70"
+            className="h-32 animate-pulse rounded-3xl border border-gray-200 bg-white"
           />
         ))}
       </div>
@@ -66,12 +66,12 @@ export function QuickStatsCard() {
 
   if (error) {
     return (
-      <div className="mb-8 rounded-3xl border border-red-500/30 bg-red-900/10 p-6 backdrop-blur">
+      <div className="mb-8 rounded-3xl border border-red-200 bg-red-50 p-6">
         <div className="flex items-center gap-3">
           <span className="text-3xl">⚠️</span>
           <div>
-            <h4 className="text-lg font-semibold text-red-400">Erreur de chargement</h4>
-            <p className="text-sm text-red-300/80">{error}</p>
+            <h4 className="text-lg font-semibold text-orange-600">Erreur de chargement</h4>
+            <p className="text-sm text-red-600">{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="mt-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500"
@@ -87,35 +87,35 @@ export function QuickStatsCard() {
   return (
     <div className="mb-8 grid gap-4 md:grid-cols-3">
       {/* Missions actives */}
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-red-900/20 to-neutral-900/70 p-6 backdrop-blur">
+      <div className="rounded-3xl border border-orange-200 bg-orange-50 p-6">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-3xl">🔥</span>
-          <span className="text-3xl font-bold text-red-400">{stats.active}</span>
+          <span className="text-3xl font-bold text-orange-600">{stats.active}</span>
         </div>
-        <h4 className="text-lg font-semibold text-white">Missions actives</h4>
-        <p className="text-sm text-white/60">En cours ou réservées</p>
+        <h4 className="text-lg font-semibold text-gray-900">Missions actives</h4>
+        <p className="text-sm text-gray-500">En cours ou réservées</p>
       </div>
 
       {/* Missions complétées */}
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-green-900/20 to-neutral-900/70 p-6 backdrop-blur">
+      <div className="rounded-3xl border border-green-200 bg-green-50 p-6">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-3xl">✅</span>
-          <span className="text-3xl font-bold text-green-400">{stats.completed}</span>
+          <span className="text-3xl font-bold text-green-600">{stats.completed}</span>
         </div>
-        <h4 className="text-lg font-semibold text-white">Complétées</h4>
-        <p className="text-sm text-white/60">Missions terminées</p>
+        <h4 className="text-lg font-semibold text-gray-900">Complétées</h4>
+        <p className="text-sm text-gray-500">Missions terminées</p>
       </div>
 
       {/* Gains totaux */}
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-yellow-900/20 to-neutral-900/70 p-6 backdrop-blur">
+      <div className="rounded-3xl border border-amber-200 bg-amber-50 p-6">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-3xl">💰</span>
-          <span className="text-3xl font-bold text-yellow-400">
+          <span className="text-3xl font-bold text-amber-600">
             {stats.totalEarnings.toFixed(0)}$
           </span>
         </div>
-        <h4 className="text-lg font-semibold text-white">Gains estimés</h4>
-        <p className="text-sm text-white/60">Missions complétées</p>
+        <h4 className="text-lg font-semibold text-gray-900">Gains estimés</h4>
+        <p className="text-sm text-gray-500">Missions complétées</p>
       </div>
     </div>
   );

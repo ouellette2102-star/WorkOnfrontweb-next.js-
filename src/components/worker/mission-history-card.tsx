@@ -91,15 +91,15 @@ export function MissionHistoryCard() {
 
   if (isLoading) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-        <h2 className="mb-4 text-2xl font-bold text-white">
+      <div className="rounded-3xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">
           Historique des Missions
         </h2>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-xl border border-white/10 bg-neutral-800/50"
+              className="h-24 animate-pulse rounded-xl border border-gray-200 bg-gray-50"
             />
           ))}
         </div>
@@ -109,13 +109,13 @@ export function MissionHistoryCard() {
 
   if (missions.length === 0) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-        <h2 className="mb-4 text-2xl font-bold text-white">
+      <div className="rounded-3xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">
           Historique des Missions
         </h2>
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <span className="mb-2 text-4xl">📋</span>
-          <p className="text-white/70">Aucune mission complétée pour le moment</p>
+          <p className="text-gray-500">Aucune mission complétée pour le moment</p>
         </div>
       </div>
     );
@@ -123,8 +123,8 @@ export function MissionHistoryCard() {
 
   return (
     <>
-      <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-        <h2 className="mb-4 text-2xl font-bold text-white">
+      <div className="rounded-3xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">
           Historique des Missions
         </h2>
 
@@ -132,17 +132,17 @@ export function MissionHistoryCard() {
           {missions.map((mission) => (
             <div
               key={mission.id}
-              className="group flex items-center justify-between rounded-xl border border-white/10 bg-neutral-800/50 p-4 backdrop-blur"
+              className="group flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 p-4"
             >
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <h4 className="font-semibold text-white">{mission.title}</h4>
-                  <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-semibold text-green-400">
+                  <h4 className="font-semibold text-gray-900">{mission.title}</h4>
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-600">
                     ✅ Complétée
                   </span>
                 </div>
                 
-                <div className="flex flex-wrap gap-4 text-sm text-white/60">
+                <div className="flex flex-wrap gap-4 text-sm text-gray-500">
                   {mission.city && <span>📍 {mission.city}</span>}
                   
                   {mission.completedAt && (
@@ -158,7 +158,7 @@ export function MissionHistoryCard() {
                   )}
 
                   {mission.hourlyRate && durations[mission.id] > 0 && (
-                    <span className="font-semibold text-green-400">
+                    <span className="font-semibold text-green-600">
                       💰 {calculateEarnings(mission).toFixed(2)} $
                     </span>
                   )}
@@ -169,7 +169,7 @@ export function MissionHistoryCard() {
                 <Button
                   onClick={() => setSelectedMissionId(mission.id)}
                   variant="outline"
-                  className="border-white/20 text-white hover:bg-neutral-700"
+                  className="border-gray-300 text-gray-900 hover:bg-gray-100"
                   size="sm"
                 >
                   📸 Photos
@@ -180,7 +180,7 @@ export function MissionHistoryCard() {
         </div>
 
         {missions.length >= 5 && (
-          <p className="mt-4 text-center text-sm text-white/50">
+          <p className="mt-4 text-center text-sm text-gray-400">
             Affichage des 5 dernières missions complétées
           </p>
         )}

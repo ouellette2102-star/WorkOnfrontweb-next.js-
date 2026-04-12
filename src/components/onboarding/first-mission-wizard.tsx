@@ -69,20 +69,20 @@ export function FirstMissionWizard() {
   const StepIcon = step.icon;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-red-600/20 to-neutral-900 p-6">
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-orange-50 p-6">
       <button
         onClick={handleDismiss}
-        className="absolute right-3 top-3 text-white/40 hover:text-white"
+        className="absolute right-3 top-3 text-gray-400 hover:text-gray-900"
         aria-label="Fermer"
       >
         <X className="h-5 w-5" />
       </button>
 
       <div className="mb-4 text-center">
-        <h2 className="mb-1 text-lg font-bold text-white">
+        <h2 className="mb-1 text-lg font-bold text-gray-900">
           {isWorker ? "Commencez a travailler" : "Trouvez votre travailleur"}
         </h2>
-        <p className="text-sm text-white/60">3 etapes simples pour commencer</p>
+        <p className="text-sm text-gray-500">3 etapes simples pour commencer</p>
       </div>
 
       {/* Step indicators */}
@@ -92,7 +92,7 @@ export function FirstMissionWizard() {
             key={i}
             onClick={() => setCurrentStep(i)}
             className={`h-2 rounded-full transition-all ${
-              i === currentStep ? "w-8 bg-red-500" : "w-2 bg-white/20"
+              i === currentStep ? "w-8 bg-red-500" : "w-2 bg-gray-300"
             }`}
           />
         ))}
@@ -101,12 +101,12 @@ export function FirstMissionWizard() {
       {/* Current step */}
       <div className="mb-6 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-600/20">
-          <StepIcon className="h-8 w-8 text-red-400" />
+          <StepIcon className="h-8 w-8 text-orange-600" />
         </div>
-        <h3 className="mb-2 text-xl font-bold text-white">
+        <h3 className="mb-2 text-xl font-bold text-gray-900">
           {currentStep + 1}. {step.title}
         </h3>
-        <p className="text-sm text-white/70">{step.description}</p>
+        <p className="text-sm text-gray-500">{step.description}</p>
       </div>
 
       {/* Navigation */}
@@ -114,7 +114,7 @@ export function FirstMissionWizard() {
         {currentStep > 0 ? (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="text-sm text-white/50 hover:text-white"
+            className="text-sm text-gray-400 hover:text-gray-900"
           >
             Precedent
           </button>

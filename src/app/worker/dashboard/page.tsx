@@ -49,7 +49,7 @@ export default async function WorkerDashboardPage() {
           </Link>
 
           <Link href="/worker/payments">
-            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-gradient-to-br from-green-900/20 to-neutral-900/70 p-6 backdrop-blur transition hover:border-[#22C55E]/50 hover:bg-workon-bg">
+            <div className="group cursor-pointer rounded-3xl border border-workon-border bg-green-50 p-6 transition hover:border-[#22C55E]/50 hover:bg-workon-bg">
               <div className="mb-3 text-4xl">💰</div>
               <h3 className="mb-2 text-xl font-semibold text-workon-ink">
                 Paiements
