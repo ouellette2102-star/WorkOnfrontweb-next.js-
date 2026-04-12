@@ -4,6 +4,7 @@ import { AvailableMissionsCard } from "@/components/worker/available-missions-ca
 import { MissionHistoryCard } from "@/components/worker/mission-history-card";
 import { QuickStatsCard } from "@/components/worker/quick-stats-card";
 import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
+import { TrustScoreRing } from "@/components/worker/trust-score-ring";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -99,26 +100,34 @@ export default async function WorkerDashboardPage() {
 
         {/* Infos profil */}
         <div className="mt-8 bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
-          <h3 className="mb-4 font-heading font-bold text-lg text-[#1B1A18]">
-            Tes informations
-          </h3>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div>
-              <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Ville</p>
-              <p className="text-[#1B1A18]">{profile.city || "Non renseignée"}</p>
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div className="flex-1">
+              <h3 className="mb-4 font-heading font-bold text-lg text-[#1B1A18]">
+                Tes informations
+              </h3>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Ville</p>
+                  <p className="text-[#1B1A18]">{profile.city || "Non renseignee"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Telephone</p>
+                  <p className="text-[#1B1A18]">{profile.phone || "Non renseigne"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Email</p>
+                  <p className="text-[#1B1A18]">{profile.email}</p>
+                </div>
+              </div>
+              <Button asChild variant="outline" size="sm" className="mt-4">
+                <Link href="/profile">Modifier mon profil</Link>
+              </Button>
             </div>
-            <div>
-              <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Téléphone</p>
-              <p className="text-[#1B1A18]">{profile.phone || "Non renseigné"}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Email</p>
-              <p className="text-[#1B1A18]">{profile.email}</p>
+            {/* Trust Score Ring */}
+            <div className="flex-shrink-0">
+              <TrustScoreRing size={120} />
             </div>
           </div>
-          <Button asChild variant="outline" size="sm" className="mt-4">
-            <Link href="/profile">Modifier mon profil</Link>
-          </Button>
         </div>
       </div>
     </div>

@@ -125,7 +125,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 <img
                   src={pro.pictureUrl}
                   alt={pro.fullName}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-[#B5382A]"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-workon-accent"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-[#134021] flex items-center justify-center text-3xl font-bold">
@@ -144,7 +144,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                   </span>
                 )}
               </div>
-              <p className="text-[#B5382A] font-medium text-lg">
+              <p className="text-workon-accent font-medium text-lg">
                 {categoryLabel}
               </p>
               {pro.city && (
@@ -161,19 +161,19 @@ export function ProProfile({ pro }: { pro: ProData }) {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mt-8">
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#B5382A]">
+              <p className="text-2xl font-bold text-workon-accent">
                 {pro.demandCount}
               </p>
               <p className="text-gray-400 text-sm">Demandes reçues</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#B5382A]">
+              <p className="text-2xl font-bold text-workon-accent">
                 {pro.completionScore || 0}%
               </p>
               <p className="text-gray-400 text-sm">Profil complété</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#B5382A]">
+              <p className="text-2xl font-bold text-workon-accent">
                 {new Date(pro.memberSince).getFullYear()}
               </p>
               <p className="text-gray-400 text-sm">Membre depuis</p>
@@ -393,7 +393,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
       <footer className="bg-[#1A1A2E] text-gray-500 text-center py-6 mt-10">
         <p className="text-sm">
           Propulsé par{" "}
-          <span className="text-[#B5382A] font-medium">WorkOn</span> —
+          <span className="text-workon-accent font-medium">WorkOn</span> —
           Système de capture de demande au Québec
         </p>
       </footer>

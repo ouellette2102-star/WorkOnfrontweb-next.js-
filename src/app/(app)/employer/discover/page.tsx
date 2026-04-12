@@ -62,7 +62,7 @@ export default function EmployerDiscoverPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-workon-bg p-6">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-8 text-center shadow-sm">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-workon-accent/30 bg-workon-accent/5 p-8 text-center shadow-sm">
           <p className="text-workon-accent">Erreur lors du chargement des profils</p>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function EmployerDiscoverPage() {
           <h1 className="mb-2 text-4xl font-bold text-workon-ink">
             Découvrir des travailleurs
           </h1>
-          <p className="text-lg text-white/70">
+          <p className="text-lg text-workon-muted">
             Trouvez les meilleurs profils pour vos missions
           </p>
         </div>

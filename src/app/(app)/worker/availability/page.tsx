@@ -146,7 +146,7 @@ export default function AvailabilityPage() {
       <div className="rounded-xl border border-workon-border bg-white shadow-sm p-4">
         <button
           onClick={() => setShowBlockForm(!showBlockForm)}
-          className="flex items-center gap-2 text-sm font-semibold text-white"
+          className="flex items-center gap-2 text-sm font-semibold text-workon-ink"
         >
           <Ban className="h-4 w-4 text-red-400" />
           Bloquer une date specifique

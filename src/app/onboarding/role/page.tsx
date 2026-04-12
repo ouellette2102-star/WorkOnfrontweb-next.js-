@@ -38,7 +38,7 @@ export default function OnboardingRolePage() {
     <div className="flex min-h-screen items-center justify-center bg-workon-bg p-4">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-white">
+          <h1 className="mb-4 text-4xl font-bold text-workon-ink">
             Bienvenue sur WorkOn
           </h1>
           <p className="text-lg text-workon-muted">
@@ -61,7 +61,7 @@ export default function OnboardingRolePage() {
           >
             <div className="relative z-10">
               <div className="mb-4 text-6xl">👷</div>
-              <h2 className="mb-3 text-2xl font-bold text-white">
+              <h2 className="mb-3 text-2xl font-bold text-workon-ink">
                 Je suis Travailleur
               </h2>
               <p className="text-workon-muted">
@@ -80,7 +80,7 @@ export default function OnboardingRolePage() {
           >
             <div className="relative z-10">
               <div className="mb-4 text-6xl">💼</div>
-              <h2 className="mb-3 text-2xl font-bold text-white">
+              <h2 className="mb-3 text-2xl font-bold text-workon-ink">
                 Je suis Employeur
               </h2>
               <p className="text-workon-muted">

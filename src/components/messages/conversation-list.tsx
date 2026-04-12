@@ -60,7 +60,7 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
             </div>
 
             {conv.unreadCount > 0 && (
-              <span className="mt-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#B5382A] px-1.5 text-[10px] font-bold text-white shadow-sm shadow-[#B5382A]/40">
+              <span className="mt-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-workon-accent px-1.5 text-[10px] font-bold text-white shadow-sm shadow-workon-accent/40">
                 {conv.unreadCount > 99 ? "99+" : conv.unreadCount}
               </span>
             )}

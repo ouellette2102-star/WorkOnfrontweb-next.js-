@@ -27,6 +27,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { MissionPhotos } from "@/components/mission/mission-photos";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -679,6 +680,11 @@ export default function MissionDetailPage() {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Photos */}
+      <div className="p-4 rounded-2xl bg-white border border-workon-border">
+        <MissionPhotos missionId={id} canEdit={isOwner || isAssigned} />
       </div>
 
       {/* Actions */}

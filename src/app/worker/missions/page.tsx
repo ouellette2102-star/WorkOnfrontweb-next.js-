@@ -184,7 +184,7 @@ function WorkerMissionsContent() {
           </div>
           <Button
             onClick={loadMissions}
-            className="bg-[#B5382A] text-white hover:bg-[#9A2F24] rounded-xl"
+            className="bg-workon-accent text-white hover:bg-workon-accent-hover rounded-xl"
           >
             Actualiser les missions
           </Button>
@@ -229,7 +229,7 @@ function WorkerMissionsContent() {
 
         {/* Erreur */}
         {error && (
-          <div className="mb-6 rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-4 text-[#B5382A] shadow-sm">
+          <div className="mb-6 rounded-2xl border border-workon-accent/30 bg-workon-accent/5 p-4 text-workon-accent shadow-sm">
             {error}
           </div>
         )}

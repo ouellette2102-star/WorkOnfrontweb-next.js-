@@ -103,14 +103,14 @@ export function AvailableMissionsCard() {
 
   if (error) {
     return (
-      <div className="bg-white border border-[#B5382A]/20 rounded-3xl p-5 shadow-card">
-        <h2 className="mb-4 font-heading font-bold text-2xl text-[#B5382A]">
+      <div className="bg-white border border-workon-accent/20 rounded-3xl p-5 shadow-card">
+        <h2 className="mb-4 font-heading font-bold text-2xl text-workon-accent">
           Erreur de chargement
         </h2>
-        <p className="mb-4 text-sm text-[#B5382A]">{error}</p>
+        <p className="mb-4 text-sm text-workon-accent">{error}</p>
         <button
           onClick={loadMissions}
-          className="rounded-xl bg-[#B5382A] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9A2F23]"
+          className="rounded-xl bg-workon-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-workon-accent-hover"
         >
           Réessayer
         </button>

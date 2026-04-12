@@ -321,6 +321,51 @@ export interface ReviewResponse {
   createdAt: string;
 }
 
+export interface MissionPhoto {
+  id: string;
+  missionId: string;
+  url: string;
+  filename?: string;
+  createdAt: string;
+}
+
+export type NotificationType =
+  | "MISSION_UPDATE"
+  | "NEW_OFFER"
+  | "MESSAGE"
+  | "PAYMENT"
+  | "REVIEW"
+  | "MARKETING";
+
+export interface NotificationPreference {
+  type: NotificationType;
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+}
+
+export interface QuietHoursResponse {
+  enabled: boolean;
+  startHour: number;
+  endHour: number;
+}
+
+export type LeadStatus = "new" | "contacted" | "qualified" | "converted" | "lost";
+
+export interface LeadResponse {
+  id: string;
+  contactName: string;
+  contactPhone: string | null;
+  contactEmail: string | null;
+  source: string | null;
+  status: LeadStatus;
+  notes: string | null;
+  proId: string;
+  missionId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Re-export PrimaryRole for backward compat with workon-api.ts consumers
 export type PrimaryRole = "WORKER" | "EMPLOYER" | "CLIENT_RESIDENTIAL" | "ADMIN";
 
@@ -497,6 +542,14 @@ export const api = {
   markNotificationRead: (id: string) => apiFetch<void>(`/notifications/${id}/read`, { method: "PATCH" }),
   markAllNotificationsRead: () => apiFetch<{ count: number }>("/notifications/read-all", { method: "PATCH" }),
 
+  // Notification Preferences
+  getNotificationPreferences: () =>
+    apiFetch<NotificationPreference[]>("/notifications/preferences"),
+  updateNotificationPreference: (type: NotificationType, data: { email: boolean; push: boolean; sms: boolean }) =>
+    apiFetch<NotificationPreference>(`/notifications/preferences/${type}`, { method: "PUT", body: JSON.stringify(data) }),
+  setQuietHours: (data: { enabled: boolean; startHour: number; endHour: number }) =>
+    apiFetch<QuietHoursResponse>("/notifications/preferences/quiet-hours", { method: "PUT", body: JSON.stringify(data) }),
+
   // Contracts
   getMyContracts: () => apiFetch<ContractResponse[]>("/contracts/user/me"),
   getContract: (id: string) => apiFetch<ContractResponse>(`/contracts/${id}`),
@@ -600,8 +653,28 @@ export const api = {
   createReview: (data: { missionId?: string; localMissionId?: string; targetUserId: string; rating: number; comment?: string }) =>
     apiFetch<ReviewResponse>("/reviews", { method: "POST", body: JSON.stringify(data) }),
 
+  // Mission Photos
+  getMissionPhotos: (missionId: string) =>
+    apiFetch<MissionPhoto[]>(`/missions/${missionId}/photos`),
+  uploadMissionPhoto: (missionId: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiFetch<MissionPhoto>(`/missions/${missionId}/photos`, { method: "POST", body: formData });
+  },
+  deleteMissionPhoto: (missionId: string, photoId: string) =>
+    apiFetch<void>(`/missions/${missionId}/photos/${photoId}`, { method: "DELETE" }),
+  getMissionPhotoUrl: (missionId: string, photoId: string) =>
+    apiFetch<{ url: string }>(`/missions/${missionId}/photos/${photoId}/signed-url`),
+
   // Mission Events
   getMissionEvents: (missionId: string) => apiFetch<unknown[]>(`/missions/${missionId}/events`),
+
+  // Leads
+  getLeads: () => apiFetch<LeadResponse[]>("/leads"),
+  updateLeadStatus: (id: string, status: LeadStatus) =>
+    apiFetch<LeadResponse>(`/leads/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  convertLead: (id: string) =>
+    apiFetch<{ missionId: string }>(`/leads/${id}/convert`, { method: "POST" }),
 
   // Legacy Missions (Clerk-era endpoints, kept for backward compatibility)
   legacy: {

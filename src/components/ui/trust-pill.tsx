@@ -22,7 +22,7 @@ const VARIANT_CLASSES: Record<TrustPillVariant, string> = {
     "bg-[#F0EDE8] text-[#706E6A] border border-[#EAE6DF]",
   // VERIFIED tier — first trust step (terracotta)
   verified:
-    "bg-[#B5382A]/10 text-[#B5382A] border border-[#B5382A]/25",
+    "bg-workon-accent/10 text-workon-accent border border-workon-accent/25",
   // TRUSTED tier — solid track record (green)
   trusted:
     "bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/25",

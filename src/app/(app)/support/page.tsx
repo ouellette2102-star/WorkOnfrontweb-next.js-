@@ -85,7 +85,7 @@ export default function SupportPage() {
     const status = STATUS_LABELS[selectedTicket.status] || STATUS_LABELS.OPEN;
     return (
       <div className="mx-auto max-w-2xl px-4 py-6">
-        <button onClick={() => setSelectedTicket(null)} className="mb-4 text-sm text-workon-muted hover:text-white">
+        <button onClick={() => setSelectedTicket(null)} className="mb-4 text-sm text-workon-muted hover:text-workon-primary">
           &larr; Retour aux tickets
         </button>
 
@@ -204,7 +204,7 @@ export default function SupportPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-xl border border-workon-border bg-white shadow-sm p-3 text-white focus:border-red-500 focus:outline-none"
+                  className="w-full rounded-xl border border-workon-border bg-white shadow-sm p-3 text-workon-ink focus:border-red-500 focus:outline-none"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c.value} value={c.value}>{c.label}</option>
@@ -218,7 +218,7 @@ export default function SupportPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Decrivez votre probleme en detail..."
                   rows={4}
-                  className="w-full rounded-xl border border-workon-border bg-white shadow-sm p-3 text-white placeholder-workon-muted/50 focus:border-red-500 focus:outline-none"
+                  className="w-full rounded-xl border border-workon-border bg-white shadow-sm p-3 text-workon-ink placeholder-workon-muted/50 focus:border-red-500 focus:outline-none"
                 />
               </div>
               <div className="flex gap-3">

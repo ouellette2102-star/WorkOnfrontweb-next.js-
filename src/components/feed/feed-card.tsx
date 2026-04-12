@@ -58,7 +58,7 @@ export function FeedCard({ post, onLike, onComment, likeDisabled }: FeedCardProp
           onClick={() => onLike?.(post.id)}
           disabled={likeDisabled}
           className={`flex items-center gap-2 rounded-full px-4 py-2 transition-colors ${
-            post.isLiked ? 'bg-[#B5382A] text-white' : 'bg-[#F9F8F5] text-[#706E6A] hover:bg-[#F0EDE8]'
+            post.isLiked ? 'bg-workon-accent text-white' : 'bg-[#F9F8F5] text-[#706E6A] hover:bg-[#F0EDE8]'
           } ${likeDisabled ? 'opacity-70' : ''}`}
         >
           <Heart className={`h-4 w-4 ${post.isLiked ? 'fill-current' : ''}`} />

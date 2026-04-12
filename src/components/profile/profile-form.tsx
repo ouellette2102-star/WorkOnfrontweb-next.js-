@@ -61,7 +61,7 @@ export function ProfileForm() {
 
   if (error && !profile) {
     return (
-      <div className="rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-6 text-sm text-workon-accent">
+      <div className="rounded-2xl border border-workon-accent/30 bg-workon-accent/5 p-6 text-sm text-workon-accent">
         Erreur : {error}
       </div>
     );

@@ -181,7 +181,7 @@ export function ActiveMissionsCard() {
                 )}
 
                 {mission.status === MissionStatus.IN_PROGRESS && (
-                  <Button className="bg-[#B5382A] text-white hover:bg-[#9A2F23]">
+                  <Button className="bg-workon-accent text-white hover:bg-workon-accent-hover">
                     ⏹️ Terminer la mission
                   </Button>
                 )}

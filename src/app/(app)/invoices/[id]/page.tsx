@@ -133,7 +133,7 @@ export default function InvoiceDetailPage() {
           {invoice.paidAt && (
             <div className="mb-6">
               <p className="text-sm text-workon-muted">Pay\u00e9e le</p>
-              <p className="text-white">
+              <p className="text-workon-muted">
                 {new Date(invoice.paidAt).toLocaleDateString("fr-CA")}
               </p>
             </div>

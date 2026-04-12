@@ -1,27 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
 import { MissionStatus, missionResponseToMission } from "@/types/mission";
+import { TrustScoreRing } from "./trust-score-ring";
 
 export function QuickStatsCard() {
   const { isLoading: authLoading } = useAuth();
-  const [stats, setStats] = useState({
-    active: 0,
-    completed: 0,
-    totalEarnings: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const [missionStats, setMissionStats] = useState({ active: 0, completed: 0 });
+  const [missionsLoading, setMissionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch real earnings from API
+  const { data: earnings, isLoading: earningsLoading } = useQuery({
+    queryKey: ["earnings-summary"],
+    queryFn: () => api.getEarningsSummary(),
+    enabled: !authLoading,
+  });
+
   useEffect(() => {
-    const loadStats = async () => {
+    const loadMissions = async () => {
       if (authLoading) return;
 
       try {
         setError(null);
-
         const raw = await api.getMyAssignments();
         const missions = raw.map(missionResponseToMission);
 
@@ -33,28 +37,25 @@ export function QuickStatsCard() {
           (m) => m.status === MissionStatus.COMPLETED
         ).length;
 
-        // Calcul approximatif des gains (à améliorer avec le time tracking réel)
-        const totalEarnings = missions
-          .filter((m) => m.status === MissionStatus.COMPLETED)
-          .reduce((sum, m) => sum + (m.priceCents / 100), 0);
-
-        setStats({ active, completed, totalEarnings });
+        setMissionStats({ active, completed });
       } catch (error) {
         console.error("Erreur lors du chargement des stats:", error);
         const errorMessage = error instanceof Error ? error.message : "Impossible de charger les statistiques";
         setError(errorMessage);
       } finally {
-        setIsLoading(false);
+        setMissionsLoading(false);
       }
     };
 
-    loadStats();
+    loadMissions();
   }, [authLoading]);
+
+  const isLoading = missionsLoading || earningsLoading;
 
   if (isLoading) {
     return (
-      <div className="mb-8 grid gap-4 md:grid-cols-3">
-        {[1, 2, 3].map((i) => (
+      <div className="mb-8 grid gap-4 md:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
             className="h-32 animate-pulse rounded-3xl border border-[#EAE6DF] bg-white shadow-card"
@@ -68,7 +69,7 @@ export function QuickStatsCard() {
     return (
       <div className="mb-8 rounded-3xl border border-red-200 bg-red-50 p-6">
         <div className="flex items-center gap-3">
-          <span className="text-3xl">⚠️</span>
+          <span className="text-3xl">!</span>
           <div>
             <h4 className="text-lg font-semibold text-orange-600">Erreur de chargement</h4>
             <p className="text-sm text-red-600">{error}</p>
@@ -84,38 +85,49 @@ export function QuickStatsCard() {
     );
   }
 
+  const totalNet = earnings?.totalNet ?? 0;
+  const totalPending = earnings?.totalPending ?? 0;
+
   return (
-    <div className="mb-8 grid gap-4 md:grid-cols-3">
+    <div className="mb-8 grid gap-4 md:grid-cols-4">
       {/* Missions actives */}
       <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-2xl text-[#B5382A]">🔥</span>
-          <span className="font-heading font-bold text-lg text-[#1B1A18]">{stats.active}</span>
+          <span className="text-2xl text-workon-accent">*</span>
+          <span className="font-heading font-bold text-lg text-[#1B1A18]">{missionStats.active}</span>
         </div>
         <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Missions actives</p>
-        <p className="text-xs text-[#706E6A] mt-1">En cours ou réservées</p>
+        <p className="text-xs text-[#706E6A] mt-1">En cours ou reservees</p>
       </div>
 
-      {/* Missions complétées */}
+      {/* Missions completees */}
       <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-2xl text-[#2D8B55]">✅</span>
-          <span className="font-heading font-bold text-lg text-[#1B1A18]">{stats.completed}</span>
+          <span className="text-2xl text-[#2D8B55]">V</span>
+          <span className="font-heading font-bold text-lg text-[#1B1A18]">{missionStats.completed}</span>
         </div>
-        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Complétées</p>
-        <p className="text-xs text-[#706E6A] mt-1">Missions terminées</p>
+        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Completees</p>
+        <p className="text-xs text-[#706E6A] mt-1">Missions terminees</p>
       </div>
 
-      {/* Gains totaux */}
+      {/* Gains nets (real earnings API) */}
       <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-2xl text-[#D4922A]">💰</span>
+          <span className="text-2xl text-[#D4922A]">$</span>
           <span className="font-heading font-bold text-lg text-[#1B1A18]">
-            {stats.totalEarnings.toFixed(0)}$
+            {(totalNet / 100).toFixed(0)}$
           </span>
         </div>
-        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Gains estimés</p>
-        <p className="text-xs text-[#706E6A] mt-1">Missions complétées</p>
+        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Gains nets</p>
+        <p className="text-xs text-[#706E6A] mt-1">
+          {totalPending > 0 ? `${(totalPending / 100).toFixed(0)}$ en attente` : "Via Stripe Connect"}
+        </p>
+      </div>
+
+      {/* Score de confiance */}
+      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card flex flex-col items-center justify-center">
+        <TrustScoreRing size={64} compact />
+        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider mt-2">Score de confiance</p>
       </div>
     </div>
   );

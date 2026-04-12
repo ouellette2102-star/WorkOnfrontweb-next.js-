@@ -55,7 +55,7 @@ export default function StripeOnboardingReturnPage() {
         {isOnboarded ? (
           <>
             <div className="mb-4 text-6xl">🎉</div>
-            <h1 className="mb-3 text-3xl font-bold text-white">
+            <h1 className="mb-3 text-3xl font-bold text-workon-ink">
               Onboarding complété !
             </h1>
             <p className="mb-6 text-workon-muted">
@@ -72,7 +72,7 @@ export default function StripeOnboardingReturnPage() {
         ) : (
           <>
             <div className="mb-4 text-6xl">⚠️</div>
-            <h1 className="mb-3 text-3xl font-bold text-white">
+            <h1 className="mb-3 text-3xl font-bold text-workon-ink">
               Onboarding incomplet
             </h1>
             <p className="mb-6 text-workon-muted">

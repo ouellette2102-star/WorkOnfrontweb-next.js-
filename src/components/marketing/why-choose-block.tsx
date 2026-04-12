@@ -55,7 +55,7 @@ export function WhyChooseBlock({
       <div className="mx-auto max-w-6xl px-4 py-20 md:py-[6.5rem]">
         <div className="text-center max-w-2xl mx-auto mb-14">
           {eyebrow && (
-            <p className="text-sm font-semibold text-[#B5382A] uppercase tracking-widest mb-4">
+            <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">
               {eyebrow}
             </p>
           )}
@@ -94,8 +94,8 @@ export function WhyChooseBlock({
                 className={cn(
                   "inline-flex h-12 w-12 items-center justify-center rounded-2xl mb-4 text-2xl",
                   isDark
-                    ? "bg-[#B5382A]/15 border border-[#B5382A]/25"
-                    : "bg-[#B5382A]/10 border border-[#B5382A]/20",
+                    ? "bg-workon-accent/15 border border-workon-accent/25"
+                    : "bg-workon-accent/10 border border-workon-accent/20",
                 )}
               >
                 {item.icon}

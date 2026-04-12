@@ -55,15 +55,15 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-[#134021]/10 via-background to-background">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-workon-bg">
       {/* Logo */}
-      <div className="mb-8 text-white">
+      <div className="mb-8 text-workon-ink">
         <WorkOnWordmark size="xl" />
       </div>
 
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm rounded-3xl border border-workon-border bg-white p-8 shadow-sm space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Connexion</h1>
+          <h1 className="text-2xl font-bold text-workon-ink">Connexion</h1>
           <p className="text-workon-muted text-sm mt-1">
             Connectez-vous à votre compte WorkOn
           </p>
@@ -99,7 +99,7 @@ function LoginForm() {
           </div>
 
           {error && (
-            <p className="text-workon-accent text-sm text-center bg-[#B5382A]/10 border border-[#B5382A]/25 rounded-xl p-3">
+            <p className="text-workon-accent text-sm text-center bg-workon-accent/10 border border-workon-accent/25 rounded-xl p-3">
               {error}
             </p>
           )}

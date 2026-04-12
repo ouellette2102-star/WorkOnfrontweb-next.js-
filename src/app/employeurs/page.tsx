@@ -11,7 +11,7 @@ export const revalidate = 120; // ISR — 2 min
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-2xl border border-[#EAE6DF] bg-white p-6 text-center shadow-card">
-      <p className="text-3xl font-black text-[#B5382A]">{value}</p>
+      <p className="text-3xl font-black text-workon-accent">{value}</p>
       <p className="text-sm font-medium mt-1 text-[#706E6A]">{label}</p>
       {sub && <p className="text-xs text-[#9C9A96] mt-0.5">{sub}</p>}
     </div>
@@ -30,7 +30,7 @@ function ReviewCard({ r }: { r: FeaturedReview }) {
       <div className="mt-4 flex items-center justify-between text-xs text-[#706E6A]">
         <span>{r.authorName ?? "Employeur anonyme"}</span>
         {r.workerName && (
-          <span className="text-[#B5382A]/60">Pro : {r.workerName}</span>
+          <span className="text-workon-accent/60">Pro : {r.workerName}</span>
         )}
       </div>
     </div>
@@ -74,7 +74,7 @@ export default async function EmployeursPage() {
           </div>
           <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight tracking-tight">
             Trouvez un renfort qualifié<br />
-            <span className="text-[#B5382A]">en moins de 10 minutes.</span>
+            <span className="text-workon-accent">en moins de 10 minutes.</span>
           </h1>
           <p className="mt-4 text-[#706E6A] text-lg leading-relaxed">
             Publiez votre mission, recevez des candidatures de travailleurs vérifiés.
@@ -142,7 +142,7 @@ export default async function EmployeursPage() {
               <h3 className="font-bold text-lg">Lancement</h3>
               <span className="px-2 py-0.5 rounded-full text-xs bg-[#134021]/10 text-[#134021] border border-[#134021]/20">Actif maintenant</span>
             </div>
-            <p className="text-4xl font-black text-[#B5382A]">0%</p>
+            <p className="text-4xl font-black text-workon-accent">0%</p>
             <p className="text-sm text-[#706E6A] mt-1">de commission sur chaque mission</p>
             <ul className="mt-4 space-y-2 text-sm text-[#1B1A18]/70">
               <li className="flex items-center gap-2"><span className="text-[#22C55E]">✓</span> Missions illimitées</li>
@@ -153,7 +153,7 @@ export default async function EmployeursPage() {
           </div>
           <div className="rounded-2xl border border-[#EAE6DF] bg-white p-6 shadow-card opacity-60">
             <h3 className="font-bold text-lg mb-4">Post-lancement</h3>
-            <p className="text-4xl font-black text-[#B5382A]">15%</p>
+            <p className="text-4xl font-black text-workon-accent">15%</p>
             <p className="text-sm text-[#706E6A] mt-1">de commission sur chaque mission</p>
             <p className="text-xs text-[#9C9A96] mt-4">
               Uniquement sur les missions complétées. Aucune charge si la mission n&apos;aboutit pas.

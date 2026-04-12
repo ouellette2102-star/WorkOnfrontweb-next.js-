@@ -296,7 +296,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                   className={`h-3 w-3 ${
                                     i < review.rating
                                       ? "fill-yellow-500 text-yellow-500"
-                                      : "text-white/20"
+                                      : "text-workon-border"
                                   }`}
                                 />
                               ))}

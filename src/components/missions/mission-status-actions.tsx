@@ -120,7 +120,7 @@ export function MissionStatusActions({
 
   if (showConfirm) {
     return (
-      <div className="space-y-3 rounded-2xl border border-[#B5382A]/30 bg-[#B5382A]/5 p-4">
+      <div className="space-y-3 rounded-2xl border border-workon-accent/30 bg-workon-accent/5 p-4">
         <p className="text-sm font-semibold text-white">
           Es-tu sûr de vouloir annuler cette mission ?
         </p>
@@ -165,7 +165,7 @@ export function MissionStatusActions({
           </Button>
         ))}
       </div>
-      {error && <p className="text-xs text-[#B5382A]">{error}</p>}
+      {error && <p className="text-xs text-workon-accent">{error}</p>}
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
   User,
   Briefcase,
   Heart,
+  Target,
   BarChart3,
   CreditCard,
   Receipt,
@@ -22,6 +23,8 @@ import {
   LogOut,
   ChevronRight,
   Shield,
+  Star,
+  Settings,
 } from "lucide-react";
 
 /**
@@ -58,14 +61,17 @@ export function TopBar() {
     { href: "/home", label: "Tableau de bord", icon: Home },
     { href: "/profile", label: "Mon profil", icon: User },
     { href: "/search", label: "Opportunités", icon: Briefcase },
+    { href: "/reviews", label: "Mes avis", icon: Star },
     ...(user?.role === "worker"
       ? [
+          { href: "/leads", label: "Mes leads", icon: Target },
           { href: "/worker/availability", label: "Disponibilités", icon: BarChart3 },
-          { href: "/payments", label: "Mes revenus", icon: CreditCard },
+          { href: "/earnings", label: "Mes revenus", icon: CreditCard },
         ]
       : [
           { href: "/bookings", label: "Mes réservations", icon: Receipt },
         ]),
+    { href: "/settings", label: "Paramètres", icon: Settings },
     { href: "/support", label: "Aide & support", icon: HelpCircle },
     { href: "/profile/verify", label: "Vérification", icon: Shield },
   ];
@@ -76,7 +82,7 @@ export function TopBar() {
         {/* Logo */}
         <Link href="/home" className="flex items-center gap-0.5 text-xl font-bold font-heading">
           <span className="text-[#1B1A18]">Work</span>
-          <MapPin className="h-5 w-5 text-[#B5382A]" />
+          <MapPin className="h-5 w-5 text-workon-accent" />
           <span className="text-[#1B1A18]">n</span>
         </Link>
 
