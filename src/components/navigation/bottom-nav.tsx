@@ -11,19 +11,38 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Vintage handset phone icon — classic curved receiver
- * matching the WorkOn brand ad (rotary phone combiné).
+ * Vintage rotary phone icon — full desk phone with handset on top
+ * and rotary dial, matching the WorkOn brand ad.
+ * Base + cadran + combiné = one unit.
  */
 function VintagePhoneIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 32 32"
       fill="currentColor"
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Classic curved handset — earpiece top-left, mouthpiece bottom-right */}
-      <path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z" />
+      {/* Phone base — rounded rectangle */}
+      <rect x="4" y="14" width="24" height="14" rx="3" opacity="0.9" />
+      {/* Rotary dial circle */}
+      <circle cx="16" cy="21" r="5" fill="currentColor" />
+      <circle cx="16" cy="21" r="3.2" fill="white" opacity="0.25" />
+      <circle cx="16" cy="21" r="1.5" fill="currentColor" />
+      {/* Dial holes — small circles around the dial */}
+      <circle cx="16" cy="17" r="0.6" fill="white" opacity="0.4" />
+      <circle cx="19.2" cy="18" r="0.6" fill="white" opacity="0.4" />
+      <circle cx="20.5" cy="21" r="0.6" fill="white" opacity="0.4" />
+      <circle cx="19.2" cy="24" r="0.6" fill="white" opacity="0.4" />
+      <circle cx="16" cy="25" r="0.6" fill="white" opacity="0.4" />
+      <circle cx="12.8" cy="24" r="0.6" fill="white" opacity="0.4" />
+      <circle cx="11.5" cy="21" r="0.6" fill="white" opacity="0.4" />
+      <circle cx="12.8" cy="18" r="0.6" fill="white" opacity="0.4" />
+      {/* Handset / combiné — resting on top of the base */}
+      <path
+        d="M7 14C7 14 7 10 7 8.5C7 6.5 8.5 5 10 5H11C11.8 5 12 5.8 12 6.5V9C12 9.5 11.5 10 11 10H10.5C10 10 9.5 10.5 9.5 11V12C9.5 12.5 10 13 10.5 13H21.5C22 13 22.5 12.5 22.5 12V11C22.5 10.5 22 10 21.5 10H21C20.5 10 20 9.5 20 9V6.5C20 5.8 20.2 5 21 5H22C23.5 5 25 6.5 25 8.5C25 10 25 14 25 14"
+        fill="currentColor"
+      />
     </svg>
   );
 }
