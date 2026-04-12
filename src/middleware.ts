@@ -44,15 +44,19 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  const token = req.cookies.get("workon_token")?.value;
+
+  // Authenticated users landing on marketing pages → redirect to app
+  if (token && pathname === "/") {
+    return NextResponse.redirect(new URL("/home", req.url));
+  }
+
   // Public routes — always pass
   if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
 
   // Protected routes — check for token in cookie
-  // (localStorage isn't available in middleware, so we use a cookie set by the client)
-  const token = req.cookies.get("workon_token")?.value;
-
   if (!token) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);

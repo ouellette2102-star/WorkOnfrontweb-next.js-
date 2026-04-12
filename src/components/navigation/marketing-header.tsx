@@ -35,7 +35,7 @@ export interface MarketingHeaderProps {
 
 const DEFAULT_ITEMS: MarketingHeaderNavItem[] = [
   { href: "/", label: "Accueil" },
-  { href: "/pros", label: "Pour les pros" },
+  { href: "/pros", label: "Travailleurs" },
   { href: "/employeurs", label: "Employeurs" },
   { href: "/pricing", label: "Tarifs" },
 ];
@@ -45,43 +45,24 @@ export function MarketingHeader({
   items = DEFAULT_ITEMS,
   className,
 }: MarketingHeaderProps) {
-  const isDark = theme === "dark";
-
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 backdrop-blur-md",
-        isDark
-          ? "border-b border-[#EAE6DF] bg-[#F9F8F5]/90 text-[#1B1A18]"
-          : "border-b border-[#EAE6DF]/80 bg-white/90 text-[#1B1A18]",
+        "sticky top-0 z-50 backdrop-blur-md border-b border-[#EAE6DF] bg-white/90 text-[#1B1A18]",
         className,
       )}
     >
       <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-        <Link
-          href="/"
-          className={cn(
-            "flex items-center gap-2.5",
-            isDark ? "text-[#1B1A18]" : "text-[#1B1A18]",
-          )}
-        >
+        <Link href="/" className="flex items-center gap-2.5 text-[#1B1A18]">
           <WorkOnWordmark size="md" />
         </Link>
 
-        <nav
-          className={cn(
-            "hidden md:flex items-center gap-8 text-[15px] font-medium",
-            isDark ? "text-[#706E6A]" : "text-[#706E6A]",
-          )}
-        >
+        <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-[#706E6A]">
           {items.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                "transition-colors",
-                isDark ? "hover:text-[#1B1A18]" : "hover:text-[#1B1A18]",
-              )}
+              className="transition-colors hover:text-[#1B1A18]"
             >
               {item.label}
             </Link>

@@ -37,11 +37,7 @@ export default async function ProsPage() {
 
   return (
     <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
-      <MarketingHeader theme="light" items={[
-        { href: "/", label: "Accueil" },
-        { href: "/employeurs", label: "Employeurs" },
-        { href: "/missions", label: "Missions" },
-      ]} />
+      <MarketingHeader />
 
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-[#EAE6DF]">

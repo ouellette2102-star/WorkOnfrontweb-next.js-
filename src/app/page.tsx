@@ -602,7 +602,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
-      <MarketingHeader theme="light" />
+      <MarketingHeader />
       <HeroSection stats={stats} />
       <ProblemSection />
       <SystemSection />
