@@ -158,7 +158,7 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
           <button
             onClick={handleSend}
             disabled={!newMessage.trim() || sending}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#134021] text-white transition hover:bg-[#E8441A] disabled:opacity-40 shadow-md shadow-[#134021]/25"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#134021] text-white transition hover:bg-[#0F3319] disabled:opacity-40 shadow-md shadow-[#134021]/25"
           >
             {sending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

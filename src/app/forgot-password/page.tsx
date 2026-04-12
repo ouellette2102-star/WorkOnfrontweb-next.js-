@@ -39,8 +39,8 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-neutral-900 via-background to-background">
-      <div className="mb-8 text-white">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-b from-[#134021]/10 via-background to-background">
+      <div className="mb-8 text-[#1B1A18]">
         <WorkOnWordmark size="xl" />
       </div>
 

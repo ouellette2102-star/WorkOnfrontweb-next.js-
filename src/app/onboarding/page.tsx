@@ -15,15 +15,15 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-950 to-black text-white">
+    <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-12">
         <header className="space-y-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-workon-muted hover:text-white">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm text-workon-muted hover:text-[#1B1A18]">
             ← Retour à l’accueil
           </Link>
           <div>
-            <p className="text-sm uppercase tracking-[0.4em] text-red-500">Onboarding WorkOn</p>
-            <h1 className="mt-4 text-4xl font-semibold md:text-5xl">Choisis ton profil</h1>
+            <p className="text-sm uppercase tracking-[0.4em] text-[#B5382A]">Onboarding WorkOn</p>
+            <h1 className="mt-4 text-4xl font-semibold font-heading md:text-5xl">Choisis ton profil</h1>
             <p className="mt-3 text-workon-muted">
               Cette étape synchronise ton compte Clerk avec les outils WorkOn. Tu pourras modifier ces informations plus
               tard depuis ton profil.
@@ -31,7 +31,7 @@ export default async function OnboardingPage() {
           </div>
         </header>
 
-        <section className="rounded-3xl border border-workon-border bg-white p-8 shadow-2xl shadow-black/40">
+        <section className="rounded-3xl border border-workon-border bg-white p-8 shadow-card">
           <OnboardingForm />
         </section>
       </div>

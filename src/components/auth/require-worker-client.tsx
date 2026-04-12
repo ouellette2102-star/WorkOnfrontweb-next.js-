@@ -39,8 +39,8 @@ export function RequireWorkerClient({ children }: { children: React.ReactNode })
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
-        <div className="text-white/70">Chargement...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#F9F8F5]">
+        <div className="text-[#706E6A]">Chargement...</div>
       </div>
     );
   }
