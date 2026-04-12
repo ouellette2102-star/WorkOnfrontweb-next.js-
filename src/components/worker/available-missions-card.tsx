@@ -85,15 +85,15 @@ export function AvailableMissionsCard() {
 
   if (isLoading) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-        <h2 className="mb-4 text-2xl font-bold text-white">
+      <div className="rounded-3xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">
           Missions Disponibles
         </h2>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-xl border border-white/10 bg-neutral-800/50"
+              className="h-24 animate-pulse rounded-xl border border-gray-200 bg-gray-50"
             />
           ))}
         </div>
@@ -103,11 +103,11 @@ export function AvailableMissionsCard() {
 
   if (error) {
     return (
-      <div className="rounded-3xl border border-red-500/30 bg-red-900/10 p-6 backdrop-blur">
-        <h2 className="mb-4 text-2xl font-bold text-red-400">
+      <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
+        <h2 className="mb-4 text-2xl font-bold text-orange-600">
           Erreur de chargement
         </h2>
-        <p className="mb-4 text-sm text-red-300/80">{error}</p>
+        <p className="mb-4 text-sm text-red-600">{error}</p>
         <button
           onClick={loadMissions}
           className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500"
@@ -120,15 +120,15 @@ export function AvailableMissionsCard() {
 
   if (missions.length === 0) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
+      <div className="rounded-3xl border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-gray-900">
             Missions Disponibles
           </h2>
           <Link href="/worker/missions">
             <Button
               variant="outline"
-              className="border-white/20 text-white hover:bg-neutral-800"
+              className="border-gray-300 text-gray-900 hover:bg-gray-100"
             >
               Voir toutes
             </Button>
@@ -136,22 +136,22 @@ export function AvailableMissionsCard() {
         </div>
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <span className="mb-2 text-4xl">🔍</span>
-          <p className="text-white/70">Aucune mission disponible pour le moment</p>
+          <p className="text-gray-500">Aucune mission disponible pour le moment</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
+    <div className="rounded-3xl border border-gray-200 bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-2xl font-bold text-gray-900">
           Missions Disponibles
         </h2>
         <Link href="/worker/missions">
           <Button
             variant="outline"
-            className="border-white/20 text-white hover:bg-neutral-800"
+            className="border-gray-300 text-gray-900 hover:bg-gray-100"
           >
             Voir toutes
           </Button>
@@ -162,14 +162,14 @@ export function AvailableMissionsCard() {
         {missions.map((mission) => (
           <div
             key={mission.id}
-            className="group flex items-center justify-between rounded-xl border border-white/10 bg-neutral-800/50 p-4 backdrop-blur transition hover:border-red-500/50"
+            className="group flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 p-4 transition hover:border-orange-400"
           >
             <div className="flex-1">
-              <h4 className="mb-1 font-semibold text-white">{mission.title}</h4>
-              <div className="flex flex-wrap gap-3 text-sm text-white/60">
+              <h4 className="mb-1 font-semibold text-gray-900">{mission.title}</h4>
+              <div className="flex flex-wrap gap-3 text-sm text-gray-500">
                 {mission.city && <span>📍 {mission.city}</span>}
                 {mission.hourlyRate && (
-                  <span className="font-semibold text-green-400">
+                  <span className="font-semibold text-green-600">
                     💰 {mission.hourlyRate.toFixed(2)} $/h
                   </span>
                 )}
@@ -190,7 +190,7 @@ export function AvailableMissionsCard() {
 
       {missions.length >= 3 && (
         <Link href="/worker/missions">
-          <p className="mt-4 text-center text-sm text-red-400 hover:text-red-300">
+          <p className="mt-4 text-center text-sm text-orange-600 hover:text-orange-500">
             Voir toutes les missions disponibles →
           </p>
         </Link>

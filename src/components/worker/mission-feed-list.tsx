@@ -17,7 +17,7 @@ export function MissionFeedList({ missions, onReserve }: Props) {
       {missions.map((mission) => (
         <div
           key={mission.id}
-          className="group relative overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/70 backdrop-blur transition hover:border-blue-500/50 hover:bg-neutral-900"
+          className="group relative overflow-hidden rounded-3xl border border-gray-200 bg-white transition hover:border-blue-500/50 hover:bg-white"
         >
           {/* Badge de distance */}
           {mission.distance !== null && (
@@ -31,17 +31,17 @@ export function MissionFeedList({ missions, onReserve }: Props) {
           <div className="p-6">
             {/* Titre et employeur */}
             <div className="mb-4">
-              <h3 className="mb-1 text-xl font-bold text-white line-clamp-2">
+              <h3 className="mb-1 text-xl font-bold text-gray-900 line-clamp-2">
                 {mission.title}
               </h3>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-gray-400">
                 par {mission.employerName || "Employeur"}
               </p>
             </div>
 
             {/* Description */}
             {mission.description && (
-              <p className="mb-4 text-sm text-white/70 line-clamp-3">
+              <p className="mb-4 text-sm text-gray-500 line-clamp-3">
                 {mission.description}
               </p>
             )}
@@ -50,22 +50,22 @@ export function MissionFeedList({ missions, onReserve }: Props) {
             <div className="mb-4 space-y-2">
               {mission.category && (
                 <div className="flex items-center gap-2">
-                  <span className="text-white/50">🏷️</span>
-                  <span className="text-sm text-white">{mission.category}</span>
+                  <span className="text-gray-400">🏷️</span>
+                  <span className="text-sm text-gray-900">{mission.category}</span>
                 </div>
               )}
 
               {mission.city && (
                 <div className="flex items-center gap-2">
-                  <span className="text-white/50">📍</span>
-                  <span className="text-sm text-white">{mission.city}</span>
+                  <span className="text-gray-400">📍</span>
+                  <span className="text-sm text-gray-900">{mission.city}</span>
                 </div>
               )}
 
               {mission.hourlyRate && (
                 <div className="flex items-center gap-2">
-                  <span className="text-white/50">💰</span>
-                  <span className="text-sm font-semibold text-green-400">
+                  <span className="text-gray-400">💰</span>
+                  <span className="text-sm font-semibold text-green-600">
                     {mission.hourlyRate.toFixed(2)} $ / heure
                   </span>
                 </div>
@@ -73,8 +73,8 @@ export function MissionFeedList({ missions, onReserve }: Props) {
 
               {mission.startsAt && (
                 <div className="flex items-center gap-2">
-                  <span className="text-white/50">📅</span>
-                  <span className="text-sm text-white">
+                  <span className="text-gray-400">📅</span>
+                  <span className="text-sm text-gray-900">
                     {format(new Date(mission.startsAt), "PPP", { locale: frCA })}
                   </span>
                 </div>
@@ -94,7 +94,7 @@ export function MissionFeedList({ missions, onReserve }: Props) {
                   // TODO: Link to mission detail
                   alert("Voir détails (à implémenter)");
                 }}
-                className="rounded-xl border border-white/20 bg-transparent px-4 py-2 text-white transition hover:bg-white/10"
+                className="rounded-xl border border-gray-300 bg-transparent px-4 py-2 text-gray-900 transition hover:bg-gray-100"
               >
                 Détails
               </Button>

@@ -134,14 +134,14 @@ export function MissionMap({ missions, userLocation, onReserve }: Props) {
   }, [missions, userLocation, onReserve]);
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-900">
+    <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white">
       <div
         ref={mapContainerRef}
         className="h-[600px] w-full"
         style={{ zIndex: 0 }}
       />
       {!userLocation && (
-        <div className="border-t border-yellow-500/30 bg-yellow-500/20 p-4 text-center text-sm text-yellow-300">
+        <div className="border-t border-yellow-500/30 bg-amber-100 p-4 text-center text-sm text-amber-600">
           ⚠️ Activez la géolocalisation pour voir votre position sur la carte
         </div>
       )}

@@ -45,13 +45,13 @@ export function ActiveMissionsCard() {
     switch (status) {
       case MissionStatus.RESERVED:
         return (
-          <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-semibold text-yellow-400">
+          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-600">
             📌 Réservée
           </span>
         );
       case MissionStatus.IN_PROGRESS:
         return (
-          <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-semibold text-green-400">
+          <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-600">
             🔄 En cours
           </span>
         );
@@ -62,15 +62,15 @@ export function ActiveMissionsCard() {
 
   if (isLoading) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
-        <h2 className="mb-4 text-2xl font-bold text-white">
+      <div className="rounded-3xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">
           Mes Missions Actives
         </h2>
         <div className="space-y-4">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-32 animate-pulse rounded-xl border border-white/10 bg-neutral-800/50"
+              className="h-32 animate-pulse rounded-xl border border-gray-200 bg-gray-50"
             />
           ))}
         </div>
@@ -80,18 +80,18 @@ export function ActiveMissionsCard() {
 
   if (missions.length === 0) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
+      <div className="rounded-3xl border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-gray-900">
             Mes Missions Actives
           </h2>
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <span className="mb-4 text-6xl">📭</span>
-          <p className="mb-2 text-lg font-semibold text-white">
+          <p className="mb-2 text-lg font-semibold text-gray-900">
             Aucune mission active
           </p>
-          <p className="text-white/70">
+          <p className="text-gray-500">
             Commence par réserver une mission disponible
           </p>
           <Link href="/worker/missions">
@@ -105,12 +105,12 @@ export function ActiveMissionsCard() {
   }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-6 backdrop-blur">
+    <div className="rounded-3xl border border-gray-200 bg-white p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-2xl font-bold text-gray-900">
           Mes Missions Actives
         </h2>
-        <span className="text-sm text-white/50">
+        <span className="text-sm text-gray-400">
           {missions.length} mission{missions.length > 1 ? "s" : ""}
         </span>
       </div>
@@ -119,17 +119,17 @@ export function ActiveMissionsCard() {
         {missions.map((mission) => (
           <div
             key={mission.id}
-            className="group overflow-hidden rounded-xl border border-white/10 bg-neutral-800/50 backdrop-blur transition hover:border-red-500/50"
+            className="group overflow-hidden rounded-xl border border-gray-200 bg-gray-50 transition hover:border-orange-400"
           >
             <div className="p-6">
               {/* Header */}
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="mb-1 text-xl font-bold text-white">
+                  <h3 className="mb-1 text-xl font-bold text-gray-900">
                     {mission.title}
                   </h3>
                   {mission.city && (
-                    <p className="text-sm text-white/60">📍 {mission.city}</p>
+                    <p className="text-sm text-gray-500">📍 {mission.city}</p>
                   )}
                 </div>
                 {getStatusBadge(mission.status)}
@@ -139,8 +139,8 @@ export function ActiveMissionsCard() {
               <div className="mb-4 grid gap-3 md:grid-cols-2">
                 {mission.hourlyRate && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/50">💰</span>
-                    <span className="font-semibold text-green-400">
+                    <span className="text-gray-400">💰</span>
+                    <span className="font-semibold text-green-600">
                       {mission.hourlyRate.toFixed(2)} $ / heure
                     </span>
                   </div>
@@ -148,8 +148,8 @@ export function ActiveMissionsCard() {
                 
                 {mission.startsAt && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/50">📅</span>
-                    <span className="text-sm text-white">
+                    <span className="text-gray-400">📅</span>
+                    <span className="text-sm text-gray-900">
                       {format(new Date(mission.startsAt), "PPP", { locale: frCA })}
                     </span>
                   </div>
@@ -168,7 +168,7 @@ export function ActiveMissionsCard() {
                 <Link href={`/missions/${mission.id}`}>
                   <Button
                     variant="outline"
-                    className="border-white/20 text-white hover:bg-neutral-700"
+                    className="border-gray-300 text-gray-900 hover:bg-gray-100"
                   >
                     Voir détails
                   </Button>
