@@ -11,33 +11,30 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Vintage rotary desk phone — optimised for 28×28 px render inside 56 px FAB.
- * Design: chunky base with visible dial ring + simplified handset on cradle.
- * All shapes use whole-pixel coordinates for crisp rendering at small sizes.
+ * Vintage rotary desk phone — optimised for 56 px FAB at 2× density.
+ * Silhouette: rounded base + dial ring + curved handset resting on cradle.
  */
 function VintagePhoneIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 28 28"
+      viewBox="0 0 56 56"
       fill="currentColor"
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* ── Base ── rounded box, bottom 60% of the icon */}
-      <rect x="3" y="12" width="22" height="13" rx="3.5" />
+      {/* ── Base body ── */}
+      <rect x="8" y="26" width="40" height="22" rx="6" />
 
-      {/* ── Dial ring ── the signature rotary circle */}
-      <circle cx="14" cy="18.5" r="4.8" fill="white" opacity="0.2" />
-      <circle cx="14" cy="18.5" r="3" fill="currentColor" />
-      <circle cx="14" cy="18.5" r="1.2" fill="white" opacity="0.35" />
+      {/* ── Rotary dial ── */}
+      <circle cx="28" cy="37" r="8" fill="white" opacity="0.18" />
+      <circle cx="28" cy="37" r="5" fill="currentColor" />
+      <circle cx="28" cy="37" r="2.2" fill="white" opacity="0.3" />
 
-      {/* ── Handset ── two ear cups connected by a thick bar on the cradle */}
-      {/* Left ear cup */}
-      <rect x="4.5" y="5" width="5" height="8" rx="2.5" />
-      {/* Right ear cup */}
-      <rect x="18.5" y="5" width="5" height="8" rx="2.5" />
-      {/* Handle bar connecting the two cups */}
-      <rect x="8" y="7.5" width="12" height="3" rx="1.5" />
+      {/* ── Handset on cradle ── single curved path */}
+      <path
+        d="M12 27 C12 27 12 18 12 15 C12 11 14.5 8 18 8 L20 8 C21.5 8 22 9.5 22 11 L22 17 C22 18.5 21 19.5 19.5 19.5 L19 19.5 C18 19.5 17 20.5 17 21.5 L17 23 C17 24 18 25 19 25 L37 25 C38 25 39 24 39 23 L39 21.5 C39 20.5 38 19.5 37 19.5 L36.5 19.5 C35 19.5 34 18.5 34 17 L34 11 C34 9.5 34.5 8 36 8 L38 8 C41.5 8 44 11 44 15 C44 18 44 27 44 27"
+        fill="currentColor"
+      />
     </svg>
   );
 }
