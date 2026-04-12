@@ -1,277 +1,381 @@
 /**
  * Privacy Policy Page - WorkOn
- * Version: PRIVACY v1.0
- * Effective Date: 2026-01-15
+ * Version: PRIVACY v2.0
+ * Effective Date: 2026-04-11
  *
- * Conformité: Loi 25 (Québec), principes GDPR, Apple App Store, Google Play
+ * Conformite: Loi 25 (Quebec), LPRPDE (federal), principes RGPD
  *
- * IMPORTANT: Ce document définit WorkOn comme plateforme de mise en relation.
+ * IMPORTANT: Ce document definit WorkOn comme plateforme de mise en relation.
  * WorkOn n'est PAS un employeur et n'exerce aucun lien de subordination.
  */
 
+import type { Metadata } from "next";
 import Link from "next/link";
 
-const POLICY_VERSION = "1.0";
-const EFFECTIVE_DATE = "15 janvier 2026";
-const LAST_UPDATED = "15 janvier 2026";
+export const metadata: Metadata = {
+  title: "Politique de confidentialite",
+  description:
+    "Politique de confidentialite de WorkOn. Conforme a la Loi 25 du Quebec. Decouvrez comment nous collectons, utilisons et protegeons vos renseignements personnels.",
+};
+
+const VERSION = "2.0";
+const EFFECTIVE_DATE = "11 avril 2026";
+const LAST_UPDATED = "11 avril 2026";
+
+/* ------------------------------------------------------------------ */
+
+function SectionTitle({ id, children }: { id?: string; children: React.ReactNode }) {
+  return (
+    <h2 id={id} className="text-xl md:text-2xl font-semibold text-workon-ink mt-10 mb-4 scroll-mt-24">
+      {children}
+    </h2>
+  );
+}
+
+function SubTitle({ children }: { children: React.ReactNode }) {
+  return <h3 className="text-lg font-medium text-workon-ink mt-6 mb-3">{children}</h3>;
+}
+
+function P({ children }: { children: React.ReactNode }) {
+  return <p className="text-workon-gray leading-relaxed mb-3">{children}</p>;
+}
+
+function UL({ children }: { children: React.ReactNode }) {
+  return <ul className="list-disc pl-6 space-y-2 text-workon-gray mb-4">{children}</ul>;
+}
+
+function InfoBox({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-4 mb-6 p-5 bg-workon-bg-cream border border-workon-border rounded-lg">
+      {children}
+    </div>
+  );
+}
+
+function Callout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-4 mb-6 p-5 bg-workon-primary-subtle border border-workon-primary/15 rounded-lg">
+      {children}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-neutral-900 text-white">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        {/* Header */}
-        <header className="mb-12">
-          <h1 className="text-4xl font-bold mb-4">Politique de confidentialité</h1>
-          <div className="flex flex-wrap gap-4 text-sm text-white/60">
-            <span className="px-3 py-1 bg-white/10 rounded-full">
-              Version {POLICY_VERSION}
-            </span>
-            <span>En vigueur depuis le {EFFECTIVE_DATE}</span>
-            <span>Dernière mise à jour : {LAST_UPDATED}</span>
-          </div>
-        </header>
-
-        {/* Content */}
-        <div className="prose prose-invert prose-lg max-w-none space-y-8">
-          {/* Introduction */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
-            <p className="text-white/80 leading-relaxed">
-              WorkOn Technologies Inc. (« WorkOn », « nous », « notre ») exploite une
-              plateforme technologique de mise en relation entre des travailleurs
-              autonomes indépendants, des employeurs et des clients résidentiels.
-            </p>
-            <p className="text-white/80 leading-relaxed">
-              Cette politique de confidentialité décrit comment nous collectons,
-              utilisons, partageons et protégeons vos renseignements personnels
-              lorsque vous utilisez notre plateforme et nos services.
-            </p>
-            <p className="text-white/80 leading-relaxed">
-              En utilisant WorkOn, vous consentez aux pratiques décrites dans cette
-              politique. Si vous n&apos;acceptez pas cette politique, veuillez ne pas
-              utiliser nos services.
-            </p>
-          </section>
-
-          {/* Responsable */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">2. Responsable de la protection des renseignements</h2>
-            <p className="text-white/80 leading-relaxed">
-              Conformément à la Loi 25 du Québec sur la protection des renseignements
-              personnels dans le secteur privé, WorkOn a désigné un responsable de la
-              protection des renseignements personnels.
-            </p>
-            <p className="text-white/80 leading-relaxed">
-              Pour toute question concernant vos renseignements personnels, vous pouvez
-              nous contacter à :{" "}
-              <a href="mailto:privacy@workon.app" className="text-amber-400 hover:underline">
-                privacy@workon.app
-              </a>
-            </p>
-          </section>
-
-          {/* Collecte */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">3. Renseignements que nous collectons</h2>
-
-            <h3 className="text-xl font-medium mt-6 mb-3">3.1 Renseignements fournis directement</h3>
-            <ul className="list-disc pl-6 space-y-2 text-white/80">
-              <li>Identité : nom, prénom, adresse courriel, numéro de téléphone</li>
-              <li>Profil professionnel : compétences, expérience, ville, zone de service</li>
-              <li>Vérification : documents d&apos;identité (le cas échéant)</li>
-              <li>Paiement : informations nécessaires au traitement des transactions via Stripe</li>
-              <li>Communications : messages échangés via la plateforme</li>
-            </ul>
-
-            <h3 className="text-xl font-medium mt-6 mb-3">3.2 Renseignements collectés automatiquement</h3>
-            <ul className="list-disc pl-6 space-y-2 text-white/80">
-              <li>Données techniques : adresse IP, type d&apos;appareil, système d&apos;exploitation, navigateur</li>
-              <li>Données d&apos;utilisation : pages consultées, fonctionnalités utilisées, horodatage</li>
-              <li>Données de localisation : uniquement si vous autorisez l&apos;accès à votre position</li>
-            </ul>
-
-            <h3 className="text-xl font-medium mt-6 mb-3">3.3 Renseignements provenant de tiers</h3>
-            <p className="text-white/80 leading-relaxed">
-              Nous pouvons recevoir des renseignements de services d&apos;authentification
-              (Clerk), de paiement (Stripe) ou d&apos;autres sources que vous autorisez.
-            </p>
-          </section>
-
-          {/* Utilisation */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">4. Utilisation des renseignements</h2>
-            <p className="text-white/80 leading-relaxed mb-4">
-              Nous utilisons vos renseignements personnels uniquement pour :
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-white/80">
-              <li>Fournir et maintenir la plateforme de mise en relation</li>
-              <li>Créer et gérer votre compte utilisateur</li>
-              <li>Faciliter les communications entre utilisateurs</li>
-              <li>Traiter les transactions de paiement</li>
-              <li>Améliorer nos services et corriger les problèmes techniques</li>
-              <li>Assurer la sécurité de la plateforme et prévenir la fraude</li>
-              <li>Respecter nos obligations légales</li>
-              <li>Vous envoyer des communications relatives à votre compte</li>
-            </ul>
-          </section>
-
-          {/* Partage */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">5. Partage des renseignements</h2>
-            <p className="text-white/80 leading-relaxed mb-4">
-              Nous ne vendons pas vos renseignements personnels. Nous pouvons partager
-              vos renseignements dans les cas suivants :
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-white/80">
-              <li>
-                <strong>Entre utilisateurs :</strong> les informations nécessaires à la
-                mise en relation (nom, compétences, coordonnées pertinentes) sont partagées
-                entre les parties d&apos;une mission
-              </li>
-              <li>
-                <strong>Fournisseurs de services :</strong> nous utilisons des services
-                tiers pour l&apos;hébergement (Railway), l&apos;authentification (Clerk), les
-                paiements (Stripe) et l&apos;analyse
-              </li>
-              <li>
-                <strong>Obligations légales :</strong> lorsque requis par la loi, une
-                ordonnance judiciaire ou une demande gouvernementale valide
-              </li>
-              <li>
-                <strong>Protection des droits :</strong> pour protéger les droits, la
-                propriété ou la sécurité de WorkOn, de nos utilisateurs ou du public
-              </li>
-            </ul>
-          </section>
-
-          {/* Conservation */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">6. Conservation des renseignements</h2>
-            <p className="text-white/80 leading-relaxed">
-              Nous conservons vos renseignements personnels aussi longtemps que nécessaire
-              pour fournir nos services et respecter nos obligations légales.
-            </p>
-            <p className="text-white/80 leading-relaxed">
-              Lorsque vous supprimez votre compte, vos renseignements personnels sont
-              anonymisés. Certaines données peuvent être conservées plus longtemps pour
-              des raisons légales, comptables ou de sécurité.
-            </p>
-          </section>
-
-          {/* Sécurité */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">7. Sécurité des renseignements</h2>
-            <p className="text-white/80 leading-relaxed">
-              Nous mettons en œuvre des mesures de sécurité techniques et
-              organisationnelles pour protéger vos renseignements personnels,
-              notamment :
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-white/80">
-              <li>Chiffrement des données en transit (HTTPS/TLS)</li>
-              <li>Mots de passe hachés avec algorithme sécurisé</li>
-              <li>Contrôle d&apos;accès aux données</li>
-              <li>Surveillance et journalisation des accès</li>
-            </ul>
-          </section>
-
-          {/* Droits */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Vos droits</h2>
-            <p className="text-white/80 leading-relaxed mb-4">
-              Conformément à la Loi 25 et aux principes de protection des données, vous disposez des droits suivants :
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-white/80">
-              <li>
-                <strong>Accès :</strong> obtenir une copie de vos renseignements personnels
-              </li>
-              <li>
-                <strong>Rectification :</strong> corriger les renseignements inexacts ou incomplets
-              </li>
-              <li>
-                <strong>Suppression :</strong> demander la suppression de votre compte et
-                l&apos;anonymisation de vos données
-              </li>
-              <li>
-                <strong>Portabilité :</strong> recevoir vos données dans un format structuré
-              </li>
-              <li>
-                <strong>Retrait du consentement :</strong> retirer votre consentement à tout moment
-              </li>
-            </ul>
-            <p className="text-white/80 leading-relaxed mt-4">
-              Pour exercer ces droits, contactez-nous à{" "}
-              <a href="mailto:privacy@workon.app" className="text-amber-400 hover:underline">
-                privacy@workon.app
-              </a>
-              {" "}ou utilisez les fonctionnalités de votre compte.
-            </p>
-          </section>
-
-          {/* Cookies */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">9. Témoins (Cookies)</h2>
-            <p className="text-white/80 leading-relaxed">
-              Nous utilisons des témoins essentiels au fonctionnement de la plateforme
-              (authentification, préférences de session). Nous n&apos;utilisons pas de
-              témoins publicitaires à des fins de ciblage comportemental.
-            </p>
-          </section>
-
-          {/* Transferts */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Transferts internationaux</h2>
-            <p className="text-white/80 leading-relaxed">
-              Vos renseignements peuvent être traités par des fournisseurs situés à
-              l&apos;extérieur du Canada. Dans ce cas, nous nous assurons que des
-              garanties appropriées sont en place pour protéger vos renseignements.
-            </p>
-          </section>
-
-          {/* Mineurs */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">11. Mineurs</h2>
-            <p className="text-white/80 leading-relaxed">
-              Nos services ne s&apos;adressent pas aux personnes de moins de 18 ans.
-              Nous ne collectons pas sciemment de renseignements personnels de mineurs.
-            </p>
-          </section>
-
-          {/* Modifications */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">12. Modifications de cette politique</h2>
-            <p className="text-white/80 leading-relaxed">
-              Nous pouvons modifier cette politique de temps à autre. En cas de
-              modification importante, nous vous en informerons par courriel ou via
-              une notification sur la plateforme. Votre utilisation continue de nos
-              services après notification constitue votre acceptation des modifications.
-            </p>
-          </section>
-
-          {/* Contact */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">13. Nous contacter</h2>
-            <p className="text-white/80 leading-relaxed">
-              Pour toute question concernant cette politique ou vos renseignements
-              personnels :
-            </p>
-            <div className="mt-4 p-4 bg-white/5 rounded-lg text-white/80">
-              <p><strong>WorkOn Technologies Inc.</strong></p>
-              <p>Courriel : <a href="mailto:privacy@workon.app" className="text-amber-400 hover:underline">privacy@workon.app</a></p>
-            </div>
-          </section>
-
-          {/* Footer */}
-          <footer className="mt-16 pt-8 border-t border-white/10">
-            <div className="flex flex-wrap gap-4 text-sm text-white/60">
-              <Link href="/legal/terms" className="hover:text-white transition-colors">
-                Conditions d&apos;utilisation
-              </Link>
-              <span>•</span>
-              <span>PRIVACY v{POLICY_VERSION}</span>
-            </div>
-          </footer>
+    <article>
+      {/* Header */}
+      <header className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold text-workon-ink mb-4">
+          Politique de confidentialit&eacute;
+        </h1>
+        <div className="flex flex-wrap gap-3 text-sm text-workon-muted">
+          <span className="px-3 py-1 bg-workon-primary-subtle text-workon-primary rounded-full font-medium">
+            Version {VERSION}
+          </span>
+          <span className="py-1">En vigueur depuis le {EFFECTIVE_DATE}</span>
+          <span className="py-1">Derni&egrave;re mise &agrave; jour : {LAST_UPDATED}</span>
         </div>
+      </header>
+
+      {/* ====== 1. Introduction ====== */}
+      <SectionTitle id="introduction">1. Introduction</SectionTitle>
+      <P>
+        WorkOn Technologies Inc. (&laquo;&nbsp;WorkOn&nbsp;&raquo;, &laquo;&nbsp;nous&nbsp;&raquo;, &laquo;&nbsp;notre&nbsp;&raquo;) exploite une
+        plateforme technologique de mise en relation entre des travailleurs
+        autonomes ind&eacute;pendants, des employeurs et des clients r&eacute;sidentiels au Qu&eacute;bec.
+      </P>
+      <P>
+        Cette politique de confidentialit&eacute; d&eacute;crit comment nous collectons,
+        utilisons, partageons et prot&eacute;geons vos renseignements personnels
+        lorsque vous utilisez notre plateforme et nos services.
+      </P>
+      <P>
+        En utilisant WorkOn, vous consentez aux pratiques d&eacute;crites dans cette
+        politique. Si vous n&rsquo;acceptez pas cette politique, veuillez ne pas
+        utiliser nos services.
+      </P>
+
+      {/* ====== 2. ROPPA ====== */}
+      <SectionTitle id="roppa">2. Responsable de la protection des renseignements personnels (ROPPA)</SectionTitle>
+      <P>
+        Conform&eacute;ment &agrave; la Loi 25 du Qu&eacute;bec (Loi modernisant des dispositions
+        l&eacute;gislatives en mati&egrave;re de protection des renseignements personnels),
+        WorkOn a d&eacute;sign&eacute; un responsable de la protection des renseignements
+        personnels (ROPPA).
+      </P>
+
+      <Callout>
+        <p className="font-semibold text-workon-ink mb-2">Responsable de la protection des renseignements personnels</p>
+        <p className="text-workon-gray">WorkOn Technologies Inc.</p>
+        <p className="text-workon-gray">
+          Courriel :{" "}
+          <a href="mailto:privacy@workon.ca" className="text-workon-primary font-medium hover:underline">
+            privacy@workon.ca
+          </a>
+        </p>
+        <p className="text-workon-muted text-sm mt-2">
+          D&eacute;lai de r&eacute;ponse : 30 jours suivant la r&eacute;ception de la demande
+        </p>
+      </Callout>
+
+      {/* ====== 3. Collecte ====== */}
+      <SectionTitle id="collecte">3. Renseignements que nous collectons</SectionTitle>
+
+      <SubTitle>3.1 Renseignements fournis directement</SubTitle>
+      <UL>
+        <li><strong>Identit&eacute; :</strong> nom, pr&eacute;nom, adresse courriel, num&eacute;ro de t&eacute;l&eacute;phone</li>
+        <li><strong>Profil professionnel :</strong> comp&eacute;tences, exp&eacute;rience, ville, zone de service</li>
+        <li><strong>V&eacute;rification :</strong> documents d&rsquo;identit&eacute; (le cas &eacute;ch&eacute;ant, pour le syst&egrave;me Trust Tier)</li>
+        <li><strong>Paiement :</strong> informations n&eacute;cessaires au traitement des transactions via Stripe (WorkOn ne stocke pas vos donn&eacute;es de carte de cr&eacute;dit)</li>
+        <li><strong>Communications :</strong> messages &eacute;chang&eacute;s via la plateforme</li>
+        <li><strong>Localisation :</strong> adresse ou zone g&eacute;ographique de service</li>
+      </UL>
+
+      <SubTitle>3.2 Renseignements collect&eacute;s automatiquement</SubTitle>
+      <UL>
+        <li><strong>Donn&eacute;es techniques :</strong> adresse IP, type d&rsquo;appareil, syst&egrave;me d&rsquo;exploitation, navigateur</li>
+        <li><strong>Donn&eacute;es d&rsquo;utilisation :</strong> pages consult&eacute;es, fonctionnalit&eacute;s utilis&eacute;es, horodatage</li>
+        <li><strong>Donn&eacute;es de g&eacute;olocalisation :</strong> uniquement si vous autorisez l&rsquo;acc&egrave;s &agrave; votre position</li>
+      </UL>
+
+      <SubTitle>3.3 Renseignements provenant de tiers</SubTitle>
+      <P>
+        Nous pouvons recevoir des renseignements de services de paiement (Stripe)
+        ou d&rsquo;autres sources que vous autorisez explicitement.
+      </P>
+
+      {/* ====== 4. Finalités ====== */}
+      <SectionTitle id="finalites">4. Finalit&eacute;s de la collecte</SectionTitle>
+      <P>Nous utilisons vos renseignements personnels uniquement pour :</P>
+      <UL>
+        <li>Fournir et maintenir la plateforme de mise en relation</li>
+        <li>Cr&eacute;er et g&eacute;rer votre compte utilisateur</li>
+        <li>Faciliter les communications entre utilisateurs</li>
+        <li>Traiter les transactions de paiement et le syst&egrave;me d&rsquo;entiercement</li>
+        <li>Ex&eacute;cuter l&rsquo;algorithme de jumelage (matching) entre travailleurs et clients</li>
+        <li>Am&eacute;liorer nos services et corriger les probl&egrave;mes techniques</li>
+        <li>Assurer la s&eacute;curit&eacute; de la plateforme et pr&eacute;venir la fraude</li>
+        <li>Respecter nos obligations l&eacute;gales</li>
+        <li>Vous envoyer des communications relatives &agrave; votre compte</li>
+      </UL>
+      <P>
+        Nous ne traitons jamais vos renseignements &agrave; des fins incompatibles avec
+        les finalit&eacute;s pour lesquelles ils ont &eacute;t&eacute; collect&eacute;s, sauf avec votre
+        consentement explicite.
+      </P>
+
+      {/* ====== 5. Partage ====== */}
+      <SectionTitle id="partage">5. Partage des renseignements</SectionTitle>
+      <P>
+        <strong>Nous ne vendons pas vos renseignements personnels.</strong> Nous pouvons partager
+        vos renseignements dans les cas suivants :
+      </P>
+      <UL>
+        <li>
+          <strong>Entre utilisateurs :</strong> les informations n&eacute;cessaires &agrave; la
+          mise en relation (nom, comp&eacute;tences, coordonn&eacute;es pertinentes) sont partag&eacute;es
+          entre les parties d&rsquo;une mission
+        </li>
+        <li>
+          <strong>Stripe :</strong> pour le traitement des paiements et l&rsquo;entiercement des fonds
+        </li>
+        <li>
+          <strong>Fournisseurs de services :</strong> h&eacute;bergement (Railway), analytique,
+          notifications (SendGrid, Firebase) — li&eacute;s par des ententes de confidentialit&eacute;
+        </li>
+        <li>
+          <strong>Obligations l&eacute;gales :</strong> lorsque requis par la loi, une ordonnance
+          judiciaire ou une demande gouvernementale valide
+        </li>
+        <li>
+          <strong>Protection des droits :</strong> pour prot&eacute;ger les droits, la propri&eacute;t&eacute;
+          ou la s&eacute;curit&eacute; de WorkOn, de nos utilisateurs ou du public
+        </li>
+      </UL>
+
+      {/* ====== 6. Consentement Loi 25 ====== */}
+      <SectionTitle id="consentement">6. Consentement (Loi 25)</SectionTitle>
+      <P>
+        Conform&eacute;ment &agrave; la Loi 25, nous obtenons votre consentement de mani&egrave;re
+        claire, libre et &eacute;clair&eacute;e avant de collecter, utiliser ou communiquer vos
+        renseignements personnels.
+      </P>
+      <P>
+        Votre consentement est obtenu au moment de la cr&eacute;ation de votre compte
+        et, lorsque n&eacute;cessaire, de fa&ccedil;on sp&eacute;cifique pour certains traitements
+        (ex.&nbsp;: g&eacute;olocalisation, communications marketing).
+      </P>
+      <P>
+        Vous pouvez retirer votre consentement &agrave; tout moment en nous contactant
+        &agrave;{" "}
+        <a href="mailto:privacy@workon.ca" className="text-workon-primary font-medium hover:underline">
+          privacy@workon.ca
+        </a>
+        {" "}ou via les param&egrave;tres de votre compte. Le retrait du consentement peut
+        limiter votre acc&egrave;s &agrave; certaines fonctionnalit&eacute;s.
+      </P>
+
+      {/* ====== 7. Droits ====== */}
+      <SectionTitle id="droits">7. Vos droits</SectionTitle>
+      <P>
+        Conform&eacute;ment &agrave; la Loi 25 et &agrave; la Loi sur la protection des renseignements
+        personnels et les documents &eacute;lectroniques (LPRPDE), vous disposez des
+        droits suivants :
+      </P>
+      <UL>
+        <li>
+          <strong>Acc&egrave;s :</strong> obtenir une copie de vos renseignements personnels
+          que nous d&eacute;tenons
+        </li>
+        <li>
+          <strong>Rectification :</strong> corriger les renseignements inexacts ou incomplets
+        </li>
+        <li>
+          <strong>Suppression :</strong> demander la suppression de votre compte et
+          l&rsquo;anonymisation de vos donn&eacute;es
+        </li>
+        <li>
+          <strong>Portabilit&eacute; :</strong> recevoir vos donn&eacute;es dans un format structur&eacute;
+          et couramment utilis&eacute;
+        </li>
+        <li>
+          <strong>Retrait du consentement :</strong> retirer votre consentement &agrave; tout moment
+        </li>
+        <li>
+          <strong>D&eacute;sindexation :</strong> demander la d&eacute;sindexation de vos renseignements
+          personnels d&rsquo;un service de recherche
+        </li>
+      </UL>
+      <P>
+        Pour exercer ces droits, contactez le ROPPA &agrave;{" "}
+        <a href="mailto:privacy@workon.ca" className="text-workon-primary font-medium hover:underline">
+          privacy@workon.ca
+        </a>
+        . Nous r&eacute;pondrons dans un d&eacute;lai de 30 jours.
+      </P>
+
+      {/* ====== 8. Conservation ====== */}
+      <SectionTitle id="conservation">8. Conservation des renseignements</SectionTitle>
+      <P>
+        Nous conservons vos renseignements personnels aussi longtemps que n&eacute;cessaire
+        pour fournir nos services et respecter nos obligations l&eacute;gales :
+      </P>
+      <UL>
+        <li><strong>Compte actif :</strong> dur&eacute;e de vie du compte</li>
+        <li><strong>Donn&eacute;es de transaction :</strong> 7 ans (obligations fiscales et comptables)</li>
+        <li><strong>Journaux techniques :</strong> 12 mois maximum</li>
+        <li><strong>Apr&egrave;s suppression du compte :</strong> anonymisation dans les 30 jours, sauf obligations l&eacute;gales</li>
+      </UL>
+
+      {/* ====== 9. Sécurité ====== */}
+      <SectionTitle id="securite">9. S&eacute;curit&eacute; des renseignements</SectionTitle>
+      <P>
+        Nous mettons en oeuvre des mesures de s&eacute;curit&eacute; techniques et
+        organisationnelles pour prot&eacute;ger vos renseignements personnels :
+      </P>
+      <UL>
+        <li>Chiffrement des donn&eacute;es en transit (HTTPS/TLS)</li>
+        <li>Chiffrement des donn&eacute;es sensibles au repos</li>
+        <li>Mots de passe hach&eacute;s avec algorithme s&eacute;curis&eacute;</li>
+        <li>Contr&ocirc;le d&rsquo;acc&egrave;s strict aux donn&eacute;es</li>
+        <li>Surveillance et journalisation des acc&egrave;s</li>
+        <li>Donn&eacute;es de paiement trait&eacute;es exclusivement par Stripe (certifi&eacute; PCI DSS)</li>
+      </UL>
+      <P>
+        En cas d&rsquo;incident de confidentialit&eacute;, nous vous en informerons conform&eacute;ment
+        aux exigences de la Loi 25, incluant la notification &agrave; la Commission
+        d&rsquo;acc&egrave;s &agrave; l&rsquo;information du Qu&eacute;bec (CAI) lorsque requis.
+      </P>
+
+      {/* ====== 10. Cookies ====== */}
+      <SectionTitle id="cookies">10. T&eacute;moins (Cookies)</SectionTitle>
+      <P>
+        Nous utilisons des t&eacute;moins essentiels au fonctionnement de la plateforme :
+      </P>
+      <UL>
+        <li><strong>T&eacute;moins d&rsquo;authentification :</strong> maintien de votre session connect&eacute;e</li>
+        <li><strong>T&eacute;moins de pr&eacute;f&eacute;rences :</strong> langue, param&egrave;tres d&rsquo;affichage</li>
+        <li><strong>T&eacute;moins analytiques :</strong> mesures d&rsquo;utilisation anonymis&eacute;es pour am&eacute;liorer le service</li>
+      </UL>
+      <P>
+        Nous n&rsquo;utilisons pas de t&eacute;moins publicitaires &agrave; des fins de ciblage
+        comportemental. Vous pouvez g&eacute;rer vos pr&eacute;f&eacute;rences de t&eacute;moins via les
+        param&egrave;tres de votre navigateur.
+      </P>
+
+      {/* ====== 11. Transferts ====== */}
+      <SectionTitle id="transferts">11. Transferts internationaux</SectionTitle>
+      <P>
+        Vos renseignements peuvent &ecirc;tre trait&eacute;s par des fournisseurs situ&eacute;s &agrave;
+        l&rsquo;ext&eacute;rieur du Canada (notamment aux &Eacute;tats-Unis pour Stripe et certains
+        services d&rsquo;h&eacute;bergement). Dans ce cas, nous nous assurons que des
+        garanties contractuelles appropri&eacute;es sont en place pour prot&eacute;ger vos
+        renseignements, conform&eacute;ment &agrave; la Loi 25.
+      </P>
+
+      {/* ====== 12. Mineurs ====== */}
+      <SectionTitle id="mineurs">12. Mineurs</SectionTitle>
+      <P>
+        Nos services ne s&rsquo;adressent pas aux personnes de moins de 18 ans.
+        Nous ne collectons pas sciemment de renseignements personnels de mineurs.
+        Si nous d&eacute;couvrons que nous avons collect&eacute; des renseignements d&rsquo;un mineur,
+        nous les supprimerons dans les meilleurs d&eacute;lais.
+      </P>
+
+      {/* ====== 13. Modifications ====== */}
+      <SectionTitle id="modifications">13. Modifications de cette politique</SectionTitle>
+      <P>
+        Nous pouvons modifier cette politique de temps &agrave; autre. En cas de
+        modification importante, nous vous en informerons par courriel ou via
+        une notification sur la plateforme au moins 30 jours avant l&rsquo;entr&eacute;e en
+        vigueur. Votre utilisation continue de nos services apr&egrave;s notification
+        constitue votre acceptation des modifications.
+      </P>
+
+      {/* ====== 14. Plaintes ====== */}
+      <SectionTitle id="plaintes">14. Plaintes</SectionTitle>
+      <P>
+        Si vous n&rsquo;&ecirc;tes pas satisfait de notre traitement de vos renseignements
+        personnels, vous pouvez :
+      </P>
+      <UL>
+        <li>Nous contacter &agrave; <a href="mailto:privacy@workon.ca" className="text-workon-primary font-medium hover:underline">privacy@workon.ca</a></li>
+        <li>D&eacute;poser une plainte aupr&egrave;s de la Commission d&rsquo;acc&egrave;s &agrave; l&rsquo;information du Qu&eacute;bec (CAI)</li>
+        <li>D&eacute;poser une plainte aupr&egrave;s du Commissariat &agrave; la protection de la vie priv&eacute;e du Canada</li>
+      </UL>
+
+      {/* ====== 15. Contact ====== */}
+      <SectionTitle id="contact">15. Nous contacter</SectionTitle>
+      <P>
+        Pour toute question concernant cette politique ou vos renseignements
+        personnels :
+      </P>
+      <InfoBox>
+        <p className="font-semibold text-workon-ink">WorkOn Technologies Inc.</p>
+        <p className="text-workon-gray mt-1">Qu&eacute;bec, Canada</p>
+        <p className="text-workon-gray mt-1">
+          Protection des donn&eacute;es :{" "}
+          <a href="mailto:privacy@workon.ca" className="text-workon-primary font-medium hover:underline">
+            privacy@workon.ca
+          </a>
+        </p>
+        <p className="text-workon-gray mt-1">
+          Questions g&eacute;n&eacute;rales :{" "}
+          <a href="mailto:legal@workon.ca" className="text-workon-primary font-medium hover:underline">
+            legal@workon.ca
+          </a>
+        </p>
+      </InfoBox>
+
+      {/* Version tag */}
+      <div className="mt-12 pt-6 border-t border-workon-border flex flex-wrap items-center justify-between gap-4 text-sm text-workon-muted">
+        <span>PRIVACY v{VERSION} &mdash; {LAST_UPDATED}</span>
+        <Link href="/legal/terms" className="text-workon-primary hover:underline">
+          Conditions d&rsquo;utilisation
+        </Link>
       </div>
-    </div>
+    </article>
   );
 }
