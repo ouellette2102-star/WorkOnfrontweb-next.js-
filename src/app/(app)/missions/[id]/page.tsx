@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MissionPhotos } from "@/components/mission/mission-photos";
+import { MissionTimeline } from "@/components/mission/mission-timeline";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -713,6 +714,14 @@ export default function MissionDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Timeline */}
+      <MissionTimeline
+        status={mission.status}
+        createdAt={mission.createdAt}
+        updatedAt={mission.updatedAt}
+        assignedToUserId={mission.assignedToUserId}
+      />
 
       {/* Photos */}
       <div className="p-4 rounded-2xl bg-white border border-workon-border">
