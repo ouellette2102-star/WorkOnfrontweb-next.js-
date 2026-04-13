@@ -1,5 +1,7 @@
 "use client";
 
+declare global { interface Window { __lastDrag?: number } }
+
 import { useState, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
@@ -238,9 +240,14 @@ export default function SwipePage() {
                   drag
                   dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
                   dragElastic={0.9}
-                  onDrag={(_, info) =>
-                    setDragOffset({ x: info.offset.x, y: info.offset.y })
-                  }
+                  onDrag={(_, info) => {
+                    // Only update state every ~32ms to avoid excessive re-renders
+                    const now = Date.now();
+                    if (!window.__lastDrag || now - window.__lastDrag > 32) {
+                      window.__lastDrag = now;
+                      setDragOffset({ x: info.offset.x, y: info.offset.y });
+                    }
+                  }}
                   onDragEnd={handleDragEnd}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{

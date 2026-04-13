@@ -676,7 +676,7 @@ export const api = {
     if (page) q.set("page", String(page));
     return apiFetch<ReviewResponse[]>(`/reviews?${q}`);
   },
-  createReview: (data: { missionId?: string; localMissionId?: string; toUserId: string; rating: number; comment?: string }) =>
+  createReview: (data: { missionId: string; toUserId: string; rating: number; comment?: string }) =>
     apiFetch<ReviewResponse>("/reviews", { method: "POST", body: JSON.stringify(data) }),
 
   // Mission Photos
