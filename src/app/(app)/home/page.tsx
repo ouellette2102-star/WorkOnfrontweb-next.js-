@@ -58,16 +58,10 @@ export default function HomePage() {
             : "Une ligne directe vers le travail instantané"}
         </p>
 
-        {/* Stats bar */}
-        {stats && (
-          <div className="mt-4">
-            <StatsBar
-              activeWorkers={stats.activeWorkers}
-              completedMissions={stats.completedContracts}
-              nearby={stats.openServiceCalls}
-            />
-          </div>
-        )}
+        {/* Live marketplace stats */}
+        <div className="mt-4">
+          <StatsBar />
+        </div>
       </div>
 
       {/* Stripe Connect gate (workers only — hidden when onboarded) */}
