@@ -547,7 +547,7 @@ export const api = {
   createCheckoutSession: (missionId: string) =>
     apiFetch<{ checkoutUrl: string; invoiceId: string; sessionId: string }>("/payments/checkout", {
       method: "POST",
-      body: JSON.stringify({ localMissionId: missionId }),
+      body: JSON.stringify({ missionId }),
     }),
 
   // Invoices

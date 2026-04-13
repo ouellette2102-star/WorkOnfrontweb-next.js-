@@ -416,6 +416,38 @@ function InlineReviewForm({
   );
 }
 
+// ---------- Pay Mission Button ----------
+
+function PayMissionButton({ missionId, price }: { missionId: string; price: number }) {
+  const [loading, setLoading] = useState(false);
+
+  const handlePay = async () => {
+    setLoading(true);
+    try {
+      const result = await api.createCheckoutSession(missionId);
+      window.location.href = result.checkoutUrl;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors du paiement");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      onClick={handlePay}
+      disabled={loading}
+      className="w-full bg-workon-primary hover:bg-workon-primary-hover text-white rounded-2xl py-3"
+    >
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+      ) : (
+        <DollarSign className="h-4 w-4 mr-2" />
+      )}
+      Payer la mission ({price > 0 ? `${price.toFixed(2)} $` : "prix à confirmer"})
+    </Button>
+  );
+}
+
 // ---------- Dispute Modal (light theme) ----------
 
 function DisputeModalLight({
@@ -745,6 +777,11 @@ export default function MissionDetailPage() {
             )}
             Terminer la mission
           </Button>
+        )}
+
+        {/* Employer: pay completed mission */}
+        {isOwner && mission.status === "completed" && (
+          <PayMissionButton missionId={id} price={mission.price} />
         )}
 
         {/* Contact via chat */}
