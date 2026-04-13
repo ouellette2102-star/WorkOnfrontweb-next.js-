@@ -89,8 +89,9 @@ function MatchCard({
   const createMission = useMutation({
     mutationFn: () =>
       api.createMissionFromMatch(match.id, {
-        ...(title.trim() ? { title: title.trim() } : {}),
-        ...(price ? { price: parseFloat(price) } : {}),
+        title: title.trim() || "Mission depuis match",
+        category: "other",
+        price: price ? parseFloat(price) : 0,
       }),
     onSuccess: (mission) => {
       toast.success("Mission créée depuis le match!");

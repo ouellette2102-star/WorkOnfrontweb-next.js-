@@ -46,7 +46,7 @@ export default function MatchesPage() {
       data,
     }: {
       matchId: string;
-      data: { title: string; description: string; price?: number };
+      data: { title: string; description?: string; price?: number; category: string };
     }) => api.createMissionFromMatch(matchId, data),
     onSuccess: () => {
       toast.success("Mission creee avec succes !");
@@ -69,7 +69,8 @@ export default function MatchesPage() {
       data: {
         title: missionForm.title,
         description: missionForm.description,
-        price: missionForm.price ? parseFloat(missionForm.price) : undefined,
+        category: "other",
+        price: missionForm.price ? parseFloat(missionForm.price) : 0,
       },
     });
   };
