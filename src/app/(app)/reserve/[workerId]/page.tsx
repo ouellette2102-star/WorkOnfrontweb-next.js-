@@ -109,6 +109,32 @@ export default function ReservePage() {
 
   const fullName = worker.fullName || `${worker.firstName} ${worker.lastName}`;
   const hasReviews = (worker.reviewCount ?? 0) > 0;
+  const isWorker = user?.role === "worker";
+
+  // Workers can't create missions/bookings — show a clear message
+  if (isWorker) {
+    return (
+      <div className="min-h-screen bg-workon-bg px-4 py-12">
+        <div className="mx-auto max-w-md rounded-3xl border border-workon-border bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-workon-accent/10">
+            <Shield className="h-7 w-7 text-workon-accent" />
+          </div>
+          <h2 className="mb-2 text-lg font-bold text-workon-ink">Compte travailleur</h2>
+          <p className="mb-6 text-sm text-workon-muted">
+            La reservation de professionnels est disponible pour les comptes employeur.
+            En tant que travailleur, tu peux recevoir des missions et des demandes de clients.
+          </p>
+          <Link
+            href="/search"
+            className="inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-2.5 text-sm font-medium text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour a la recherche
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Minimum date = tomorrow
   const tomorrow = new Date();
