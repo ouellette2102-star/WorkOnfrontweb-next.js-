@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Star, Shield, CalendarDays } from "lucide-react";
+import { Star, Shield, CalendarDays, MapPin, User } from "lucide-react";
 import type { WorkerProfile } from "@/lib/api-client";
 import { TrustPill } from "@/components/ui/trust-pill";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ interface WorkerCardProps {
 
 export function WorkerCard({ worker, compact }: WorkerCardProps) {
   const hasReviews = (worker.reviewCount ?? 0) > 0;
+  const displayName = worker.fullName || `${worker.firstName} ${worker.lastName}`;
 
   return (
     <Link
@@ -22,21 +23,35 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
         compact ? "p-3" : "p-0",
       )}
     >
-      {/* Photo */}
-      {!compact && worker.photoUrl && (
+      {/* Photo — show default avatar if no photo */}
+      {!compact && (
         <div className="relative h-48 bg-workon-bg">
-          <img
-            src={worker.photoUrl}
-            alt={worker.fullName || `${worker.firstName} ${worker.lastName}`}
-            className="w-full h-full object-cover"
-          />
+          {worker.photoUrl ? (
+            <img
+              src={worker.photoUrl}
+              alt={displayName}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <div className="flex items-center justify-center h-20 w-20 rounded-full bg-workon-primary/10">
+                <User className="h-10 w-10 text-workon-primary/40" />
+              </div>
+            </div>
+          )}
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent" />
+          {/* Category badge overlay */}
+          {worker.category && (
+            <span className="absolute top-3 left-3 inline-flex items-center rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-workon-ink shadow-sm">
+              {worker.category}
+            </span>
+          )}
         </div>
       )}
 
       <div className={cn("space-y-2", compact ? "" : "p-4")}>
-        {/* Name + Rating */}
+        {/* Name + Category + City */}
         <div>
           <h3 className="font-semibold text-base text-workon-ink">
             {worker.firstName} {worker.lastName}
@@ -44,8 +59,14 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
           {worker.jobTitle && (
             <p className="text-sm text-workon-muted">{worker.jobTitle}</p>
           )}
+          {compact && worker.category && !worker.jobTitle && (
+            <p className="text-sm text-workon-muted">{worker.category}</p>
+          )}
           {worker.city && (
-            <p className="text-xs text-workon-muted">{worker.city}</p>
+            <p className="flex items-center gap-1 text-xs text-workon-muted">
+              <MapPin className="h-3 w-3" />
+              {worker.city}
+            </p>
           )}
         </div>
 

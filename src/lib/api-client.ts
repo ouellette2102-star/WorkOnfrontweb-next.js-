@@ -109,6 +109,7 @@ export interface WorkerProfile {
   jobTitle?: string;
   city?: string;
   photoUrl?: string;
+  category?: string;
   averageRating: number;
   completionPercentage: number;
   reviewCount: number;

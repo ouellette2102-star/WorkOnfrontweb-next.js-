@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { MissionResponse } from "@/lib/api-client";
@@ -43,11 +43,18 @@ function createMissionIcon() {
 const missionIcon = createMissionIcon();
 
 // Helper component to recenter map when center prop changes
-function RecenterMap({ center }: { center: [number, number] }) {
+// Uses primitive lat/lng to avoid infinite re-render from new array refs
+function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
+  const prevRef = useRef({ lat, lng });
+
   useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
+    if (prevRef.current.lat !== lat || prevRef.current.lng !== lng) {
+      prevRef.current = { lat, lng };
+      map.setView([lat, lng], map.getZoom());
+    }
+  }, [lat, lng, map]);
+
   return null;
 }
 
@@ -77,7 +84,7 @@ export default function MissionMap({ missions, center, radiusKm }: MissionMapPro
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
-      <RecenterMap center={center} />
+      <RecenterMap lat={center[0]} lng={center[1]} />
 
       {missions.map((m) => (
         <Marker
