@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
   "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "rm -rf app 2>/dev/null || true; next build",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)backend'"
+  "buildCommand": "rm -rf app 2>/dev/null || true; next build"
 }
