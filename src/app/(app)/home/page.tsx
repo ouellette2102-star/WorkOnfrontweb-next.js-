@@ -108,67 +108,76 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Active missions */}
-      {activeMissions && activeMissions.length > 0 ? (
+      {/* Missions + Pros — side by side on desktop, stacked on mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Left: Active missions */}
         <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-workon-ink">
-              <Briefcase className="inline h-4 w-4 mr-1 text-workon-primary" />
-              Missions actives
-            </h2>
-            <Link href="/missions" className="text-xs text-workon-primary hover:underline">
-              Voir tout
-            </Link>
-          </div>
-          <div className="space-y-2">
-            {activeMissions.slice(0, 3).map((m) => (
-              <MissionCard key={m.id} mission={m} />
-            ))}
-          </div>
-        </section>
-      ) : (
-        user && activeMissions !== undefined && (
-          <section>
-            <div className="rounded-2xl border border-workon-border bg-white p-6 text-center shadow-sm">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-workon-primary/10">
-                <Briefcase className="h-5 w-5 text-workon-primary" />
-              </div>
-              <h2 className="font-semibold text-base text-workon-ink">
-                {user.role === "employer"
-                  ? "Aucune mission en cours"
-                  : "Prêt pour ta prochaine mission ?"}
-              </h2>
-              <p className="mt-1 text-sm text-workon-muted">
-                {user.role === "employer"
-                  ? "Publie ta première mission — un pro peut répondre en quelques minutes."
-                  : "Des missions payées rapidement t'attendent près de chez toi."}
-              </p>
-              <Button asChild className="mt-4 bg-workon-primary hover:bg-workon-primary/90 text-white">
-                <Link href={user.role === "employer" ? "/express" : "/search"}>
-                  {user.role === "employer" ? "Express Dispatch" : "Voir les missions"}
+          {activeMissions && activeMissions.length > 0 ? (
+            <>
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-workon-ink">
+                  <Briefcase className="inline h-4 w-4 mr-1 text-workon-primary" />
+                  Missions actives
+                </h2>
+                <Link href="/missions" className="text-xs text-workon-primary hover:underline">
+                  Voir tout
                 </Link>
-              </Button>
-            </div>
-          </section>
-        )
-      )}
-
-      {/* Featured workers */}
-      {realWorkers.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-workon-ink">Pros disponibles</h2>
-            <Link href="/search" className="text-xs text-workon-primary hover:underline">
-              Voir tout
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {realWorkers.slice(0, 4).map((w) => (
-              <WorkerCard key={w.id} worker={w} compact />
-            ))}
-          </div>
+              </div>
+              <div className="space-y-2">
+                {activeMissions.slice(0, 4).map((m) => (
+                  <MissionCard key={m.id} mission={m} />
+                ))}
+              </div>
+            </>
+          ) : (
+            user && activeMissions !== undefined && (
+              <div className="rounded-2xl border border-workon-border bg-white p-6 text-center shadow-sm h-full flex flex-col items-center justify-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-workon-primary/10">
+                  <Briefcase className="h-5 w-5 text-workon-primary" />
+                </div>
+                <h2 className="font-semibold text-base text-workon-ink">
+                  {user.role === "employer"
+                    ? "Aucune mission en cours"
+                    : "Prêt pour ta prochaine mission ?"}
+                </h2>
+                <p className="mt-1 text-sm text-workon-muted">
+                  {user.role === "employer"
+                    ? "Publie ta première mission."
+                    : "Des missions t'attendent près de chez toi."}
+                </p>
+                <Button asChild className="mt-4 bg-workon-primary hover:bg-workon-primary/90 text-white">
+                  <Link href={user.role === "employer" ? "/express" : "/search"}>
+                    {user.role === "employer" ? "Express Dispatch" : "Voir les missions"}
+                  </Link>
+                </Button>
+              </div>
+            )
+          )}
         </section>
-      )}
+
+        {/* Right: Featured workers */}
+        <section className="space-y-3">
+          {realWorkers.length > 0 ? (
+            <>
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-workon-ink">Pros disponibles</h2>
+                <Link href="/search" className="text-xs text-workon-primary hover:underline">
+                  Voir tout
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {realWorkers.slice(0, 4).map((w) => (
+                  <WorkerCard key={w.id} worker={w} compact />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="rounded-2xl border border-workon-border bg-white p-6 text-center shadow-sm h-full flex flex-col items-center justify-center">
+              <p className="text-sm text-workon-muted">Aucun pro disponible pour le moment.</p>
+            </div>
+          )}
+        </section>
+      </div>
 
       {/* Footer */}
       <div className="text-center text-xs text-workon-muted pt-4 space-y-1">
