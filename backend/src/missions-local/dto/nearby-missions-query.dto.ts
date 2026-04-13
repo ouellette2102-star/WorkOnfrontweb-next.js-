@@ -5,6 +5,8 @@ import {
   Max,
   IsLatitude,
   IsLongitude,
+  IsString,
+  IsIn,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -39,5 +41,51 @@ export class NearbyMissionsQueryDto {
   @Max(100)
   @IsOptional()
   radiusKm?: number = 10;
+
+  @ApiPropertyOptional({
+    example: 'proximity',
+    description: 'Sort order: proximity (default), date, price',
+    enum: ['proximity', 'date', 'price'],
+  })
+  @IsString()
+  @IsIn(['proximity', 'date', 'price'])
+  @IsOptional()
+  sort?: 'proximity' | 'date' | 'price';
+
+  @ApiPropertyOptional({
+    example: 'Entretien',
+    description: 'Filter by category name',
+  })
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @ApiPropertyOptional({
+    example: 'plomberie',
+    description: 'Search query for title/description',
+  })
+  @IsString()
+  @IsOptional()
+  query?: string;
+
+  @ApiPropertyOptional({
+    example: 50,
+    description: 'Minimum price filter (CAD)',
+  })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  priceMin?: number;
+
+  @ApiPropertyOptional({
+    example: 500,
+    description: 'Maximum price filter (CAD)',
+  })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  priceMax?: number;
 }
 

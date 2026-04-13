@@ -73,22 +73,18 @@ async function bootstrap() {
   const isProd = nodeEnv === 'production';
   const frontendUrl = configService.get<string>('FRONTEND_URL');
   const corsOrigin = configService.get<string>('CORS_ORIGIN');
-  const corsFailFast = configService.get<string>('CORS_FAIL_FAST') === 'true';
-  
+
   let allowedOrigins: string[] | boolean;
 
+  const DEFAULT_PROD_ORIGINS = 'https://workon.ca,https://www.workon.ca';
+
   if (isProd) {
-    // PRODUCTION: Mode strict
+    // PRODUCTION: Mode strict, fail-closed
     if (corsOrigin === '*') {
-      if (corsFailFast) {
-        // Fail-fast: refuser de démarrer avec CORS_ORIGIN="*"
-        throw new Error(
-          '❌ SECURITY: CORS_ORIGIN="*" is not allowed in production with CORS_FAIL_FAST=true. ' +
-          'Set a specific origin list or remove CORS_FAIL_FAST.',
-        );
-      }
-      console.warn('⚠️ SECURITY WARNING: CORS_ORIGIN="*" in production. Set specific origins for security.');
-      allowedOrigins = true;
+      throw new Error(
+        '❌ SECURITY: CORS_ORIGIN="*" is not allowed in production. ' +
+          'Set a specific origin list via CORS_ORIGIN or FRONTEND_URL.',
+      );
     } else if (frontendUrl) {
       allowedOrigins = [frontendUrl];
       console.log(`🔒 CORS: Allowing FRONTEND_URL: ${frontendUrl}`);
@@ -96,12 +92,9 @@ async function bootstrap() {
       allowedOrigins = corsOrigin.split(',').map((o) => o.trim()).filter(Boolean);
       console.log(`🔒 CORS: Allowing origins: ${allowedOrigins.join(', ')}`);
     } else {
-      // Pas de config: permettre health checks mais avertir
-      console.warn(
-        '⚠️ SECURITY WARNING: No CORS config in production. ' +
-        'Set CORS_ORIGIN or FRONTEND_URL in Railway for security.',
-      );
-      allowedOrigins = true;
+      // Default to workon.ca domains when no explicit origin is configured
+      allowedOrigins = DEFAULT_PROD_ORIGINS.split(',').map((o) => o.trim());
+      console.log(`🔒 CORS: No CORS_ORIGIN or FRONTEND_URL set, defaulting to: ${allowedOrigins.join(', ')}`);
     }
   } else {
     // DEVELOPMENT: Plus permissif
@@ -344,12 +337,10 @@ async function bootstrap() {
   logger.log(`💚 Health: /health, /healthz, /readyz, /api/v1/health (no throttle)`);
   
   // Warnings
-  if (isProd && !corsOrigin && !frontendUrl) {
-    logger.warn(`⚠️  ACTION REQUIRED: Set CORS_ORIGIN or FRONTEND_URL in production`);
-  }
   if (isProd && !rateLimitEnabled) {
     logger.warn(`⚠️  WARNING: Rate limiting is DISABLED in production`);
   }
 }
 
-bootstrap();
+bootstrap();// deploy trigger 1776026608
+// clean deploy 20260412T214757

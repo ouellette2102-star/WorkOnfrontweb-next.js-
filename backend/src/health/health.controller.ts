@@ -23,6 +23,7 @@ export interface HealthResponse {
   status: 'ok' | 'degraded' | 'error';
   timestamp: string;
   version: string;
+  deployVersion?: string;
   environment: string;
   uptime: number;
   system?: SystemMetrics;
@@ -120,6 +121,7 @@ export class HealthController {
       status: globalStatus,
       timestamp,
       version: process.env.npm_package_version || '1.0.0',
+      deployVersion: '2026-04-12-audit',
       environment: this.configService.get<string>('NODE_ENV', 'development'),
       uptime: process.uptime(),
       system: this.getSystemMetrics(),

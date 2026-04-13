@@ -1,14 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+const HOME_STATS_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 /**
  * Metrics Service - Platform metrics and ratios
- * 
- * Provides insights into worker/employer distribution
+ *
+ * Provides insights into worker/employer distribution.
+ * homeStats is cached in-memory (TTL 5 min) to avoid repeated COUNT queries.
  */
 @Injectable()
 export class MetricsService {
   private readonly logger = new Logger(MetricsService.name);
+  private _homeStatsCache: { data: any; expiresAt: number } | null = null;
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -48,6 +52,29 @@ export class MetricsService {
       residentialClients,
       workerToEmployerRatio,
     };
+  }
+
+  /**
+   * Get home page stats (public metrics for landing page).
+   * Cached in-memory with a 5-minute TTL to avoid repeated COUNT queries.
+   */
+  async getHomeStats() {
+    const now = Date.now();
+    if (this._homeStatsCache && this._homeStatsCache.expiresAt > now) {
+      this.logger.debug('homeStats served from cache');
+      return this._homeStatsCache.data;
+    }
+
+    const [completedContracts, openServiceCalls, activeWorkers] = await Promise.all([
+      this.prisma.localMission.count({ where: { status: 'completed' } }),
+      this.prisma.localMission.count({ where: { status: 'open' } }),
+      this.prisma.localUser.count({ where: { role: 'worker', active: true } }),
+    ]);
+
+    const data = { completedContracts, activeWorkers, openServiceCalls };
+    this._homeStatsCache = { data, expiresAt: now + HOME_STATS_TTL_MS };
+    this.logger.debug('homeStats computed and cached');
+    return data;
   }
 
   /**

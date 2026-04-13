@@ -13,6 +13,16 @@ import { RatioResponseDto } from './dto/ratio-response.dto';
 export class MetricsController {
   constructor(private readonly metricsService: MetricsService) {}
 
+  @Get('home-stats')
+  @ApiOperation({
+    summary: 'Get home page stats',
+    description: 'Returns public platform metrics for the landing page',
+  })
+  @ApiResponse({ status: 200, description: 'Platform stats' })
+  async getHomeStats() {
+    return this.metricsService.getHomeStats();
+  }
+
   @Get('ratio')
   @ApiOperation({
     summary: 'Get worker to employer ratio',
