@@ -62,7 +62,7 @@ type Tab = {
 
 const leftTabs: Tab[] = [
   { href: "/home", label: "Accueil", icon: Home },
-  { href: "/search", label: "Pros", icon: Users },
+  { href: "/swipe", label: "Pros", icon: Users },
 ];
 
 const rightTabs: Tab[] = [
