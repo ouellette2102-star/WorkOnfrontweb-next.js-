@@ -7,8 +7,10 @@ import {
   Users,
   Map,
   MessageCircle,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Vintage rotary desk phone — optimised for 56 px FAB at 2× density.
@@ -72,6 +74,8 @@ const rightTabs: Tab[] = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const isWorker = user?.role === "worker";
 
   const { data: unread } = useQuery({
     queryKey: ["unread-count"],
@@ -110,18 +114,20 @@ export function BottomNav() {
     );
   };
 
-  const fabActive = isActive("/express");
+  const fabHref = isWorker ? "/search" : "/express";
+  const fabLabel = isWorker ? "Missions" : "Appeler";
+  const fabActive = isActive(fabHref);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#EAE6DF] bg-white/90 backdrop-blur-xl safe-area-bottom">
       <div className="relative flex items-end justify-around h-16 max-w-lg mx-auto px-4 pb-4 pt-0">
         {leftTabs.map(renderTab)}
 
-        {/* Center: raised Express FAB "Appeler" */}
+        {/* Center: raised FAB — role-aware */}
         <div className="flex flex-col items-center -mt-5 min-w-[52px]">
           <Link
-            href="/express"
-            aria-label="Appeler un pro — dispatch express"
+            href={fabHref}
+            aria-label={isWorker ? "Voir les missions disponibles" : "Appeler un pro — dispatch express"}
             className={cn(
               "flex items-center justify-center h-14 w-14 rounded-full transition-all",
               "bg-workon-accent text-white",
@@ -130,7 +136,11 @@ export function BottomNav() {
               fabActive && "shadow-[0_4px_20px_rgba(201,102,70,0.4)]",
             )}
           >
-            <VintagePhoneIcon className="h-7 w-7" />
+            {isWorker ? (
+              <Briefcase className="h-7 w-7" />
+            ) : (
+              <VintagePhoneIcon className="h-7 w-7" />
+            )}
           </Link>
           <span
             className={cn(
@@ -138,7 +148,7 @@ export function BottomNav() {
               fabActive ? "text-workon-accent" : "text-workon-gray",
             )}
           >
-            Appeler
+            {fabLabel}
           </span>
         </div>
 
