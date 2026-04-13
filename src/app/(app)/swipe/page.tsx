@@ -64,7 +64,7 @@ export default function SwipePage() {
 
   const swipeMutation = useMutation({
     mutationFn: (data: {
-      targetUserId: string;
+      candidateId: string;
       action: "LIKE" | "PASS" | "SUPERLIKE";
     }) => api.recordSwipe(data),
     onSuccess: (result) => {
@@ -94,7 +94,7 @@ export default function SwipePage() {
       setExitDirection(
         action === "PASS" ? "left" : action === "LIKE" ? "right" : "up"
       );
-      swipeMutation.mutate({ targetUserId: current.id, action });
+      swipeMutation.mutate({ candidateId: current.id, action });
       setTimeout(advance, 300);
     },
     [current, swipeMutation, advance]

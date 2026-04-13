@@ -34,7 +34,7 @@ export default function AvailabilityPage() {
   });
 
   const blockMutation = useMutation({
-    mutationFn: () => api.blockTime({ date: blockDate, reason: blockReason || undefined }),
+    mutationFn: () => api.blockTime({ specificDate: blockDate, startTime: "00:00", endTime: "23:59" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Date bloquee");

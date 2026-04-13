@@ -35,9 +35,11 @@ export default function TemplatesPage() {
       api.createTemplate({
         title,
         description,
-        category,
+        categoryId: category,
         price: parseFloat(price),
-        recurrence,
+        recurrenceRule: recurrence,
+        priceType: "FIXED",
+        duration: 60,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["templates"] });

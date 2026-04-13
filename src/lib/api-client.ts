@@ -518,31 +518,20 @@ export const api = {
 
   // Stripe Connect.
   //
-  // Backend canonical paths are namespaced under `/payments/stripe/*`
-  // (verified live 2026-04-08 against workon-backend-production-8908):
-  //
-  //   GET /api/v1/payments/stripe/connect/onboarding   -> 200 (worker role)
-  //   GET /api/v1/payments/stripe/connect/status       -> 200
-  //   GET /api/v1/payments/stripe/worker/history       -> 200 (worker role)
-  //
-  // The previous client paths (`/payments/connect/...`,
-  // `/payments/worker/history`) returned 404 in production, blocking
-  // the entire Stripe Connect onboarding flow for workers and the
-  // payment history view. The fix is purely a path alignment with the
-  // backend's `StripeController` (`backend/src/stripe/stripe.controller.ts`).
-  // No payload, no auth, no schema changes.
+  // Backend controller is at `api/v1/stripe` (StripeController).
+  // Paths: /stripe/connect/onboarding, /stripe/connect/status, /stripe/worker/history.
   getStripeOnboardingLink: () =>
-    apiFetch<{ url: string }>("/payments/stripe/connect/onboarding"),
+    apiFetch<{ url: string }>("/stripe/connect/onboarding"),
   getStripeOnboardingStatus: async () => {
-    const raw = await apiFetch<unknown>("/payments/stripe/connect/status");
+    const raw = await apiFetch<unknown>("/stripe/connect/status");
     return parseResponse(
       stripeConnectStatusSchema,
       raw,
-      "GET /payments/stripe/connect/status",
+      "GET /stripe/connect/status",
     );
   },
   getWorkerPaymentHistory: () =>
-    apiFetch<WorkerPayment[]>("/payments/stripe/worker/history"),
+    apiFetch<WorkerPayment[]>("/stripe/worker/history"),
 
   // Stripe Checkout
   createCheckoutSession: (missionId: string) =>
@@ -574,7 +563,7 @@ export const api = {
   // Contracts
   getMyContracts: () => apiFetch<ContractResponse[]>("/contracts/user/me"),
   getContract: (id: string) => apiFetch<ContractResponse>(`/contracts/${id}`),
-  createContract: (data: { missionId?: string; localMissionId?: string; terms?: string }) =>
+  createContract: (data: { missionId?: string; localMissionId?: string; terms?: string; amount: number }) =>
     apiFetch<ContractResponse>("/contracts", { method: "POST", body: JSON.stringify(data) }),
   updateContractStatus: (id: string, status: string) =>
     apiFetch<ContractResponse>(`/contracts/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
@@ -623,19 +612,19 @@ export const api = {
   // Availability
   getAvailability: () => apiFetch<AvailabilitySlot[]>("/scheduling/availability"),
   setAvailability: (data: { dayOfWeek: number; startTime: string; endTime: string }) =>
-    apiFetch<AvailabilitySlot>("/scheduling/availability", { method: "POST", body: JSON.stringify(data) }),
+    apiFetch<AvailabilitySlot[]>("/scheduling/availability", { method: "POST", body: JSON.stringify({ slots: [data] }) }),
   getMyAvailability: () => apiFetch<AvailabilitySlot[]>("/scheduling/availability"),
   setMyAvailability: (slots: { dayOfWeek: number; startTime: string; endTime: string }[]) =>
     apiFetch<AvailabilitySlot[]>("/scheduling/availability", {
       method: "POST",
       body: JSON.stringify({ slots }),
     }),
-  blockTime: (data: { date: string; reason?: string }) =>
+  blockTime: (data: { specificDate: string; startTime: string; endTime: string; timezone?: string }) =>
     apiFetch<unknown>("/scheduling/availability/block", { method: "POST", body: JSON.stringify(data) }),
 
   // Templates
   getTemplates: () => apiFetch<RecurringTemplate[]>("/scheduling/templates"),
-  createTemplate: (data: { title: string; description: string; category: string; price: number; recurrence: string }) =>
+  createTemplate: (data: { title: string; description: string; categoryId: string; price: number; recurrenceRule: string; priceType: string; duration: number }) =>
     apiFetch<RecurringTemplate>("/scheduling/templates", { method: "POST", body: JSON.stringify(data) }),
   deactivateTemplate: (id: string) =>
     apiFetch<RecurringTemplate>(`/scheduling/templates/${id}/deactivate`, { method: "PATCH" }),
@@ -647,15 +636,15 @@ export const api = {
     const q = new URLSearchParams();
     if (filters?.role) q.set("role", filters.role);
     if (filters?.category) q.set("category", filters.category);
-    if (filters?.latitude) q.set("latitude", String(filters.latitude));
-    if (filters?.longitude) q.set("longitude", String(filters.longitude));
+    if (filters?.latitude) q.set("lat", String(filters.latitude));
+    if (filters?.longitude) q.set("lng", String(filters.longitude));
     const qs = q.toString();
     return apiFetch<SwipeCandidate[]>(`/swipe/candidates${qs ? `?${qs}` : ""}`);
   },
-  recordSwipe: (data: { targetUserId: string; action: "LIKE" | "PASS" | "SUPERLIKE" }) =>
+  recordSwipe: (data: { candidateId: string; action: "LIKE" | "PASS" | "SUPERLIKE" }) =>
     apiFetch<{ matched: boolean; matchId?: string }>("/swipe/action", { method: "POST", body: JSON.stringify(data) }),
   getMatches: () => apiFetch<SwipeMatch[]>("/swipe/matches"),
-  createMissionFromMatch: (matchId: string, data?: { title?: string; description?: string; price?: number }) =>
+  createMissionFromMatch: (matchId: string, data: { title?: string; description?: string; price?: number; category: string }) =>
     apiFetch<MissionResponse>("/swipe/matches/mission", { method: "POST", body: JSON.stringify({ matchId, ...data }) }),
 
   // Support
@@ -687,7 +676,7 @@ export const api = {
     if (page) q.set("page", String(page));
     return apiFetch<ReviewResponse[]>(`/reviews?${q}`);
   },
-  createReview: (data: { missionId?: string; localMissionId?: string; targetUserId: string; rating: number; comment?: string }) =>
+  createReview: (data: { missionId?: string; localMissionId?: string; toUserId: string; rating: number; comment?: string }) =>
     apiFetch<ReviewResponse>("/reviews", { method: "POST", body: JSON.stringify(data) }),
 
   // Mission Photos

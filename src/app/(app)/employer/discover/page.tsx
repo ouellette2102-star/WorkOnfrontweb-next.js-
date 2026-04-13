@@ -21,7 +21,7 @@ export default function EmployerDiscoverPage() {
   });
 
   const swipeMutation = useMutation({
-    mutationFn: (data: { targetUserId: string; action: "LIKE" | "PASS" | "SUPERLIKE" }) =>
+    mutationFn: (data: { candidateId: string; action: "LIKE" | "PASS" | "SUPERLIKE" }) =>
       api.recordSwipe(data),
     onSuccess: (result) => {
       if (result.matched) {
@@ -47,7 +47,7 @@ export default function EmployerDiscoverPage() {
   const handleSwipe = (action: "PASS" | "LIKE" | "SUPERLIKE") => {
     if (!currentCandidate) return;
     setDirection(action === "PASS" ? "left" : "right");
-    swipeMutation.mutate({ targetUserId: currentCandidate.id, action });
+    swipeMutation.mutate({ candidateId: currentCandidate.id, action });
     setTimeout(handleNext, 300);
   };
 
