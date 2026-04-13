@@ -19,7 +19,11 @@ export default function ReservePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [scheduledDate, setScheduledDate] = useState("");
-  const [notes, setNotes] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("09:00");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [duration, setDuration] = useState(60);
+  const [price, setPrice] = useState("");
 
   const { data: worker, isLoading } = useQuery({
     queryKey: ["worker", workerId],
@@ -32,12 +36,22 @@ export default function ReservePage() {
       toast.error("Veuillez sélectionner une date.");
       return;
     }
+    if (!title.trim()) {
+      toast.error("Veuillez entrer un titre pour la réservation.");
+      return;
+    }
     setLoading(true);
     try {
+      // Combine date + time into ISO 8601 scheduledAt
+      const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString();
       await api.createBooking({
         workerId,
-        scheduledDate: new Date(scheduledDate).toISOString(),
-        notes: notes || undefined,
+        title: title.trim(),
+        description: description || undefined,
+        scheduledAt,
+        duration,
+        price: Number(price) || 0,
+        priceType: "fixed",
       });
       toast.success("Réservation envoyée avec succès !");
       router.push("/bookings");
@@ -154,6 +168,17 @@ export default function ReservePage() {
           </h2>
 
           <div className="space-y-2">
+            <Label className="text-workon-ink">Titre de la réservation *</Label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Nettoyage résidentiel"
+              className="w-full h-10 rounded-lg border border-workon-border bg-workon-bg px-3 text-sm text-workon-ink focus:outline-none focus:ring-2 focus:ring-workon-primary/30 focus:border-workon-primary"
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label className="text-workon-ink">Date souhaitée *</Label>
             <input
               type="date"
@@ -165,12 +190,47 @@ export default function ReservePage() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-workon-ink">Notes (optionnel)</Label>
+            <Label className="text-workon-ink">Heure *</Label>
+            <input
+              type="time"
+              value={scheduledTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
+              className="w-full h-10 rounded-lg border border-workon-border bg-workon-bg px-3 text-sm text-workon-ink focus:outline-none focus:ring-2 focus:ring-workon-primary/30 focus:border-workon-primary"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-workon-ink">Durée (minutes) *</Label>
+              <input
+                type="number"
+                min={15}
+                step={15}
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                className="w-full h-10 rounded-lg border border-workon-border bg-workon-bg px-3 text-sm text-workon-ink focus:outline-none focus:ring-2 focus:ring-workon-primary/30 focus:border-workon-primary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-workon-ink">Prix ($CAD) *</Label>
+              <input
+                type="number"
+                min={0}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="150"
+                className="w-full h-10 rounded-lg border border-workon-border bg-workon-bg px-3 text-sm text-workon-ink focus:outline-none focus:ring-2 focus:ring-workon-primary/30 focus:border-workon-primary"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-workon-ink">Description (optionnel)</Label>
             <Textarea
               placeholder="Décrivez votre besoin, l'adresse, les détails importants..."
               rows={4}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="border-workon-border bg-workon-bg text-workon-ink placeholder:text-workon-muted/60 focus:ring-workon-primary/30 focus:border-workon-primary"
             />
           </div>
@@ -180,7 +240,7 @@ export default function ReservePage() {
         <Button
           onClick={handleBooking}
           className="w-full h-12 text-base"
-          disabled={loading || !scheduledDate}
+          disabled={loading || !scheduledDate || !title.trim()}
         >
           {loading ? (
             <>

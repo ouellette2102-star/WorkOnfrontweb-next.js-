@@ -590,7 +590,17 @@ export const api = {
     apiFetch<DisputeResponse>(`/disputes/${id}/resolve`, { method: "PATCH", body: JSON.stringify(data) }),
 
   // Bookings
-  createBooking: (data: { templateId?: string; workerId?: string; scheduledDate: string; notes?: string }) =>
+  createBooking: (data: {
+    workerId: string;
+    templateId?: string;
+    title: string;
+    description?: string;
+    scheduledAt: string;
+    duration: number;
+    price: number;
+    priceType: string;
+    timezone?: string;
+  }) =>
     apiFetch<BookingResponse>("/scheduling/bookings", { method: "POST", body: JSON.stringify(data) }),
   getMyBookings: (filters?: { status?: string; upcoming?: boolean }) => {
     const q = new URLSearchParams();
