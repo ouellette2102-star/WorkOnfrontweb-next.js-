@@ -73,6 +73,15 @@ export default function DisputesPage() {
     queryFn: () => api.getMyMissions(),
   });
 
+  // Also try the dedicated /disputes/mine endpoint
+  const {
+    data: myDisputes,
+    isLoading: myDisputesLoading,
+  } = useQuery({
+    queryKey: ["my-disputes"],
+    queryFn: () => api.getMyDisputes(),
+  });
+
   // Try to fetch disputes for each mission that is completed or in_progress
   const eligibleMissions = (missions ?? []).filter(
     (m) => ["completed", "paid", "in_progress", "assigned"].includes(m.status),
@@ -98,8 +107,18 @@ export default function DisputesPage() {
     enabled: eligibleMissions.length > 0,
   });
 
-  const disputes = disputeQueries.data ?? [];
-  const isLoading = missionsLoading || disputeQueries.isLoading;
+  // Merge disputes from both sources, deduplicate by id
+  const allDisputes = (() => {
+    const map = new Map<string, DisputeResponse & { _missionTitle?: string }>();
+    for (const d of disputeQueries.data ?? []) map.set(d.id, d);
+    for (const d of myDisputes ?? []) {
+      if (!map.has(d.id)) map.set(d.id, d);
+    }
+    return Array.from(map.values());
+  })();
+
+  const disputes = allDisputes;
+  const isLoading = missionsLoading || disputeQueries.isLoading || myDisputesLoading;
 
   return (
     <div className="min-h-screen bg-workon-bg px-4 py-6">
@@ -164,46 +183,9 @@ export default function DisputesPage() {
         {/* Dispute list */}
         {!isLoading && disputes.length > 0 && (
           <div className="space-y-3">
-            {disputes.map((dispute) => {
-              const statusInfo = DISPUTE_STATUS_MAP[dispute.status];
-              return (
-                <Link
-                  key={dispute.id}
-                  href={`/disputes/${dispute.id}`}
-                  className="block rounded-2xl border border-workon-border bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-workon-ink">
-                        {dispute.reason}
-                      </p>
-                      {(dispute as DisputeResponse & { _missionTitle?: string })._missionTitle && (
-                        <p className="mt-0.5 text-sm text-workon-muted">
-                          Mission : {(dispute as DisputeResponse & { _missionTitle?: string })._missionTitle}
-                        </p>
-                      )}
-                      <p className="mt-1 line-clamp-2 text-sm text-workon-muted/80">
-                        {dispute.description}
-                      </p>
-                      <p className="mt-2 text-xs text-workon-muted/60">
-                        Ouvert le{" "}
-                        {new Date(dispute.createdAt).toLocaleDateString("fr-CA", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium whitespace-nowrap ${statusInfo.color}`}
-                    >
-                      {statusInfo.icon}
-                      {statusInfo.label}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+            {disputes.map((dispute) => (
+              <DisputeCard key={dispute.id} dispute={dispute} />
+            ))}
           </div>
         )}
 
@@ -251,6 +233,134 @@ export default function DisputesPage() {
             Pour les urgences, <Link href="/support" className="text-workon-primary underline">contactez le support</Link>.
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function DisputeCard({ dispute }: { dispute: DisputeResponse & { _missionTitle?: string } }) {
+  const [showEvidence, setShowEvidence] = useState(false);
+  const queryClient = useQueryClient();
+  const statusInfo = DISPUTE_STATUS_MAP[dispute.status];
+
+  return (
+    <div className="rounded-2xl border border-workon-border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+      <Link
+        href={`/disputes/${dispute.id}`}
+        className="block p-5"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-workon-ink">
+              {dispute.reason}
+            </p>
+            {dispute._missionTitle && (
+              <p className="mt-0.5 text-sm text-workon-muted">
+                Mission : {dispute._missionTitle}
+              </p>
+            )}
+            <p className="mt-1 line-clamp-2 text-sm text-workon-muted/80">
+              {dispute.description}
+            </p>
+            <p className="mt-2 text-xs text-workon-muted/60">
+              Ouvert le{" "}
+              {new Date(dispute.createdAt).toLocaleDateString("fr-CA", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
+          </div>
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium whitespace-nowrap ${statusInfo.color}`}
+          >
+            {statusInfo.icon}
+            {statusInfo.label}
+          </span>
+        </div>
+      </Link>
+
+      {/* Evidence actions */}
+      {["OPEN", "IN_MEDIATION"].includes(dispute.status) && (
+        <div className="border-t border-workon-border px-5 py-3">
+          {!showEvidence ? (
+            <button
+              onClick={() => setShowEvidence(true)}
+              className="flex items-center gap-2 text-sm font-medium text-workon-primary hover:text-workon-primary-hover transition-colors"
+            >
+              <FileText className="h-4 w-4" />
+              Ajouter une preuve
+            </button>
+          ) : (
+            <EvidenceForm
+              disputeId={dispute.id}
+              onSuccess={() => {
+                setShowEvidence(false);
+                queryClient.invalidateQueries({ queryKey: ["my-disputes"] });
+                queryClient.invalidateQueries({ queryKey: ["disputes-all"] });
+              }}
+              onCancel={() => setShowEvidence(false)}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EvidenceForm({
+  disputeId,
+  onSuccess,
+  onCancel,
+}: {
+  disputeId: string;
+  onSuccess: () => void;
+  onCancel: () => void;
+}) {
+  const [content, setContent] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      api.addDisputeTextEvidence(disputeId, { type: "TEXT", content }),
+    onSuccess: () => {
+      toast.success("Preuve ajoutee avec succes !");
+      setContent("");
+      onSuccess();
+    },
+    onError: () => toast.error("Erreur lors de l'ajout de la preuve"),
+  });
+
+  return (
+    <div className="space-y-3">
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Decrivez votre preuve : captures d'ecran, temoignages, details..."
+        rows={3}
+        className="w-full rounded-xl border border-workon-border bg-workon-bg p-3 text-sm text-workon-ink placeholder-workon-muted/50 focus:border-workon-primary focus:outline-none focus:ring-1 focus:ring-workon-primary"
+      />
+      <div className="flex gap-2">
+        <Button
+          onClick={() => mutation.mutate()}
+          disabled={!content.trim() || mutation.isPending}
+          size="sm"
+          className="bg-workon-primary hover:bg-workon-primary/90 text-white"
+        >
+          {mutation.isPending ? (
+            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+          ) : (
+            <FileText className="mr-2 h-3 w-3" />
+          )}
+          Soumettre
+        </Button>
+        <Button
+          onClick={onCancel}
+          size="sm"
+          variant="outline"
+          className="border-workon-border text-workon-ink"
+        >
+          Annuler
+        </Button>
       </div>
     </div>
   );

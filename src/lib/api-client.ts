@@ -702,6 +702,28 @@ export const api = {
   convertLead: (id: string) =>
     apiFetch<{ missionId: string }>(`/leads/${id}/convert`, { method: "POST" }),
 
+  // Time Logs (check-in / check-out)
+  checkIn: (missionId: string) =>
+    apiFetch<unknown>(`/missions/${missionId}/time-logs/check-in`, { method: "POST" }),
+  checkOut: (missionId: string) =>
+    apiFetch<unknown>(`/missions/${missionId}/time-logs/check-out`, { method: "POST" }),
+  getTimeLogs: (missionId: string) =>
+    apiFetch<unknown[]>(`/missions/${missionId}/time-logs`),
+
+  // Disputes (additional)
+  getMyDisputes: () => apiFetch<DisputeResponse[]>("/disputes/mine"),
+  addDisputeTextEvidence: (disputeId: string, data: { type: string; content: string }) =>
+    apiFetch<unknown>(`/disputes/${disputeId}/evidence`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  // Admin
+  adminReconcile: () =>
+    apiFetch<unknown>("/admin/reconcile-payments", { method: "POST" }),
+  adminSeedCatalog: () =>
+    apiFetch<unknown>("/admin/seed-catalog", { method: "POST" }),
+
   // Legacy Missions (Clerk-era endpoints, kept for backward compatibility)
   legacy: {
     getMissions: () => apiFetch<unknown[]>("/missions/mine"),

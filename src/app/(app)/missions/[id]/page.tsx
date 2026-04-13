@@ -22,6 +22,8 @@ import {
   X,
   Star,
   AlertTriangle,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -549,6 +551,61 @@ function DisputeModalLight({
   );
 }
 
+// ---------- Time Log Buttons ----------
+
+function TimeLogButtons({ missionId }: { missionId: string }) {
+  const queryClient = useQueryClient();
+
+  const checkInMut = useMutation({
+    mutationFn: () => api.checkIn(missionId),
+    onSuccess: () => {
+      toast.success("Check-in enregistré !");
+      queryClient.invalidateQueries({ queryKey: ["mission", missionId] });
+    },
+    onError: (err) =>
+      toast.error(err instanceof Error ? err.message : "Erreur lors du check-in"),
+  });
+
+  const checkOutMut = useMutation({
+    mutationFn: () => api.checkOut(missionId),
+    onSuccess: () => {
+      toast.success("Check-out enregistré !");
+      queryClient.invalidateQueries({ queryKey: ["mission", missionId] });
+    },
+    onError: (err) =>
+      toast.error(err instanceof Error ? err.message : "Erreur lors du check-out"),
+  });
+
+  return (
+    <div className="flex gap-3">
+      <Button
+        onClick={() => checkInMut.mutate()}
+        disabled={checkInMut.isPending}
+        className="flex-1 bg-workon-primary hover:bg-workon-primary-hover text-white rounded-2xl py-3"
+      >
+        {checkInMut.isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        ) : (
+          <LogIn className="h-4 w-4 mr-2" />
+        )}
+        Arrivé
+      </Button>
+      <Button
+        onClick={() => checkOutMut.mutate()}
+        disabled={checkOutMut.isPending}
+        className="flex-1 bg-workon-accent hover:bg-workon-accent-hover text-white rounded-2xl py-3"
+      >
+        {checkOutMut.isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        ) : (
+          <LogOut className="h-4 w-4 mr-2" />
+        )}
+        Terminé
+      </Button>
+    </div>
+  );
+}
+
 // ---------- Main Page ----------
 
 /**
@@ -786,6 +843,11 @@ export default function MissionDetailPage() {
             )}
             Terminer la mission
           </Button>
+        )}
+
+        {/* Time-log check-in / check-out (assigned worker, in_progress only) */}
+        {isAssigned && mission.status === "in_progress" && (
+          <TimeLogButtons missionId={id} />
         )}
 
         {/* Employer: pay completed mission */}

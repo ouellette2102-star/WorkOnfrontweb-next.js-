@@ -17,7 +17,7 @@ const TOKEN_KEY = "workon_access_token";
 const REFRESH_KEY = "workon_refresh_token";
 const USER_KEY = "workon_user";
 
-export type UserRole = "worker" | "employer" | "residential_client";
+export type UserRole = "worker" | "employer" | "residential_client" | "admin";
 
 export interface AuthUser {
   id: string;
