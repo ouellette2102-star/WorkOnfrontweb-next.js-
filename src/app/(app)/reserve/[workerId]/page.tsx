@@ -8,10 +8,11 @@ import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Shield, MapPin, Loader2, CalendarDays, ArrowLeft } from "lucide-react";
+import { Star, Shield, MapPin, Loader2, CalendarDays, ArrowLeft, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
 
 export default function ReservePage() {
   const { workerId } = useParams<{ workerId: string }>();
@@ -24,6 +25,34 @@ export default function ReservePage() {
   const [description, setDescription] = useState("");
   const [duration, setDuration] = useState(60);
   const [price, setPrice] = useState("");
+  const [sendingDirect, setSendingDirect] = useState(false);
+
+  async function handleDirectRequest() {
+    if (!title.trim()) {
+      toast.error("Décris ton besoin avant d'envoyer.");
+      return;
+    }
+    setSendingDirect(true);
+    try {
+      const mission = await api.createMission({
+        title: title.trim(),
+        description: description || title.trim(),
+        category: "other",
+        price: Number(price) || 0,
+        latitude: 45.5017,
+        longitude: -73.5673,
+        city: "Montreal",
+      });
+      // Send first message in the mission thread
+      await api.sendMessage({ missionId: mission.id, content: `Bonjour, ${description || title.trim()}` });
+      toast.success("Demande envoyée ! Redirection vers le chat...");
+      router.push(`/messages/${mission.id}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors de l'envoi.");
+    } finally {
+      setSendingDirect(false);
+    }
+  }
 
   const { data: worker, isLoading } = useQuery({
     queryKey: ["worker", workerId],
@@ -251,6 +280,32 @@ export default function ReservePage() {
             <>
               <CalendarDays className="h-4 w-4 mr-2" />
               Confirmer la réservation
+            </>
+          )}
+        </Button>
+
+        <div className="relative flex items-center gap-3 py-2">
+          <div className="flex-1 border-t border-workon-border" />
+          <span className="text-xs text-workon-muted">ou</span>
+          <div className="flex-1 border-t border-workon-border" />
+        </div>
+
+        {/* Direct message — creates mission + opens chat */}
+        <Button
+          variant="outline"
+          onClick={handleDirectRequest}
+          className="w-full h-12 text-base border-workon-accent text-workon-accent hover:bg-workon-accent/5"
+          disabled={sendingDirect || !title.trim()}
+        >
+          {sendingDirect ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Envoi...
+            </>
+          ) : (
+            <>
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Envoyer une demande directe
             </>
           )}
         </Button>
