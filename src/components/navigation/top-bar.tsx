@@ -26,6 +26,10 @@ import {
   Shield,
   Star,
   Settings,
+  FileText,
+  AlertTriangle,
+  Gauge,
+  Wrench,
 } from "lucide-react";
 
 /**
@@ -73,9 +77,13 @@ export function TopBar() {
       : [
           { href: "/bookings", label: "Mes réservations", icon: Receipt },
         ]),
+    { href: "/contracts", label: "Contrats", icon: FileText },
+    { href: "/disputes", label: "Litiges", icon: AlertTriangle },
+    { href: "/operator", label: "Centre de commande", icon: Gauge },
     { href: "/settings", label: "Paramètres", icon: Settings },
     { href: "/support", label: "Aide & support", icon: HelpCircle },
     { href: "/profile/verify", label: "Vérification", icon: Shield },
+    ...(user?.role === "admin" ? [{ href: "/admin", label: "Administration", icon: Wrench }] : []),
   ];
 
   return (
