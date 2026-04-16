@@ -95,35 +95,51 @@ export function ProfileForm() {
       return;
     }
 
-    // Convert to base64 data URI for preview + storage
+    // Compress image to max 200x200 JPEG, then convert to base64
     setAvatarMessage(null);
     setIsUploadingAvatar(true);
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const dataUri = reader.result as string;
-      setAvatarPreview(dataUri);
-
-      try {
-        // Save as data URI via avatar URL endpoint (no file upload needed)
-        await api.updateAvatar(dataUri);
-        await refetch();
-        setAvatarMessage("Photo mise a jour !");
-        setAvatarMessageType("success");
-      } catch (uploadError) {
-        setAvatarMessage(
-          uploadError instanceof Error
-            ? uploadError.message
-            : "Impossible de sauvegarder la photo.",
-        );
-        setAvatarMessageType("error");
-        setAvatarPreview(profile?.pictureUrl ?? null);
-      } finally {
-        setIsUploadingAvatar(false);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }
+    const compressImage = (src: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX = 200;
+          let w = img.width;
+          let h = img.height;
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) { reject(new Error("Canvas not supported")); return; }
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.8));
+        };
+        img.onerror = () => reject(new Error("Image load failed"));
+        img.src = URL.createObjectURL(src);
+      });
     };
-    reader.readAsDataURL(file);
+
+    try {
+      const dataUri = await compressImage(file);
+      setAvatarPreview(dataUri);
+      await api.updateAvatar(dataUri);
+      await refetch();
+      setAvatarMessage("Photo mise a jour !");
+      setAvatarMessageType("success");
+    } catch (uploadError) {
+      setAvatarMessage(
+        uploadError instanceof Error
+          ? uploadError.message
+          : "Impossible de sauvegarder la photo.",
+      );
+      setAvatarMessageType("error");
+      setAvatarPreview(profile?.pictureUrl ?? null);
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const initials = (profile?.fullName ?? "?")
