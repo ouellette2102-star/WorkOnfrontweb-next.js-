@@ -141,7 +141,7 @@ export default async function ProsPage() {
         <div className="mx-auto max-w-6xl px-4 py-6 flex items-center justify-between text-xs text-[#9C9A96]">
           <Link href="/" className="hover:text-[#706E6A]">WorkOn</Link>
           <p>Les travailleurs sont des prestataires autonomes.</p>
-          <Link href="/employeurs" className="hover:text-[#706E6A]">Côté employeur →</Link>
+          <Link href="/employeurs" className="hover:text-[#706E6A]">Côté client →</Link>
         </div>
       </footer>
     </main>

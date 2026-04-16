@@ -5,7 +5,7 @@ import { useProfile } from "@/hooks/use-profile";
 
 const ROLE_LABELS: Record<string, string> = {
   WORKER: "Travailleur",
-  EMPLOYER: "Employeur",
+  EMPLOYER: "Client entreprise",
   CLIENT_RESIDENTIAL: "Client résidentiel",
   ADMIN: "Administrateur",
 };

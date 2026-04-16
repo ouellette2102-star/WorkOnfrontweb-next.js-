@@ -50,10 +50,10 @@ export default function ExpressPage() {
         <div className="flex flex-col items-center text-center space-y-4">
           <AlertCircle className="h-12 w-12 text-workon-accent" />
           <h1 className="text-xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
-            Accès réservé aux employeurs
+            Accès réservé aux clients
           </h1>
           <p className="text-sm text-workon-gray">
-            Le dispatch express est réservé aux employeurs. Changez votre rôle ou créez un compte employeur pour accéder à cette fonctionnalité.
+            Le dispatch express est réservé aux clients. Changez votre rôle ou créez un compte client pour accéder à cette fonctionnalité.
           </p>
         </div>
       </div>

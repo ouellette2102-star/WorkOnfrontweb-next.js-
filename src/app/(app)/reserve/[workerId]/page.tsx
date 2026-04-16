@@ -120,7 +120,7 @@ export default function ReservePage() {
           </div>
           <h2 className="mb-2 text-lg font-bold text-workon-ink">Compte travailleur</h2>
           <p className="mb-6 text-sm text-workon-muted">
-            La reservation de professionnels est disponible pour les comptes employeur.
+            La reservation de professionnels est disponible pour les comptes client.
             En tant que travailleur, tu peux recevoir des missions et des demandes de clients.
           </p>
           <Link

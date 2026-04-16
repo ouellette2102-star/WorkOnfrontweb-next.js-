@@ -73,7 +73,7 @@ export function DashboardHero({ displayName }: DashboardHeroProps) {
           <h2 className="mt-4 text-2xl font-semibold text-workon-ink">Choisis ton rôle principal</h2>
           <p className="mt-3 max-w-2xl text-workon-muted">
             Ton espace sera personnalisé après avoir sélectionné ton rôle principal (travailleur,
-            employeur ou client résidentiel).
+            client entreprise ou client résidentiel).
           </p>
           <Link
             href="/profile"

@@ -84,7 +84,7 @@ export default async function WorkerDashboardPage() {
                 Messages
               </h3>
               <p className="text-xs text-[#706E6A]">
-                Communique avec les employeurs
+                Communique avec les clients
               </p>
             </div>
           </Link>

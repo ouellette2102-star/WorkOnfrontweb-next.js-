@@ -28,7 +28,7 @@ function ReviewCard({ r }: { r: FeaturedReview }) {
       </div>
       <p className="text-sm text-[#1B1A18] leading-relaxed line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
       <div className="mt-4 flex items-center justify-between text-xs text-[#706E6A]">
-        <span>{r.authorName ?? "Employeur anonyme"}</span>
+        <span>{r.authorName ?? "Client anonyme"}</span>
         {r.workerName && (
           <span className="text-workon-accent/60">Pro : {r.workerName}</span>
         )}

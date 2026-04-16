@@ -29,13 +29,13 @@ export function MissionFeedList({ missions, onReserve }: Props) {
             </div>
           )}
 
-          {/* Titre et employeur */}
+          {/* Titre et client */}
           <div className="mb-3">
             <h3 className="font-heading mb-1 text-base font-bold text-[#1B1A18] line-clamp-2">
               {mission.title}
             </h3>
             <p className="text-sm text-[#706E6A]">
-              par {mission.employerName || "Employeur"}
+              par {mission.employerName || "Client"}
             </p>
           </div>
 

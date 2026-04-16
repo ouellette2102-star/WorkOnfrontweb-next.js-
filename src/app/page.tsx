@@ -500,7 +500,7 @@ function EmployerSection({ stats }: { stats: PublicStats | null }) {
       <div className="mx-auto max-w-6xl px-4 py-[7.5rem]">
         <div className="rounded-3xl bg-gradient-to-br from-workon-accent/5 via-workon-accent/8 to-workon-accent/5 border border-workon-accent/15 p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="max-w-lg">
-            <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Employeurs</p>
+            <p className="text-sm font-semibold text-workon-accent uppercase tracking-widest mb-4">Clients</p>
             <h2 className="font-heading text-3xl font-bold text-[#1B1A18]">Vous cherchez du renfort qualifié?</h2>
             <p className="mt-4 text-lg text-[#706E6A] leading-relaxed">
               Zéro commission pendant le lancement. Accès à{" "}
@@ -511,7 +511,7 @@ function EmployerSection({ stats }: { stats: PublicStats | null }) {
             </p>
           </div>
           <Button size="lg" className="bg-[#134021] hover:bg-[#0F3319] text-white h-14 px-10 text-base font-semibold rounded-xl flex-shrink-0 shadow-lg shadow-[#134021]/20" asChild>
-            <Link href="/employeurs">Découvrir l&apos;offre employeur →</Link>
+            <Link href="/employeurs">Découvrir l&apos;offre client →</Link>
           </Button>
         </div>
       </div>

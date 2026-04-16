@@ -72,7 +72,7 @@ export default function OnboardingRolePage() {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
           </button>
 
-          {/* Carte Employeur */}
+          {/* Carte Client entreprise */}
           <button
             onClick={() => handleRoleSelect("EMPLOYER")}
             disabled={isSubmitting}
@@ -81,10 +81,10 @@ export default function OnboardingRolePage() {
             <div className="relative z-10">
               <div className="mb-4 text-6xl">💼</div>
               <h2 className="mb-3 text-2xl font-bold text-workon-ink">
-                Je suis Employeur
+                Je suis Client entreprise
               </h2>
               <p className="text-workon-muted">
-                Je publie des missions et je cherche des travailleurs qualifiés
+                Tu publies des missions et tu fais appel à des professionnels.
               </p>
             </div>
             <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />

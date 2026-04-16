@@ -67,7 +67,7 @@ export function getMissionStatusMessage(
       case MissionStatus.CANCELLED:
         return {
           title: "Mission annulée",
-          message: `${title} a été annulée par l'employeur.`,
+          message: `${title} a été annulée par le client.`,
           action: { label: "Voir d'autres missions", href: "/missions/available" },
           icon: "❌",
           variant: "warning",

@@ -14,7 +14,7 @@ export function MessageBubble({ message, isOwnMessage }: MessageBubbleProps) {
 
   const roleLabel =
     message.senderRole === MessageSenderRole.EMPLOYER
-      ? "Employeur"
+      ? "Client"
       : "Travailleur";
 
   return (

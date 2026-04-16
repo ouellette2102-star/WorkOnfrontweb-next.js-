@@ -12,10 +12,10 @@ export default async function EmployerDashboardPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-workon-ink sm:text-4xl">
-            Bienvenue, {profile.fullName || "Employeur"}
+            Bienvenue, {profile.fullName || "Client"}
           </h1>
           <p className="mt-1 text-base text-workon-muted">
-            Votre tableau de bord employeur
+            Votre tableau de bord client
           </p>
         </div>
 

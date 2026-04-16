@@ -8,7 +8,7 @@ import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
 
 const roleLabels: Record<string, string> = {
   worker: "Travailleur",
-  employer: "Employeur",
+  employer: "Client entreprise",
   client: "Client résidentiel",
   admin: "Administrateur",
 };

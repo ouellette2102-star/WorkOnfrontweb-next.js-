@@ -115,13 +115,13 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
                 </span>
               </div>
 
-              {/* Titre et employeur */}
+              {/* Titre et client */}
               <div className="mb-6">
                 <h2 className="font-heading mb-2 text-3xl font-bold text-[#1B1A18]">
                   {currentMission.title}
                 </h2>
                 <p className="text-lg text-[#706E6A]">
-                  par {currentMission.employerName || "Employeur"}
+                  par {currentMission.employerName || "Client"}
                 </p>
               </div>
 

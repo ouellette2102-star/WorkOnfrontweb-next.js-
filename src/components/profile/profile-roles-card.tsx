@@ -17,8 +17,8 @@ const ROLE_OPTIONS: Array<{
   },
   {
     key: "EMPLOYER",
-    label: "Employeur",
-    description: "Tu postes des missions, tu sélectionnes des talents et tu suis leur avancement.",
+    label: "Client entreprise",
+    description: "Tu publies des missions et tu fais appel à des professionnels.",
   },
   {
     key: "CLIENT_RESIDENTIAL",
@@ -90,7 +90,7 @@ export function ProfileRolesCard() {
       <p className="text-sm uppercase tracking-[0.4em] text-workon-accent">Ton rôle WorkOn</p>
       <h2 className="mt-4 text-2xl font-semibold">Sélectionne ton espace principal</h2>
       <p className="mt-3 text-workon-muted">
-        Tu peux activer plusieurs espaces en parallèle (Worker, Employer, Client).
+        Tu peux activer plusieurs espaces en parallèle (Travailleur, Client entreprise, Client résidentiel).
         Choisis simplement celui que tu veux voir en priorité dans le dashboard.
       </p>
 
@@ -151,7 +151,7 @@ export function ProfileRolesCard() {
           <p className="font-semibold text-white">Accès actifs :</p>
           <ul className="mt-2 space-y-1">
             <li>• Travailleurs : {profile.isWorker ? "✅ actif" : "—"}</li>
-            <li>• Employeurs : {profile.isEmployer ? "✅ actif" : "—"}</li>
+            <li>• Clients entreprise : {profile.isEmployer ? "✅ actif" : "—"}</li>
             <li>
               • Clients résidentiels : {profile.isClientResidential ? "✅ actif" : "—"}
             </li>

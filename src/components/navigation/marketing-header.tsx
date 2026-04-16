@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * - `theme="light"` — landing page (white bg, dark text)
  * - `theme="dark"`  — /pros, /employeurs, /p/[slug] (dark bg, white text)
  *
- * The nav items list defaults to { Accueil, Pour les pros, Employeurs,
+ * The nav items list defaults to { Accueil, Pour les pros, Clients,
  * Tarifs } but can be overridden per surface.
  */
 
@@ -36,7 +36,7 @@ export interface MarketingHeaderProps {
 const DEFAULT_ITEMS: MarketingHeaderNavItem[] = [
   { href: "/", label: "Accueil" },
   { href: "/pros", label: "Travailleurs" },
-  { href: "/employeurs", label: "Employeurs" },
+  { href: "/employeurs", label: "Clients" },
   { href: "/pricing", label: "Tarifs" },
 ];
 

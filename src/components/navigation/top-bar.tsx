@@ -59,7 +59,7 @@ export function TopBar() {
     user?.role === "worker"
       ? "Professionnel"
       : user?.role === "employer"
-        ? "Employeur"
+        ? "Client"
         : "Client résidentiel";
 
   const menuItems = [
