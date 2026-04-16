@@ -547,6 +547,7 @@ export const api = {
 
   // Invoices
   getInvoice: (id: string) => apiFetch<InvoiceResponse>(`/payments/invoice/${id}`),
+  getMyInvoices: () => apiFetch<InvoiceResponse[]>("/payments/invoices/mine"),
   previewInvoice: (priceCents: number) =>
     apiFetch<InvoicePreview>(`/payments/preview?priceCents=${priceCents}`),
 
