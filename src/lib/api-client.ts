@@ -469,6 +469,11 @@ export const api = {
   getThread: (missionId: string) => apiFetch<ChatMessage[]>(`/messages-local/thread/${missionId}`),
   sendMessage: (data: { missionId: string; content: string }) =>
     apiFetch<ChatMessage>("/messages-local", { method: "POST", body: JSON.stringify(data) }),
+  sendDirectMessage: (recipientId: string, content: string) =>
+    apiFetch<{ id: string; missionId: string; content: string }>("/messages-local/direct", {
+      method: "POST",
+      body: JSON.stringify({ recipientId, content }),
+    }),
   markRead: (missionId: string) => apiFetch<void>(`/messages-local/read/${missionId}`, { method: "PATCH" }),
   getUnreadCount: () => apiFetch<{ count: number }>("/messages-local/unread-count"),
 

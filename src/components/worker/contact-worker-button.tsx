@@ -16,8 +16,6 @@ interface ContactWorkerButtonProps {
 export function ContactWorkerButton({
   workerId,
   workerFirstName,
-  workerCategory,
-  workerCity,
 }: ContactWorkerButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -29,27 +27,14 @@ export function ContactWorkerButton({
 
     setLoading(true);
     try {
-      // Step 1: Create a mission for this worker
-      const mission = await api.createMission({
-        title: `Demande - ${workerCategory || "Service"}`,
-        description: `Demande de contact via WorkOn pour ${workerFirstName}`,
-        category: workerCategory || "other",
-        price: 0,
-        latitude: 45.5017,
-        longitude: -73.5673,
-        city: workerCity || "Montreal",
-      });
+      // Send direct message — backend auto-creates mission-conversation
+      const result = await api.sendDirectMessage(
+        workerId,
+        `Bonjour ${workerFirstName}, je suis intéressé par vos services. Êtes-vous disponible ?`,
+      );
 
-      // Step 2: SUPERLIKE the worker so they get notified
-      try {
-        await api.recordSwipe({ candidateId: workerId, action: "SUPERLIKE" });
-      } catch {
-        // Swipe may fail if already swiped — non-blocking
-      }
-
-      // Step 3: Redirect to the mission page (worker will see it and can accept → then chat opens)
-      toast.success(`Demande envoyée à ${workerFirstName} ! En attente de réponse.`);
-      router.push(`/missions/${mission.id}`);
+      toast.success(`Message envoyé à ${workerFirstName} !`);
+      router.push(`/messages/${result.missionId}`);
     } catch (err) {
       console.error("Contact error:", err);
       toast.error("Impossible de contacter ce professionnel. Réessayez.");
@@ -69,7 +54,7 @@ export function ContactWorkerButton({
       ) : (
         <MessageCircle className="h-3.5 w-3.5" />
       )}
-      {loading ? "Connexion..." : "Contacter"}
+      {loading ? "Envoi..." : "Contacter"}
     </button>
   );
 }

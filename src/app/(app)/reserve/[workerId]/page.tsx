@@ -34,23 +34,13 @@ export default function ReservePage() {
     }
     setSendingDirect(true);
     try {
-      const mission = await api.createMission({
-        title: title.trim(),
-        description: description || title.trim(),
-        category: worker?.category || "other",
-        price: Number(price) || 0,
-        latitude: 45.5017,
-        longitude: -73.5673,
-        city: worker?.city || "Montreal",
-      });
-      // Notify worker via SUPERLIKE
-      try {
-        await api.recordSwipe({ candidateId: workerId, action: "SUPERLIKE" });
-      } catch {
-        // Non-blocking if already swiped
-      }
-      toast.success("Demande envoyée ! Le professionnel sera notifié.");
-      router.push(`/missions/${mission.id}`);
+      // Send direct message — backend auto-creates conversation
+      const result = await api.sendDirectMessage(
+        workerId,
+        `${title.trim()}${description ? ` — ${description}` : ""}${price ? ` (budget: ${price}$)` : ""}`,
+      );
+      toast.success("Message envoyé ! Redirection vers la conversation...");
+      router.push(`/messages/${result.missionId}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur lors de l'envoi.");
     } finally {
