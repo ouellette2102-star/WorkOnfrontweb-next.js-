@@ -94,18 +94,10 @@ export function ProfileRolesCard() {
         Choisis simplement celui que tu veux voir en priorité dans le dashboard.
       </p>
 
-      {/* Beta notice — role-change endpoint not yet shipped backend-side */}
-      <div className="mt-5 flex items-start gap-3 rounded-2xl border border-yellow-500/25 bg-yellow-500/5 p-4 text-sm">
-        <AlertCircle className="h-4 w-4 flex-shrink-0 text-yellow-400 mt-0.5" />
-        <div className="text-white/80">
-          <p className="font-medium">Changement de rôle en cours de préparation</p>
-          <p className="mt-1 text-workon-muted text-xs leading-relaxed">
-            L&apos;endpoint backend dédié arrive bientôt. En attendant, ton rôle
-            actuel est affiché mais la sauvegarde n&apos;est pas encore active —
-            tu recevras un message clair si tu cliques sur « Sauvegarder ».
-          </p>
-        </div>
-      </div>
+      {/* Role change info */}
+      <p className="mt-5 text-xs text-workon-muted">
+        Ton rôle détermine ce que tu vois dans l&apos;app. Tu peux le changer à tout moment.
+      </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         {ROLE_OPTIONS.map((option) => {

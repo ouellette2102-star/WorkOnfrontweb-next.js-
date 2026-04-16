@@ -801,18 +801,15 @@ export const api = {
     if (typeof data.phone === "string") patch.phone = data.phone;
     if (typeof data.city === "string") patch.city = data.city;
 
-    // HARD GUARD: backend PATCH /users/me does NOT accept role updates
-    // ("property role should not exist"). Silently dropping the field
-    // the way we used to caused ProfileRolesCard to show a fake
-    // "Rôle principal mis à jour ✨" success toast while nothing
-    // actually changed server-side. Throw loudly so callers can
-    // surface a real error to the user and we never regress into the
-    // silent-drop pattern again.
+    // Map primaryRole to backend role field
     if (data.primaryRole !== undefined) {
-      throw new Error(
-        "Le changement de rôle principal n'est pas encore supporté. " +
-          "Un endpoint dédié sera ajouté côté backend.",
-      );
+      const roleMap: Record<string, string> = {
+        WORKER: "worker",
+        EMPLOYER: "employer",
+        CLIENT_RESIDENTIAL: "residential_client",
+        ADMIN: "admin",
+      };
+      (patch as Record<string, string>).role = roleMap[data.primaryRole] || data.primaryRole.toLowerCase();
     }
 
     const u = await apiFetch<{
