@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import {
@@ -30,6 +31,7 @@ import {
   AlertTriangle,
   Gauge,
   Wrench,
+  Users,
 } from "lucide-react";
 
 /**
@@ -42,6 +44,7 @@ import {
  */
 export function TopBar() {
   const { user, logout } = useAuth();
+  const { mode, setMode } = useMode();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -55,19 +58,14 @@ export function TopBar() {
 
   const unread = notifCount?.count ?? 0;
 
-  const roleLabel =
-    user?.role === "worker"
-      ? "Professionnel"
-      : user?.role === "employer"
-        ? "Client"
-        : "Client résidentiel";
+  const roleLabel = mode === "pro" ? "Mode Pro" : "Mode Client";
 
   const menuItems = [
     { href: "/home", label: "Tableau de bord", icon: Home },
     { href: "/profile", label: "Mon profil", icon: User },
     { href: "/search", label: "Opportunités", icon: Briefcase },
     { href: "/reviews", label: "Mes avis", icon: Star },
-    ...(user?.role === "worker"
+    ...(mode === "pro"
       ? [
           { href: "/leads", label: "Mes leads", icon: Target },
           { href: "/worker/availability", label: "Disponibilités", icon: BarChart3 },
@@ -141,6 +139,34 @@ export function TopBar() {
                 {user?.firstName} {user?.lastName}
               </p>
               <p className="text-xs text-workon-muted">{roleLabel}</p>
+            </div>
+
+            {/* Mode toggle */}
+            <div className="px-4 py-3 border-b border-workon-border flex items-center justify-center">
+              <div className="bg-workon-bg rounded-full p-0.5 border border-workon-border flex">
+                <button
+                  onClick={() => setMode("pro")}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                    mode === "pro"
+                      ? "bg-workon-primary text-white"
+                      : "text-workon-muted"
+                  }`}
+                >
+                  <Briefcase className="h-3.5 w-3.5" />
+                  Pro
+                </button>
+                <button
+                  onClick={() => setMode("client")}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                    mode === "client"
+                      ? "bg-workon-primary text-white"
+                      : "text-workon-muted"
+                  }`}
+                >
+                  <Users className="h-3.5 w-3.5" />
+                  Client
+                </button>
+              </div>
             </div>
 
             {/* Menu items */}

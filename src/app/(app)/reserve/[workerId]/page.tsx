@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Shield, MapPin, Loader2, CalendarDays, ArrowLeft, MessageCircle } from "lucide-react";
+import { Star, Shield, MapPin, Loader2, CalendarDays, ArrowLeft, MessageCircle, ArrowRightLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -17,6 +18,7 @@ import { Input } from "@/components/ui/input";
 export default function ReservePage() {
   const { workerId } = useParams<{ workerId: string }>();
   const { user } = useAuth();
+  const { mode, setMode } = useMode();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [scheduledDate, setScheduledDate] = useState("");
@@ -108,28 +110,26 @@ export default function ReservePage() {
 
   const fullName = worker.fullName || `${worker.firstName} ${worker.lastName}`;
   const hasReviews = (worker.reviewCount ?? 0) > 0;
-  const isWorker = user?.role === "worker";
 
-  // Workers can't create missions/bookings — show a clear message
-  if (isWorker) {
+  // Pro mode users see a prompt to switch to client mode
+  if (mode === "pro") {
     return (
       <div className="min-h-screen bg-workon-bg px-4 py-12">
         <div className="mx-auto max-w-md rounded-3xl border border-workon-border bg-white p-8 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-workon-accent/10">
-            <Shield className="h-7 w-7 text-workon-accent" />
+            <ArrowRightLeft className="h-7 w-7 text-workon-accent" />
           </div>
-          <h2 className="mb-2 text-lg font-bold text-workon-ink">Compte travailleur</h2>
+          <h2 className="mb-2 text-lg font-bold text-workon-ink">Fonctionnalité Mode Client</h2>
           <p className="mb-6 text-sm text-workon-muted">
-            La reservation de professionnels est disponible pour les comptes client.
-            En tant que travailleur, tu peux recevoir des missions et des demandes de clients.
+            La réservation de professionnels est disponible en Mode Client.
+            Passe en mode Client pour réserver ce pro.
           </p>
-          <Link
-            href="/search"
+          <button
+            onClick={() => setMode("client")}
             className="inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-2.5 text-sm font-medium text-white"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Retour a la recherche
-          </Link>
+            Passer en Mode Client
+          </button>
         </div>
       </div>
     );

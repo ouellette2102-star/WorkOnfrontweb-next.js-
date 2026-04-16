@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import { api } from "@/lib/api-client";
 import { StatsBar } from "@/components/stats-bar";
 import { WorkerCard } from "@/components/worker/worker-card";
@@ -13,6 +14,9 @@ import Link from "next/link";
 
 export default function HomePage() {
   const { user } = useAuth();
+  const { mode } = useMode();
+  const isClient = mode === "client";
+  const isPro = mode === "pro";
 
   const { data: stats } = useQuery({
     queryKey: ["home-stats"],
@@ -36,8 +40,8 @@ export default function HomePage() {
   });
 
   const { data: myMissions } = useQuery({
-    queryKey: ["my-missions"],
-    queryFn: () => (user?.role === "employer" ? api.getMyMissions() : api.getMyAssignments()),
+    queryKey: ["my-missions", mode],
+    queryFn: () => (isClient ? api.getMyMissions() : api.getMyAssignments()),
     enabled: !!user,
   });
 
@@ -50,10 +54,10 @@ export default function HomePage() {
       {/* Hero — light organic gradient */}
       <div className="relative -mx-4 -mt-6 px-4 pt-6 pb-8 bg-gradient-to-b from-workon-primary/10 via-workon-primary/5 to-transparent">
         <h1 className="text-2xl font-bold text-center text-workon-ink">
-          {user?.role === "worker" ? "Trouvez des missions" : "Trouvez votre talent"}
+          {isPro ? "Trouvez des missions" : "Trouvez votre talent"}
         </h1>
         <p className="text-center text-workon-muted text-sm mt-1">
-          {user?.role === "worker"
+          {isPro
             ? "Missions disponibles près de chez vous"
             : "Une ligne directe vers le travail instantané"}
         </p>
@@ -64,12 +68,12 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Stripe Connect gate (workers only — hidden when onboarded) */}
-      {user?.role === "worker" && <StripeConnectGate />}
+      {/* Stripe Connect gate (pro mode only — hidden when onboarded) */}
+      {isPro && <StripeConnectGate />}
 
       {/* Quick actions */}
       <div className="flex gap-3">
-        {user?.role === "employer" || user?.role === "residential_client" ? (
+        {isClient ? (
           <>
             <Button asChild className="flex-1 h-12 bg-workon-accent hover:bg-workon-accent/90 text-white">
               <Link href="/express">
@@ -130,18 +134,18 @@ export default function HomePage() {
                   <Briefcase className="h-5 w-5 text-workon-primary" />
                 </div>
                 <h2 className="font-semibold text-base text-workon-ink">
-                  {user.role === "employer"
+                  {isClient
                     ? "Aucune mission en cours"
                     : "Prêt pour ta prochaine mission ?"}
                 </h2>
                 <p className="mt-1 text-sm text-workon-muted">
-                  {user.role === "employer"
+                  {isClient
                     ? "Publie ta première mission."
                     : "Des missions t'attendent près de chez toi."}
                 </p>
                 <Button asChild className="mt-4 bg-workon-primary hover:bg-workon-primary/90 text-white">
-                  <Link href={user.role === "employer" ? "/express" : "/search"}>
-                    {user.role === "employer" ? "Express Dispatch" : "Voir les missions"}
+                  <Link href={isClient ? "/express" : "/search"}>
+                    {isClient ? "Express Dispatch" : "Voir les missions"}
                   </Link>
                 </Button>
               </div>

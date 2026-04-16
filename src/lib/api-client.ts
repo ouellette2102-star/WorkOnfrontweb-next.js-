@@ -485,7 +485,7 @@ export const api = {
   }),
 
   // Profile
-  updateProfile: (data: { firstName?: string; lastName?: string; phone?: string; city?: string }) =>
+  updateProfile: (data: { firstName?: string; lastName?: string; phone?: string; city?: string; role?: string }) =>
     apiFetch<unknown>("/users/me", { method: "PATCH", body: JSON.stringify(data) }),
   uploadProfilePicture: (file: File) => {
     const formData = new FormData();

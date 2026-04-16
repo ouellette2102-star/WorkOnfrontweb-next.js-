@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 
 /**
  * Vintage rotary desk phone — optimised for 56 px FAB at 2× density.
@@ -75,7 +76,8 @@ const rightTabs: Tab[] = [
 export function BottomNav() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const isWorker = user?.role === "worker";
+  const { mode } = useMode();
+  const isWorker = mode === "pro";
 
   const { data: unread } = useQuery({
     queryKey: ["unread-count"],

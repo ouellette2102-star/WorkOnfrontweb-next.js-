@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import {
   Phone,
   MapPin,
@@ -11,6 +12,7 @@ import {
   CheckCircle,
   AlertCircle,
   Navigation,
+  ArrowRightLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -34,6 +36,7 @@ interface ExpressResult {
 
 export default function ExpressPage() {
   const { user } = useAuth();
+  const { mode, setMode } = useMode();
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [city, setCity] = useState(user?.city ?? "");
@@ -43,18 +46,24 @@ export default function ExpressPage() {
   const [gpsStatus, setGpsStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [result, setResult] = useState<ExpressResult | null>(null);
 
-  // Role gate: only employers can dispatch express missions
-  if (user && user.role === "worker") {
+  // Mode gate: pro mode users see a prompt to switch
+  if (mode === "pro") {
     return (
       <div className="max-w-lg mx-auto px-4 py-8">
         <div className="flex flex-col items-center text-center space-y-4">
-          <AlertCircle className="h-12 w-12 text-workon-accent" />
+          <ArrowRightLeft className="h-12 w-12 text-workon-accent" />
           <h1 className="text-xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
-            Accès réservé aux clients
+            Fonctionnalité Mode Client
           </h1>
           <p className="text-sm text-workon-gray">
-            Le dispatch express est réservé aux clients. Changez votre rôle ou créez un compte client pour accéder à cette fonctionnalité.
+            Le dispatch express est disponible en Mode Client. Passe en mode Client pour dispatcher une mission.
           </p>
+          <Button
+            onClick={() => setMode("client")}
+            className="bg-workon-primary hover:bg-workon-primary/90 text-white rounded-2xl px-6 py-3"
+          >
+            Passer en Mode Client
+          </Button>
         </div>
       </div>
     );
