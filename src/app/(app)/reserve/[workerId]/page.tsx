@@ -79,7 +79,12 @@ export default function ReservePage() {
       toast.success("Réservation envoyée avec succès !");
       router.push("/bookings");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur lors de la réservation.");
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("not available") || msg.includes("disponible")) {
+        toast.error("Ce professionnel n'a pas encore configuré ses disponibilités. Envoyez-lui un message direct à la place.");
+      } else {
+        toast.error(msg || "Erreur lors de la réservation.");
+      }
     } finally {
       setLoading(false);
     }
@@ -283,6 +288,15 @@ export default function ReservePage() {
               className="border-workon-border bg-workon-bg text-workon-ink placeholder:text-workon-muted/60 focus:ring-workon-primary/30 focus:border-workon-primary"
             />
           </div>
+        </div>
+
+        {/* Availability warning */}
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <p className="font-medium">Note</p>
+          <p className="text-xs mt-1">
+            Si ce professionnel n&apos;a pas configuré ses disponibilités, la réservation sera refusée.
+            Utilisez &quot;Envoyer un message direct&quot; ci-dessous pour le contacter sans réservation.
+          </p>
         </div>
 
         {/* CTA */}
