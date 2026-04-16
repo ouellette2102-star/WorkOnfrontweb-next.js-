@@ -32,6 +32,11 @@ import {
   Gauge,
   Wrench,
   Users,
+  ClipboardList,
+  Inbox,
+  Handshake,
+  Newspaper,
+  FileCheck,
 } from "lucide-react";
 
 /**
@@ -63,7 +68,11 @@ export function TopBar() {
   const menuItems = [
     { href: "/home", label: "Tableau de bord", icon: Home },
     { href: "/profile", label: "Mon profil", icon: User },
+    { href: "/feed", label: "Feed", icon: Newspaper },
     { href: "/search", label: "Opportunités", icon: Briefcase },
+    { href: "/missions", label: "Mes missions", icon: ClipboardList },
+    { href: "/offers", label: "Mes offres", icon: Inbox },
+    { href: "/matches", label: "Matches", icon: Handshake },
     { href: "/reviews", label: "Mes avis", icon: Star },
     ...(mode === "pro"
       ? [
@@ -76,6 +85,8 @@ export function TopBar() {
           { href: "/bookings", label: "Mes réservations", icon: Receipt },
         ]),
     { href: "/contracts", label: "Contrats", icon: FileText },
+    { href: "/invoices", label: "Factures", icon: FileCheck },
+    { href: "/receipts", label: "Reçus", icon: Receipt },
     { href: "/disputes", label: "Litiges", icon: AlertTriangle },
     { href: "/operator", label: "Centre de commande", icon: Gauge },
     { href: "/settings", label: "Paramètres", icon: Settings },
