@@ -84,6 +84,7 @@ export function TopBar() {
           { href: "/bookings", label: "Mes réservations", icon: Receipt },
         ]),
     { href: "/contracts", label: "Contrats", icon: FileText },
+    { href: "/invoices", label: "Factures", icon: FileCheck },
     { href: "/disputes", label: "Litiges", icon: AlertTriangle },
     { href: "/operator", label: "Centre de commande", icon: Gauge },
     { href: "/settings", label: "Paramètres", icon: Settings },
