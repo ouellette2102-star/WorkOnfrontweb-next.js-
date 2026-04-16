@@ -37,16 +37,20 @@ export default function ReservePage() {
       const mission = await api.createMission({
         title: title.trim(),
         description: description || title.trim(),
-        category: "other",
+        category: worker?.category || "other",
         price: Number(price) || 0,
         latitude: 45.5017,
         longitude: -73.5673,
-        city: "Montreal",
+        city: worker?.city || "Montreal",
       });
-      // Send first message in the mission thread
-      await api.sendMessage({ missionId: mission.id, content: `Bonjour, ${description || title.trim()}` });
-      toast.success("Demande envoyée ! Redirection vers le chat...");
-      router.push(`/messages/${mission.id}`);
+      // Notify worker via SUPERLIKE
+      try {
+        await api.recordSwipe({ candidateId: workerId, action: "SUPERLIKE" });
+      } catch {
+        // Non-blocking if already swiped
+      }
+      toast.success("Demande envoyée ! Le professionnel sera notifié.");
+      router.push(`/missions/${mission.id}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur lors de l'envoi.");
     } finally {

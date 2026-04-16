@@ -29,9 +29,10 @@ export function ContactWorkerButton({
 
     setLoading(true);
     try {
+      // Step 1: Create a mission for this worker
       const mission = await api.createMission({
         title: `Demande - ${workerCategory || "Service"}`,
-        description: "Demande de contact via WorkOn",
+        description: `Demande de contact via WorkOn pour ${workerFirstName}`,
         category: workerCategory || "other",
         price: 0,
         latitude: 45.5017,
@@ -39,12 +40,16 @@ export function ContactWorkerButton({
         city: workerCity || "Montreal",
       });
 
-      await api.sendMessage({
-        missionId: mission.id,
-        content: `Bonjour ${workerFirstName}, je suis intéressé par vos services.`,
-      });
+      // Step 2: SUPERLIKE the worker so they get notified
+      try {
+        await api.recordSwipe({ candidateId: workerId, action: "SUPERLIKE" });
+      } catch {
+        // Swipe may fail if already swiped — non-blocking
+      }
 
-      router.push(`/messages/${mission.id}`);
+      // Step 3: Redirect to the mission page (worker will see it and can accept → then chat opens)
+      toast.success(`Demande envoyée à ${workerFirstName} ! En attente de réponse.`);
+      router.push(`/missions/${mission.id}`);
     } catch (err) {
       console.error("Contact error:", err);
       toast.error("Impossible de contacter ce professionnel. Réessayez.");
