@@ -1,17 +1,24 @@
-import { redirect } from "next/navigation";
+"use client";
+
 import { ProfileForm } from "@/components/profile/profile-form";
 import { ProfileRolesCard } from "@/components/profile/profile-roles-card";
-import { requireAuth } from "@/lib/server-auth";
-import { getCurrentProfile } from "@/lib/get-profile";
+import { useAuth } from "@/contexts/auth-context";
+import { Loader2 } from "lucide-react";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
+export default function ProfilePage() {
+  const { user, isLoading } = useAuth();
 
-export default async function ProfilePage() {
-  const user = await requireAuth();
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-workon-primary" />
+      </div>
+    );
+  }
 
-  const profile = await getCurrentProfile(user.id);
-  if (!profile) {
-    redirect("/onboarding");
+  if (!user) {
+    redirect("/login");
   }
 
   return (
@@ -21,18 +28,18 @@ export default async function ProfilePage() {
           <p className="text-sm uppercase tracking-[0.4em] text-workon-accent">Profil</p>
           <h1 className="mt-3 text-4xl font-semibold">Tes informations</h1>
           <p className="mt-2 text-workon-muted">
-            Sélectionne ton rôle principal WorkOn et complète tes infos publiques.
+            Modifie ta photo, ton rôle et tes informations publiques.
           </p>
         </div>
 
         <div className="grid gap-10 lg:grid-cols-2">
           <ProfileRolesCard />
 
-          <section className="rounded-3xl border border-workon-border bg-white  p-8 shadow-sm">
+          <section className="rounded-3xl border border-workon-border bg-white p-8 shadow-sm">
             <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Infos publiques</p>
             <h2 className="mt-3 text-2xl font-semibold">Profil affiché</h2>
             <p className="mt-2 text-workon-muted">
-              Ces données sont visibles sur les futures cartes WorkOn.
+              Photo, nom, ville — visibles sur tes cartes WorkOn.
             </p>
 
             <div className="mt-6">
@@ -44,5 +51,3 @@ export default async function ProfilePage() {
     </main>
   );
 }
-
-
