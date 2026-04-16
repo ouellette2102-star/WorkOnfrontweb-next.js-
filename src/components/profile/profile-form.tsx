@@ -95,31 +95,35 @@ export function ProfileForm() {
       return;
     }
 
-    // Show preview immediately
-    const previewUrl = URL.createObjectURL(file);
-    setAvatarPreview(previewUrl);
+    // Convert to base64 data URI for preview + storage
     setAvatarMessage(null);
     setIsUploadingAvatar(true);
 
-    try {
-      await api.uploadProfilePicture(file);
-      await refetch();
-      setAvatarMessage("Photo mise a jour");
-      setAvatarMessageType("success");
-    } catch (uploadError) {
-      setAvatarMessage(
-        uploadError instanceof Error
-          ? uploadError.message
-          : "Impossible de telecharger la photo.",
-      );
-      setAvatarMessageType("error");
-      // Revert preview on error
-      setAvatarPreview(profile?.pictureUrl ?? null);
-    } finally {
-      setIsUploadingAvatar(false);
-      // Reset file input so the same file can be re-selected
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUri = reader.result as string;
+      setAvatarPreview(dataUri);
+
+      try {
+        // Save as data URI via avatar URL endpoint (no file upload needed)
+        await api.updateAvatar(dataUri);
+        await refetch();
+        setAvatarMessage("Photo mise a jour !");
+        setAvatarMessageType("success");
+      } catch (uploadError) {
+        setAvatarMessage(
+          uploadError instanceof Error
+            ? uploadError.message
+            : "Impossible de sauvegarder la photo.",
+        );
+        setAvatarMessageType("error");
+        setAvatarPreview(profile?.pictureUrl ?? null);
+      } finally {
+        setIsUploadingAvatar(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const initials = (profile?.fullName ?? "?")
