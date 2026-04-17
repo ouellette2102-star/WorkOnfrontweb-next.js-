@@ -11,7 +11,13 @@
  * Both stores stay in sync. Removing the previous dual-call pattern
  * (proxy then direct cross-origin call) fixes a CORS / SameSite class of
  * bugs that surfaced as "Échec de la connexion" on Vercel previews.
+ *
+ * All localStorage access goes through `safeLocalStorage` — raw access
+ * throws SecurityError/QuotaExceededError inside Messenger/Instagram
+ * in-app WebViews and surfaces as the app-wide error boundary.
  */
+
+import { safeLocalStorage } from "@/lib/safe-storage";
 
 const TOKEN_KEY = "workon_access_token";
 const REFRESH_KEY = "workon_refresh_token";
@@ -57,18 +63,15 @@ export interface LoginDto {
 // --- Token Storage (localStorage cache, mirrored from proxy responses) ---
 
 export function getAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return safeLocalStorage.getItem(TOKEN_KEY);
 }
 
 export function getRefreshTokenValue(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(REFRESH_KEY);
+  return safeLocalStorage.getItem(REFRESH_KEY);
 }
 
 export function getCachedUser(): AuthUser | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(USER_KEY);
+  const raw = safeLocalStorage.getItem(USER_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -84,21 +87,19 @@ interface ProxyAuthResponse {
 }
 
 function storeAuth(res: ProxyAuthResponse) {
-  if (typeof window === "undefined") return;
   if (res.accessToken) {
-    localStorage.setItem(TOKEN_KEY, res.accessToken);
+    safeLocalStorage.setItem(TOKEN_KEY, res.accessToken);
   }
   if (res.refreshToken) {
-    localStorage.setItem(REFRESH_KEY, res.refreshToken);
+    safeLocalStorage.setItem(REFRESH_KEY, res.refreshToken);
   }
-  localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+  safeLocalStorage.setItem(USER_KEY, JSON.stringify(res.user));
 }
 
 function clearAuth() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_KEY);
-  localStorage.removeItem(USER_KEY);
+  safeLocalStorage.removeItem(TOKEN_KEY);
+  safeLocalStorage.removeItem(REFRESH_KEY);
+  safeLocalStorage.removeItem(USER_KEY);
 }
 
 // --- API Calls (all via same-origin proxy routes) ---
@@ -167,10 +168,8 @@ export async function refreshToken(): Promise<string | null> {
       return null;
     }
     const data = await res.json();
-    if (typeof window !== "undefined") {
-      if (data.accessToken) localStorage.setItem(TOKEN_KEY, data.accessToken);
-      if (data.refreshToken) localStorage.setItem(REFRESH_KEY, data.refreshToken);
-    }
+    if (data.accessToken) safeLocalStorage.setItem(TOKEN_KEY, data.accessToken);
+    if (data.refreshToken) safeLocalStorage.setItem(REFRESH_KEY, data.refreshToken);
     return data.accessToken ?? null;
   } catch {
     clearAuth();
@@ -191,9 +190,7 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
     }
     if (!res.ok) return null;
     const user = await res.json();
-    if (typeof window !== "undefined") {
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
-    }
+    safeLocalStorage.setItem(USER_KEY, JSON.stringify(user));
     return user;
   } catch {
     return null;

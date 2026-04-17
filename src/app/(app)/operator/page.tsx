@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { safeLocalStorage } from "@/lib/safe-storage";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -39,7 +40,7 @@ export default function OperatorPage() {
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/missions-local/nearby?latitude=45.5&longitude=-73.5&radiusKm=100`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("workon_token")}`,
+            Authorization: `Bearer ${safeLocalStorage.getItem("workon_token") ?? ""}`,
           },
         }
       );

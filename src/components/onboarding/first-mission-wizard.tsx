@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { X, Search, FileText, Briefcase, Send, Users, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { safeLocalStorage } from "@/lib/safe-storage";
 
 const STORAGE_KEY = "workon_wizard_dismissed";
 
@@ -50,14 +51,14 @@ export function FirstMissionWizard() {
   const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = safeLocalStorage.getItem(STORAGE_KEY);
     if (!stored) {
       setDismissed(false);
     }
   }, []);
 
   const handleDismiss = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
+    safeLocalStorage.setItem(STORAGE_KEY, "true");
     setDismissed(true);
   };
 

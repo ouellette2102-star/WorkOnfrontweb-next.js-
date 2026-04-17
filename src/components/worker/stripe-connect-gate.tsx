@@ -7,6 +7,7 @@ import { getAccessToken } from "@/lib/auth";
 import { getOnboardingStatus } from "@/lib/stripe-api";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { safeSessionStorage } from "@/lib/safe-storage";
 
 /**
  * StripeConnectGate — reusable banner that surfaces when a worker
@@ -44,19 +45,14 @@ export function StripeConnectGate({
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (sessionStorage.getItem("workon:stripe-gate-dismissed") === "1") {
+    if (safeSessionStorage.getItem("workon:stripe-gate-dismissed") === "1") {
       setDismissed(true);
     }
   }, []);
 
   function handleDismiss() {
     setDismissed(true);
-    try {
-      sessionStorage.setItem("workon:stripe-gate-dismissed", "1");
-    } catch {
-      // sessionStorage may be disabled
-    }
+    safeSessionStorage.setItem("workon:stripe-gate-dismissed", "1");
   }
 
   if (onboarded === null) return null;
