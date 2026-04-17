@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
+import { safeLocalStorage } from "@/lib/safe-storage";
 
 type Mode = "pro" | "client";
 
@@ -30,17 +31,15 @@ function defaultModeFromRole(role?: string): Mode {
 export function ModeProvider({ children }: { children: ReactNode }) {
   const { user, refreshUser } = useAuth();
   const [mode, setModeState] = useState<Mode>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(STORAGE_KEY) as Mode | null;
-      if (stored === "pro" || stored === "client") return stored;
-    }
+    const stored = safeLocalStorage.getItem(STORAGE_KEY) as Mode | null;
+    if (stored === "pro" || stored === "client") return stored;
     return defaultModeFromRole(user?.role);
   });
 
   // Sync default from user role on first load (when no localStorage value)
   useEffect(() => {
     if (!user) return;
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = safeLocalStorage.getItem(STORAGE_KEY);
     if (!stored) {
       const def = defaultModeFromRole(user.role);
       setModeState(def);
@@ -50,7 +49,7 @@ export function ModeProvider({ children }: { children: ReactNode }) {
   const setMode = useCallback(
     async (newMode: Mode) => {
       setModeState(newMode);
-      localStorage.setItem(STORAGE_KEY, newMode);
+      safeLocalStorage.setItem(STORAGE_KEY, newMode);
 
       // Sync role to backend
       const backendRole = newMode === "pro" ? "worker" : "employer";

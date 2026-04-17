@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { Zap, Users, Briefcase, TrendingUp } from "lucide-react";
+import { safeLocalStorage } from "@/lib/safe-storage";
 
 /**
  * Live marketplace stats — replaces static counters with real-time data.
@@ -16,7 +17,7 @@ export function StatsBar() {
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/missions-local/nearby?latitude=45.5&longitude=-73.5&radiusKm=100`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("workon_token")}`,
+            Authorization: `Bearer ${safeLocalStorage.getItem("workon_token") ?? ""}`,
           },
         }
       );

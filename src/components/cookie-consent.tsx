@@ -15,6 +15,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { safeLocalStorage } from "@/lib/safe-storage";
 
 const STORAGE_KEY = "cookie-consent";
 
@@ -25,23 +26,14 @@ export function CookieConsent() {
 
   useEffect(() => {
     // Show banner only if no choice has been recorded yet
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        setVisible(true);
-      }
-    } catch {
-      // localStorage unavailable (SSR, private browsing) — show banner
+    const stored = safeLocalStorage.getItem(STORAGE_KEY);
+    if (!stored) {
       setVisible(true);
     }
   }, []);
 
   const handleChoice = (value: ConsentValue) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, value);
-    } catch {
-      // Silent fail — cookie preference won't persist but UX continues
-    }
+    safeLocalStorage.setItem(STORAGE_KEY, value);
     setVisible(false);
   };
 
