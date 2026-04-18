@@ -5,6 +5,11 @@ import {
   parseResponse,
   stripeConnectStatusSchema,
   userMeSchema,
+  subscriptionSchema,
+  checkoutSessionSchema,
+  missionsQuotaSchema,
+  type Subscription,
+  type MissionsQuota,
 } from "./api-schemas";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
@@ -38,8 +43,15 @@ export async function apiFetch<T>(path: string, options: FetchOptions = {}): Pro
   }
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: "Erreur serveur" }));
-    throw new ApiError(res.status, err.message || "Erreur serveur", err.error);
+    const body = await res.json().catch(() => ({ message: "Erreur serveur" }));
+    // Backend canonical shape: { error: { code, message, status, ... } }.
+    // Legacy shape: { message }. Accept both.
+    const errorObj = body?.error ?? body;
+    const msg =
+      errorObj?.message || body?.message || "Erreur serveur";
+    const code =
+      typeof errorObj?.code === "string" ? errorObj.code : undefined;
+    throw new ApiError(res.status, msg, code);
   }
 
   if (res.status === 204) return undefined as T;
@@ -537,6 +549,36 @@ export const api = {
   },
   getWorkerPaymentHistory: () =>
     apiFetch<WorkerPayment[]>("/stripe/worker/history"),
+
+  // Subscriptions (Phase 1 monetization)
+  getSubscription: async (): Promise<Subscription> => {
+    const raw = await apiFetch<unknown>("/subscriptions/me");
+    return parseResponse(subscriptionSchema, raw, "GET /subscriptions/me");
+  },
+  createSubscriptionCheckout: async (
+    plan: "CLIENT_PRO" | "WORKER_PRO" | "CLIENT_BUSINESS",
+    opts?: { successUrl?: string; cancelUrl?: string },
+  ) => {
+    const raw = await apiFetch<unknown>("/subscriptions/checkout", {
+      method: "POST",
+      body: JSON.stringify({ plan, ...opts }),
+    });
+    return parseResponse(
+      checkoutSessionSchema,
+      raw,
+      "POST /subscriptions/checkout",
+    );
+  },
+  cancelSubscription: () =>
+    apiFetch<{ canceledAt: string }>("/subscriptions/cancel", { method: "POST" }),
+  getMissionsQuota: async (): Promise<MissionsQuota> => {
+    const raw = await apiFetch<unknown>("/usage/missions-count-month");
+    return parseResponse(
+      missionsQuotaSchema,
+      raw,
+      "GET /usage/missions-count-month",
+    );
+  },
 
   // Stripe Checkout
   createCheckoutSession: (missionId: string) =>

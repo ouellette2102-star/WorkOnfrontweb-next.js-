@@ -1,135 +1,262 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { MarketingHeader } from "@/components/navigation/marketing-header";
+import { api } from "@/lib/api-client";
+import { toast } from "sonner";
 
 /**
- * Honest pricing page.
+ * Pricing page — Free Entry + Paid Acceleration.
  *
- * The previous version advertised PRO at $29/mois and PREMIUM at $79/mois
- * with features (Auto-leadgen silencieux, Pages vitrines SEO, CRM avancé…)
- * that do not exist in the product. Shipping a pricing page for a SaaS
- * tier we cannot deliver is a consumer-protection risk.
- *
- * Replaced with the actual commercial model documented in
- * /employeurs and in WORKON_PRODUCT_CANON.md: 0% commission during
- * launch, 15% post-launch, charged only on completed missions.
+ * Free: 3 missions/month, chat after match, 15% commission on payouts.
+ * Client Pro ($39): unlimited missions, priority, badge, leads 5/mo.
+ * Worker Pro ($19): verified badge, boost, priority alerts, leads alerts.
+ * Client Business ($99): leads unlimited, multi-seats, CSM.
  */
 
-export const metadata = {
-  title: "Tarifs — WorkOn",
-  description:
-    "0% de commission pendant le lancement. Payez uniquement sur les missions complétées.",
-};
+type PaidPlan = "CLIENT_PRO" | "WORKER_PRO" | "CLIENT_BUSINESS";
+
+function useCheckout() {
+  const [loading, setLoading] = useState<PaidPlan | null>(null);
+  const go = async (plan: PaidPlan) => {
+    try {
+      setLoading(plan);
+      const { url } = await api.createSubscriptionCheckout(plan, {
+        successUrl: `${window.location.origin}/settings/subscription?ok=1`,
+        cancelUrl: `${window.location.origin}/pricing?canceled=1`,
+      });
+      window.location.href = url;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erreur inconnue";
+      if (/401|Authorization/i.test(msg)) {
+        window.location.href = `/login?next=/pricing`;
+        return;
+      }
+      toast.error("Impossible de démarrer le paiement", { description: msg });
+      setLoading(null);
+    }
+  };
+  return { loading, go };
+}
+
+function PlanCard({
+  name,
+  price,
+  tagline,
+  features,
+  cta,
+  onClick,
+  loading,
+  highlight,
+  footnote,
+}: {
+  name: string;
+  price: string;
+  tagline: string;
+  features: string[];
+  cta: string;
+  onClick?: () => void;
+  loading?: boolean;
+  highlight?: boolean;
+  footnote?: string;
+}) {
+  return (
+    <div
+      className={`rounded-3xl p-6 shadow-card flex flex-col ${
+        highlight
+          ? "border border-workon-primary/35 bg-workon-primary/5"
+          : "bg-white border border-workon-border"
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <h2 className="font-bold text-lg font-heading text-workon-ink">{name}</h2>
+        {highlight && (
+          <span className="px-2 py-0.5 rounded-full text-xs bg-workon-primary/10 text-workon-primary border border-workon-primary/30">
+            Populaire
+          </span>
+        )}
+      </div>
+      <div className="mt-4">
+        <p className="text-4xl font-bold text-workon-ink">{price}</p>
+        <p className="text-sm text-workon-gray mt-1">{tagline}</p>
+      </div>
+      <ul className="mt-5 space-y-2.5 text-sm text-workon-ink flex-1">
+        {features.map((f) => (
+          <li key={f} className="flex items-start gap-2">
+            <Check className="h-4 w-4 text-workon-primary flex-shrink-0 mt-0.5" />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+      {onClick ? (
+        <Button
+          onClick={onClick}
+          disabled={loading}
+          variant={highlight ? "hero" : "default"}
+          size="hero"
+          className="w-full mt-6"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" /> Redirection…
+            </>
+          ) : (
+            cta
+          )}
+        </Button>
+      ) : (
+        <Button asChild variant="default" size="hero" className="w-full mt-6">
+          <Link href="/register">{cta}</Link>
+        </Button>
+      )}
+      {footnote && (
+        <p className="mt-3 text-xs text-workon-muted">{footnote}</p>
+      )}
+    </div>
+  );
+}
 
 export default function PricingPage() {
+  const { loading, go } = useCheckout();
+
   return (
     <main className="min-h-screen bg-workon-bg text-workon-ink">
       <MarketingHeader />
 
-      <section className="mx-auto max-w-4xl px-4 py-16">
+      <section className="mx-auto max-w-6xl px-4 py-14">
         <header className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-workon-primary/30 bg-workon-primary/10 px-3 py-1 text-xs text-workon-primary mb-5">
-            🚀 0% commission pendant le lancement
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight font-heading text-workon-ink">
-            Tarification transparente
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight font-heading">
+            Des prix qui accélèrent ton travail
           </h1>
-          <p className="mt-4 text-workon-gray text-lg">
-            Pas d&apos;abonnement. Pas de frais cachés. Vous payez seulement
-            pour les missions complétées.
+          <p className="mt-4 text-workon-gray text-lg max-w-2xl mx-auto">
+            Gratuit pour essayer. Payant pour aller plus vite, gagner en
+            visibilité et décrocher plus de contrats. Commission de 15 % sur
+            les transactions complétées, peu importe le plan.
           </p>
         </header>
 
-        <div className="grid md:grid-cols-2 gap-5">
-          {/* Current — launch */}
-          <div className="rounded-3xl border border-workon-primary/25 bg-workon-primary/5 p-7 shadow-card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-xl font-heading text-workon-ink">Lancement</h2>
-              <span className="px-2 py-0.5 rounded-full text-xs bg-workon-primary/10 text-workon-primary border border-workon-primary/30">
-                Actif maintenant
-              </span>
-            </div>
-            <p className="text-5xl font-bold text-workon-primary">0%</p>
-            <p className="text-sm text-workon-gray mt-1">
-              de commission sur chaque mission
-            </p>
-            <ul className="mt-6 space-y-3 text-sm text-workon-ink">
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-primary flex-shrink-0 mt-0.5" />
-                <span>Missions illimitées</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-primary flex-shrink-0 mt-0.5" />
-                <span>Accès à tous les travailleurs vérifiés</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-primary flex-shrink-0 mt-0.5" />
-                <span>Paiement sécurisé via Stripe (escrow)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-primary flex-shrink-0 mt-0.5" />
-                <span>Contrat de service généré automatiquement</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-primary flex-shrink-0 mt-0.5" />
-                <span>Support prioritaire pendant la période de lancement</span>
-              </li>
-            </ul>
-            <Button asChild variant="hero" size="hero" className="w-full mt-7">
-              <Link href="/register?role=employer">Commencer gratuitement</Link>
-            </Button>
-          </div>
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <PlanCard
+            name="Gratuit"
+            price="0 $"
+            tagline="/mois — pour commencer"
+            features={[
+              "3 missions par mois",
+              "Profil complet + galerie",
+              "Chat débloqué après match",
+              "Paiement sécurisé Stripe",
+              "Support communautaire",
+            ]}
+            cta="Créer un compte"
+          />
 
-          {/* Post-launch */}
-          <div className="rounded-3xl bg-white border border-workon-border p-7 shadow-card opacity-80">
-            <h2 className="font-bold text-xl mb-4 font-heading text-workon-ink">Post-lancement</h2>
-            <p className="text-5xl font-bold text-workon-ink">15%</p>
-            <p className="text-sm text-workon-gray mt-1">
-              de commission sur chaque mission
-            </p>
-            <ul className="mt-6 space-y-3 text-sm text-workon-gray">
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-muted flex-shrink-0 mt-0.5" />
-                <span>Mêmes fonctionnalités que la période de lancement</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-muted flex-shrink-0 mt-0.5" />
-                <span>Facturé uniquement sur les missions complétées</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-workon-muted flex-shrink-0 mt-0.5" />
-                <span>
-                  Aucune charge si la mission n&apos;aboutit pas
-                </span>
-              </li>
-            </ul>
-            <p className="mt-6 text-xs text-workon-muted leading-relaxed">
-              Le passage au modèle 15% sera annoncé au moins 30 jours à
-              l&apos;avance. Les utilisateurs inscrits pendant la période de
-              lancement conservent leurs conditions actuelles sur une période
-              de transition.
-            </p>
-          </div>
+          <PlanCard
+            name="Worker Pro"
+            price="19 $"
+            tagline="/mois CAD"
+            features={[
+              "Badge vérifié",
+              "Boost de visibilité",
+              "Apparition prioritaire (swipe)",
+              "Alertes jobs rapides",
+              "Stats de profil avancées",
+              "Plus de candidatures possibles",
+            ]}
+            cta="S'abonner"
+            onClick={() => go("WORKER_PRO")}
+            loading={loading === "WORKER_PRO"}
+          />
+
+          <PlanCard
+            name="Client Pro"
+            price="39 $"
+            tagline="/mois CAD"
+            features={[
+              "Missions illimitées",
+              "Priorité d'affichage",
+              "Badge entreprise",
+              "5 leads entrants/mois",
+              "Support prioritaire",
+              "Favoris travailleurs",
+            ]}
+            cta="S'abonner"
+            onClick={() => go("CLIENT_PRO")}
+            loading={loading === "CLIENT_PRO"}
+            highlight
+          />
+
+          <PlanCard
+            name="Client Business"
+            price="99 $"
+            tagline="/mois CAD"
+            features={[
+              "Tout du Client Pro",
+              "Leads entrants illimités",
+              "Comptes multi-sièges (bientôt)",
+              "Reporting avancé",
+              "CSM dédié",
+            ]}
+            cta="S'abonner"
+            onClick={() => go("CLIENT_BUSINESS")}
+            loading={loading === "CLIENT_BUSINESS"}
+          />
         </div>
 
-        {/* Worker note */}
-        <div className="mt-10 rounded-3xl bg-white border border-workon-border p-6 text-sm text-workon-gray shadow-card">
-          <p className="font-semibold text-workon-ink mb-1">Pour les travailleurs</p>
-          <p>
-            L&apos;inscription est et restera <strong>gratuite</strong>. Aucun
-            abonnement. Le paiement est transféré via Stripe dès la
-            confirmation de la mission.{" "}
-            <Link href="/pros" className="text-workon-accent hover:underline">
-              En savoir plus →
-            </Link>
+        {/* Boosts à la carte */}
+        <div className="mt-12">
+          <h3 className="text-xl font-bold font-heading text-workon-ink mb-3">
+            Boosts ponctuels (à la carte)
+          </h3>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl bg-white border border-workon-border p-5 shadow-card">
+              <p className="text-sm text-workon-gray">Mission urgente</p>
+              <p className="text-2xl font-bold text-workon-ink mt-1">9 $</p>
+              <p className="text-xs text-workon-muted mt-2">
+                Push prioritaire aux pros à proximité, badge &laquo;&nbsp;urgent&nbsp;&raquo;.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white border border-workon-border p-5 shadow-card">
+              <p className="text-sm text-workon-gray">Top visibilité 48 h</p>
+              <p className="text-2xl font-bold text-workon-ink mt-1">14 $</p>
+              <p className="text-xs text-workon-muted mt-2">
+                Profil ou mission en tête de liste et carte pendant 48 h.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white border border-workon-border p-5 shadow-card">
+              <p className="text-sm text-workon-gray">Vérification express</p>
+              <p className="text-2xl font-bold text-workon-ink mt-1">19 $</p>
+              <p className="text-xs text-workon-muted mt-2">
+                Vérification identité sous 24 h (au lieu de 72 h).
+              </p>
+            </div>
+          </div>
+          <p className="text-xs text-workon-muted mt-3">
+            Les boosts seront activés dans ton tableau de bord après le lancement
+            du module de paiement à la carte.
           </p>
         </div>
 
-        {/* Footer nav */}
-        <div className="mt-10 text-center text-xs text-workon-muted">
+        <div className="mt-12 rounded-3xl bg-white border border-workon-border p-6 text-sm text-workon-gray shadow-card">
+          <p className="font-semibold text-workon-ink mb-1">
+            Commission plateforme
+          </p>
+          <p>
+            15 % prélevés sur chaque transaction réussie, tous plans confondus.
+            Aucun abonnement n&apos;est nécessaire pour encaisser ou dépenser —
+            les plans débloquent volume, visibilité et leads.
+          </p>
+        </div>
+
+        <div className="mt-8 text-center text-xs text-workon-muted">
           <Link href="/" className="hover:text-workon-gray">
             Retour à l&apos;accueil
+          </Link>{" "}
+          ·{" "}
+          <Link href="/settings/subscription" className="hover:text-workon-gray">
+            Mon abonnement
           </Link>
         </div>
       </section>
