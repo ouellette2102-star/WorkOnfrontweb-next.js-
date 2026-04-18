@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import {
@@ -12,6 +13,8 @@ import {
   Shield,
   Calendar,
   Megaphone,
+  FileSignature,
+  Heart,
   CheckCheck,
   Loader2,
 } from "lucide-react";
@@ -19,32 +22,46 @@ import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
 /**
- * Notifications page — reads from backend GET /notifications.
+ * Notifications — reads GET /notifications.
  *
- * Notification types map to icons/colors:
- *   - MISSION_*    → Briefcase (green)
- *   - MESSAGE_*    → MessageCircle (blue)
- *   - PAYMENT_*    → CreditCard (emerald)
- *   - REVIEW_*     → Star (yellow)
- *   - ACCOUNT_*    → Shield (red)
- *   - BOOKING_*    → Calendar (purple)
- *   - MARKETING_*  → Megaphone (orange)
+ * Handles both legacy UPPERCASE types (MISSION_NEW_OFFER, PAYMENT_RECEIVED…)
+ * and the new lowercase LocalNotification types (contract_received, new_message…).
+ *
+ * Each notification maps to a deterministic destination URL via resolveActionUrl:
+ *   1. payload.link / payload.actionUrl  (explicit backend override)
+ *   2. Type + payload-field mapping      (contractId, missionId, conversationId)
+ *   3. Fallback route per type family
  */
 
 interface Notification {
   id: string;
   type: string;
-  payloadJSON: {
+  // Legacy shape
+  payloadJSON?: {
     title?: string;
     body?: string;
     link?: string;
+    actionUrl?: string;
+    [key: string]: unknown;
+  };
+  // LocalNotification shape (inlined title/body, separate payload)
+  title?: string;
+  body?: string;
+  payload?: {
+    title?: string;
+    body?: string;
+    link?: string;
+    actionUrl?: string;
     [key: string]: unknown;
   };
   readAt: string | null;
   createdAt: string;
 }
 
-const typeConfig: Record<string, { icon: typeof Bell; color: string; bgColor: string }> = {
+type IconStyle = { icon: typeof Bell; color: string; bgColor: string };
+
+const typeConfig: Record<string, IconStyle> = {
+  // Legacy UPPERCASE
   MISSION_NEW_OFFER:      { icon: Briefcase, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
   MISSION_OFFER_ACCEPTED: { icon: Briefcase, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
   MISSION_STARTED:        { icon: Briefcase, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
@@ -66,13 +83,133 @@ const typeConfig: Record<string, { icon: typeof Bell; color: string; bgColor: st
   BOOKING_CANCELLED:      { icon: Calendar, color: "text-workon-accent", bgColor: "bg-workon-accent-subtle" },
   MARKETING_PROMO:        { icon: Megaphone, color: "text-orange-600", bgColor: "bg-orange-50" },
   MARKETING_NEWS:         { icon: Megaphone, color: "text-orange-600", bgColor: "bg-orange-50" },
+
+  // New LocalNotification (lowercase)
+  contract_received:      { icon: FileSignature, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
+  contract_signed:        { icon: FileSignature, color: "text-emerald-600", bgColor: "bg-emerald-50" },
+  new_message:            { icon: MessageCircle, color: "text-blue-600", bgColor: "bg-blue-50" },
+  mission_accepted:       { icon: Briefcase, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
+  mission_completed:      { icon: Briefcase, color: "text-emerald-600", bgColor: "bg-emerald-50" },
+  mission_cancelled:      { icon: Briefcase, color: "text-workon-accent", bgColor: "bg-workon-accent-subtle" },
+  offer_received:         { icon: Briefcase, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
+  offer_accepted:         { icon: Briefcase, color: "text-emerald-600", bgColor: "bg-emerald-50" },
+  review_received:        { icon: Star, color: "text-yellow-600", bgColor: "bg-yellow-50" },
+  payout_failed:          { icon: CreditCard, color: "text-workon-accent", bgColor: "bg-workon-accent-subtle" },
+  lead_delivered:         { icon: Briefcase, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
+  swipe_match:            { icon: Heart, color: "text-pink-600", bgColor: "bg-pink-50" },
 };
 
-function getConfig(type: string) {
+function getConfig(type: string): IconStyle {
   return typeConfig[type] ?? { icon: Bell, color: "text-workon-gray", bgColor: "bg-workon-bg-cream" };
 }
 
+function getPayload(n: Notification): Record<string, unknown> {
+  return (n.payload ?? n.payloadJSON ?? {}) as Record<string, unknown>;
+}
+
+function getTitle(n: Notification): string {
+  const p = getPayload(n);
+  return (
+    (n.title as string | undefined) ??
+    (p.title as string | undefined) ??
+    n.type.replace(/_/g, " ").toLowerCase()
+  );
+}
+
+function getBody(n: Notification): string {
+  const p = getPayload(n);
+  return (n.body as string | undefined) ?? (p.body as string | undefined) ?? "";
+}
+
+function pickString(p: Record<string, unknown>, key: string): string | null {
+  const v = p[key];
+  return typeof v === "string" && v.length > 0 ? v : null;
+}
+
+/**
+ * Deterministic URL resolver. Priority:
+ *   1. Explicit payload.link / payload.actionUrl
+ *   2. Type-based routing with payload fields (contractId, missionId, conversationId)
+ *   3. Fallback to a sensible list route
+ */
+function resolveActionUrl(n: Notification): string {
+  const p = getPayload(n);
+
+  const explicit = pickString(p, "link") ?? pickString(p, "actionUrl");
+  if (explicit) return explicit;
+
+  const contractId = pickString(p, "contractId");
+  const missionId = pickString(p, "missionId");
+  const conversationId = pickString(p, "conversationId");
+  const offerId = pickString(p, "offerId");
+
+  switch (n.type) {
+    case "contract_received":
+    case "contract_signed":
+      return contractId ? `/contracts/${contractId}` : "/contracts";
+
+    case "new_message":
+    case "MESSAGE_NEW":
+    case "MESSAGE_UNREAD_REMINDER":
+      if (conversationId) return `/messages/cv/${conversationId}`;
+      if (missionId) return `/messages/${missionId}`;
+      return "/messages";
+
+    case "mission_accepted":
+    case "mission_completed":
+    case "mission_cancelled":
+    case "MISSION_OFFER_ACCEPTED":
+    case "MISSION_STARTED":
+    case "MISSION_COMPLETED":
+    case "MISSION_CANCELLED":
+      return missionId ? `/missions/${missionId}` : "/missions/mine";
+
+    case "offer_received":
+    case "offer_accepted":
+    case "MISSION_NEW_OFFER":
+      if (missionId) return `/missions/${missionId}`;
+      if (offerId) return `/offers/${offerId}`;
+      return "/missions/mine";
+
+    case "review_received":
+    case "REVIEW_RECEIVED":
+    case "REVIEW_REMINDER":
+      return "/reviews";
+
+    case "payout_failed":
+    case "PAYMENT_FAILED":
+    case "PAYMENT_RECEIVED":
+    case "PAYMENT_SENT":
+    case "PAYOUT_PROCESSED":
+      return "/earnings";
+
+    case "BOOKING_REQUEST":
+    case "BOOKING_CONFIRMED":
+    case "BOOKING_REMINDER":
+    case "BOOKING_CANCELLED":
+      return "/bookings";
+
+    case "lead_delivered":
+      return "/leads/mine";
+
+    case "swipe_match":
+      return "/matches";
+
+    case "ACCOUNT_SECURITY":
+    case "ACCOUNT_VERIFICATION":
+      return "/settings";
+
+    case "MARKETING_PROMO":
+    case "MARKETING_NEWS":
+      return "/home";
+
+    default:
+      return "/home";
+  }
+}
+
 export default function NotificationsPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data: notifications, isLoading } = useQuery({
@@ -135,18 +272,16 @@ export default function NotificationsPage() {
             const config = getConfig(notif.type);
             const Icon = config.icon;
             const isUnread = !notif.readAt;
-            const payload = notif.payloadJSON ?? {};
-            const title = payload.title ?? notif.type.replace(/_/g, " ").toLowerCase();
-            const body = payload.body ?? "";
+            const title = getTitle(notif);
+            const body = getBody(notif);
 
             return (
               <button
                 key={notif.id}
                 onClick={() => {
                   if (isUnread) markRead.mutate(notif.id);
-                  if (payload.link && typeof window !== "undefined") {
-                    window.location.href = payload.link as string;
-                  }
+                  const url = resolveActionUrl(notif);
+                  router.push(url);
                 }}
                 className={`w-full flex items-start gap-3 p-3 rounded-2xl text-left transition-colors ${
                   isUnread ? "bg-workon-primary-subtle" : "hover:bg-workon-bg-cream"
