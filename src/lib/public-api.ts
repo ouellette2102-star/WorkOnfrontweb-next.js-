@@ -3,9 +3,14 @@
  * Used by landing pages (ISR / SSR)
  */
 
-const RAW_BASE =
+// Support both env formats: "https://host" or "https://host/api/v1".
+// Vercel sets NEXT_PUBLIC_API_URL WITH the /api/v1 suffix (same as api-client.ts),
+// so we must strip a trailing /api/v1 before re-appending — otherwise we'd
+// build /api/v1/api/v1/... and every fetch here 404s silently.
+const RAW_BASE = (
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "https://workon-backend-production-8908.up.railway.app";
+  "https://workon-backend-production-8908.up.railway.app"
+).replace(/\/api\/v1$/, "");
 const API_BASE = `${RAW_BASE}/api/v1`;
 
 // ─── DTOs ──────────────────────────────────────────────────────────────────
