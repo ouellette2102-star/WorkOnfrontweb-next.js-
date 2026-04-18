@@ -9,12 +9,12 @@ import { WorkerCard } from "@/components/worker/worker-card";
 import { MissionCard } from "@/components/mission/mission-card";
 import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { Button } from "@/components/ui/button";
-import { MapPin, Plus, Briefcase, Search, Phone, Users } from "lucide-react";
+import { MapPin, Plus, Briefcase, Search, Phone } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {
   const { user } = useAuth();
-  const { mode, setMode } = useMode();
+  const { mode } = useMode();
   const isClient = mode === "client";
   const isPro = mode === "pro";
 
@@ -51,43 +51,18 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6 px-4 py-6">
-      {/* Hero — light organic gradient */}
+      {/* Hero — light organic gradient. Role toggle moved to /profile
+          to reduce noise; the app detects context by action (publishing
+          → client, accepting → pro). The RedPhone CTA in BottomNav
+          is the primary action across all modes. */}
       <div className="relative -mx-4 -mt-6 px-4 pt-6 pb-8 bg-gradient-to-b from-workon-primary/10 via-workon-primary/5 to-transparent">
-        {/* Mode toggle — always visible so users can both search and publish */}
-        <div className="flex justify-center mb-4">
-          <div className="bg-white/80 rounded-full p-0.5 border border-workon-border flex shadow-sm">
-            <button
-              onClick={() => setMode("pro")}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                mode === "pro"
-                  ? "bg-workon-primary text-white"
-                  : "text-workon-muted hover:text-workon-ink"
-              }`}
-            >
-              <Briefcase className="h-3.5 w-3.5" />
-              Je cherche des missions
-            </button>
-            <button
-              onClick={() => setMode("client")}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                mode === "client"
-                  ? "bg-workon-primary text-white"
-                  : "text-workon-muted hover:text-workon-ink"
-              }`}
-            >
-              <Users className="h-3.5 w-3.5" />
-              J&apos;ai un besoin
-            </button>
-          </div>
-        </div>
-
         <h1 className="text-2xl font-bold text-center text-workon-ink">
-          {isPro ? "Trouvez des missions" : "Trouvez votre talent"}
+          Bonjour {user?.firstName || ""} 👋
         </h1>
         <p className="text-center text-workon-muted text-sm mt-1">
           {isPro
-            ? "Missions disponibles près de chez vous"
-            : "Une ligne directe vers le travail instantané"}
+            ? "Voici ce qui se passe dans ta zone aujourd'hui"
+            : "Trouve un pro qualifié en quelques taps"}
         </p>
 
         {/* Live marketplace stats */}

@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { safeLocalStorage } from "@/lib/safe-storage";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { missionStatusLabel } from "@/lib/i18n-labels";
 import {
   Zap,
   MapPin,
@@ -275,8 +276,8 @@ export default function OperatorPage() {
                       {m.title}
                     </p>
                   </div>
-                  <span className="text-[10px] rounded-full bg-workon-bg px-2 py-0.5 text-workon-muted capitalize">
-                    {m.status}
+                  <span className="text-[10px] rounded-full bg-workon-bg px-2 py-0.5 text-workon-muted">
+                    {missionStatusLabel(m.status)}
                   </span>
                 </div>
               ))}

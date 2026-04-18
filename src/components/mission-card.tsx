@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Clock, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { missionStatusLabel } from "@/lib/i18n-labels";
 
 interface MissionCardProps {
   mission: {
@@ -36,7 +37,7 @@ export function MissionCard({ mission }: MissionCardProps) {
               <p className="text-sm text-white/50 mt-1">{mission.category}</p>
             </div>
             <span className="px-2 py-1 text-xs rounded bg-red-500/20 text-red-400">
-              {mission.status}
+              {missionStatusLabel(mission.status)}
             </span>
           </div>
         </CardHeader>
