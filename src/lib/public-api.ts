@@ -37,6 +37,9 @@ export interface FeaturedWorker {
   city?: string;
   photoUrl?: string;
   sector?: string;
+  jobTitle?: string | null;
+  hourlyRate?: number | null;
+  portfolioPhotos?: string[];
   ratingAvg: number;
   ratingCount: number;
   completedMissions: number;

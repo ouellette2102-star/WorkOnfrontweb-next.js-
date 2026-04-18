@@ -67,7 +67,13 @@ export default function HomePage() {
       const last = (w.lastName ?? "").trim();
       if (first.length < 2 || last.length < 2) return false;
       const full = `${first} ${last}`.toLowerCase();
-      if (full.startsWith("test") || full.includes("smoke") || full.includes("john doe"))
+      if (
+        full.startsWith("test") ||
+        full.includes("smoke") ||
+        full.includes("john doe") ||
+        first.toLowerCase() === "release" ||
+        last.toLowerCase() === "test"
+      )
         return false;
       return true;
     })
@@ -78,6 +84,9 @@ export default function HomePage() {
       city: w.city,
       photoUrl: w.photoUrl,
       category: w.sector ?? undefined,
+      jobTitle: w.jobTitle ?? undefined,
+      hourlyRate: w.hourlyRate ?? undefined,
+      portfolioPhotos: w.portfolioPhotos ?? [],
       averageRating: w.ratingAvg,
       reviewCount: w.ratingCount,
       completionPercentage: 0,
