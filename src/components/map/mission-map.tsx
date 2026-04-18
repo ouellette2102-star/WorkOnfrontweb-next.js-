@@ -1,31 +1,32 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { MissionResponse } from "@/lib/api-client";
-import Link from "next/link";
 import "leaflet/dist/leaflet.css";
 
 /**
  * Leaflet map component for displaying missions.
  *
  * Uses CartoDB Positron tiles (light, clean) matching the Emergent design.
- * Custom green DivIcon pins for mission markers.
- * Rich popups with title, city, budget, distance, and "Voir détails" link.
+ * Custom DivIcon pins (green default, orange-red for boosted/urgent).
+ * Pin click invokes parent-provided `onPinClick(mission)` — parent is
+ * responsible for rendering the detail UI (bottom sheet on mobile).
  */
 
-// Custom green pin icon matching WorkOn primary color
-function createMissionIcon() {
+function createMissionIcon(boosted = false) {
+  const color = boosted ? "#C96646" : "#134021";
   return L.divIcon({
     className: "mission-pin",
     html: `<div style="
       width: 32px; height: 32px;
-      background: #134021;
+      background: ${color};
       border: 3px solid white;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
-      box-shadow: 0 2px 8px rgba(19,64,33,0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      cursor: pointer;
     "><div style="
       width: 8px; height: 8px;
       background: white;
@@ -40,10 +41,9 @@ function createMissionIcon() {
   });
 }
 
-const missionIcon = createMissionIcon();
+const missionIcon = createMissionIcon(false);
+const boostedMissionIcon = createMissionIcon(true);
 
-// Helper component to recenter map when center prop changes
-// Uses primitive lat/lng to avoid infinite re-render from new array refs
 function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
   const prevRef = useRef({ lat, lng });
@@ -62,15 +62,41 @@ interface MissionMapProps {
   missions: MissionResponse[];
   center: [number, number];
   radiusKm: number;
+  onPinClick?: (mission: MissionResponse) => void;
 }
 
-export default function MissionMap({ missions, center, radiusKm }: MissionMapProps) {
-  // Adjust zoom based on radius
+function isBoosted(m: MissionResponse): boolean {
+  const boostedUntil = (m as unknown as { boostedUntil?: string | null })
+    .boostedUntil;
+  const urgentUntil = (m as unknown as { urgentUntil?: string | null })
+    .urgentUntil;
+  const isUrgent = (m as unknown as { isUrgent?: boolean }).isUrgent;
+  const now = Date.now();
+  if (isUrgent && (!urgentUntil || new Date(urgentUntil).getTime() > now)) {
+    return true;
+  }
+  if (boostedUntil && new Date(boostedUntil).getTime() > now) {
+    return true;
+  }
+  return false;
+}
+
+export default function MissionMap({
+  missions,
+  center,
+  radiusKm,
+  onPinClick,
+}: MissionMapProps) {
   const zoom =
-    radiusKm <= 5 ? 14 :
-    radiusKm <= 10 ? 13 :
-    radiusKm <= 25 ? 11 :
-    radiusKm <= 50 ? 10 : 9;
+    radiusKm <= 5
+      ? 14
+      : radiusKm <= 10
+        ? 13
+        : radiusKm <= 25
+          ? 11
+          : radiusKm <= 50
+            ? 10
+            : 9;
 
   return (
     <MapContainer
@@ -90,27 +116,13 @@ export default function MissionMap({ missions, center, radiusKm }: MissionMapPro
         <Marker
           key={m.id}
           position={[m.latitude, m.longitude]}
-          icon={missionIcon}
-        >
-          <Popup>
-            <div className="min-w-[200px] p-1">
-              <p className="font-semibold text-sm text-gray-900">{m.title}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{m.city}</p>
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-sm font-bold text-green-800">${m.price}</span>
-                {m.distanceKm != null && (
-                  <span className="text-xs text-gray-400">{m.distanceKm.toFixed(1)} km</span>
-                )}
-              </div>
-              <Link
-                href={`/missions/${m.id}`}
-                className="block mt-2 text-center text-xs font-medium text-white bg-[#134021] rounded-lg py-1.5 hover:bg-[#0F3319]"
-              >
-                Voir détails
-              </Link>
-            </div>
-          </Popup>
-        </Marker>
+          icon={isBoosted(m) ? boostedMissionIcon : missionIcon}
+          eventHandlers={{
+            click: () => {
+              onPinClick?.(m);
+            },
+          }}
+        />
       ))}
     </MapContainer>
   );
