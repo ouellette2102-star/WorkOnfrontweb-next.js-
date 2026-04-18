@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
+import { PaywallModal, isQuotaError } from "@/components/subscriptions/paywall-modal";
 
 // --- Validation schema ---
 
@@ -52,6 +53,14 @@ export default function NewMissionPage() {
   const [gpsStatus, setGpsStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
+  const [paywallOpen, setPaywallOpen] = useState(false);
+
+  // Quota usage (soft-info in header)
+  const { data: quota } = useQuery({
+    queryKey: ["missions-quota"],
+    queryFn: () => api.getMissionsQuota(),
+    staleTime: 30_000,
+  });
 
   // Categories from backend
   const { data: categories, isLoading: categoriesLoading } = useQuery({
@@ -149,6 +158,10 @@ export default function NewMissionPage() {
       router.push(`/missions/${mission.id}`);
     },
     onError: (error) => {
+      if (isQuotaError(error)) {
+        setPaywallOpen(true);
+        return;
+      }
       toast.error(
         error instanceof Error
           ? error.message
@@ -181,6 +194,28 @@ export default function NewMissionPage() {
             </p>
           </div>
         </div>
+
+        {/* Quota banner (free plan only) */}
+        {quota && quota.limit !== null && !quota.hasPaidPlan && (
+          <div
+            className={`rounded-2xl border p-3 text-sm flex items-center justify-between ${
+              quota.used >= quota.limit
+                ? "border-amber-300 bg-amber-50 text-amber-900"
+                : "border-workon-border bg-white text-workon-gray"
+            }`}
+          >
+            <span>
+              Plan gratuit : <strong>{quota.used}/{quota.limit}</strong> missions
+              ce mois
+            </span>
+            <Link
+              href="/pricing"
+              className="text-workon-primary hover:underline text-xs font-medium"
+            >
+              Passer en illimité →
+            </Link>
+          </div>
+        )}
 
         {/* Form card */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -390,6 +425,8 @@ export default function NewMissionPage() {
           </Button>
         </form>
       </div>
+
+      <PaywallModal open={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </div>
   );
 }

@@ -115,6 +115,41 @@ export const stripeConnectStatusSchema = z.object({
 
 export type StripeConnectStatus = z.infer<typeof stripeConnectStatusSchema>;
 
+// ─── Subscriptions (Phase 1 monetization) ───────────────────────────────────
+
+export const SUBSCRIPTION_PLANS = [
+  "FREE",
+  "PRO",              // legacy, not sold
+  "PREMIUM",          // legacy, not sold
+  "CLIENT_PRO",
+  "WORKER_PRO",
+  "CLIENT_BUSINESS",
+] as const;
+
+export const subscriptionSchema = z.object({
+  id: z.string().optional(),
+  plan: z.enum(SUBSCRIPTION_PLANS),
+  status: z.string().nullable(),
+  currentPeriodEnd: z.string().nullable(),
+  cancelAtPeriodEnd: z.boolean(),
+  stripeSubscriptionId: z.string().optional(),
+});
+
+export type Subscription = z.infer<typeof subscriptionSchema>;
+
+export const checkoutSessionSchema = z.object({
+  url: z.string().url(),
+  sessionId: z.string(),
+});
+
+export const missionsQuotaSchema = z.object({
+  used: z.number(),
+  limit: z.number().nullable(),
+  hasPaidPlan: z.boolean(),
+});
+
+export type MissionsQuota = z.infer<typeof missionsQuotaSchema>;
+
 // ─── Parser helper ──────────────────────────────────────────────────────────
 
 /**
