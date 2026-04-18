@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { MissionBottomSheet } from "@/components/map/mission-bottom-sheet";
 
 /**
  * Interactive map page — shows nearby missions.
@@ -46,6 +47,8 @@ export default function MapPage() {
   const [radiusKm, setRadiusKm] = useState(25);
   const [category, setCategory] = useState("");
   const [gpsActive, setGpsActive] = useState(false);
+  const [selectedMission, setSelectedMission] =
+    useState<MissionResponse | null>(null);
 
   const detectGPS = useCallback(() => {
     if (!navigator.geolocation) return;
@@ -165,8 +168,15 @@ export default function MapPage() {
           missions={missions ?? []}
           center={[latitude, longitude]}
           radiusKm={radiusKm}
+          onPinClick={setSelectedMission}
         />
       )}
+
+      {/* Bottom sheet — triggered by pin tap */}
+      <MissionBottomSheet
+        mission={selectedMission}
+        onClose={() => setSelectedMission(null)}
+      />
 
       {/* Mission list */}
       <div className="space-y-2">
