@@ -18,7 +18,7 @@ const HERO_COPY: Record<
   worker: {
     message: "Tu es prêt à accepter des missions autour de toi.",
     ctaLabel: "Voir les missions disponibles",
-    ctaHref: "/search",
+    ctaHref: "/missions/mine",
   },
   employer: {
     message: "Tu es prêt à publier des missions pour trouver du renfort.",
@@ -28,7 +28,7 @@ const HERO_COPY: Record<
   client: {
     message: "Tu es prêt à réserver des pros en toute simplicité.",
     ctaLabel: "Explorer les offres près de chez toi",
-    ctaHref: "/search",
+    ctaHref: "/missions/mine",
   },
   admin: {
     message: "Tu supervises l'activité WorkOn et aides les équipes à avancer.",

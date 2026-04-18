@@ -177,7 +177,7 @@ export function EmployerDashboardClient() {
               Matches recents
             </h2>
             <Link
-              href="/employer/matches"
+              href="/matches"
               className="text-xs font-medium text-workon-primary hover:underline"
             >
               Voir tout
@@ -227,7 +227,7 @@ export function EmployerDashboardClient() {
                 size="sm"
                 className="mt-4 bg-workon-primary text-white hover:bg-workon-primary/90"
               >
-                <Link href="/employer/discover">
+                <Link href="/pros">
                   Decouvrir des pros
                   <ArrowRight className="ml-1 h-3.5 w-3.5" />
                 </Link>

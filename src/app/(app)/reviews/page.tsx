@@ -171,7 +171,7 @@ export default function ReviewsPage() {
                 title="Aucun avis pour le moment"
                 description="Complétez des missions pour recevoir vos premiers avis."
                 actionLabel="Trouver des missions"
-                actionHref="/search"
+                actionHref="/missions/mine"
               />
             )}
 

@@ -131,7 +131,7 @@ export function FirstMissionWizard() {
             Suivant
           </Button>
         ) : (
-          <Link href={isWorker ? "/search" : "/employer"}>
+          <Link href={isWorker ? "/missions/mine" : "/missions/new"}>
             <Button onClick={handleDismiss} className="bg-red-600 hover:bg-red-500">
               {isWorker ? "Voir les missions" : "Creer une mission"}
             </Button>

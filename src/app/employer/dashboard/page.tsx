@@ -45,7 +45,7 @@ export default async function EmployerDashboardPage() {
             </div>
           </Link>
 
-          <Link href="/employer/discover">
+          <Link href="/pros">
             <div className="group cursor-pointer rounded-2xl border border-workon-border bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-workon-primary/40 hover:shadow-md">
               <div className="mb-2 text-3xl">&#x1F50D;</div>
               <h3 className="text-base font-semibold text-workon-ink">
@@ -57,7 +57,7 @@ export default async function EmployerDashboardPage() {
             </div>
           </Link>
 
-          <Link href="/employer/matches">
+          <Link href="/matches">
             <div className="group cursor-pointer rounded-2xl border border-workon-border bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-workon-primary/40 hover:shadow-md">
               <div className="mb-2 text-3xl">&#x1F91D;</div>
               <h3 className="text-base font-semibold text-workon-ink">
