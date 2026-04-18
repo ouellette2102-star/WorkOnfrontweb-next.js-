@@ -128,6 +128,10 @@ export interface WorkerProfile {
   completedMissions: number;
   badges: { label: string; type: string }[];
   hourlyRate?: number;
+  /** Top N portfolio photo URLs, when the backend includes them. */
+  portfolioPhotos?: string[];
+  /** Trust tier from backend — aligns with LocalUser.trustTier Prisma enum. */
+  trustTier?: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
 }
 
 export interface ConversationItem {

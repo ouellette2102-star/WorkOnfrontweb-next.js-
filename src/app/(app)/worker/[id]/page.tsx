@@ -4,7 +4,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
-import { Star, Shield, CheckCircle2, MapPin, Loader2 } from "lucide-react";
+import { AvatarFallback } from "@/components/ui/avatar-fallback";
+import { TrustTierBadge } from "@/components/worker/trust-tier-badge";
+import { ContactWorkerButton } from "@/components/worker/contact-worker-button";
+import { Star, Shield, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function WorkerProfilePage() {
@@ -38,18 +41,28 @@ export default function WorkerProfilePage() {
       {/* Hero photo */}
       <div className="relative h-72 bg-gradient-to-b from-workon-primary/10 to-workon-bg">
         {worker.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={worker.photoUrl}
             alt={fullName}
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl font-bold text-workon-muted/30">
-            {worker.firstName[0]}
-            {worker.lastName[0]}
+          <div className="w-full h-full flex items-center justify-center">
+            <AvatarFallback
+              firstName={worker.firstName}
+              lastName={worker.lastName}
+              size="xl"
+              className="!h-32 !w-32 !text-5xl"
+            />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-workon-bg via-workon-bg/50 to-transparent" />
+        {worker.trustTier && worker.trustTier !== "BASIC" && (
+          <div className="absolute top-4 right-4">
+            <TrustTierBadge tier={worker.trustTier} />
+          </div>
+        )}
       </div>
 
       <div className="px-4 -mt-16 relative space-y-4">
@@ -101,14 +114,51 @@ export default function WorkerProfilePage() {
           </div>
         )}
 
-        {/* CTA — Réserver ce professionnel */}
-        <Button
-          onClick={() => router.push(`/reserve/${worker.id}`)}
-          className="w-full h-12 text-base"
-        >
-          <Shield className="h-4 w-4 mr-2" />
-          Réserver ce professionnel
-        </Button>
+        {/* Hourly rate */}
+        {worker.hourlyRate != null && worker.hourlyRate > 0 && (
+          <div className="rounded-xl bg-workon-primary-subtle border border-workon-primary/20 p-3 text-center">
+            <p className="text-xs text-workon-muted">Tarif horaire</p>
+            <p className="text-xl font-bold text-workon-primary">
+              À partir de {worker.hourlyRate} $/h
+            </p>
+          </div>
+        )}
+
+        {/* Portfolio — 3 thumbs */}
+        {worker.portfolioPhotos && worker.portfolioPhotos.length > 0 && (
+          <section>
+            <h2 className="font-semibold text-workon-ink mb-2">Portfolio</h2>
+            <div className="grid grid-cols-3 gap-2">
+              {worker.portfolioPhotos.slice(0, 6).map((url, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={`portfolio-${i}`}
+                  src={url}
+                  alt={`Réalisation ${i + 1}`}
+                  className="aspect-square w-full rounded-xl object-cover border border-workon-border"
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Primary CTAs */}
+        <div className="space-y-2">
+          <ContactWorkerButton
+            workerId={worker.id}
+            workerFirstName={worker.firstName}
+            workerCategory={worker.category}
+            workerCity={worker.city}
+          />
+          <Button
+            onClick={() => router.push(`/reserve/${worker.id}`)}
+            variant="outline"
+            className="w-full h-12 text-base border-workon-primary text-workon-primary hover:bg-workon-primary/5"
+          >
+            <Shield className="h-4 w-4 mr-2" />
+            Réserver ce professionnel
+          </Button>
+        </div>
 
         {/* Why choose section */}
         <div className="space-y-2 pt-2">
