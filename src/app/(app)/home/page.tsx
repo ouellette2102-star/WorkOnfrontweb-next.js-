@@ -8,6 +8,9 @@ import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { WorkerCard } from "@/components/worker/worker-card";
 import { Button } from "@/components/ui/button";
 import { MissionProgressBar } from "@/components/mission/mission-progress-bar";
+import { SkeletonWorkerCard } from "@/components/ui/skeleton";
+import { getFeaturedWorkers, type FeaturedWorker } from "@/lib/public-api";
+import type { WorkerProfile } from "@/lib/api-client";
 import {
   ArrowRight,
   Inbox,
@@ -49,21 +52,39 @@ export default function HomePage() {
     staleTime: 60_000,
   });
 
-  const { data: workersData } = useQuery({
-    queryKey: ["featured-workers"],
-    queryFn: () => api.getWorkers({ limit: 12 }),
+  const { data: featured, isLoading: isLoadingWorkers } = useQuery({
+    queryKey: ["featured-workers-public"],
+    queryFn: () => getFeaturedWorkers(12),
+    staleTime: 60_000,
   });
 
-  // Filter out obvious test / seed accounts
-  const realWorkers = (workersData?.workers ?? []).filter((w) => {
-    const first = (w.firstName ?? "").trim();
-    const last = (w.lastName ?? "").trim();
-    if (first.length < 2 || last.length < 2) return false;
-    const full = `${first} ${last}`.toLowerCase();
-    if (full.startsWith("test") || full.includes("john doe") || full.includes("jane doe"))
-      return false;
-    return true;
-  });
+  // Adapt public FeaturedWorker to the WorkerProfile shape used by
+  // WorkerCard. Fields absent from the public DTO become undefined /
+  // zero — WorkerCard renders conditionally on each.
+  const realWorkers: WorkerProfile[] = (featured ?? [])
+    .filter((w: FeaturedWorker) => {
+      const first = (w.firstName ?? "").trim();
+      const last = (w.lastName ?? "").trim();
+      if (first.length < 2 || last.length < 2) return false;
+      const full = `${first} ${last}`.toLowerCase();
+      if (full.startsWith("test") || full.includes("smoke") || full.includes("john doe"))
+        return false;
+      return true;
+    })
+    .map((w: FeaturedWorker) => ({
+      id: w.id,
+      firstName: w.firstName,
+      lastName: w.lastName,
+      city: w.city,
+      photoUrl: w.photoUrl,
+      category: w.sector ?? undefined,
+      averageRating: w.ratingAvg,
+      reviewCount: w.ratingCount,
+      completionPercentage: 0,
+      completedMissions: w.completedMissions,
+      badges: w.badges,
+      trustTier: w.trustTier,
+    }));
 
   const { data: myClientMissions } = useQuery({
     queryKey: ["my-missions-client"],
@@ -210,7 +231,7 @@ export default function HomePage() {
       )}
 
       {/* ── 4. AUTOUR DE TOI ────────────────────────────────────── */}
-      {realWorkers.length > 0 && (
+      {(isLoadingWorkers || realWorkers.length > 0) && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-workon-ink uppercase tracking-wide">
@@ -227,14 +248,23 @@ export default function HomePage() {
             className="flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-2 scrollbar-hide"
             style={{ scrollPaddingLeft: "1rem" }}
           >
-            {realWorkers.slice(0, 8).map((w) => (
-              <div
-                key={w.id}
-                className="shrink-0 w-[78vw] max-w-[300px] snap-start"
-              >
-                <WorkerCard worker={w} compact />
-              </div>
-            ))}
+            {isLoadingWorkers
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={`skel-${i}`}
+                    className="shrink-0 w-[78vw] max-w-[300px] snap-start"
+                  >
+                    <SkeletonWorkerCard />
+                  </div>
+                ))
+              : realWorkers.slice(0, 8).map((w) => (
+                  <div
+                    key={w.id}
+                    className="shrink-0 w-[78vw] max-w-[300px] snap-start"
+                  >
+                    <WorkerCard worker={w} compact />
+                  </div>
+                ))}
           </div>
         </section>
       )}

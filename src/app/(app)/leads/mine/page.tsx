@@ -17,6 +17,8 @@ import {
   CheckCircle2,
   Crown,
 } from "lucide-react";
+import { SkeletonCard } from "@/components/ui/skeleton";
+import { FreshBadge } from "@/components/ui/fresh-badge";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -87,8 +89,10 @@ export default function LeadsInboxPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-workon-muted" />
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-3">
+        <SkeletonCard lines={3} />
+        <SkeletonCard lines={3} />
+        <SkeletonCard lines={3} />
       </div>
     );
   }
@@ -235,6 +239,7 @@ function DeliveryCard({
                 NOUVEAU
               </span>
             )}
+            <FreshBadge createdAt={delivery.deliveredAt} freshMinutes={10} label="< 10 min" />
           </div>
           <p className="text-xs text-workon-muted mt-0.5">
             Reçu{" "}
