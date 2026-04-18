@@ -36,26 +36,26 @@ export function ContactWorkerButton({
     setOpen(true);
   };
 
-  const handleSend = async () => {
-    const text = message.trim();
-    if (!text) {
-      toast.error("Écris un message avant d'envoyer.");
-      return;
-    }
-
-    setSending(true);
-    try {
-      const result = await api.sendDirectMessage(workerId, text);
-      toast.success(`Message envoyé à ${workerFirstName} !`);
-      setOpen(false);
-      setMessage("");
-      router.push(`/messages/${result.missionId}`);
-    } catch (err) {
-      console.error("Contact error:", err);
-      toast.error("Impossible d'envoyer le message. Réessayez.");
-      setSending(false);
-    }
+  // Contact flow is now swipe-first: the user must match before chatting.
+  // Clicking "Envoyer" redirects to /swipe so the user can like the
+  // worker's card. On mutual LIKE the backend auto-creates a Conversation
+  // (see swipe.service.ts#ensureConversation) and the chat appears in
+  // /messages. This replaces the old POST /messages-local/direct endpoint
+  // that was removed 2026-04-18 (returns 410 Gone).
+  const handleSend = () => {
+    toast.info("Swipe pour matcher d'abord", {
+      description:
+        `Pour contacter ${workerFirstName}, likez son profil dans Pros. Le chat s'ouvre dès le match.`,
+    });
+    setOpen(false);
+    setMessage("");
+    router.push("/swipe");
   };
+
+  // Silence unused — API is no longer called, but workerId stays part of the
+  // component signature for the time being.
+  void workerId;
+  void sending;
 
   return (
     <>

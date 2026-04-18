@@ -85,8 +85,15 @@ export const missionListSchema = z.array(missionResponseSchema);
  * Canonical conversation shape from /messages-local/conversations.
  * Used by the /messages list view and the BottomNav unread badge.
  */
+/**
+ * Polymorphic: exactly one of `missionId` / `conversationId` is set.
+ * - missionId set     → thread attached to a LocalMission (job chat)
+ * - conversationId set → pure DM thread (unlocked post-swipe-match)
+ * The frontend routes differently depending on which is populated.
+ */
 export const conversationSchema = z.object({
-  missionId: z.string(),
+  missionId: z.string().nullable(),
+  conversationId: z.string().nullable().optional(),
   missionTitle: z.string(),
   otherUser: z.object({
     id: z.string(),
@@ -98,7 +105,30 @@ export const conversationSchema = z.object({
   unreadCount: z.number(),
 });
 
+export type ConversationListItem = z.infer<typeof conversationSchema>;
+
 export const conversationListSchema = z.array(conversationSchema);
+
+/**
+ * Shape of a message in a pure Conversation (post-match DM).
+ */
+export const conversationMessageSchema = z.object({
+  id: z.string(),
+  conversationId: z.string(),
+  senderId: z.string(),
+  senderRole: z.string(),
+  content: z.string(),
+  status: z.string(),
+  createdAt: z.string(),
+});
+
+export type ConversationMessage = z.infer<typeof conversationMessageSchema>;
+
+export const conversationMessagesResponseSchema = z.object({
+  messages: z.array(conversationMessageSchema),
+  nextCursor: z.string().nullable(),
+  hasMore: z.boolean(),
+});
 
 // ─── Stripe Connect status ──────────────────────────────────────────────────
 
