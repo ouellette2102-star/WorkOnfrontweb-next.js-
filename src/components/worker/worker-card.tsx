@@ -12,22 +12,32 @@ interface WorkerCardProps {
   compact?: boolean;
 }
 
+/**
+ * Worker card used on home, search, carousels.
+ *
+ * NB: root is <article>, not <Link>. Contact/Réserver are real action buttons
+ * that used to be nested anchors under an outer <Link> — invalid HTML and the
+ * CTAs were being swallowed by the card navigation. Now the photo + name act
+ * as the "open profile" affordance via a single <Link> wrapper, and the CTAs
+ * stand on their own.
+ */
 export function WorkerCard({ worker, compact }: WorkerCardProps) {
   const hasReviews = (worker.reviewCount ?? 0) > 0;
   const displayName = worker.fullName || `${worker.firstName} ${worker.lastName}`;
+  const profileHref = `/worker/${worker.id}`;
 
   return (
-    <Link
-      href={`/worker/${worker.id}`}
+    <article
       className={cn(
-        "block rounded-2xl border border-workon-border bg-white overflow-hidden transition-all hover:border-workon-primary/30 hover:shadow-md shadow-sm",
+        "rounded-2xl border border-workon-border bg-white overflow-hidden transition-all hover:border-workon-primary/30 hover:shadow-md shadow-sm",
         compact ? "p-3" : "p-0",
       )}
     >
-      {/* Photo — show default avatar if no photo */}
+      {/* Photo — open profile on click */}
       {!compact && (
-        <div className="relative h-48 bg-workon-bg">
+        <Link href={profileHref} className="block relative h-48 bg-workon-bg">
           {worker.photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={worker.photoUrl}
               alt={displayName}
@@ -40,20 +50,18 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
               </div>
             </div>
           )}
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent" />
-          {/* Category badge overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent pointer-events-none" />
           {worker.category && (
             <span className="absolute top-3 left-3 inline-flex items-center rounded-full bg-[#C96646]/90 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-white shadow-sm">
               {worker.category}
             </span>
           )}
-        </div>
+        </Link>
       )}
 
       <div className={cn("space-y-2", compact ? "" : "p-4")}>
-        {/* Name + Job title */}
-        <div>
+        {/* Name + Job title — clickable, opens profile */}
+        <Link href={profileHref} className="block hover:text-workon-primary transition-colors">
           <h3 className="font-semibold text-base text-workon-ink">
             {worker.firstName} {worker.lastName}
           </h3>
@@ -63,11 +71,10 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
           {compact && worker.category && !worker.jobTitle && (
             <p className="text-sm text-workon-muted">{worker.category}</p>
           )}
-        </div>
+        </Link>
 
         {/* Trust signals row */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* City */}
           {worker.city && (
             <span className="flex items-center gap-1 text-xs text-workon-muted">
               <MapPin className="h-3 w-3" />
@@ -75,7 +82,6 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
             </span>
           )}
 
-          {/* Completed missions */}
           {worker.completedMissions > 0 && (
             <span className="flex items-center gap-1 text-xs text-workon-muted">
               <CheckCircle className="h-3 w-3 text-workon-primary" />
@@ -83,7 +89,6 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
             </span>
           )}
 
-          {/* Compact category pill */}
           {compact && worker.category && (
             <span className="inline-flex items-center rounded-full bg-[#C96646]/10 px-2 py-0.5 text-xs font-medium text-[#C96646]">
               <Briefcase className="h-3 w-3 mr-1" />
@@ -119,7 +124,7 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
           <TrustPill variant="nouveau" />
         )}
 
-        {/* Badges — including trust tier */}
+        {/* Badges */}
         {worker.badges && worker.badges.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {worker.badges.map((badge) => (
@@ -134,7 +139,7 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
           </div>
         )}
 
-        {/* Primary CTA: Contacter */}
+        {/* Primary CTA: Contacter (opens match modal) */}
         <ContactWorkerButton
           workerId={worker.id}
           workerFirstName={worker.firstName}
@@ -145,13 +150,12 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
         {/* Secondary CTA: Réserver */}
         <Link
           href={`/reserve/${worker.id}`}
-          onClick={(e) => e.stopPropagation()}
           className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-workon-primary text-workon-primary text-sm font-medium py-2 hover:bg-workon-primary/5 transition-colors"
         >
           <CalendarDays className="h-3.5 w-3.5" />
           Réserver
         </Link>
       </div>
-    </Link>
+    </article>
   );
 }
