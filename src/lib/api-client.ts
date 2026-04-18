@@ -830,12 +830,51 @@ export const api = {
   // Mission Events
   getMissionEvents: (missionId: string) => apiFetch<unknown[]>(`/missions/${missionId}/events`),
 
-  // Leads
+  // Leads (owned / CRM)
   getLeads: () => apiFetch<LeadResponse[]>("/leads"),
   updateLeadStatus: (id: string, status: LeadStatus) =>
     apiFetch<LeadResponse>(`/leads/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
   convertLead: (id: string) =>
     apiFetch<{ missionId: string }>(`/leads/${id}/convert`, { method: "POST" }),
+
+  // Leads delivered to me (Phase 4 — subscribers)
+  getMyLeads: () =>
+    apiFetch<{
+      deliveries: {
+        id: string;
+        leadId: string;
+        deliveredAt: string;
+        openedAt: string | null;
+        acceptedAt: string | null;
+        declinedAt: string | null;
+        convertedToMissionId: string | null;
+        lead: {
+          id: string;
+          name: string;
+          phone: string | null;
+          email: string | null;
+          category: string | null;
+          city: string | null;
+          description: string | null;
+          budgetCents: number | null;
+          createdAt: string;
+        };
+      }[];
+      usage: { used: number; limit: number | null };
+    }>("/leads/mine"),
+  markLeadDeliveryOpened: (deliveryId: string) =>
+    apiFetch<{ ok: boolean }>(`/leads/deliveries/${deliveryId}/open`, {
+      method: "PATCH",
+    }),
+  acceptLeadDelivery: (deliveryId: string) =>
+    apiFetch<{ mission: { id: string }; leadId: string }>(
+      `/leads/deliveries/${deliveryId}/accept`,
+      { method: "POST" },
+    ),
+  declineLeadDelivery: (deliveryId: string) =>
+    apiFetch<{ ok: boolean }>(`/leads/deliveries/${deliveryId}/decline`, {
+      method: "POST",
+    }),
 
   // Time Logs (check-in / check-out)
   checkIn: (missionId: string) =>

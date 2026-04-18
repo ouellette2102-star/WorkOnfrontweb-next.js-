@@ -74,13 +74,15 @@ export function TopBar() {
     { href: "/reviews", label: "Mes avis", icon: Star },
     ...(mode === "pro"
       ? [
-          { href: "/leads", label: "Mes leads", icon: Target },
+          { href: "/leads/mine", label: "Leads entrants", icon: Inbox },
+          { href: "/leads", label: "Mes clients (leads)", icon: Target },
           { href: "/worker/availability", label: "Disponibilités", icon: BarChart3 },
           { href: "/calendar", label: "Calendrier", icon: Calendar },
           { href: "/earnings", label: "Mes revenus", icon: CreditCard },
           { href: "/receipts", label: "Reçus", icon: FileCheck },
         ]
       : [
+          { href: "/leads/mine", label: "Leads entrants", icon: Inbox },
           { href: "/bookings", label: "Mes réservations", icon: Receipt },
         ]),
     { href: "/contracts", label: "Contrats", icon: FileText },
