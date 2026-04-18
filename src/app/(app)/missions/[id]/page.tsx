@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type OfferResponse } from "@/lib/api-client";
+import { api, type OfferResponse, type BoostType } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import {
   MapPin,
@@ -24,6 +24,8 @@ import {
   AlertTriangle,
   LogIn,
   LogOut,
+  Zap,
+  Rocket,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -31,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MissionPhotos } from "@/components/mission/mission-photos";
 import { MissionTimeline } from "@/components/mission/mission-timeline";
+import { BoostCheckoutModal } from "@/components/boosts/boost-checkout-modal";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -627,6 +630,7 @@ export default function MissionDetailPage() {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [disputeModalOpen, setDisputeModalOpen] = useState(false);
+  const [boostType, setBoostType] = useState<BoostType | null>(null);
 
   const { data: mission, isLoading } = useQuery({
     queryKey: ["mission", id],
@@ -855,6 +859,30 @@ export default function MissionDetailPage() {
           <PayMissionButton missionId={id} price={mission.price} />
         )}
 
+        {/* Owner: boost CTAs (only while mission is open or assigned) */}
+        {isOwner && ["open", "assigned"].includes(mission.status) && (
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setBoostType("URGENT_9")}
+              className="rounded-2xl border-amber-300 text-amber-700 hover:bg-amber-50"
+            >
+              <Zap className="h-4 w-4 mr-1.5" />
+              Urgent 9 $
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setBoostType("TOP_48H_14")}
+              className="rounded-2xl border-blue-300 text-blue-700 hover:bg-blue-50"
+            >
+              <Rocket className="h-4 w-4 mr-1.5" />
+              Top 48h 14 $
+            </Button>
+          </div>
+        )}
+
         {/* Contact via chat */}
         <Link
           href={`/messages/${mission.id}`}
@@ -940,6 +968,17 @@ export default function MissionDetailPage() {
         isOpen={disputeModalOpen}
         onClose={() => setDisputeModalOpen(false)}
       />
+      {boostType && (boostType === "URGENT_9" || boostType === "TOP_48H_14") && (
+        <BoostCheckoutModal
+          type={boostType}
+          missionId={id}
+          isOpen={boostType !== null}
+          onClose={() => setBoostType(null)}
+          onSuccess={() =>
+            queryClient.invalidateQueries({ queryKey: ["mission", id] })
+          }
+        />
+      )}
     </div>
   );
 }
