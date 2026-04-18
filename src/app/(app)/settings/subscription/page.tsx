@@ -6,8 +6,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, Crown, AlertTriangle } from "lucide-react";
+import { Loader2, CheckCircle2, Crown, AlertTriangle, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import { BoostCheckoutModal } from "@/components/boosts/boost-checkout-modal";
 
 const PLAN_LABEL: Record<string, string> = {
   FREE: "Gratuit",
@@ -58,6 +59,7 @@ export default function SubscriptionSettingsPage() {
   });
 
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [verifyBoostOpen, setVerifyBoostOpen] = useState(false);
   const cancelMutation = useMutation({
     mutationFn: () => api.cancelSubscription(),
     onSuccess: () => {
@@ -234,11 +236,42 @@ export default function SubscriptionSettingsPage() {
         </div>
       )}
 
+      {/* Verify Express boost CTA */}
+      <div className="mt-5 rounded-3xl bg-white border border-workon-border p-5 shadow-card">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-workon-ink">
+              Vérification express — 19 $
+            </p>
+            <p className="text-xs text-workon-gray mt-1">
+              Ton dossier KYC (ID + téléphone) traité en moins de 24h. Badge
+              « vérifié » accéléré.
+            </p>
+            <Button
+              onClick={() => setVerifyBoostOpen(true)}
+              variant="outline"
+              className="mt-3 border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+            >
+              <ShieldCheck className="h-4 w-4 mr-1.5" />
+              Activer — 19 $
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <div className="mt-6 text-center text-xs text-workon-muted">
         <Link href="/settings" className="hover:text-workon-gray">
           ← Autres réglages
         </Link>
       </div>
+
+      <BoostCheckoutModal
+        type="VERIFY_EXPRESS_19"
+        isOpen={verifyBoostOpen}
+        onClose={() => setVerifyBoostOpen(false)}
+        onSuccess={() => qc.invalidateQueries({ queryKey: ["subscription-me"] })}
+      />
     </div>
   );
 }

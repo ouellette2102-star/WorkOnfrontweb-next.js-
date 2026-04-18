@@ -384,6 +384,30 @@ export interface LeadResponse {
 // Re-export PrimaryRole for backward compat with workon-api.ts consumers
 export type PrimaryRole = "WORKER" | "EMPLOYER" | "CLIENT_RESIDENTIAL" | "ADMIN";
 
+export type BoostType = "URGENT_9" | "TOP_48H_14" | "VERIFY_EXPRESS_19";
+export type BoostStatus = "PENDING" | "PAID" | "FAILED" | "EXPIRED";
+
+export interface BoostCheckoutResponse {
+  boostId: string;
+  clientSecret: string;
+  amountCents: number;
+}
+
+export interface BoostHistoryItem {
+  id: string;
+  userId: string;
+  missionId: string | null;
+  type: BoostType;
+  status: BoostStatus;
+  amountCents: number;
+  currency: string;
+  stripePaymentIntentId: string | null;
+  appliedAt: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // --- API Methods ---
 
 export const api = {
@@ -631,6 +655,24 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ missionId }),
     }),
+
+  // Boosts (Phase 3 — one-shot paid visibility / urgency / verify)
+  createMissionUrgentBoost: (missionId: string) =>
+    apiFetch<BoostCheckoutResponse>("/boosts/mission-urgent", {
+      method: "POST",
+      body: JSON.stringify({ missionId }),
+    }),
+  createTopVisibilityBoost: (missionId: string) =>
+    apiFetch<BoostCheckoutResponse>("/boosts/top-visibility", {
+      method: "POST",
+      body: JSON.stringify({ missionId }),
+    }),
+  createVerifyExpressBoost: () =>
+    apiFetch<BoostCheckoutResponse>("/boosts/verify-express", {
+      method: "POST",
+      body: JSON.stringify({}),
+    }),
+  getMyBoosts: () => apiFetch<BoostHistoryItem[]>("/boosts/mine"),
 
   // Invoices
   getInvoice: (id: string) => apiFetch<InvoiceResponse>(`/payments/invoice/${id}`),
