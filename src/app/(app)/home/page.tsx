@@ -4,23 +4,49 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
 import { useMode } from "@/contexts/mode-context";
 import { api } from "@/lib/api-client";
-import { StatsBar } from "@/components/stats-bar";
-import { WorkerCard } from "@/components/worker/worker-card";
-import { MissionCard } from "@/components/mission/mission-card";
 import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { Button } from "@/components/ui/button";
-import { MapPin, Plus, Briefcase, Search, Phone } from "lucide-react";
+import { MissionProgressBar } from "@/components/mission/mission-progress-bar";
+import {
+  ArrowRight,
+  Inbox,
+  FileText,
+  Star,
+  Crown,
+  ShieldCheck,
+  FileCheck,
+  BadgeCheck,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
+import { missionStatusLabel, missionStatusColor } from "@/lib/i18n-labels";
 
+/**
+ * Home v2 — dashboard contextuel.
+ *
+ * Principe: pas de CTA dupliqué (le RedPhone FAB de la BottomNav est
+ * la seule action primaire). La home raconte à l'utilisateur ce qui
+ * se passe dans son univers et propose 3 sections dynamiques qui ne
+ * s'affichent QUE si elles ont du contenu utile.
+ *
+ * 1. Greeting + stats live (toujours)
+ * 2. À TRAITER — notifs actionnables (leads, contrats, reviews)
+ * 3. MISSIONS EN COURS — avec timeline visuelle
+ * 4. AUTOUR DE TOI — carousel 3 pros recommandés
+ * 5. Trust footer compact
+ *
+ * Conçue pour être lue comme un feed: scroll, reconnaissance visuelle,
+ * tap sur ce qui intéresse.
+ */
 export default function HomePage() {
   const { user } = useAuth();
   const { mode } = useMode();
-  const isClient = mode === "client";
   const isPro = mode === "pro";
 
   const { data: stats } = useQuery({
     queryKey: ["home-stats"],
     queryFn: () => api.getHomeStats(),
+    staleTime: 60_000,
   });
 
   const { data: workersData } = useQuery({
@@ -39,152 +65,347 @@ export default function HomePage() {
     return true;
   });
 
-  const { data: myMissions } = useQuery({
-    queryKey: ["my-missions", mode],
-    queryFn: () => (isClient ? api.getMyMissions() : api.getMyAssignments()),
+  const { data: myClientMissions } = useQuery({
+    queryKey: ["my-missions-client"],
+    queryFn: () => api.getMyMissions(),
     enabled: !!user,
   });
 
-  const activeMissions = myMissions?.filter(
-    (m) => m.status === "open" || m.status === "assigned" || m.status === "in_progress",
+  const { data: myProMissions } = useQuery({
+    queryKey: ["my-missions-pro"],
+    queryFn: () => api.getMyAssignments(),
+    enabled: !!user,
+  });
+
+  // Union: home shows both so a user with mixed activity sees everything.
+  const myMissions = [
+    ...(myClientMissions ?? []),
+    ...(myProMissions ?? []),
+  ];
+  const activeMissions = myMissions.filter(
+    (m) =>
+      m.status === "open" ||
+      m.status === "assigned" ||
+      m.status === "in_progress",
   );
 
+  const { data: quota } = useQuery({
+    queryKey: ["missions-quota"],
+    queryFn: () => api.getMissionsQuota().catch(() => null),
+  });
+
+  const { data: leadsData } = useQuery({
+    queryKey: ["leads-mine-home"],
+    queryFn: () => api.getMyLeads().catch(() => null),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+
+  const pendingLeads =
+    leadsData?.deliveries?.filter(
+      (d) => !d.acceptedAt && !d.declinedAt,
+    ) ?? [];
+
+  const todayLabel = new Date().toLocaleDateString("fr-CA", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
+  const proCount = stats?.activeWorkers ?? realWorkers.length;
+  const missionsThisMonth = stats?.openServiceCalls ?? 0;
+
   return (
-    <div className="space-y-6 px-4 py-6">
-      {/* Hero — light organic gradient. Role toggle moved to /profile
-          to reduce noise; the app detects context by action (publishing
-          → client, accepting → pro). The RedPhone CTA in BottomNav
-          is the primary action across all modes. */}
-      <div className="relative -mx-4 -mt-6 px-4 pt-6 pb-8 bg-gradient-to-b from-workon-primary/10 via-workon-primary/5 to-transparent">
-        <h1 className="text-2xl font-bold text-center text-workon-ink">
+    <div className="space-y-5 px-4 py-5 pb-24">
+      {/* ── 1. Greeting ─────────────────────────────────────────── */}
+      <header className="space-y-1">
+        <h1 className="text-2xl font-bold text-workon-ink">
           Bonjour {user?.firstName || ""} 👋
         </h1>
-        <p className="text-center text-workon-muted text-sm mt-1">
-          {isPro
-            ? "Voici ce qui se passe dans ta zone aujourd'hui"
-            : "Trouve un pro qualifié en quelques taps"}
+        <p className="text-xs text-workon-muted capitalize">
+          {todayLabel}
+          {user?.city ? ` · ${user.city}` : ""}
         </p>
+      </header>
 
-        {/* Live marketplace stats */}
-        <div className="mt-4">
-          <StatsBar />
+      {/* Live stats — une ligne dense */}
+      {proCount > 0 && (
+        <div className="flex items-center gap-2 rounded-2xl border border-workon-border bg-white px-4 py-2.5 shadow-card text-xs text-workon-gray">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+          </span>
+          <span>
+            <strong className="text-workon-ink">{proCount}</strong> pros
+            actifs
+            {missionsThisMonth > 0 ? (
+              <>
+                {" · "}
+                <strong className="text-workon-ink">
+                  {missionsThisMonth}
+                </strong>{" "}
+                missions ouvertes
+              </>
+            ) : null}
+          </span>
         </div>
-      </div>
+      )}
 
-      {/* Stripe Connect gate (pro mode only — hidden when onboarded) */}
+      {/* Stripe Connect gate (pro mode only — masqué après onboarding) */}
       {isPro && <StripeConnectGate />}
 
-      {/* Quick actions */}
-      <div className="flex gap-3">
-        {isClient ? (
-          <>
-            <Button asChild className="flex-1 h-12 bg-workon-accent hover:bg-workon-accent/90 text-white">
-              <Link href="/express">
-                <Phone className="h-4 w-4 mr-1" />
-                Express Dispatch
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="flex-1 h-12 border-workon-border text-workon-ink">
-              <Link href="/missions/new">
-                <Plus className="h-4 w-4 mr-1" />
-                Mission
-              </Link>
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button asChild className="flex-1 h-12 bg-workon-primary hover:bg-workon-primary/90 text-white">
-              <Link href="/search">
-                <Search className="h-4 w-4 mr-1" />
-                Trouver des missions
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="flex-1 h-12 border-workon-border text-workon-ink">
-              <Link href="/map">
-                <MapPin className="h-4 w-4 mr-1" />
-                Carte
-              </Link>
-            </Button>
-          </>
-        )}
-      </div>
+      {/* ── 2. À TRAITER ────────────────────────────────────────── */}
+      <ToDoSection
+        pendingLeads={pendingLeads.length}
+        quotaExceeded={
+          quota && quota.limit !== null && quota.used >= quota.limit
+        }
+        isPro={isPro}
+        hasPaidPlan={quota?.hasPaidPlan ?? false}
+      />
 
-      {/* Missions + Pros — side by side on desktop, stacked on mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Left: Active missions */}
+      {/* ── 3. MISSIONS EN COURS ────────────────────────────────── */}
+      {activeMissions.length > 0 && (
         <section className="space-y-3">
-          {activeMissions && activeMissions.length > 0 ? (
-            <>
-              <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-workon-ink">
-                  <Briefcase className="inline h-4 w-4 mr-1 text-workon-primary" />
-                  Missions actives
-                </h2>
-                <Link href="/missions" className="text-xs text-workon-primary hover:underline">
-                  Voir tout
-                </Link>
-              </div>
-              <div className="space-y-2">
-                {activeMissions.slice(0, 4).map((m) => (
-                  <MissionCard key={m.id} mission={m} />
-                ))}
-              </div>
-            </>
-          ) : (
-            user && activeMissions !== undefined && (
-              <div className="rounded-2xl border border-workon-border bg-white p-6 text-center shadow-sm h-full flex flex-col items-center justify-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-workon-primary/10">
-                  <Briefcase className="h-5 w-5 text-workon-primary" />
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-workon-ink uppercase tracking-wide">
+              Missions en cours
+            </h2>
+            <Link
+              href="/missions/mine"
+              className="text-xs text-workon-primary hover:underline font-medium"
+            >
+              Voir tout
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {activeMissions.slice(0, 3).map((m) => (
+              <Link
+                key={m.id}
+                href={`/missions/${m.id}`}
+                className="block rounded-2xl bg-white border border-workon-border p-4 shadow-card hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-workon-ink truncate">
+                      {m.title}
+                    </p>
+                    <p className="text-xs text-workon-muted mt-0.5">
+                      {m.category}
+                      {m.city ? ` · ${m.city}` : ""}
+                      {m.price ? ` · ${m.price}$` : ""}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${missionStatusColor(m.status)}`}
+                  >
+                    {missionStatusLabel(m.status)}
+                  </span>
                 </div>
-                <h2 className="font-semibold text-base text-workon-ink">
-                  {isClient
-                    ? "Aucune mission en cours"
-                    : "Prêt pour ta prochaine mission ?"}
-                </h2>
-                <p className="mt-1 text-sm text-workon-muted">
-                  {isClient
-                    ? "Publie ta première mission."
-                    : "Des missions t'attendent près de chez toi."}
-                </p>
-                <Button asChild className="mt-4 bg-workon-primary hover:bg-workon-primary/90 text-white">
-                  <Link href={isClient ? "/express" : "/search"}>
-                    {isClient ? "Express Dispatch" : "Voir les missions"}
-                  </Link>
-                </Button>
-              </div>
-            )
-          )}
+                <MissionProgressBar status={m.status} />
+              </Link>
+            ))}
+          </div>
         </section>
+      )}
 
-        {/* Right: Featured workers */}
+      {/* ── 4. AUTOUR DE TOI ────────────────────────────────────── */}
+      {realWorkers.length > 0 && (
         <section className="space-y-3">
-          {realWorkers.length > 0 ? (
-            <>
-              <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-workon-ink">Pros disponibles</h2>
-                <Link href="/search" className="text-xs text-workon-primary hover:underline">
-                  Voir tout
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-workon-ink uppercase tracking-wide">
+              Autour de toi
+            </h2>
+            <Link
+              href="/swipe"
+              className="text-xs text-workon-primary hover:underline font-medium"
+            >
+              Voir tout
+            </Link>
+          </div>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <div className="flex gap-3 pb-1" style={{ minWidth: "min-content" }}>
+              {realWorkers.slice(0, 6).map((w) => (
+                <Link
+                  key={w.id}
+                  href={`/worker/${w.id}`}
+                  className="shrink-0 w-[140px] rounded-2xl bg-white border border-workon-border p-3 shadow-card hover:shadow-md transition-shadow"
+                >
+                  <div className="aspect-square rounded-xl bg-workon-bg-cream mb-2 flex items-center justify-center overflow-hidden">
+                    {w.photoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={w.photoUrl}
+                        alt={`${w.firstName} ${w.lastName}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-2xl font-bold text-workon-primary">
+                        {(w.firstName?.[0] ?? "") + (w.lastName?.[0] ?? "")}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs font-semibold text-workon-ink truncate">
+                    {w.firstName} {w.lastName?.[0] ?? ""}.
+                  </p>
+                  <p className="text-[10px] text-workon-muted truncate mt-0.5">
+                    {w.category || w.city || "Pro"}
+                  </p>
+                  {w.averageRating != null && w.averageRating > 0 && (
+                    <p className="text-[10px] text-workon-gray mt-1 flex items-center gap-1">
+                      <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                      <span className="font-semibold text-workon-ink">
+                        {w.averageRating.toFixed(1)}
+                      </span>
+                      {w.reviewCount ? (
+                        <span>({w.reviewCount})</span>
+                      ) : null}
+                    </p>
+                  )}
                 </Link>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {realWorkers.slice(0, 4).map((w) => (
-                  <WorkerCard key={w.id} worker={w} compact />
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="rounded-2xl border border-workon-border bg-white p-6 text-center shadow-sm h-full flex flex-col items-center justify-center">
-              <p className="text-sm text-workon-muted">Aucun pro disponible pour le moment.</p>
+              ))}
             </div>
-          )}
+          </div>
         </section>
-      </div>
+      )}
 
-      {/* Footer */}
-      <div className="text-center text-xs text-workon-muted pt-4 space-y-1">
-        <p>WorkOn fournit l&apos;infrastructure de mise en relation et paiement.</p>
-        <p>Paiement sécurisé par Stripe.</p>
+      {/* Empty state — tout neuf, aucune mission, aucun pro */}
+      {activeMissions.length === 0 &&
+        realWorkers.length === 0 &&
+        pendingLeads.length === 0 && (
+          <div className="rounded-2xl bg-white border border-workon-border p-6 text-center shadow-card">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-workon-primary/10">
+              <Sparkles className="h-5 w-5 text-workon-primary" />
+            </div>
+            <p className="text-sm font-semibold text-workon-ink">
+              Bienvenue sur WorkOn
+            </p>
+            <p className="text-xs text-workon-muted mt-1">
+              Commence en appelant un pro — le bouton rouge en bas.
+            </p>
+          </div>
+        )}
+
+      {/* ── 5. Trust footer compact ─────────────────────────────── */}
+      <div className="rounded-2xl bg-workon-bg-cream/60 border border-workon-border p-3">
+        <div className="grid grid-cols-3 gap-2 text-[11px] text-workon-gray">
+          <div className="flex items-center gap-1.5 justify-center">
+            <ShieldCheck className="h-3.5 w-3.5 text-workon-primary" />
+            <span>Paiement Stripe</span>
+          </div>
+          <div className="flex items-center gap-1.5 justify-center">
+            <FileCheck className="h-3.5 w-3.5 text-workon-primary" />
+            <span>Contrat auto</span>
+          </div>
+          <div className="flex items-center gap-1.5 justify-center">
+            <BadgeCheck className="h-3.5 w-3.5 text-workon-primary" />
+            <span>Pros vérifiés</span>
+          </div>
+        </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Actionable cards — shown in priority order. Section hidden entirely
+ * if nothing to show.
+ */
+function ToDoSection({
+  pendingLeads,
+  quotaExceeded,
+  isPro,
+  hasPaidPlan,
+}: {
+  pendingLeads: number;
+  quotaExceeded: boolean | null | undefined;
+  isPro: boolean;
+  hasPaidPlan: boolean;
+}) {
+  const cards: Array<{
+    key: string;
+    icon: React.ReactNode;
+    title: string;
+    subtitle: string;
+    href: string;
+    cta: string;
+    accent?: "primary" | "amber" | "violet";
+  }> = [];
+
+  if (pendingLeads > 0) {
+    cards.push({
+      key: "leads",
+      icon: <Inbox className="h-5 w-5" />,
+      title: `${pendingLeads} nouvelle${pendingLeads > 1 ? "s" : ""} demande${pendingLeads > 1 ? "s" : ""}`,
+      subtitle: "Dans ta zone · à accepter ou décliner",
+      href: "/leads/mine",
+      cta: "Voir",
+      accent: "primary",
+    });
+  }
+
+  if (quotaExceeded) {
+    cards.push({
+      key: "paywall",
+      icon: <Crown className="h-5 w-5" />,
+      title: "Limite gratuite atteinte",
+      subtitle: "Passe Pro pour publier en illimité",
+      href: "/pricing",
+      cta: "Upgrader",
+      accent: "amber",
+    });
+  }
+
+  if (isPro && !hasPaidPlan) {
+    cards.push({
+      key: "upsell-pro",
+      icon: <FileText className="h-5 w-5" />,
+      title: "Débloque 5 leads entrants par mois",
+      subtitle: "Abonne-toi à Pro — 19 $ / mois",
+      href: "/pricing",
+      cta: "Voir plans",
+      accent: "violet",
+    });
+  }
+
+  if (cards.length === 0) return null;
+
+  const accentClasses: Record<string, string> = {
+    primary:
+      "bg-workon-primary-subtle border-workon-primary/25 text-workon-primary",
+    amber: "bg-amber-50 border-amber-200 text-amber-800",
+    violet: "bg-violet-50 border-violet-200 text-violet-800",
+  };
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-sm font-bold text-workon-ink uppercase tracking-wide">
+        À traiter
+      </h2>
+      <div className="space-y-2">
+        {cards.map((c) => (
+          <Link
+            key={c.key}
+            href={c.href}
+            className={`flex items-center gap-3 rounded-2xl border p-3 shadow-card hover:shadow-md transition-shadow ${
+              accentClasses[c.accent ?? "primary"]
+            }`}
+          >
+            <div className="shrink-0">{c.icon}</div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold truncate">{c.title}</p>
+              <p className="text-xs opacity-80 truncate">{c.subtitle}</p>
+            </div>
+            <Button
+              variant="ghost"
+              className="shrink-0 h-8 px-2 text-xs hover:bg-transparent"
+            >
+              {c.cta}
+              <ArrowRight className="h-3.5 w-3.5 ml-1" />
+            </Button>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
