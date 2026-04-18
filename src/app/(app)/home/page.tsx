@@ -5,13 +5,13 @@ import { useAuth } from "@/contexts/auth-context";
 import { useMode } from "@/contexts/mode-context";
 import { api } from "@/lib/api-client";
 import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
+import { WorkerCard } from "@/components/worker/worker-card";
 import { Button } from "@/components/ui/button";
 import { MissionProgressBar } from "@/components/mission/mission-progress-bar";
 import {
   ArrowRight,
   Inbox,
   FileText,
-  Star,
   Crown,
   ShieldCheck,
   FileCheck,
@@ -223,48 +223,18 @@ export default function HomePage() {
               Voir tout
             </Link>
           </div>
-          <div className="overflow-x-auto -mx-4 px-4">
-            <div className="flex gap-3 pb-1" style={{ minWidth: "min-content" }}>
-              {realWorkers.slice(0, 6).map((w) => (
-                <Link
-                  key={w.id}
-                  href={`/worker/${w.id}`}
-                  className="shrink-0 w-[140px] rounded-2xl bg-white border border-workon-border p-3 shadow-card hover:shadow-md transition-shadow"
-                >
-                  <div className="aspect-square rounded-xl bg-workon-bg-cream mb-2 flex items-center justify-center overflow-hidden">
-                    {w.photoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={w.photoUrl}
-                        alt={`${w.firstName} ${w.lastName}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-2xl font-bold text-workon-primary">
-                        {(w.firstName?.[0] ?? "") + (w.lastName?.[0] ?? "")}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs font-semibold text-workon-ink truncate">
-                    {w.firstName} {w.lastName?.[0] ?? ""}.
-                  </p>
-                  <p className="text-[10px] text-workon-muted truncate mt-0.5">
-                    {w.category || w.city || "Pro"}
-                  </p>
-                  {w.averageRating != null && w.averageRating > 0 && (
-                    <p className="text-[10px] text-workon-gray mt-1 flex items-center gap-1">
-                      <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
-                      <span className="font-semibold text-workon-ink">
-                        {w.averageRating.toFixed(1)}
-                      </span>
-                      {w.reviewCount ? (
-                        <span>({w.reviewCount})</span>
-                      ) : null}
-                    </p>
-                  )}
-                </Link>
-              ))}
-            </div>
+          <div
+            className="flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-2 scrollbar-hide"
+            style={{ scrollPaddingLeft: "1rem" }}
+          >
+            {realWorkers.slice(0, 8).map((w) => (
+              <div
+                key={w.id}
+                className="shrink-0 w-[78vw] max-w-[300px] snap-start"
+              >
+                <WorkerCard worker={w} compact />
+              </div>
+            ))}
           </div>
         </section>
       )}
