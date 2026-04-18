@@ -15,8 +15,7 @@ import {
   Home,
   User,
   Briefcase,
-  Heart,
-  Target,
+  Crown,
   BarChart3,
   Calendar,
   CreditCard,
@@ -64,34 +63,17 @@ export function TopBar() {
 
   const currentRoleLabel = mode === "pro" ? "Pro" : "Client";
 
+  // Hamburger menu — 5 essentiels + admin (si applicable).
+  // Les autres actions sont sur /home (feed contextuel), dans la BottomNav
+  // (missions/chat/pros/carte), ou dans /profile (détails compte).
   const menuItems = [
-    { href: "/home", label: "Tableau de bord", icon: Home },
     { href: "/profile", label: "Mon profil", icon: User },
-    { href: "/search", label: "Opportunités", icon: Briefcase },
-    { href: "/missions", label: "Mes missions", icon: ClipboardList },
-    { href: "/offers", label: "Mes offres", icon: Inbox },
-    { href: "/matches", label: "Matches", icon: Handshake },
-    { href: "/reviews", label: "Mes avis", icon: Star },
     ...(mode === "pro"
-      ? [
-          { href: "/leads/mine", label: "Leads entrants", icon: Inbox },
-          { href: "/leads", label: "Mes clients (leads)", icon: Target },
-          { href: "/worker/availability", label: "Disponibilités", icon: BarChart3 },
-          { href: "/calendar", label: "Calendrier", icon: Calendar },
-          { href: "/earnings", label: "Mes revenus", icon: CreditCard },
-          { href: "/receipts", label: "Reçus", icon: FileCheck },
-        ]
-      : [
-          { href: "/leads/mine", label: "Leads entrants", icon: Inbox },
-          { href: "/bookings", label: "Mes réservations", icon: Receipt },
-        ]),
-    { href: "/contracts", label: "Contrats", icon: FileText },
-    { href: "/invoices", label: "Factures", icon: FileCheck },
-    { href: "/disputes", label: "Litiges", icon: AlertTriangle },
-    { href: "/operator", label: "Centre de commande", icon: Gauge },
-    { href: "/settings", label: "Paramètres", icon: Settings },
+      ? [{ href: "/earnings", label: "Mes revenus", icon: CreditCard }]
+      : [{ href: "/invoices", label: "Mes factures", icon: FileText }]),
+    { href: "/settings/subscription", label: "Mon abonnement", icon: Crown },
     { href: "/support", label: "Aide & support", icon: HelpCircle },
-    { href: "/profile/verify", label: "Vérification", icon: Shield },
+    { href: "/settings", label: "Paramètres", icon: Settings },
     ...(user?.role === "admin" ? [{ href: "/admin", label: "Administration", icon: Wrench }] : []),
   ];
 

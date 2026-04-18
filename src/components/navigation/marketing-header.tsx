@@ -36,7 +36,7 @@ export interface MarketingHeaderProps {
 const DEFAULT_ITEMS: MarketingHeaderNavItem[] = [
   { href: "/", label: "Accueil" },
   { href: "/pros", label: "Travailleurs" },
-  { href: "/employeurs", label: "Clients" },
+  { href: "/pricing", label: "Clients" },
   { href: "/pricing", label: "Tarifs" },
 ];
 

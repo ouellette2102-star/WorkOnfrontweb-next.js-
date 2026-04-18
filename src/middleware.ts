@@ -12,7 +12,6 @@ const PUBLIC_PATHS = [
   "/forgot-password",
   "/sign-up",
   "/pros",
-  "/employeurs",
   "/p/",
   "/pro/",
   "/missions",

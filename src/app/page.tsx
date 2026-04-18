@@ -511,7 +511,7 @@ function EmployerSection({ stats }: { stats: PublicStats | null }) {
             </p>
           </div>
           <Button size="lg" className="bg-[#134021] hover:bg-[#0F3319] text-white h-14 px-10 text-base font-semibold rounded-xl flex-shrink-0 shadow-lg shadow-[#134021]/20" asChild>
-            <Link href="/employeurs">Découvrir l&apos;offre client →</Link>
+            <Link href="/pricing">Découvrir l&apos;offre client →</Link>
           </Button>
         </div>
       </div>

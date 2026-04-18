@@ -49,7 +49,7 @@ export default function MyOffersPage() {
             Vos offres apparaîtront ici quand vous proposerez vos services
           </p>
           <Link
-            href="/search"
+            href="/missions/mine"
             className="mt-4 rounded-xl bg-workon-primary px-6 py-2 text-sm font-semibold text-white hover:bg-workon-primary/90"
           >
             Trouver des missions

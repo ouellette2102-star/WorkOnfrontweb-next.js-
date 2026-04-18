@@ -90,10 +90,9 @@ export function BottomNav() {
   };
 
   // FAB is the primary call-to-action, role-aware:
-  // - Pro (worker)  → /search  (find missions to accept)
-  // - Client        → /missions/new  (publish a new mission)
-  // Express Dispatch is still accessible as a secondary CTA on /home.
-  const fabHref = isWorker ? "/search" : "/missions/new";
+  // - Pro (worker)  → /missions/mine (mes affectations / opportunités)
+  // - Client        → /missions/new  (publier une demande)
+  const fabHref = isWorker ? "/missions/mine" : "/missions/new";
   const fabLabel = isWorker ? "Missions" : "Publier";
   const fabActive = isActive(fabHref);
 
