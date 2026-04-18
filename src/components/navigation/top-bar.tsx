@@ -62,7 +62,7 @@ export function TopBar() {
 
   const unread = notifCount?.count ?? 0;
 
-  const roleLabel = mode === "pro" ? "Mode Pro" : "Mode Client";
+  const currentRoleLabel = mode === "pro" ? "Pro" : "Client";
 
   const menuItems = [
     { href: "/home", label: "Tableau de bord", icon: Home },
@@ -149,7 +149,7 @@ export function TopBar() {
               <p className="font-semibold text-workon-ink">
                 {user?.firstName} {user?.lastName}
               </p>
-              <p className="text-xs text-workon-muted">{roleLabel}</p>
+              <p className="text-xs text-workon-muted">{currentRoleLabel}</p>
             </div>
 
             {/* Mode toggle */}

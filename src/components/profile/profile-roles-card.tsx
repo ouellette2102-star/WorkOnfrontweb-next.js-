@@ -12,23 +12,13 @@ const ROLE_OPTIONS: Array<{
 }> = [
   {
     key: "WORKER",
-    label: "Travailleur",
-    description: "Tu réalises des missions, tu partages ton portfolio et tu reçois des paiements.",
+    label: "Pro",
+    description: "J'offre mes services, je réalise des missions et je reçois des paiements.",
   },
   {
     key: "EMPLOYER",
-    label: "Client entreprise",
-    description: "Tu publies des missions et tu fais appel à des professionnels.",
-  },
-  {
-    key: "CLIENT_RESIDENTIAL",
-    label: "Client résidentiel",
-    description: "Tu cherches des pros pour ta maison (plomberie, électricité, entretien...).",
-  },
-  {
-    key: "ADMIN",
-    label: "Administrateur",
-    description: "Accès complet WorkOn pour superviser les opérations et les équipes.",
+    label: "Client",
+    description: "Je publie des demandes et je fais appel à des pros qualifiés.",
   },
 ];
 
@@ -87,19 +77,13 @@ export function ProfileRolesCard() {
 
   return (
     <section className="rounded-3xl border border-workon-border bg-white  p-8 shadow-sm">
-      <p className="text-sm uppercase tracking-[0.4em] text-workon-accent">Ton rôle WorkOn</p>
-      <h2 className="mt-4 text-2xl font-semibold">Sélectionne ton espace principal</h2>
-      <p className="mt-3 text-workon-muted">
-        Tu peux activer plusieurs espaces en parallèle (Travailleur, Client entreprise, Client résidentiel).
-        Choisis simplement celui que tu veux voir en priorité dans le dashboard.
+      <p className="text-sm uppercase tracking-[0.4em] text-workon-accent">Ton rôle</p>
+      <h2 className="mt-4 text-2xl font-semibold">Comment utilises-tu WorkOn ?</h2>
+      <p className="mt-3 text-workon-muted text-sm">
+        Choisis l&apos;affichage par défaut. Tu peux le changer à tout moment.
       </p>
 
-      {/* Role change info */}
-      <p className="mt-5 text-xs text-workon-muted">
-        Ton rôle détermine ce que tu vois dans l&apos;app. Tu peux le changer à tout moment.
-      </p>
-
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
         {ROLE_OPTIONS.map((option) => {
           const isSelected = option.key === selectedRole;
           return (
@@ -148,13 +132,10 @@ export function ProfileRolesCard() {
 
       {profile ? (
         <div className="mt-8 rounded-2xl border border-workon-border bg-workon-bg/60 p-4 text-sm text-workon-muted">
-          <p className="font-semibold text-white">Accès actifs :</p>
+          <p className="font-semibold text-workon-ink">Accès actifs :</p>
           <ul className="mt-2 space-y-1">
-            <li>• Travailleurs : {profile.isWorker ? "✅ actif" : "—"}</li>
-            <li>• Clients entreprise : {profile.isEmployer ? "✅ actif" : "—"}</li>
-            <li>
-              • Clients résidentiels : {profile.isClientResidential ? "✅ actif" : "—"}
-            </li>
+            <li>• Pro : {profile.isWorker ? "✅ actif" : "—"}</li>
+            <li>• Client : {profile.isEmployer || profile.isClientResidential ? "✅ actif" : "—"}</li>
           </ul>
         </div>
       ) : null}
