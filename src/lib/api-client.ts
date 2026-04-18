@@ -131,9 +131,11 @@ export interface WorkerProfile {
 }
 
 export interface ConversationItem {
-  missionId: string;
+  /** One of missionId / conversationId is set (the other is null). */
+  missionId: string | null;
+  conversationId?: string | null;
   missionTitle: string;
-  lastMessage: string;
+  lastMessage: string | null;
   lastMessageAt: string;
   unreadCount: number;
   otherUser: { id: string; firstName: string; lastName: string };
@@ -481,13 +483,56 @@ export const api = {
   getThread: (missionId: string) => apiFetch<ChatMessage[]>(`/messages-local/thread/${missionId}`),
   sendMessage: (data: { missionId: string; content: string }) =>
     apiFetch<ChatMessage>("/messages-local", { method: "POST", body: JSON.stringify(data) }),
-  sendDirectMessage: (recipientId: string, content: string) =>
-    apiFetch<{ id: string; missionId: string; content: string }>("/messages-local/direct", {
-      method: "POST",
-      body: JSON.stringify({ recipientId, content }),
-    }),
+  /**
+   * @deprecated Backend returns 410 Gone since 2026-04-18.
+   * Use the swipe → match flow then getConversationMessages / sendConversationMessage.
+   */
+  sendDirectMessage: (_recipientId: string, _content: string) => {
+    throw new Error(
+      "sendDirectMessage retiré — utilisez /swipe pour matcher puis sendConversationMessage",
+    );
+  },
   markRead: (missionId: string) => apiFetch<void>(`/messages-local/read/${missionId}`, { method: "PATCH" }),
   getUnreadCount: () => apiFetch<{ count: number }>("/messages-local/unread-count"),
+
+  // Conversations (pure DM threads, unlocked post-swipe-match)
+  getConversationMessages: async (
+    conversationId: string,
+    opts?: { cursor?: string; limit?: number },
+  ) => {
+    const qs = new URLSearchParams();
+    if (opts?.cursor) qs.set("cursor", opts.cursor);
+    if (opts?.limit) qs.set("limit", String(opts.limit));
+    const qsStr = qs.toString() ? `?${qs}` : "";
+    return apiFetch<{
+      messages: {
+        id: string;
+        conversationId: string;
+        senderId: string;
+        senderRole: string;
+        content: string;
+        status: string;
+        createdAt: string;
+      }[];
+      nextCursor: string | null;
+      hasMore: boolean;
+    }>(`/conversations/${conversationId}/messages${qsStr}`);
+  },
+  sendConversationMessage: (conversationId: string, content: string) =>
+    apiFetch<{
+      id: string;
+      conversationId: string;
+      senderId: string;
+      content: string;
+      createdAt: string;
+    }>(`/conversations/${conversationId}/messages`, {
+      method: "POST",
+      body: JSON.stringify({ content }),
+    }),
+  markConversationRead: (conversationId: string) =>
+    apiFetch<{ count: number }>(`/conversations/${conversationId}/read`, {
+      method: "PATCH",
+    }),
 
   // Worker Skills
   getMySkills: () => apiFetch<any[]>("/workers/me/skills"),

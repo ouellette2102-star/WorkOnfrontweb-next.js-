@@ -27,11 +27,14 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
   return (
     <div className="divide-y divide-[#EAE6DF]">
       {conversations.map((conv) => {
-        const isSelected = conv.missionId === selectedMissionId;
+        // Skip pure conversations — this list component is mission-only legacy UI
+        if (!conv.missionId) return null;
+        const missionId = conv.missionId;
+        const isSelected = missionId === selectedMissionId;
         return (
           <button
-            key={conv.missionId}
-            onClick={() => onSelect(conv.missionId)}
+            key={missionId}
+            onClick={() => onSelect(missionId)}
             className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors ${
               isSelected
                 ? "bg-[#134021]/10 border-l-2 border-[#134021]"

@@ -42,7 +42,10 @@ export default function MessagesPage() {
       ) : (
         <div className="space-y-1">
           {conversations.map((conv) => (
-            <ConversationRow key={conv.missionId} conversation={conv} />
+            <ConversationRow
+              key={conv.conversationId ?? conv.missionId ?? Math.random()}
+              conversation={conv}
+            />
           ))}
         </div>
       )}
@@ -52,10 +55,15 @@ export default function MessagesPage() {
 
 function ConversationRow({ conversation: conv }: { conversation: ConversationItem }) {
   const hasUnread = conv.unreadCount > 0;
+  // Pure DM conversations (post-match) → /messages/cv/:id
+  // Mission-chats → /messages/:missionId
+  const href = conv.conversationId
+    ? `/messages/cv/${conv.conversationId}`
+    : `/messages/${conv.missionId}`;
 
   return (
     <Link
-      href={`/messages/${conv.missionId}`}
+      href={href}
       className={`flex items-center gap-3 p-3 rounded-2xl transition-colors ${
         hasUnread ? "bg-workon-primary-subtle" : "hover:bg-workon-bg-cream"
       }`}

@@ -34,20 +34,14 @@ export default function ReservePage() {
       toast.error("Décris ton besoin avant d'envoyer.");
       return;
     }
-    setSendingDirect(true);
-    try {
-      // Send direct message — backend auto-creates conversation
-      const result = await api.sendDirectMessage(
-        workerId,
-        `${title.trim()}${description ? ` — ${description}` : ""}${price ? ` (budget: ${price}$)` : ""}`,
-      );
-      toast.success("Message envoyé ! Redirection vers la conversation...");
-      router.push(`/messages/${result.missionId}`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur lors de l'envoi.");
-    } finally {
-      setSendingDirect(false);
-    }
+    // Direct message endpoint removed 2026-04-18 (Phase 2 chat refactor).
+    // The contact flow is now swipe-first — user must match before chatting.
+    // On mutual LIKE the backend auto-creates a Conversation.
+    setSendingDirect(false);
+    toast.info("Matchez d'abord dans Pros pour ouvrir le chat", {
+      description: `Swipez sur ${worker?.firstName || 'ce pro'} pour démarrer une conversation.`,
+    });
+    router.push("/swipe");
   }
 
   const { data: worker, isLoading } = useQuery({
