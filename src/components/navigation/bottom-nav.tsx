@@ -8,39 +8,12 @@ import {
   Map,
   MessageCircle,
   Briefcase,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { useMode } from "@/contexts/mode-context";
 
-/**
- * Vintage rotary desk phone — optimised for 56 px FAB at 2× density.
- * Silhouette: rounded base + dial ring + curved handset resting on cradle.
- */
-function VintagePhoneIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 56 56"
-      fill="currentColor"
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* ── Base body ── */}
-      <rect x="8" y="26" width="40" height="22" rx="6" />
-
-      {/* ── Rotary dial ── */}
-      <circle cx="28" cy="37" r="8" fill="white" opacity="0.18" />
-      <circle cx="28" cy="37" r="5" fill="currentColor" />
-      <circle cx="28" cy="37" r="2.2" fill="white" opacity="0.3" />
-
-      {/* ── Handset on cradle ── single curved path */}
-      <path
-        d="M12 27 C12 27 12 18 12 15 C12 11 14.5 8 18 8 L20 8 C21.5 8 22 9.5 22 11 L22 17 C22 18.5 21 19.5 19.5 19.5 L19 19.5 C18 19.5 17 20.5 17 21.5 L17 23 C17 24 18 25 19 25 L37 25 C38 25 39 24 39 23 L39 21.5 C39 20.5 38 19.5 37 19.5 L36.5 19.5 C35 19.5 34 18.5 34 17 L34 11 C34 9.5 34.5 8 36 8 L38 8 C41.5 8 44 11 44 15 C44 18 44 27 44 27"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 
@@ -116,8 +89,12 @@ export function BottomNav() {
     );
   };
 
-  const fabHref = isWorker ? "/search" : "/express";
-  const fabLabel = isWorker ? "Missions" : "Appeler";
+  // FAB is the primary call-to-action, role-aware:
+  // - Pro (worker)  → /search  (find missions to accept)
+  // - Client        → /missions/new  (publish a new mission)
+  // Express Dispatch is still accessible as a secondary CTA on /home.
+  const fabHref = isWorker ? "/search" : "/missions/new";
+  const fabLabel = isWorker ? "Missions" : "Publier";
   const fabActive = isActive(fabHref);
 
   return (
@@ -129,7 +106,7 @@ export function BottomNav() {
         <div className="flex flex-col items-center -mt-5 min-w-[52px]">
           <Link
             href={fabHref}
-            aria-label={isWorker ? "Voir les missions disponibles" : "Appeler un pro — dispatch express"}
+            aria-label={isWorker ? "Voir les missions disponibles" : "Publier une nouvelle mission"}
             className={cn(
               "flex items-center justify-center h-14 w-14 rounded-full transition-all",
               "bg-workon-accent text-white",
@@ -141,7 +118,7 @@ export function BottomNav() {
             {isWorker ? (
               <Briefcase className="h-7 w-7" />
             ) : (
-              <VintagePhoneIcon className="h-7 w-7" />
+              <Plus className="h-7 w-7" strokeWidth={2.5} />
             )}
           </Link>
           <span
