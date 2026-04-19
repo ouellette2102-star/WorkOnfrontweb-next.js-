@@ -271,7 +271,7 @@ export default function HomePage() {
                     key={w.id}
                     className="shrink-0 w-[78vw] max-w-[300px] snap-start"
                   >
-                    <WorkerCard worker={w} compact />
+                    <WorkerCard worker={w} />
                   </div>
                 ))}
           </div>
