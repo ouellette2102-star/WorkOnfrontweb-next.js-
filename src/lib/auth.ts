@@ -37,6 +37,17 @@ export interface AuthUser {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+  // Worker-facing fields
+  jobTitle?: string | null;
+  hourlyRate?: number | null;
+  bio?: string | null;
+  // Employer onboarding (T44) — all nullable pre-migration; the stamp
+  // drives the /onboarding/employer gate + /missions/new guard.
+  businessName?: string | null;
+  businessCategory?: string | null;
+  businessDescription?: string | null;
+  businessWebsite?: string | null;
+  onboardingCompletedAt?: string | null;
 }
 
 export interface AuthResponse {
