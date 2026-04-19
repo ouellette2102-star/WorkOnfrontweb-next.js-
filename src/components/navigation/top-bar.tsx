@@ -69,8 +69,17 @@ export function TopBar() {
   const menuItems = [
     { href: "/profile", label: "Mon profil", icon: User },
     ...(mode === "pro"
-      ? [{ href: "/earnings", label: "Mes revenus", icon: CreditCard }]
+      ? [
+          { href: "/earnings", label: "Mes revenus", icon: CreditCard },
+          // R3.3 — leads delivered to this pro via GHL scraping (backend
+          // /leads/mine). Subscription-gated in the page itself.
+          { href: "/leads/mine", label: "Mes leads", icon: Inbox },
+        ]
       : [{ href: "/invoices", label: "Mes factures", icon: FileText }]),
+    // R3.6 — shared trust & safety entries. Both routes were built but
+    // orphan on main: no nav pointed at them.
+    { href: "/reviews", label: "Mes évaluations", icon: Star },
+    { href: "/disputes", label: "Litiges", icon: AlertTriangle },
     { href: "/settings/subscription", label: "Mon abonnement", icon: Crown },
     { href: "/support", label: "Aide & support", icon: HelpCircle },
     { href: "/settings", label: "Paramètres", icon: Settings },
