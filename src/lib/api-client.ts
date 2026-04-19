@@ -606,7 +606,19 @@ export const api = {
   }),
 
   // Profile
-  updateProfile: (data: { firstName?: string; lastName?: string; phone?: string; city?: string; role?: string }) =>
+  updateProfile: (data: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    city?: string;
+    role?: string;
+    hourlyRate?: number;
+    jobTitle?: string;
+    bio?: string;
+    category?: string;
+    serviceRadiusKm?: number;
+    gallery?: string[];
+  }) =>
     apiFetch<unknown>("/users/me", { method: "PATCH", body: JSON.stringify(data) }),
   uploadProfilePicture: (file: File) => {
     const formData = new FormData();
