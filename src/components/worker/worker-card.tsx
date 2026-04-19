@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Star, CalendarDays, MapPin, CheckCircle, Briefcase } from "lucide-react";
+import { useState } from "react";
+import { Star, CalendarDays, MapPin, CheckCircle, Briefcase, X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { WorkerProfile } from "@/lib/api-client";
 import { TrustPill } from "@/components/ui/trust-pill";
 import { AvatarFallback } from "@/components/ui/avatar-fallback";
@@ -34,8 +35,54 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
   const displayName = worker.fullName || `${worker.firstName} ${worker.lastName}`;
   const profileHref = `/worker/${worker.id}`;
   const portfolio = (worker.portfolioPhotos ?? []).slice(0, 3);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const openLightbox = (i: number) => setLightboxIndex(i);
+  const closeLightbox = () => setLightboxIndex(null);
+  const prev = () => setLightboxIndex((i) => (i != null ? (i - 1 + portfolio.length) % portfolio.length : null));
+  const next = () => setLightboxIndex((i) => (i != null ? (i + 1) % portfolio.length : null));
 
   return (
+    <>
+    {lightboxIndex !== null && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/85"
+        onClick={closeLightbox}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={portfolio[lightboxIndex]}
+          alt={`Réalisation ${lightboxIndex + 1}`}
+          className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        />
+        <button
+          onClick={closeLightbox}
+          className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+        >
+          <X className="h-7 w-7" />
+        </button>
+        {portfolio.length > 1 && (
+          <>
+            <button
+              onClick={(e) => { e.stopPropagation(); prev(); }}
+              className="absolute left-4 text-white/80 hover:text-white transition-colors"
+            >
+              <ChevronLeft className="h-9 w-9" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); next(); }}
+              className="absolute right-4 text-white/80 hover:text-white transition-colors"
+            >
+              <ChevronRight className="h-9 w-9" />
+            </button>
+          </>
+        )}
+        <div className="absolute bottom-4 text-white/60 text-sm">
+          {lightboxIndex + 1} / {portfolio.length}
+        </div>
+      </div>
+    )}
     <article
       className={cn(
         "rounded-2xl border border-workon-border bg-white overflow-hidden transition-all hover:border-workon-primary/30 hover:shadow-md shadow-sm",
@@ -216,18 +263,20 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
         {portfolio.length > 0 && (
           <div className="flex gap-1.5">
             {portfolio.map((url, i) => (
-              <Link
+              <button
                 key={`${worker.id}-thumb-${i}`}
-                href={profileHref}
-                className="relative flex-1 aspect-square overflow-hidden rounded-md bg-workon-bg"
+                type="button"
+                onClick={() => openLightbox(i)}
+                className="relative flex-1 aspect-square overflow-hidden rounded-md bg-workon-bg group"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}
                   alt={`Réalisation ${i + 1}`}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
-              </Link>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-md" />
+              </button>
             ))}
           </div>
         )}
@@ -248,5 +297,6 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
         </Link>
       </div>
     </article>
+    </>
   );
 }
