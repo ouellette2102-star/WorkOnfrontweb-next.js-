@@ -76,9 +76,9 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
             <h3 className="font-semibold text-base text-workon-ink truncate">
               {worker.firstName} {worker.lastName}
             </h3>
-            {worker.category && (
+            {(worker.jobTitle || worker.category) && (
               <p className="text-xs text-workon-muted truncate mt-0.5">
-                {worker.category}
+                {worker.jobTitle || worker.category}
               </p>
             )}
             <div className="mt-1.5">
