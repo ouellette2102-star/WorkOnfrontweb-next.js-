@@ -153,13 +153,10 @@ export function WorkerCard({ worker, compact }: WorkerCardProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="flex items-center justify-center w-full h-full">
-              <AvatarFallback
-                firstName={worker.firstName}
-                lastName={worker.lastName}
-                size="xl"
-                className="!h-24 !w-24 !text-3xl"
-              />
+            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-workon-primary/20 to-workon-primary/40">
+              <span className="text-5xl font-bold text-workon-primary/70 select-none">
+                {worker.firstName?.[0]?.toUpperCase()}{worker.lastName?.[0]?.toUpperCase()}
+              </span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent pointer-events-none" />
