@@ -865,9 +865,8 @@ export default function MissionDetailPage() {
             <Button
               type="button"
               variant="outline"
-              disabled
-              title="Bientôt disponible"
-              className="rounded-2xl border-amber-200 text-amber-400 opacity-50 cursor-not-allowed"
+              onClick={() => setBoostType("URGENT_9")}
+              className="rounded-2xl border-amber-300 text-amber-700 hover:bg-amber-50"
             >
               <Zap className="h-4 w-4 mr-1.5" />
               Urgent 9 $
