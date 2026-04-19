@@ -298,6 +298,8 @@ export interface SwipeCandidate {
   completionScore: number;
   avgRating: number;
   reviewCount: number;
+  jobTitle: string | null;
+  hourlyRate: number | null;
 }
 
 export interface SwipeMatch {

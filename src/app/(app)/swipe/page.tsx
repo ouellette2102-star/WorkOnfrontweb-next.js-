@@ -21,6 +21,8 @@ import {
   MessageCircle,
   Users,
   ArrowUp,
+  Briefcase,
+  DollarSign,
 } from "lucide-react";
 
 const SWIPE_THRESHOLD = 100; // px offset to trigger
@@ -345,12 +347,27 @@ export default function SwipePage() {
                       {current.firstName} {current.lastName}
                     </h2>
 
-                    {current.city && (
-                      <div className="mt-1 flex items-center gap-1 text-sm text-workon-muted">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {current.city}
+                    {current.jobTitle && (
+                      <div className="mt-0.5 flex items-center gap-1 text-sm font-medium text-workon-primary">
+                        <Briefcase className="h-3.5 w-3.5" />
+                        {current.jobTitle}
                       </div>
                     )}
+
+                    <div className="mt-1 flex items-center gap-3 text-sm text-workon-muted">
+                      {current.city && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {current.city}
+                        </span>
+                      )}
+                      {current.hourlyRate != null && (
+                        <span className="flex items-center gap-1 font-medium text-workon-ink">
+                          <DollarSign className="h-3.5 w-3.5" />
+                          {current.hourlyRate} $/h
+                        </span>
+                      )}
+                    </div>
 
                     <div className="mt-4 space-y-2">
                       {/* Rating */}
