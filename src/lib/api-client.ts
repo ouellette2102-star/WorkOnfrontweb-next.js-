@@ -248,6 +248,8 @@ export interface BookingResponse {
   status: "PENDING" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
   notes: string | null;
   createdAt: string;
+  client?: { id: string; firstName: string | null; lastName: string | null; email: string };
+  worker?: { id: string; user: { id: string; firstName: string | null; lastName: string | null } };
 }
 
 export interface AvailabilitySlot {
