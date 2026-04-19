@@ -11,6 +11,11 @@ import {
   type FeaturedWorker,
   type FeaturedReview,
 } from "@/lib/public-api";
+import {
+  displayStatOrFallback,
+  filterDisplayableReviews,
+  shouldDisplayStat,
+} from "@/lib/public-display-rules";
 
 export const revalidate = 300; // ISR — 5 min
 
@@ -30,18 +35,18 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
     <section className="bg-[#F9F8F5]">
       <div className="mx-auto max-w-6xl px-4 pt-20 pb-[7.5rem] md:pt-28">
         <div className="max-w-3xl">
-          {/* Urgence + Social proof */}
+          {/* Urgence + Social proof — only show pills when stats have credible volume. */}
           <div className="flex flex-wrap items-center gap-3 mb-10">
-            {stats && stats.openMissions > 0 && (
+            {shouldDisplayStat(stats?.openMissions, "openMissions") && (
               <span className="inline-flex items-center gap-2 rounded-full border border-workon-accent/20 bg-workon-accent/5 px-4 py-1.5 text-sm text-workon-accent font-medium">
                 <span className="h-2 w-2 rounded-full bg-workon-accent animate-pulse" />
-                {stats.openMissions} opportunités disponibles maintenant
+                {stats!.openMissions} opportunités disponibles maintenant
               </span>
             )}
-            {stats && stats.activeWorkers > 0 && (
+            {shouldDisplayStat(stats?.activeWorkers, "activeWorkers") && (
               <span className="inline-flex items-center gap-2 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/5 px-4 py-1.5 text-sm text-[#22C55E] font-medium">
                 <span className="h-2 w-2 rounded-full bg-[#22C55E] animate-pulse" />
-                {stats.activeWorkers} professionnels inscrits
+                {stats!.activeWorkers} professionnels inscrits
               </span>
             )}
           </div>
@@ -343,9 +348,18 @@ function UseCasesSection() {
 
 function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: FeaturedReview[] }) {
   const figures = [
-    { value: stats?.activeWorkers?.toLocaleString("fr-CA") ?? "100+", label: "Professionnels actifs" },
-    { value: stats?.completedMissions?.toLocaleString("fr-CA") ?? "500+", label: "Missions complétées" },
-    { value: stats?.activeCities?.toString() ?? "10+", label: "Villes couvertes au Québec" },
+    {
+      value: displayStatOrFallback(stats?.activeWorkers, "activeWorkers", "100+"),
+      label: "Professionnels actifs",
+    },
+    {
+      value: displayStatOrFallback(stats?.completedMissions, "completedMissions", "500+"),
+      label: "Missions complétées",
+    },
+    {
+      value: displayStatOrFallback(stats?.activeCities, "activeCities", "10+"),
+      label: "Villes couvertes au Québec",
+    },
     { value: "15%", label: "Commission transparente" },
   ];
 
@@ -504,8 +518,8 @@ function EmployerSection({ stats }: { stats: PublicStats | null }) {
             <h2 className="font-heading text-3xl font-bold text-[#1B1A18]">Vous cherchez du renfort qualifié?</h2>
             <p className="mt-4 text-lg text-[#706E6A] leading-relaxed">
               Zéro commission pendant le lancement. Accès à{" "}
-              {stats?.activeWorkers
-                ? `${stats.activeWorkers.toLocaleString("fr-CA")} travailleurs vérifiés`
+              {shouldDisplayStat(stats?.activeWorkers, "activeWorkers")
+                ? `${stats!.activeWorkers.toLocaleString("fr-CA")} travailleurs vérifiés`
                 : "des centaines de travailleurs vérifiés"}{" "}
               au Québec.
             </p>
@@ -598,7 +612,12 @@ export default async function HomePage() {
 
   const stats = statsRes.status === "fulfilled" ? statsRes.value : null;
   const workers = workersRes.status === "fulfilled" ? workersRes.value : [];
-  const reviews = reviewsRes.status === "fulfilled" ? reviewsRes.value : [];
+  // Filter out seed/test reviews (null authors, short comments, seed keywords)
+  // before rendering. Raw `/public/reviews/featured` is intentionally unfiltered
+  // so admin UIs can still see everything.
+  const reviews = filterDisplayableReviews(
+    reviewsRes.status === "fulfilled" ? reviewsRes.value : [],
+  );
 
   return (
     <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
