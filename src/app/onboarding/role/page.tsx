@@ -1,15 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { apiFetch } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
 
 export default function OnboardingRolePage() {
-  const { isLoading: authLoading, isAuthenticated } = useAuth();
+  const { isLoading: authLoading, isAuthenticated, user } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Legacy entry point — /register already sets role during signup. This
+  // page now only serves the rare fallback (e.g. user landed from /dashboard
+  // without a primaryRole). If the user already has a role we never want
+  // to re-prompt them; send them to /home instead.
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      router.replace("/login?redirect=/onboarding/role");
+      return;
+    }
+    if (user?.role) {
+      router.replace("/home");
+    }
+  }, [authLoading, isAuthenticated, user?.role, router]);
 
   const handleRoleSelect = async (role: "WORKER" | "EMPLOYER") => {
     if (authLoading || !isAuthenticated) return;

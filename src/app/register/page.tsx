@@ -21,11 +21,15 @@ const step1Schema = z.object({
   password: z.string().min(8, "Minimum 8 caractères"),
 });
 
+// `city` is required for both roles — workers need a home zone to surface in
+// map/swipe results, employers need a city to address missions. `phone` is
+// validated per-role in the submit handler (required for employers, optional
+// for workers) since the resolver runs once with role captured at mount.
 const step3Schema = z.object({
   firstName: z.string().min(1, "Prénom requis"),
   lastName: z.string().min(1, "Nom requis"),
   phone: z.string().optional(),
-  city: z.string().optional(),
+  city: z.string().min(1, "Ville requise"),
 });
 
 type Step1Data = z.infer<typeof step1Schema>;
@@ -70,6 +74,18 @@ function RegisterInner() {
   async function onStep3(data: Step3Data) {
     if (!credentials) return;
     setError("");
+
+    // Role-aware phone validation: employers trigger escrow + KYC on their
+    // first mission, so a valid phone is required upfront. Workers can
+    // complete this later via /settings/profile.
+    if (role === "employer" && (!data.phone || data.phone.trim().length < 8)) {
+      step3Form.setError("phone", {
+        type: "manual",
+        message: "Téléphone requis pour publier une mission",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await authRegister({
@@ -115,6 +131,28 @@ function RegisterInner() {
       </div>
 
       <div className="w-full max-w-sm rounded-3xl border border-workon-border bg-white p-8 shadow-sm">
+        {/* Progress dots — show 3 steps. When presetRole skips step 2 the
+            middle dot still renders so users know where they are in the
+            conceptual 3-step flow (credentials · role · profile). */}
+        {step >= 1 && step <= 3 && (
+          <div className="mb-6 flex items-center justify-center gap-1.5">
+            {[1, 2, 3].map((n) => (
+              <span
+                key={n}
+                aria-hidden="true"
+                className={`h-1.5 rounded-full transition-all ${
+                  n === step
+                    ? "w-8 bg-workon-accent"
+                    : n < step
+                      ? "w-4 bg-workon-accent/60"
+                      : "w-4 bg-workon-border"
+                }`}
+              />
+            ))}
+            <span className="sr-only">Étape {step} sur 3</span>
+          </div>
+        )}
+
         {/* Step 1: Credentials */}
         {step === 1 && (
           <div className="space-y-6">
@@ -284,16 +322,23 @@ function RegisterInner() {
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="flex items-center gap-2">
-                  Téléphone <span className="text-workon-muted text-xs font-normal">(facultatif)</span>
+                  Téléphone{" "}
+                  <span className="text-workon-muted text-xs font-normal">
+                    {role === "employer" ? "(requis)" : "(facultatif)"}
+                  </span>
                 </Label>
                 <Input id="phone" type="tel" placeholder="514-555-0000" {...step3Form.register("phone")} />
+                {step3Form.formState.errors.phone && (
+                  <p className="text-workon-accent text-xs">{step3Form.formState.errors.phone.message}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="city" className="flex items-center gap-2">
-                  Ville <span className="text-workon-muted text-xs font-normal">(facultatif)</span>
-                </Label>
+                <Label htmlFor="city">Ville</Label>
                 <Input id="city" placeholder="Montréal" {...step3Form.register("city")} />
+                {step3Form.formState.errors.city && (
+                  <p className="text-workon-accent text-xs">{step3Form.formState.errors.city.message}</p>
+                )}
               </div>
 
               {error && (
