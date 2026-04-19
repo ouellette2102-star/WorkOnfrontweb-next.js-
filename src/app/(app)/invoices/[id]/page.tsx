@@ -139,13 +139,13 @@ export default function InvoiceDetailPage() {
             </div>
           )}
 
-          {/* Download placeholder */}
+          {/* Download invoice as PDF via browser print */}
           <Button
             variant="outline"
-            className="border-workon-border text-workon-ink hover:bg-workon-bg"
-            disabled
+            className="border-workon-border text-workon-ink hover:bg-workon-bg print:hidden"
+            onClick={() => window.print()}
           >
-            T\u00e9l\u00e9charger (bient\u00f4t disponible)
+            Télécharger PDF
           </Button>
         </div>
       </div>
