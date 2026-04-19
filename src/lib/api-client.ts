@@ -496,6 +496,7 @@ export const api = {
     apiFetch<OfferResponse>("/offers", { method: "POST", body: JSON.stringify(data) }),
   getOffersForMission: (missionId: string) => apiFetch<OfferResponse[]>(`/offers/mission/${missionId}`),
   getMyOffers: () => apiFetch<OfferResponse[]>("/offers/mine"),
+  getOfferById: (id: string) => apiFetch<OfferResponse>(`/offers/${id}`),
   acceptOffer: (id: string) => apiFetch<OfferResponse>(`/offers/${id}/accept`, { method: "PATCH" }),
   rejectOffer: (id: string) => apiFetch<OfferResponse>(`/offers/${id}/reject`, { method: "PATCH" }),
 

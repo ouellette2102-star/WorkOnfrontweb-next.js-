@@ -10,7 +10,7 @@ const PUBLIC_PATHS = [
   "/login",
   "/register",
   "/forgot-password",
-  "/sign-up",
+  "/onboarding",
   "/pros",
   "/p/",
   "/pro/",
@@ -19,7 +19,6 @@ const PUBLIC_PATHS = [
   "/legal/",
   "/faq",
   "/api/",
-  "/setup",
 ];
 
 function isPublicPath(pathname: string): boolean {
