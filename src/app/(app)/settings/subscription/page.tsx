@@ -249,12 +249,13 @@ export default function SubscriptionSettingsPage() {
               « vérifié » accéléré.
             </p>
             <Button
-              onClick={() => setVerifyBoostOpen(true)}
+              disabled
+              title="Bientôt disponible"
               variant="outline"
-              className="mt-3 border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+              className="mt-3 border-emerald-200 text-emerald-400 opacity-50 cursor-not-allowed"
             >
               <ShieldCheck className="h-4 w-4 mr-1.5" />
-              Activer — 19 $
+              Bientôt disponible
             </Button>
           </div>
         </div>
