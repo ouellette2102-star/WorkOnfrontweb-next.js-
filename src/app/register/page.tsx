@@ -389,12 +389,18 @@ function RegisterInner() {
             </div>
 
             <Button
-              onClick={() => router.push("/home")}
+              onClick={() =>
+                router.push(
+                  role === "employer" ? "/onboarding/employer" : "/home",
+                )
+              }
               variant="hero"
               size="hero"
               className="w-full"
             >
-              Commencer
+              {role === "employer"
+                ? "Configurer mon entreprise"
+                : "Commencer"}
             </Button>
           </div>
         )}

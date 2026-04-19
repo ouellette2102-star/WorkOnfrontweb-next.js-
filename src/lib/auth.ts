@@ -37,6 +37,18 @@ export interface AuthUser {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+  // Worker-facing fields (already round-tripped by /users/me since #253)
+  jobTitle?: string | null;
+  hourlyRate?: number | null;
+  bio?: string | null;
+  gallery?: string[];
+  // Employer onboarding (T44 backend #263) — all nullable pre-migration.
+  // `onboardingCompletedAt` gates /missions/new + drives /onboarding/employer.
+  businessName?: string | null;
+  businessCategory?: string | null;
+  businessDescription?: string | null;
+  businessWebsite?: string | null;
+  onboardingCompletedAt?: string | null;
 }
 
 export interface AuthResponse {
