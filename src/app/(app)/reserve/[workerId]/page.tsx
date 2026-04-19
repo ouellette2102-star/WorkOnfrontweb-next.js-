@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Star, Shield, MapPin, Loader2, CalendarDays, ArrowLeft, MessageCircle, ArrowRightLeft } from "lucide-react";
+import { BookingRecapCard } from "@/components/mission/booking-recap-card";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -292,6 +293,17 @@ export default function ReservePage() {
             Utilisez &quot;Envoyer un message direct&quot; ci-dessous pour le contacter sans réservation.
           </p>
         </div>
+
+        {/* Booking recap — price breakdown + contract + escrow notice */}
+        {worker && (
+          <BookingRecapCard
+            workerName={`${worker.firstName} ${worker.lastName}`}
+            workerJobTitle={worker.jobTitle ?? worker.category}
+            priceCad={Number(price) || 0}
+            durationMinutes={duration}
+            scheduledDate={scheduledDate}
+          />
+        )}
 
         {/* CTA */}
         <Button
