@@ -15,7 +15,6 @@ import {
   Star,
   ShieldCheck,
   Tag,
-  User,
   Loader2,
   Heart,
   X,
@@ -249,7 +248,7 @@ export default function SwipePage() {
             </div>
 
             {/* Card */}
-            <div className="relative h-[460px]">
+            <div className="relative h-[520px]">
               <AnimatePresence initial={false}>
                 <motion.div
                   key={current.id}
@@ -340,19 +339,23 @@ export default function SwipePage() {
                     </div>
                   </div>
 
-                  {/* Avatar header */}
-                  <div className="flex h-36 items-center justify-center bg-gradient-to-br from-[#134021] to-[#1A5C2E]">
+                  {/* Hero photo pleine largeur */}
+                  <div className="relative h-52 bg-gradient-to-br from-workon-primary/20 to-workon-primary/40 overflow-hidden">
                     {current.pictureUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={current.pictureUrl}
                         alt={current.firstName}
-                        className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-lg"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-workon-bg shadow-lg">
-                        <User className="h-10 w-10 text-workon-primary" />
+                      <div className="flex h-full w-full items-center justify-center">
+                        <span className="text-6xl font-bold text-workon-primary/60 select-none">
+                          {(current.firstName?.[0] ?? "").toUpperCase()}{(current.lastName?.[0] ?? "").toUpperCase()}
+                        </span>
                       </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                   </div>
 
                   {/* Content */}

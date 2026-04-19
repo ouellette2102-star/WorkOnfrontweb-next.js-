@@ -83,7 +83,7 @@ export default function EarningsPage() {
   });
 
   const isLoading = summaryLoading;
-  const hasError = summaryError || historyError;
+  const hasError = summaryError; // history error is handled per-section, not page-wide
 
   const summaryCards = summary
     ? [
@@ -213,7 +213,15 @@ export default function EarningsPage() {
                 </div>
               )}
 
-              {!historyLoading && history?.items && history.items.length === 0 && (
+              {!historyLoading && historyError && (
+                <div className="py-12 text-center">
+                  <Inbox className="mx-auto mb-3 h-8 w-8 text-workon-muted/40" />
+                  <p className="text-workon-muted text-sm">Aucun historique disponible pour le moment</p>
+                  <p className="mt-1 text-xs text-workon-muted/60">Complétez des missions pour voir vos revenus ici</p>
+                </div>
+              )}
+
+              {!historyLoading && !historyError && history?.items && history.items.length === 0 && (
                 <div className="py-12 text-center">
                   <Inbox className="mx-auto mb-3 h-10 w-10 text-workon-muted/40" />
                   <p className="text-workon-muted">Aucun revenu pour le moment</p>
