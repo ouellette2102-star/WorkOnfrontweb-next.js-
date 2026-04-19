@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import {
   ArrowLeft,
   Loader2,
@@ -48,6 +49,18 @@ type MissionFormData = z.infer<typeof missionSchema>;
 
 export default function NewMissionPage() {
   const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+
+  // T44 guard: employers without a completed onboarding (businessName +
+  // phone + city per backend `onboardingCompletedAt` logic) can't publish.
+  // Redirect them to finish the wizard rather than letting them hit a
+  // validation failure mid-form.
+  useEffect(() => {
+    if (authLoading || !user) return;
+    if (user.role === "employer" && !user.onboardingCompletedAt) {
+      router.replace("/onboarding/employer?from=missions-new");
+    }
+  }, [authLoading, user, router]);
 
   // GPS state
   const [latitude, setLatitude] = useState<number | null>(null);
