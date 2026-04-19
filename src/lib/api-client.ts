@@ -440,7 +440,43 @@ export const api = {
       { skipAuth: true },
     );
   },
-  getWorker: (id: string) => apiFetch<WorkerProfile>(`/profiles/workers/${id}`, { skipAuth: true }),
+  getWorker: async (id: string): Promise<WorkerProfile> => {
+    // /profiles/workers/:id returns 404 in production — use the public
+    // by-id endpoint and adapt to the WorkerProfile shape.
+    const raw = await apiFetch<{
+      id: string;
+      firstName: string;
+      lastName: string;
+      city: string | null;
+      photoUrl: string | null;
+      sector: string | null;
+      jobTitle: string | null;
+      hourlyRate: number | null;
+      ratingAvg: number;
+      ratingCount: number;
+      completedMissions: number;
+      badges: { label: string; type: string }[];
+      trustTier: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
+      portfolioPhotos: string[];
+    }>(`/public/workers/by-id/${id}`, { skipAuth: true });
+    return {
+      id: raw.id,
+      firstName: raw.firstName,
+      lastName: raw.lastName,
+      city: raw.city ?? undefined,
+      photoUrl: raw.photoUrl ?? undefined,
+      category: raw.sector ?? undefined,
+      jobTitle: raw.jobTitle ?? undefined,
+      hourlyRate: raw.hourlyRate ?? undefined,
+      averageRating: raw.ratingAvg,
+      reviewCount: raw.ratingCount,
+      completionPercentage: 0,
+      completedMissions: raw.completedMissions,
+      badges: raw.badges,
+      trustTier: raw.trustTier,
+      portfolioPhotos: raw.portfolioPhotos,
+    };
+  },
 
   // Missions
   createMission: (data: { title: string; description: string; category: string; price: number; latitude: number; longitude: number; city: string; address?: string }) =>
