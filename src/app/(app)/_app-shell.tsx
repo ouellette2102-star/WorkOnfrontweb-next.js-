@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { ModeProvider } from "@/contexts/mode-context";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { TopBar } from "@/components/navigation/top-bar";
+import { ConsentProvider } from "@/components/consent-provider";
 import { Loader2 } from "lucide-react";
 
 /**
@@ -13,6 +14,10 @@ import { Loader2 } from "lucide-react";
  * This component handles post-hydration UX: showing a loading spinner while
  * the client auth context boots, then rendering the persistent shell
  * (header + BottomNav) around children.
+ *
+ * `ConsentProvider` wraps every authenticated route so the Loi 25 / GDPR
+ * consent modal can block any navigation when a required document
+ * (TERMS, PRIVACY) has not been accepted at the current active version.
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { isLoading, isAuthenticated } = useAuth();
@@ -33,12 +38,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ModeProvider>
-      <div className="min-h-dvh pb-20 bg-workon-bg">
-        <TopBar />
-        <main>{children}</main>
-        <BottomNav />
-      </div>
-    </ModeProvider>
+    <ConsentProvider>
+      <ModeProvider>
+        <div className="min-h-dvh pb-20 bg-workon-bg">
+          <TopBar />
+          <main>{children}</main>
+          <BottomNav />
+        </div>
+      </ModeProvider>
+    </ConsentProvider>
   );
 }
