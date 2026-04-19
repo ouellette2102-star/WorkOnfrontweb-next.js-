@@ -870,6 +870,20 @@ export const api = {
   },
   createReview: (data: { missionId: string; toUserId: string; rating: number; comment?: string }) =>
     apiFetch<ReviewResponse>("/reviews", { method: "POST", body: JSON.stringify(data) }),
+  // Auto-prompt: missions the viewer completed (as creator or worker)
+  // but hasn't yet reviewed. Backend endpoint: workon-backend PR #262.
+  getPendingReviews: () =>
+    apiFetch<
+      Array<{
+        missionId: string;
+        missionTitle: string;
+        missionStatus: string;
+        missionCompletedAt: string;
+        counterpartUserId: string;
+        counterpartName: string | null;
+        counterpartRoleRelativeToViewer: "worker" | "employer";
+      }>
+    >("/reviews/pending-for-me"),
 
   // Mission Photos
   getMissionPhotos: (missionId: string) =>

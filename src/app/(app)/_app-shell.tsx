@@ -5,6 +5,7 @@ import { ModeProvider } from "@/contexts/mode-context";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { TopBar } from "@/components/navigation/top-bar";
 import { ConsentProvider } from "@/components/consent-provider";
+import { ReviewPromptProvider } from "@/components/review-prompt-provider";
 import { Loader2 } from "lucide-react";
 
 /**
@@ -39,13 +40,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <ConsentProvider>
-      <ModeProvider>
-        <div className="min-h-dvh pb-20 bg-workon-bg">
-          <TopBar />
-          <main>{children}</main>
-          <BottomNav />
-        </div>
-      </ModeProvider>
+      <ReviewPromptProvider>
+        <ModeProvider>
+          <div className="min-h-dvh pb-20 bg-workon-bg">
+            <TopBar />
+            <main>{children}</main>
+            <BottomNav />
+          </div>
+        </ModeProvider>
+      </ReviewPromptProvider>
     </ConsentProvider>
   );
 }
