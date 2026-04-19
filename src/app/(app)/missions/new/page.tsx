@@ -14,6 +14,8 @@ import {
   AlertCircle,
   MapPin,
   DollarSign,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -55,12 +57,20 @@ export default function NewMissionPage() {
   >("idle");
   const [paywallOpen, setPaywallOpen] = useState(false);
 
-  // Quota usage (soft-info in header)
-  const { data: quota } = useQuery({
+  // Quota usage — checked BEFORE rendering the form so a user whose free
+  // plan is exhausted sees the paywall immediately instead of filling 5
+  // fields and getting bounced at submit time.
+  const { data: quota, isLoading: quotaLoading } = useQuery({
     queryKey: ["missions-quota"],
     queryFn: () => api.getMissionsQuota(),
     staleTime: 30_000,
   });
+
+  const quotaExhausted =
+    !!quota &&
+    !quota.hasPaidPlan &&
+    quota.limit !== null &&
+    quota.used >= quota.limit;
 
   // Categories from backend
   const { data: categories, isLoading: categoriesLoading } = useQuery({
@@ -173,6 +183,85 @@ export default function NewMissionPage() {
   const onSubmit = (data: MissionFormData) => {
     createMission.mutate(data);
   };
+
+  // Pre-render paywall: user hit their monthly quota. Shown BEFORE the form
+  // so they don't waste time typing. Mega-list T30.
+  if (quotaExhausted) {
+    return (
+      <div className="min-h-screen bg-workon-bg">
+        <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/home"
+              className="flex items-center justify-center h-10 w-10 rounded-xl border border-workon-border bg-white text-workon-ink hover:bg-workon-bg transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
+                Quota atteint
+              </h1>
+              <p className="text-sm text-workon-muted">
+                Vous avez publié toutes vos missions gratuites du mois.
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="rounded-2xl border border-workon-accent/30 bg-workon-accent/5 p-6 flex items-start gap-4"
+            data-testid="quota-exhausted-banner"
+          >
+            <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-workon-accent/15 flex items-center justify-center">
+              <Lock className="h-6 w-6 text-workon-accent" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-workon-ink">
+                {quota!.used}/{quota!.limit} missions utilisées ce mois
+              </p>
+              <p className="text-sm text-workon-muted mt-1">
+                Passez à un abonnement Pro pour publier autant de missions
+                que vous le souhaitez. Annulable à tout moment.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-workon-border shadow-sm p-5 space-y-3">
+            <div className="flex items-center gap-2 text-sm text-workon-ink">
+              <Sparkles className="h-4 w-4 text-workon-accent" />
+              <span className="font-medium">Plan Client Pro</span>
+            </div>
+            <ul className="space-y-1.5 text-sm text-workon-muted pl-6">
+              <li>Missions illimitées</li>
+              <li>Priorité dans les résultats de swipe</li>
+              <li>Support par courriel en 24h</li>
+            </ul>
+            <Button
+              onClick={() => setPaywallOpen(true)}
+              className="w-full h-12 rounded-2xl bg-workon-primary hover:bg-workon-primary/90 text-white font-semibold mt-2"
+              data-testid="open-paywall-button"
+            >
+              Voir les plans
+            </Button>
+            <p className="text-xs text-center text-workon-muted">
+              Votre quota se réinitialise le 1er du mois prochain.
+            </p>
+          </div>
+        </div>
+
+        <PaywallModal open={paywallOpen} onClose={() => setPaywallOpen(false)} />
+      </div>
+    );
+  }
+
+  // Quota query hasn't resolved yet — show a minimal skeleton so the form
+  // doesn't flash before we know whether to show the paywall instead.
+  if (quotaLoading) {
+    return (
+      <div className="min-h-screen bg-workon-bg flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-workon-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-workon-bg">
