@@ -69,7 +69,13 @@ export function TopBar() {
   const menuItems = [
     { href: "/profile", label: "Mon profil", icon: User },
     ...(mode === "pro"
-      ? [{ href: "/earnings", label: "Mes revenus", icon: CreditCard }]
+      ? [
+          { href: "/earnings", label: "Mes revenus", icon: CreditCard },
+          // R3.3 — leads delivered to this pro via the scraping pipeline.
+          // Backend: GET /leads/mine. Route was orphan on main; now lives
+          // under the pro menu (subscription-gated feature).
+          { href: "/leads/mine", label: "Mes leads", icon: Inbox },
+        ]
       : [{ href: "/invoices", label: "Mes factures", icon: FileText }]),
     { href: "/settings/subscription", label: "Mon abonnement", icon: Crown },
     { href: "/support", label: "Aide & support", icon: HelpCircle },
