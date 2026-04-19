@@ -17,6 +17,20 @@ const nextConfig: NextConfig = {
     },
   },
 
+  // Permanent aliases for legacy / conventional URL paths so external links
+  // (emails, old marketing copy, SEO inbound) don't hit a 404.
+  async redirects() {
+    return [
+      { source: "/signin", destination: "/login", permanent: true },
+      { source: "/sign-in", destination: "/login", permanent: true },
+      { source: "/signup", destination: "/register", permanent: true },
+      { source: "/sign-up", destination: "/register", permanent: true },
+      { source: "/logout", destination: "/", permanent: false },
+      { source: "/help", destination: "/faq", permanent: true },
+      { source: "/contact", destination: "/about#contact", permanent: true },
+    ];
+  },
+
   // Security headers
   async headers() {
     return [
