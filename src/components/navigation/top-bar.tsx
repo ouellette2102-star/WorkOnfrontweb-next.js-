@@ -69,8 +69,21 @@ export function TopBar() {
   const menuItems = [
     { href: "/profile", label: "Mon profil", icon: User },
     ...(mode === "pro"
-      ? [{ href: "/earnings", label: "Mes revenus", icon: CreditCard }]
+      ? [
+          { href: "/earnings", label: "Mes revenus", icon: CreditCard },
+          // R3 orphans revealed — pages built, backends consumed, no nav
+          // before this PR. Pro-side: leads delivered, bookings received,
+          // availability calendar.
+          { href: "/leads/mine", label: "Mes leads", icon: Inbox },
+          { href: "/bookings", label: "Mes réservations", icon: ClipboardList },
+          { href: "/calendar", label: "Disponibilités", icon: Calendar },
+        ]
       : [{ href: "/invoices", label: "Mes factures", icon: FileText }]),
+    // Universal — both pro and client care about their contracts, reviews,
+    // and dispute history.
+    { href: "/contracts", label: "Mes contrats", icon: FileCheck },
+    { href: "/reviews", label: "Mes évaluations", icon: Star },
+    { href: "/disputes", label: "Litiges", icon: AlertTriangle },
     { href: "/settings/subscription", label: "Mon abonnement", icon: Crown },
     { href: "/support", label: "Aide & support", icon: HelpCircle },
     { href: "/settings", label: "Paramètres", icon: Settings },
