@@ -2,6 +2,7 @@
 
 import { ProfileForm } from "@/components/profile/profile-form";
 import { ProfileRolesCard } from "@/components/profile/profile-roles-card";
+import { WorkerCardEditor } from "@/components/profile/worker-card-editor";
 import { useAuth } from "@/contexts/auth-context";
 import { Loader2 } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -47,6 +48,10 @@ export default function ProfilePage() {
             </div>
           </section>
         </div>
+
+        {/* Worker card editor — visible to all authenticated users; fields
+            only affect the public card when the user has worker access */}
+        <WorkerCardEditor />
       </div>
     </main>
   );
