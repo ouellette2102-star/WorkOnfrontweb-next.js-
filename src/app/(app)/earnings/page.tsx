@@ -89,7 +89,7 @@ export default function EarningsPage() {
     ? [
         {
           label: "Total brut",
-          value: formatCADFromDollars(summary.totalGross),
+          value: formatCADFromDollars((summary as any).totalLifetimeGross ?? (summary as any).totalGross ?? 0),
           icon: <DollarSign className="h-5 w-5" />,
           color: "text-workon-primary",
           bg: "bg-workon-primary/10",
@@ -97,7 +97,7 @@ export default function EarningsPage() {
         {
           label: "Total net",
           sublabel: "Après commission",
-          value: formatCADFromDollars(summary.totalNet),
+          value: formatCADFromDollars((summary as any).totalLifetimeNet ?? (summary as any).totalNet ?? 0),
           icon: <TrendingUp className="h-5 w-5" />,
           color: "text-green-600",
           bg: "bg-green-50",
