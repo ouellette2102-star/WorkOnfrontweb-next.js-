@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, X, Save, ImagePlus } from "lucide-react";
+import { Loader2, Plus, X, Save, ImagePlus, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { api, apiFetch } from "@/lib/api-client";
 
@@ -145,6 +145,52 @@ export function WorkerCardEditor() {
     });
   };
 
+  // R3.2 file-upload path — hits POST /users/me/gallery which saves the
+  // file server-side and returns the updated user, so we can reflect the
+  // canonical gallery immediately instead of waiting for the manual Save.
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFileUpload(file: File) {
+    if (!draft) return;
+    if (draft.gallery.length >= MAX_GALLERY) {
+      toast.error(`Max ${MAX_GALLERY} photos dans le portfolio`);
+      return;
+    }
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Format non supporté (JPEG, PNG, WebP uniquement)");
+      return;
+    }
+    const MAX = 5 * 1024 * 1024;
+    if (file.size > MAX) {
+      toast.error("Fichier trop volumineux (max 5 Mo)");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const updated = await apiFetch<{ gallery?: string[] }>(
+        "/users/me/gallery",
+        { method: "POST", body: formData },
+      );
+      if (Array.isArray(updated.gallery)) {
+        const nextGallery = updated.gallery as string[];
+        setDraft((prev) => (prev ? { ...prev, gallery: nextGallery } : prev));
+        toast.success("Photo ajoutée au portfolio");
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Échec de l'ajout de la photo",
+      );
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   return (
     <section className="rounded-3xl border border-workon-border bg-white p-6 md:p-8 shadow-sm space-y-6">
       <header>
@@ -217,8 +263,9 @@ export function WorkerCardEditor() {
           Portfolio ({draft.gallery.length}/{MAX_GALLERY})
         </label>
         <p className="text-xs text-workon-muted mb-2">
-          Ajoute des URLs d&apos;images (Unsplash, ton hébergeur, etc.). Les
-          3 premières sont affichées sur ta card publique.
+          Importe une photo depuis ton appareil (JPEG/PNG/WebP, 5 Mo max) ou
+          colle une URL existante. Les 3 premières sont affichées sur ta
+          card publique.
         </p>
 
         {draft.gallery.length > 0 && (
@@ -249,7 +296,35 @@ export function WorkerCardEditor() {
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          {/* File upload path (R3.2) — POST /users/me/gallery multipart */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            data-testid="worker-gallery-file-input"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handleFileUpload(file);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading || draft.gallery.length >= MAX_GALLERY}
+            data-testid="worker-gallery-upload-button"
+            className="flex items-center justify-center gap-1.5 h-10 px-4 rounded-lg bg-workon-primary text-white text-sm font-medium hover:bg-workon-primary/90 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            {uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4" />
+            )}
+            {uploading ? "Envoi…" : "Importer une photo"}
+          </button>
+
+          {/* URL paste path kept for external hosts */}
           <div className="flex-1 relative">
             <ImagePlus className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-workon-muted" />
             <input
@@ -262,7 +337,7 @@ export function WorkerCardEditor() {
                   handleAddPhoto();
                 }
               }}
-              placeholder="https://…"
+              placeholder="…ou colle une URL"
               className="w-full h-10 rounded-lg border border-workon-border bg-white pl-9 pr-3 text-sm text-workon-ink focus:outline-none focus:ring-2 focus:ring-workon-primary/30 focus:border-workon-primary"
             />
           </div>
@@ -272,7 +347,7 @@ export function WorkerCardEditor() {
             disabled={
               !newPhotoUrl.trim() || draft.gallery.length >= MAX_GALLERY
             }
-            className="flex items-center gap-1.5 h-10 px-4 rounded-lg bg-workon-primary text-white text-sm font-medium hover:bg-workon-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 h-10 px-4 rounded-lg border border-workon-border bg-white text-sm font-medium text-workon-ink hover:bg-workon-bg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4" />
             Ajouter
