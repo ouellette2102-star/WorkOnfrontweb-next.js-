@@ -158,7 +158,13 @@ function BookingCard({
               {isWorker ? "Client" : "Travailleur"}
             </p>
             <p className="font-medium text-workon-ink">
-              {isWorker ? booking.clientId : booking.workerId}
+              {isWorker
+                ? booking.client
+                  ? `${booking.client.firstName ?? ""} ${booking.client.lastName ?? ""}`.trim() || booking.clientId
+                  : booking.clientId
+                : booking.worker?.user
+                  ? `${booking.worker.user.firstName ?? ""} ${booking.worker.user.lastName ?? ""}`.trim() || booking.workerId
+                  : booking.workerId}
             </p>
           </div>
         </div>
