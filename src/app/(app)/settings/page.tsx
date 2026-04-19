@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   api,
   type NotificationPreference,
   type NotificationType,
 } from "@/lib/api-client";
-import { Loader2, Bell, Moon } from "lucide-react";
+import { Loader2, Bell, Moon, ShieldCheck, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 const NOTIFICATION_TYPES: { type: NotificationType; label: string }[] = [
@@ -196,6 +197,26 @@ export default function SettingsPage() {
             })
           )}
         </div>
+      </section>
+
+      {/* Section 1b: Privacy link (Loi 25 rights) */}
+      <section className="mb-6">
+        <Link
+          href="/settings/privacy"
+          data-testid="settings-privacy-link"
+          className="flex items-center gap-3 rounded-2xl border border-workon-border bg-white p-4 shadow-sm transition-colors hover:bg-workon-bg/40"
+        >
+          <ShieldCheck className="h-5 w-5 text-workon-primary" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-workon-ink">
+              Confidentialité et données
+            </p>
+            <p className="mt-0.5 text-xs text-workon-muted">
+              Exporter mes données, supprimer mon compte (Loi&nbsp;25).
+            </p>
+          </div>
+          <ChevronRight className="h-4 w-4 text-workon-muted" />
+        </Link>
       </section>
 
       {/* Section 2: Quiet Hours */}

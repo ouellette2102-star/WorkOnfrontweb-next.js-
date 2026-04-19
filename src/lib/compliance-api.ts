@@ -100,3 +100,82 @@ export async function acceptAllDocuments(
     results: [termsResult, privacyResult],
   };
 }
+
+// ─── Data export + account deletion (Loi 25 / GDPR rights) ─────────────────
+
+/**
+ * Shape returned by `GET /compliance/my-data`.
+ * Backend may add fields over time; anything unknown stays in `extra`.
+ */
+export type PersonalDataExport = {
+  exportedAt: string;
+  user: Record<string, unknown>;
+  consents: Array<Record<string, unknown>>;
+  missions?: Array<Record<string, unknown>>;
+  reviews?: Array<Record<string, unknown>>;
+  payments?: Array<Record<string, unknown>>;
+  messages?: Array<Record<string, unknown>>;
+  [extra: string]: unknown;
+};
+
+/**
+ * Request a full export of the current user's personal data.
+ * Fulfils Loi 25 Art. 27 / GDPR Art. 20 (right to data portability).
+ */
+export async function getMyData(): Promise<PersonalDataExport> {
+  return apiFetch<PersonalDataExport>("/compliance/my-data");
+}
+
+export type DeletionRequestResponse = {
+  requestedAt: string;
+  scheduledFor: string;
+  graceDays: number;
+  canCancel: boolean;
+};
+
+/**
+ * Start the 30-day account deletion grace period.
+ * The account stays accessible during the grace window; data is
+ * purged by a server-side job after `scheduledFor`.
+ */
+export async function requestAccountDeletion(): Promise<DeletionRequestResponse> {
+  return apiFetch<DeletionRequestResponse>("/compliance/delete-account", {
+    method: "POST",
+  });
+}
+
+/**
+ * Cancel a pending deletion request while still within the grace period.
+ */
+export async function cancelAccountDeletion(): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  return apiFetch<{ success: boolean; message: string }>(
+    "/compliance/delete-account",
+    { method: "DELETE" },
+  );
+}
+
+/**
+ * Trigger a browser download of the user's full data as JSON.
+ * Used by the /settings/privacy page.
+ */
+export async function downloadMyDataAsJson(): Promise<void> {
+  if (typeof window === "undefined") {
+    throw new Error("downloadMyDataAsJson must run in the browser");
+  }
+  const data = await getMyData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `workon-mes-donnees-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
