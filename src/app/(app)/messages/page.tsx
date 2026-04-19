@@ -14,7 +14,7 @@ import { fr } from "date-fns/locale";
  * Each conversation links to /messages/[missionId] for the thread view.
  */
 export default function MessagesPage() {
-  const { data: conversations, isLoading } = useQuery({
+  const { data: conversations, isLoading, isError } = useQuery({
     queryKey: ["conversations"],
     queryFn: () => api.getConversations(),
   });
@@ -28,6 +28,14 @@ export default function MessagesPage() {
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-workon-muted" />
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="h-16 w-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
+            <MessageCircle className="h-8 w-8 text-red-400" />
+          </div>
+          <p className="text-workon-ink text-sm font-medium">Impossible de charger les conversations</p>
+          <p className="text-workon-muted text-xs mt-1">Vérifie ta connexion et réessaie</p>
         </div>
       ) : !conversations || conversations.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
