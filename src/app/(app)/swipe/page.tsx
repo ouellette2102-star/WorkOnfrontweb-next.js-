@@ -8,6 +8,7 @@ import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { api, type SwipeCandidate } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
+import { MatchCelebrationModal } from "@/components/match-celebration-modal";
 import Link from "next/link";
 import {
   MapPin,
@@ -41,6 +42,10 @@ export default function SwipePage() {
     "left" | "right" | "up" | null
   >(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [matchCelebration, setMatchCelebration] = useState<{
+    candidate: SwipeCandidate;
+    matchId: string;
+  } | null>(null);
 
   const targetRole = user?.role === "employer" ? "worker" : "employer";
   const pageTitle =
@@ -70,12 +75,17 @@ export default function SwipePage() {
     mutationFn: (data: {
       candidateId: string;
       action: "LIKE" | "PASS" | "SUPERLIKE";
-    }) => api.recordSwipe(data),
-    onSuccess: (result) => {
-      if (result.matched) {
-        toast.success(
-          "Match ! Vous pouvez maintenant demarrer une mission ensemble."
-        );
+      // Carry the candidate through the mutation so onSuccess can surface
+      // the right card in the celebration modal (the mutation fn ignores
+      // it — backend only sees candidateId + action).
+      _candidate: SwipeCandidate;
+    }) => api.recordSwipe({ candidateId: data.candidateId, action: data.action }),
+    onSuccess: (result, variables) => {
+      if (result.matched && result.matchId) {
+        setMatchCelebration({
+          candidate: variables._candidate,
+          matchId: result.matchId,
+        });
       }
     },
     onError: () => {
@@ -98,7 +108,11 @@ export default function SwipePage() {
       setExitDirection(
         action === "PASS" ? "left" : action === "LIKE" ? "right" : "up"
       );
-      swipeMutation.mutate({ candidateId: current.id, action });
+      swipeMutation.mutate({
+        candidateId: current.id,
+        action,
+        _candidate: current,
+      });
       setTimeout(advance, 300);
     },
     [current, swipeMutation, advance]
@@ -465,6 +479,15 @@ export default function SwipePage() {
           </>
         )}
       </div>
+
+      {matchCelebration && (
+        <MatchCelebrationModal
+          open
+          candidate={matchCelebration.candidate}
+          matchId={matchCelebration.matchId}
+          onDismiss={() => setMatchCelebration(null)}
+        />
+      )}
     </div>
   );
 }
