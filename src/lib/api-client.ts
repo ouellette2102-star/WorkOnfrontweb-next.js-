@@ -707,6 +707,11 @@ export const api = {
   },
 
   // Stripe Checkout
+  createBookingCheckout: (bookingId: string) =>
+    apiFetch<{ checkoutUrl: string; invoiceId: string; sessionId: string }>(`/payments/booking-checkout/${bookingId}`, {
+      method: "POST",
+    }),
+
   createCheckoutSession: (missionId: string) =>
     apiFetch<{ checkoutUrl: string; invoiceId: string; sessionId: string }>("/payments/checkout", {
       method: "POST",

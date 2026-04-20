@@ -60,25 +60,36 @@ export default function ReservePage() {
       toast.error("Veuillez entrer un titre pour la réservation.");
       return;
     }
+    const numPrice = Number(price) || 0;
     setLoading(true);
     try {
-      // Combine date + time into ISO 8601 scheduledAt
       const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString();
-      await api.createBooking({
+      const booking = await api.createBooking({
         workerId,
         title: title.trim(),
         description: description || undefined,
         scheduledAt,
         duration,
-        price: Number(price) || 0,
+        price: numPrice,
         priceType: "fixed",
       });
-      toast.success("Réservation envoyée avec succès !");
-      router.push("/bookings");
+
+      if (numPrice > 0) {
+        // Redirect to Stripe checkout for 50% deposit
+        toast.loading("Redirection vers Stripe...");
+        const checkout = await api.createBookingCheckout(booking.id);
+        window.location.href = checkout.checkoutUrl;
+      } else {
+        toast.success("Réservation envoyée avec succès !");
+        router.push("/bookings");
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("not available") || msg.includes("disponible")) {
         toast.error("Ce professionnel n'a pas encore configuré ses disponibilités. Envoyez-lui un message direct à la place.");
+      } else if (msg.includes("Consent") || msg.includes("consent")) {
+        toast.error("Vous devez accepter les conditions d'utilisation avant de payer.");
+        router.push("/onboarding");
       } else {
         toast.error(msg || "Erreur lors de la réservation.");
       }
@@ -319,7 +330,7 @@ export default function ReservePage() {
           ) : (
             <>
               <CalendarDays className="h-4 w-4 mr-2" />
-              Confirmer la réservation
+              {Number(price) > 0 ? "Payer le dépôt (50%) →" : "Confirmer la réservation"}
             </>
           )}
         </Button>
