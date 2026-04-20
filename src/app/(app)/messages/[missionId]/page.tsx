@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type ChatMessage } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { useMissionChatSocket } from "@/hooks/use-mission-chat-socket";
 import { Send, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -17,20 +18,42 @@ import { fr } from "date-fns/locale";
  * Sends via POST /messages-local.
  * Marks as read via PATCH /messages-local/read/:missionId.
  *
- * Polls every 3 seconds for new messages (HTTP fallback).
- * WebSocket upgrade will be added in PR #102.
+ * Realtime via Socket.IO (/chat namespace, room mission:{id}). HTTP
+ * polling is kept as a fallback at 15s when the socket is connected,
+ * 3s otherwise, so that a dead socket (CORS, expired JWT, blocked
+ * network) never leaves the thread stale.
  */
 export default function ChatThreadPage() {
   const { missionId } = useParams<{ missionId: string }>();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const handleIncomingMessage = useCallback(
+    (incoming: unknown) => {
+      const msg = incoming as ChatMessage | null;
+      if (!msg || typeof msg !== "object" || !("id" in msg) || !("missionId" in msg)) return;
+      if (msg.missionId !== missionId) return;
+      queryClient.setQueryData<ChatMessage[]>(["thread", missionId], (prev) => {
+        const list = Array.isArray(prev) ? prev : [];
+        if (list.some((m) => m.id === msg.id)) return list;
+        return [...list, msg];
+      });
+    },
+    [missionId, queryClient],
+  );
+
+  const { isConnected, status: socketStatus } = useMissionChatSocket({
+    missionId: missionId ?? null,
+    enabled: !!missionId && isAuthenticated,
+    onNewMessage: handleIncomingMessage,
+  });
+
   const { data: messagesRaw, isLoading } = useQuery({
     queryKey: ["thread", missionId],
     queryFn: () => api.getThread(missionId),
-    refetchInterval: 3_000,
+    refetchInterval: isConnected ? 15_000 : 3_000,
     enabled: !!missionId,
   });
 
@@ -78,7 +101,7 @@ export default function ChatThreadPage() {
         <Link href="/messages" className="shrink-0 text-workon-muted hover:text-workon-ink">
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-workon-ink truncate">
             Mission #{missionId?.slice(0, 8)}
           </p>
@@ -86,6 +109,7 @@ export default function ChatThreadPage() {
             {messages.length} messages
           </p>
         </div>
+        <LiveStatusBadge status={socketStatus} isConnected={isConnected} />
       </div>
 
       {/* Messages area */}
@@ -129,6 +153,42 @@ export default function ChatThreadPage() {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function LiveStatusBadge({
+  status,
+  isConnected,
+}: {
+  status: "idle" | "connecting" | "connected" | "error" | "disconnected";
+  isConnected: boolean;
+}) {
+  const label =
+    status === "connecting"
+      ? "Connexion…"
+      : isConnected
+        ? "Live"
+        : status === "error"
+          ? "Hors ligne"
+          : "Polling";
+  const dot = isConnected
+    ? "bg-emerald-500"
+    : status === "connecting"
+      ? "bg-amber-400 animate-pulse"
+      : status === "error"
+        ? "bg-red-500"
+        : "bg-workon-muted";
+  return (
+    <div
+      className="shrink-0 flex items-center gap-1.5 rounded-full border border-workon-border bg-workon-bg px-2 py-0.5"
+      aria-live="polite"
+      aria-label={`État du chat: ${label}`}
+      data-testid="chat-live-status"
+      data-status={status}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+      <span className="text-[10px] font-medium text-workon-muted">{label}</span>
     </div>
   );
 }
