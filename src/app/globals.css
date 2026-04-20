@@ -40,6 +40,39 @@
   --red-accent: var(--workon-accent);
 }
 
+/* ============================================================
+ * Dark theme — activated via `.dark` class on <html>
+ *   Driven by next-themes (system default, user-toggleable via
+ *   the header theme switcher). Token names mirror the light
+ *   palette so any component using `text-workon-ink`,
+ *   `bg-workon-bg`, etc. theme-switches automatically.
+ *   Components that hardcode hex values (e.g. bg-[#F9F8F5]) stay
+ *   light-themed until migrated — tracked as follow-up polish.
+ * ============================================================
+ */
+.dark {
+  --background: #0E0D0B;
+  --foreground: #F2EFE9;
+
+  --workon-primary: #2C7D3F;
+  --workon-primary-hover: #35944D;
+  --workon-primary-subtle: rgba(44, 125, 63, 0.15);
+  --workon-primary-ring: rgba(44, 125, 63, 0.45);
+
+  --workon-accent: #E07D5C;
+  --workon-accent-hover: #EB8E6C;
+  --workon-accent-subtle: rgba(224, 125, 92, 0.15);
+  --workon-accent-ring: rgba(224, 125, 92, 0.45);
+
+  --workon-ink: #F2EFE9;
+  --workon-bg: #0E0D0B;
+  --workon-bg-cream: #1A1815;
+  --workon-border: #2A2622;
+  --workon-gray: #B8B4AE;
+  --workon-muted: #807C77;
+  --workon-trust-green: #4ADE80;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

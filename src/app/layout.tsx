@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { ThemeProvider } from "@/components/theme-provider";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -59,13 +60,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr-CA">
+    <html lang="fr-CA" suppressHydrationWarning>
       <body
         className={`${manrope.variable} antialiased bg-background text-foreground`}
       >
-        <Toaster position="top-right" richColors closeButton theme="light" />
-        <Providers>{children}</Providers>
-        <CookieConsent />
+        <ThemeProvider>
+          <Toaster position="top-right" richColors closeButton theme="system" />
+          <Providers>{children}</Providers>
+          <CookieConsent />
+        </ThemeProvider>
       </body>
     </html>
   );

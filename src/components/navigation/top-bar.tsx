@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useMode } from "@/contexts/mode-context";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   MapPin,
   Bell,
@@ -102,6 +103,9 @@ export function TopBar() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
+          {/* R4 theme toggle (system → light → dark cycle) */}
+          <ThemeToggle />
+
           {/* Notification bell */}
           <Link
             href="/notifications"
