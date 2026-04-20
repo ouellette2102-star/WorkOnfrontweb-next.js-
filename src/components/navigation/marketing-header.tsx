@@ -48,21 +48,21 @@ export function MarketingHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 backdrop-blur-md border-b border-[#EAE6DF] bg-white/90 text-[#1B1A18]",
+        "sticky top-0 z-50 backdrop-blur-md border-b border-workon-border bg-white/90 text-workon-ink",
         className,
       )}
     >
       <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 text-[#1B1A18]">
+        <Link href="/" className="flex items-center gap-2.5 text-workon-ink">
           <WorkOnWordmark size="md" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-[#706E6A]">
+        <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-workon-gray">
           {items.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="transition-colors hover:text-[#1B1A18]"
+              className="transition-colors hover:text-workon-ink"
             >
               {item.label}
             </Link>
