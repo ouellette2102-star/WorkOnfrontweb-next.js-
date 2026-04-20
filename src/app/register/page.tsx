@@ -208,11 +208,11 @@ function RegisterInner() {
             {/* Trust strip — reduces email+password anxiety */}
             <div className="rounded-2xl border border-workon-border bg-workon-bg p-3 space-y-1.5">
               <div className="flex items-center gap-2 text-xs text-workon-muted">
-                <Lock className="h-3.5 w-3.5 text-[#22C55E]" />
+                <Lock className="h-3.5 w-3.5 text-workon-trust-green" />
                 <span>Vos données sont chiffrées et jamais revendues</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-workon-muted">
-                <Shield className="h-3.5 w-3.5 text-[#22C55E]" />
+                <Shield className="h-3.5 w-3.5 text-workon-trust-green" />
                 <span>Conformité Loi 25 &middot; Hébergement canadien</span>
               </div>
             </div>
@@ -239,7 +239,7 @@ function RegisterInner() {
             <div className="space-y-3">
               <button
                 onClick={() => selectRole("worker")}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#134021]/30 hover:bg-[#F0EDE8] transition-all text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-workon-primary/30 hover:bg-workon-bg-cream transition-all text-left"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-workon-accent/10 border border-workon-accent/25">
                   <Wrench className="h-6 w-6 text-workon-accent" />
@@ -255,7 +255,7 @@ function RegisterInner() {
 
               <button
                 onClick={() => selectRole("employer")}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-[#134021]/30 hover:bg-[#F0EDE8] transition-all text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-workon-border bg-white hover:border-workon-primary/30 hover:bg-workon-bg-cream transition-all text-left"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-workon-accent/10 border border-workon-accent/25">
                   <Briefcase className="h-6 w-6 text-workon-accent" />
@@ -273,7 +273,7 @@ function RegisterInner() {
             <div className="space-y-2 pt-2">
               {["Vérification d'identité (tiers VERIFIED+)", "Paiement sécurisé par Stripe", "Contrat de service généré automatiquement"].map((text) => (
                 <div key={text} className="flex items-center gap-2 text-sm text-workon-muted">
-                  <CheckCircle2 className="h-4 w-4 text-[#22C55E]" />
+                  <CheckCircle2 className="h-4 w-4 text-workon-trust-green" />
                   <span>{text}</span>
                 </div>
               ))}
