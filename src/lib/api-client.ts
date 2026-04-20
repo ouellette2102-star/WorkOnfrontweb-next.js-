@@ -806,16 +806,30 @@ export const api = {
   cancelBooking: (id: string) => apiFetch<BookingResponse>(`/scheduling/bookings/${id}/cancel`, { method: "PATCH" }),
   completeBooking: (id: string) => apiFetch<BookingResponse>(`/scheduling/bookings/${id}/complete`, { method: "PATCH" }),
 
-  // Availability
-  getAvailability: () => apiFetch<AvailabilitySlot[]>("/scheduling/availability"),
+  // Availability — backend groups slots as { recurring, blocked, specific }.
+  // Consumers must destructure or use Array.isArray guards (see calendar/page.tsx
+  // and availability-editor.tsx for the canonical pattern).
+  getAvailability: () =>
+    apiFetch<{ recurring: AvailabilitySlot[]; blocked: AvailabilitySlot[]; specific: AvailabilitySlot[] }>(
+      "/scheduling/availability",
+    ),
   setAvailability: (data: { dayOfWeek: number; startTime: string; endTime: string }) =>
-    apiFetch<AvailabilitySlot[]>("/scheduling/availability", { method: "POST", body: JSON.stringify({ slots: [data] }) }),
-  getMyAvailability: () => apiFetch<AvailabilitySlot[]>("/scheduling/availability"),
+    apiFetch<{ recurring: AvailabilitySlot[]; blocked: AvailabilitySlot[]; specific: AvailabilitySlot[] }>(
+      "/scheduling/availability",
+      { method: "POST", body: JSON.stringify({ slots: [data] }) },
+    ),
+  getMyAvailability: () =>
+    apiFetch<{ recurring: AvailabilitySlot[]; blocked: AvailabilitySlot[]; specific: AvailabilitySlot[] }>(
+      "/scheduling/availability",
+    ),
   setMyAvailability: (slots: { dayOfWeek: number; startTime: string; endTime: string }[]) =>
-    apiFetch<AvailabilitySlot[]>("/scheduling/availability", {
-      method: "POST",
-      body: JSON.stringify({ slots }),
-    }),
+    apiFetch<{ recurring: AvailabilitySlot[]; blocked: AvailabilitySlot[]; specific: AvailabilitySlot[] }>(
+      "/scheduling/availability",
+      {
+        method: "POST",
+        body: JSON.stringify({ slots }),
+      },
+    ),
   blockTime: (data: { specificDate: string; startTime: string; endTime: string; timezone?: string }) =>
     apiFetch<unknown>("/scheduling/availability/block", { method: "POST", body: JSON.stringify(data) }),
 
