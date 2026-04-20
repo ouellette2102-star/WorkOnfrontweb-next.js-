@@ -120,10 +120,15 @@ body {
 .shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 4px 12px rgba(27,26,24,0.03); }
 .shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
 
-/* Heading font — Cabinet Grotesk with Manrope bold fallback */
+/* Heading font — Bricolage Grotesque (loaded via next/font in layout.tsx)
+ * with Manrope and the system stack as fallbacks. Bricolage is a free
+ * open-source display grotesque that fills the role the unloadable
+ * Cabinet Grotesk previously occupied — without it, headings silently
+ * fell back to Manrope (same family as body, no contrast). */
 .font-heading {
-  font-family: 'Cabinet Grotesk', var(--font-manrope), system-ui, sans-serif;
+  font-family: var(--font-heading), var(--font-manrope), system-ui, sans-serif;
   font-feature-settings: 'ss01';
+  letter-spacing: -0.01em;
 }
 
 /* Emergent shadow tokens */
