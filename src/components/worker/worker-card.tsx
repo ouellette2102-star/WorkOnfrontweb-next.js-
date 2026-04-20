@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Star, X, ChevronLeft, ChevronRight, MapPin, CheckCircle, ShieldCheck } from "lucide-react";
+import { Star, X, ChevronLeft, ChevronRight, MapPin, CheckCircle, ShieldCheck, Quote } from "lucide-react";
 import type { WorkerProfile } from "@/lib/api-client";
 import { TrustPill } from "@/components/ui/trust-pill";
 import { ContactWorkerButton } from "@/components/worker/contact-worker-button";
@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 interface WorkerCardProps {
   worker: WorkerProfile;
   className?: string;
+  /** In swipe mode, hides CTAs (Réserver / Contacter) so the drag gesture is used instead */
+  hideActions?: boolean;
 }
 
 function deriveTrustPillVariant(worker: WorkerProfile) {
@@ -22,7 +24,7 @@ function deriveTrustPillVariant(worker: WorkerProfile) {
   return "fiable";
 }
 
-export function WorkerCard({ worker, className }: WorkerCardProps) {
+export function WorkerCard({ worker, className, hideActions = false }: WorkerCardProps) {
   const hasReviews = (worker.reviewCount ?? 0) > 0;
   const portfolio = (worker.portfolioPhotos ?? []).slice(0, 3);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -128,12 +130,14 @@ export function WorkerCard({ worker, className }: WorkerCardProps) {
           )}
 
           {/* 5. CTA principal Réserver */}
-          <Link
-            href={`/reserve/${worker.id}`}
-            className="flex items-center justify-center w-full rounded-xl bg-workon-primary text-white text-sm font-bold py-3 shadow-md shadow-workon-primary/25 hover:bg-workon-primary/90 transition-colors"
-          >
-            Réserver
-          </Link>
+          {!hideActions && (
+            <Link
+              href={`/reserve/${worker.id}`}
+              className="flex items-center justify-center w-full rounded-xl bg-workon-primary text-white text-sm font-bold py-3 shadow-md shadow-workon-primary/25 hover:bg-workon-primary/90 transition-colors"
+            >
+              Réserver
+            </Link>
+          )}
 
           {/* 6. Pourquoi choisir */}
           <div className="rounded-xl bg-workon-bg border border-workon-border p-3 space-y-1.5">
@@ -149,9 +153,47 @@ export function WorkerCard({ worker, className }: WorkerCardProps) {
           </div>
 
           {/* 7. CTA secondaire Contacter */}
-          <ContactWorkerButton workerId={worker.id} workerFirstName={worker.firstName} workerCategory={worker.category} workerCity={worker.city} />
+          {!hideActions && (
+            <ContactWorkerButton workerId={worker.id} workerFirstName={worker.firstName} workerCategory={worker.category} workerCity={worker.city} />
+          )}
 
-          {/* 8. Portfolio */}
+          {/* 8. Section avis */}
+          {(worker.reviewCount ?? 0) > 0 ? (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide">Avis clients</p>
+                {!hideActions && (
+                  <Link href={`/worker/${worker.id}#reviews`} className="text-[11px] text-workon-primary hover:underline">
+                    Voir tous
+                  </Link>
+                )}
+              </div>
+              <div className="rounded-xl border border-workon-border bg-workon-bg p-3">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Star key={i} className={cn("h-3.5 w-3.5", i < Math.round(worker.averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-200 fill-gray-200")} />
+                    ))}
+                  </div>
+                  <span className="text-xs font-semibold text-workon-ink">{worker.averageRating.toFixed(1)}</span>
+                  <span className="text-xs text-workon-muted">({worker.reviewCount} avis)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Quote className="h-3.5 w-3.5 text-workon-primary/40 shrink-0 mt-0.5" />
+                  <p className="text-xs text-workon-muted italic leading-relaxed">
+                    {worker.reviewCount === 1 ? "1 client a laissé un avis positif." : `${worker.reviewCount} clients ont laissé des avis positifs.`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-workon-border bg-workon-bg/50 p-3 text-center">
+              <p className="text-xs text-workon-muted">Aucun avis pour le moment</p>
+              <p className="text-[10px] text-workon-muted/60 mt-0.5">Soyez le premier à travailler avec {worker.firstName}</p>
+            </div>
+          )}
+
+          {/* 9. Portfolio */}
           {portfolio.length > 0 && (
             <div>
               <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2">Réalisations</p>
@@ -167,7 +209,7 @@ export function WorkerCard({ worker, className }: WorkerCardProps) {
             </div>
           )}
 
-          {/* 9. Footer légal */}
+          {/* 10. Footer légal */}
           <div className="flex items-center gap-1.5 pt-1 text-[10px] text-workon-muted border-t border-workon-border">
             <ShieldCheck className="h-3 w-3 shrink-0" />
             Paiement sécurisé par Stripe · WorkOn n&apos;est pas partie au contrat de service

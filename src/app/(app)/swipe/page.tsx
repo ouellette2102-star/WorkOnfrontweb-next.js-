@@ -13,17 +13,18 @@ import Link from "next/link";
 import {
   MapPin,
   Star,
-  ShieldCheck,
-  Tag,
   Loader2,
   Heart,
   X,
   MessageCircle,
   Users,
   ArrowUp,
-  Briefcase,
-  DollarSign,
+  CheckCircle,
+  ShieldCheck,
+  Quote,
 } from "lucide-react";
+import { TrustPill } from "@/components/ui/trust-pill";
+import { cn } from "@/lib/utils";
 
 const SWIPE_THRESHOLD = 100; // px offset to trigger
 const VELOCITY_THRESHOLD = 500; // px/s velocity to trigger
@@ -248,7 +249,7 @@ export default function SwipePage() {
             </div>
 
             {/* Card */}
-            <div className="relative h-[520px]">
+            <div className="relative min-h-[520px]">
               <AnimatePresence initial={false}>
                 <motion.div
                   key={current.id}
@@ -291,7 +292,7 @@ export default function SwipePage() {
                   }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   style={{ rotate: rotation, touchAction: "none" }}
-                  className="absolute inset-0 cursor-grab overflow-hidden rounded-3xl border border-workon-border bg-white shadow-md active:cursor-grabbing"
+                  className="relative w-full cursor-grab overflow-hidden rounded-3xl border border-workon-border bg-white shadow-md active:cursor-grabbing"
                 >
                   {/* Drag overlays */}
                   {/* LIKE overlay (right) — green */}
@@ -339,15 +340,11 @@ export default function SwipePage() {
                     </div>
                   </div>
 
-                  {/* Hero photo pleine largeur */}
-                  <div className="relative h-52 bg-gradient-to-br from-workon-primary/20 to-workon-primary/40 overflow-hidden">
+                  {/* 1. Hero photo pleine largeur */}
+                  <Link href={`/worker/${current.id}`} className="block relative h-56 bg-gradient-to-br from-workon-primary/20 to-workon-primary/40 overflow-hidden">
                     {current.pictureUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={current.pictureUrl}
-                        alt={current.firstName}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={current.pictureUrl} alt={current.firstName} className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
                         <span className="text-6xl font-bold text-workon-primary/60 select-none">
@@ -355,89 +352,124 @@ export default function SwipePage() {
                         </span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
-                  </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute top-3 left-3">
+                      <TrustPill variant={
+                        current.trustTier === "PREMIUM" ? "premium"
+                        : current.trustTier === "TRUSTED" ? "trusted"
+                        : current.trustTier === "VERIFIED" ? "verified"
+                        : current.reviewCount === 0 ? "nouveau"
+                        : "fiable"
+                      } />
+                    </div>
+                  </Link>
 
-                  {/* Content */}
-                  <div className="p-5">
-                    <h2 className="text-xl font-bold text-workon-ink">
-                      {current.firstName} {current.lastName}
-                    </h2>
+                  <div className="p-4 space-y-3">
+                    {/* 2. Nom + métier + ville */}
+                    <div>
+                      <h3 className="font-bold text-lg text-workon-ink leading-tight">
+                        {current.firstName} {current.lastName}
+                      </h3>
+                      <p className="text-sm text-workon-muted mt-0.5 flex items-center gap-1 flex-wrap">
+                        {current.jobTitle || current.category || "Professionnel"}
+                        {current.city && (
+                          <>
+                            <span className="text-workon-border">·</span>
+                            <span className="inline-flex items-center gap-0.5">
+                              <MapPin className="h-3 w-3" />{current.city}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </div>
 
-                    {current.jobTitle && (
-                      <div className="mt-0.5 flex items-center gap-1 text-sm font-medium text-workon-primary">
-                        <Briefcase className="h-3.5 w-3.5" />
-                        {current.jobTitle}
+                    {/* 3. Étoiles + avis */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-0.5">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <Star key={i} className={cn("h-4 w-4", i < Math.round(current.avgRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-200 fill-gray-200")} />
+                        ))}
+                      </div>
+                      {current.reviewCount > 0 && <span className="text-sm font-semibold text-workon-ink">{current.avgRating.toFixed(1)}</span>}
+                      <span className="text-xs text-workon-muted">{current.reviewCount > 0 ? `(${current.reviewCount} avis)` : "Nouveau"}</span>
+                    </div>
+
+                    {/* 4. Badges + tarif */}
+                    {(current.hourlyRate ?? 0) > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {current.category && (
+                          <span className="inline-flex items-center rounded-full border border-workon-border bg-workon-bg px-2.5 py-1 text-[11px] font-medium text-workon-ink">
+                            {current.category}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center rounded-full bg-workon-primary/10 px-2.5 py-1 text-[11px] font-semibold text-workon-primary">
+                          À partir de {current.hourlyRate} $/h
+                        </span>
                       </div>
                     )}
 
-                    <div className="mt-1 flex items-center gap-3 text-sm text-workon-muted">
-                      {current.city && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5" />
-                          {current.city}
-                        </span>
-                      )}
-                      {current.hourlyRate != null && (
-                        <span className="flex items-center gap-1 font-medium text-workon-ink">
-                          <DollarSign className="h-3.5 w-3.5" />
-                          {current.hourlyRate} $/h
-                        </span>
-                      )}
+                    {/* 5. Pourquoi choisir */}
+                    <div className="rounded-xl bg-workon-bg border border-workon-border p-3 space-y-1.5">
+                      <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2">
+                        Pourquoi choisir {current.firstName} ?
+                      </p>
+                      {["Identité vérifiée", "Assurances & conformité", "Contrat sécurisé WorkOn"].map((item) => (
+                        <div key={item} className="flex items-center gap-2 text-xs text-workon-ink">
+                          <CheckCircle className="h-3.5 w-3.5 text-workon-primary shrink-0" />
+                          {item}
+                        </div>
+                      ))}
                     </div>
 
-                    <div className="mt-4 space-y-2">
-                      {/* Rating */}
-                      <div className="flex items-center gap-2 text-sm">
-                        <Star className="h-4 w-4 text-yellow-500" />
-                        <span className="text-workon-ink">
-                          {current.avgRating > 0
-                            ? `${current.avgRating.toFixed(1)} / 5 (${current.reviewCount} avis)`
-                            : "Nouveau profil"}
-                        </span>
+                    {/* 6. Section avis */}
+                    {current.reviewCount > 0 ? (
+                      <div>
+                        <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2">Avis clients</p>
+                        <div className="rounded-xl border border-workon-border bg-workon-bg p-3">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <div className="flex">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <Star key={i} className={cn("h-3.5 w-3.5", i < Math.round(current.avgRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-200 fill-gray-200")} />
+                              ))}
+                            </div>
+                            <span className="text-xs font-semibold text-workon-ink">{current.avgRating.toFixed(1)}</span>
+                            <span className="text-xs text-workon-muted">({current.reviewCount} avis)</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <Quote className="h-3.5 w-3.5 text-workon-primary/40 shrink-0 mt-0.5" />
+                            <p className="text-xs text-workon-muted italic leading-relaxed">
+                              {current.reviewCount === 1 ? "1 client a laissé un avis positif." : `${current.reviewCount} clients ont laissé des avis positifs.`}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-workon-border bg-workon-bg/50 p-3 text-center">
+                        <p className="text-xs text-workon-muted">Aucun avis pour le moment</p>
+                        <p className="text-[10px] text-workon-muted/60 mt-0.5">Soyez le premier à travailler avec {current.firstName}</p>
+                      </div>
+                    )}
 
-                      {/* Trust tier */}
-                      {current.trustTier && current.trustTier !== "BASIC" && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <ShieldCheck className="h-4 w-4 text-workon-primary" />
-                          <span className="capitalize text-workon-ink">
-                            {current.trustTier.toLowerCase()}
-                          </span>
-                        </div>
-                      )}
+                    {/* 7. Bio */}
+                    {current.bio && (
+                      <p className="text-sm leading-relaxed text-workon-muted line-clamp-2 border-t border-workon-border/50 pt-2">
+                        {current.bio}
+                      </p>
+                    )}
 
-                      {/* Category */}
-                      {current.category && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Tag className="h-4 w-4 text-workon-accent" />
-                          <span className="rounded-full bg-workon-accent/10 px-2.5 py-0.5 text-xs font-medium text-workon-accent">
-                            {current.category}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Bio */}
-                      {current.bio && (
-                        <p className="mt-2 text-sm leading-relaxed text-workon-muted line-clamp-3">
-                          {current.bio}
-                        </p>
-                      )}
+                    {/* 8. Footer légal */}
+                    <div className="flex items-center gap-1.5 pt-1 text-[10px] text-workon-muted border-t border-workon-border">
+                      <ShieldCheck className="h-3 w-3 shrink-0" />
+                      Paiement sécurisé par Stripe · WorkOn n&apos;est pas partie au contrat de service
                     </div>
-                  </div>
 
-                  {/* Drag hint */}
-                  <div className="absolute bottom-3 left-0 right-0 flex justify-center">
-                    <div className="flex items-center gap-3 rounded-full bg-black/5 px-4 py-1.5 text-[10px] text-workon-muted">
-                      <span className="flex items-center gap-1">
-                        <X className="h-3 w-3" /> Gauche
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <ArrowUp className="h-3 w-3" /> Super
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Heart className="h-3 w-3" /> Droite
-                      </span>
+                    {/* 9. Drag hint */}
+                    <div className="flex justify-center">
+                      <div className="flex items-center gap-3 rounded-full bg-black/5 px-4 py-1.5 text-[10px] text-workon-muted">
+                        <span className="flex items-center gap-1"><X className="h-3 w-3" /> Gauche</span>
+                        <span className="flex items-center gap-1"><ArrowUp className="h-3 w-3" /> Super</span>
+                        <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> Droite</span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
