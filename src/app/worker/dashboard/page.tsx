@@ -20,10 +20,10 @@ export default async function WorkerDashboardPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="mb-2 font-heading font-bold text-2xl text-[#1B1A18]">
+          <h1 className="mb-2 font-heading font-bold text-2xl text-workon-ink">
             Salut {firstName} 👋
           </h1>
-          <p className="text-sm text-[#706E6A]">
+          <p className="text-sm text-workon-gray">
             {profile.city ? `Tu es à ${profile.city}` : "Prêt à trouver des missions près de chez toi"}
           </p>
         </div>
@@ -42,48 +42,48 @@ export default async function WorkerDashboardPage() {
         {/* Actions rapides */}
         <div className="mb-8 grid gap-4 md:grid-cols-4">
           <Link href="/worker/missions">
-            <div className="group cursor-pointer bg-white border border-[#EAE6DF] rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
+            <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
               <div className="mb-3 text-3xl">🔍</div>
-              <h3 className="mb-1 text-base font-semibold text-[#1B1A18]">
+              <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Missions disponibles
               </h3>
-              <p className="text-xs text-[#706E6A]">
+              <p className="text-xs text-workon-gray">
                 Trouve des missions près de chez toi
               </p>
             </div>
           </Link>
 
           <Link href="/worker/payments">
-            <div className="group cursor-pointer bg-white border border-[#EAE6DF] rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
+            <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
               <div className="mb-3 text-3xl">💰</div>
-              <h3 className="mb-1 text-base font-semibold text-[#1B1A18]">
+              <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Paiements
               </h3>
-              <p className="text-xs text-[#706E6A]">
+              <p className="text-xs text-workon-gray">
                 Gère tes paiements Stripe
               </p>
             </div>
           </Link>
 
           <Link href="/notifications">
-            <div className="group cursor-pointer bg-white border border-[#EAE6DF] rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
+            <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
               <div className="mb-3 text-3xl">🔔</div>
-              <h3 className="mb-1 text-base font-semibold text-[#1B1A18]">
+              <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Notifications
               </h3>
-              <p className="text-xs text-[#706E6A]">
+              <p className="text-xs text-workon-gray">
                 Consulte tes notifications
               </p>
             </div>
           </Link>
 
           <Link href="/messages">
-            <div className="group cursor-pointer bg-white border border-[#EAE6DF] rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
+            <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
               <div className="mb-3 text-3xl">💬</div>
-              <h3 className="mb-1 text-base font-semibold text-[#1B1A18]">
+              <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Messages
               </h3>
-              <p className="text-xs text-[#706E6A]">
+              <p className="text-xs text-workon-gray">
                 Communique avec les clients
               </p>
             </div>
@@ -103,24 +103,24 @@ export default async function WorkerDashboardPage() {
         </div>
 
         {/* Infos profil */}
-        <div className="mt-8 bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
+        <div className="mt-8 bg-white border border-workon-border rounded-3xl p-5 shadow-card">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div className="flex-1">
-              <h3 className="mb-4 font-heading font-bold text-lg text-[#1B1A18]">
+              <h3 className="mb-4 font-heading font-bold text-lg text-workon-ink">
                 Tes informations
               </h3>
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
-                  <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Ville</p>
-                  <p className="text-[#1B1A18]">{profile.city || "Non renseignee"}</p>
+                  <p className="text-[10px] text-workon-gray uppercase tracking-wider">Ville</p>
+                  <p className="text-workon-ink">{profile.city || "Non renseignee"}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Telephone</p>
-                  <p className="text-[#1B1A18]">{profile.phone || "Non renseigne"}</p>
+                  <p className="text-[10px] text-workon-gray uppercase tracking-wider">Telephone</p>
+                  <p className="text-workon-ink">{profile.phone || "Non renseigne"}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Email</p>
-                  <p className="text-[#1B1A18]">{profile.email}</p>
+                  <p className="text-[10px] text-workon-gray uppercase tracking-wider">Email</p>
+                  <p className="text-workon-ink">{profile.email}</p>
                 </div>
               </div>
               <Button asChild variant="outline" size="sm" className="mt-4">
