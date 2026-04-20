@@ -72,22 +72,25 @@ export default function CalendarPage() {
 
   const isLoading = slotsLoading || bookingsLoading;
 
+  // API responses occasionally arrive as a non-array error envelope
+  // ({error,message,...}) — guard before any .filter to avoid crashing
+  // the whole page error-boundary (Sentry WORKON-FRONTEND-4).
+  const safeSlots: AvailabilitySlot[] = Array.isArray(slots) ? slots : [];
+  const safeBookings: BookingResponse[] = Array.isArray(bookings) ? bookings : [];
+
   // Group data by day
   const getSlotsForDay = (date: Date): AvailabilitySlot[] => {
-    if (!slots) return [];
     const dayIndex = jsDayToSlotDay(getDay(date));
-    return slots.filter((s) => s.dayOfWeek === dayIndex && !s.isBlocked);
+    return safeSlots.filter((s) => s.dayOfWeek === dayIndex && !s.isBlocked);
   };
 
   const getBlockedForDay = (date: Date): AvailabilitySlot[] => {
-    if (!slots) return [];
     const dayIndex = jsDayToSlotDay(getDay(date));
-    return slots.filter((s) => s.dayOfWeek === dayIndex && s.isBlocked);
+    return safeSlots.filter((s) => s.dayOfWeek === dayIndex && s.isBlocked);
   };
 
   const getBookingsForDay = (date: Date): BookingResponse[] => {
-    if (!bookings) return [];
-    return bookings.filter((b) => {
+    return safeBookings.filter((b) => {
       try {
         return isSameDay(new Date(b.scheduledDate), date);
       } catch {

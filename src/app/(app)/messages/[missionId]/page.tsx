@@ -27,29 +27,34 @@ export default function ChatThreadPage() {
   const [message, setMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data: messages, isLoading } = useQuery({
+  const { data: messagesRaw, isLoading } = useQuery({
     queryKey: ["thread", missionId],
     queryFn: () => api.getThread(missionId),
     refetchInterval: 3_000,
     enabled: !!missionId,
   });
 
+  // Legacy DM stubs (lm_dm_*) were migrated to Conversation in PR #243;
+  // the API can now return 410 Gone or a non-array error shape for those
+  // IDs, so we normalise to an array before any .map/.length access.
+  const messages: ChatMessage[] = Array.isArray(messagesRaw) ? messagesRaw : [];
+
   // Mark as read on mount and when new messages arrive
   useEffect(() => {
-    if (missionId && messages && messages.length > 0) {
+    if (missionId && messages.length > 0) {
       api.markRead(missionId).then(() => {
         queryClient.invalidateQueries({ queryKey: ["unread-count"] });
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       });
     }
-  }, [missionId, messages?.length, queryClient, messages]);
+  }, [missionId, messages.length, queryClient]);
 
   // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages?.length]);
+  }, [messages.length]);
 
   const sendMessage = useMutation({
     mutationFn: (content: string) =>
@@ -78,7 +83,7 @@ export default function ChatThreadPage() {
             Mission #{missionId?.slice(0, 8)}
           </p>
           <p className="text-[10px] text-workon-muted">
-            {messages?.length ?? 0} messages
+            {messages.length} messages
           </p>
         </div>
       </div>
@@ -89,7 +94,7 @@ export default function ChatThreadPage() {
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-workon-muted" />
           </div>
-        ) : !messages || messages.length === 0 ? (
+        ) : messages.length === 0 ? (
           <p className="text-center text-sm text-workon-muted py-8">
             Commencez la conversation
           </p>
