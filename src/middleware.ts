@@ -7,10 +7,14 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = [
   "/",
+  "/about",
   "/login",
   "/register",
   "/forgot-password",
-  "/onboarding",
+  // NOTE: /onboarding/* is intentionally NOT public. Every onboarding page
+  // (role, details, success, employer) requires an authenticated user to
+  // PATCH /users/me. Middleware redirects unauth to /login before the
+  // client-side guard fires, avoiding the pre-hydration flash of the form.
   "/pros",
   "/p/",
   "/pro/",
