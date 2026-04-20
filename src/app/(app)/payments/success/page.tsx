@@ -1,55 +1,93 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Loader2, ArrowRight, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Loader2, ArrowRight, AlertTriangle, RefreshCw, XCircle } from "lucide-react";
 import { api } from "@/lib/api-client";
+
+type Status = "loading" | "confirmed" | "pending" | "failed" | "no-session";
+
+// ~30s total: 1.5s, 2s, 2.5s, 3s, 4s, 5s, 6s, 6s, 6s, 6s
+const POLL_DELAYS_MS = [1500, 2000, 2500, 3000, 4000, 5000, 6000, 6000, 6000, 6000];
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const [status, setStatus] = useState<"loading" | "confirmed" | "pending" | "no-session">("loading");
+  const invoiceId = searchParams.get("invoice_id");
 
-  useEffect(() => {
+  const [status, setStatus] = useState<Status>("loading");
+  const cancelledRef = useRef(false);
+  const retryKeyRef = useRef(0);
+
+  const poll = useCallback(async () => {
     if (!sessionId) {
       setStatus("no-session");
       return;
     }
 
-    let attempts = 0;
-    const maxAttempts = 4;
-    const delayMs = 2000;
+    cancelledRef.current = false;
+    const myKey = ++retryKeyRef.current;
+    setStatus("loading");
 
-    async function verify() {
+    for (let attempt = 0; attempt < POLL_DELAYS_MS.length; attempt++) {
+      if (cancelledRef.current || retryKeyRef.current !== myKey) return;
+
       try {
-        const sub = await api.getSubscription();
-        if (sub && sub.plan !== "FREE") {
-          setStatus("confirmed");
-          return;
+        if (invoiceId) {
+          const inv = await api.getInvoice(invoiceId);
+          if (inv.status === "PAID") {
+            setStatus("confirmed");
+            return;
+          }
+          if (inv.status === "FAILED" || inv.status === "CANCELLED") {
+            setStatus("failed");
+            return;
+          }
+        } else {
+          // Legacy fallback: subscription flow without invoice_id
+          const sub = await api.getSubscription();
+          if (sub && sub.plan !== "FREE") {
+            setStatus("confirmed");
+            return;
+          }
         }
       } catch {
-        // ignore — webhook may not have fired yet
+        // Network / webhook race — keep polling
       }
 
-      attempts++;
-      if (attempts < maxAttempts) {
-        setTimeout(verify, delayMs);
-      } else {
-        // Webhook takes time — tell user it'll arrive soon, don't cry fraud
-        setStatus("pending");
-      }
+      await new Promise((r) => setTimeout(r, POLL_DELAYS_MS[attempt]));
     }
 
-    verify();
-  }, [sessionId]);
+    if (!cancelledRef.current && retryKeyRef.current === myKey) {
+      setStatus("pending");
+    }
+  }, [sessionId, invoiceId]);
+
+  useEffect(() => {
+    poll();
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, [poll]);
+
+  const handleRetry = () => {
+    poll();
+  };
 
   return (
     <div className="min-h-screen bg-workon-bg p-6 flex items-center justify-center">
       <div className="mx-auto max-w-md w-full">
-        <div className={`rounded-2xl border bg-white p-10 text-center shadow-sm ${status === "no-session" ? "border-red-200" : "border-green-200"}`}>
-
+        <div
+          className={`rounded-2xl border bg-white p-10 text-center shadow-sm ${
+            status === "no-session" || status === "failed"
+              ? "border-red-200"
+              : status === "pending"
+              ? "border-amber-200"
+              : "border-green-200"
+          }`}
+        >
           {status === "loading" && (
             <>
               <div className="mb-5 flex justify-center">
@@ -73,7 +111,7 @@ function SuccessContent() {
                 Paiement confirmé !
               </h1>
               <p className="mb-6 text-base text-workon-muted">
-                Ton abonnement est actif. Bienvenue dans WorkOn Pro.
+                Ton paiement a été reçu. Tu peux consulter ton reçu en tout temps.
               </p>
             </>
           )}
@@ -84,11 +122,26 @@ function SuccessContent() {
                 <AlertTriangle className="h-16 w-16 text-amber-500" />
               </div>
               <h1 className="mb-2 text-2xl font-bold text-workon-ink">
-                Paiement reçu
+                Paiement en traitement
               </h1>
               <p className="mb-6 text-base text-workon-muted">
-                Ton paiement a été traité. L&apos;activation peut prendre quelques minutes.
-                Rafraîchis la page si ton abonnement n&apos;apparaît pas.
+                Stripe a reçu ton paiement mais la confirmation met plus de temps que prévu.
+                Tu peux réessayer ou consulter tes reçus dans quelques minutes.
+              </p>
+            </>
+          )}
+
+          {status === "failed" && (
+            <>
+              <div className="mb-5 flex justify-center">
+                <XCircle className="h-16 w-16 text-red-500" />
+              </div>
+              <h1 className="mb-2 text-2xl font-bold text-workon-ink">
+                Paiement non complété
+              </h1>
+              <p className="mb-6 text-base text-workon-muted">
+                Le paiement n&apos;a pas abouti. Aucun montant n&apos;a été débité.
+                Tu peux réessayer depuis la mission.
               </p>
             </>
           )}
@@ -109,12 +162,31 @@ function SuccessContent() {
 
           {status !== "loading" && (
             <div className="flex flex-col items-center gap-3 mt-4">
-              <Button asChild className="w-full">
-                <Link href="/settings/subscription" className="inline-flex items-center justify-center gap-2">
-                  Voir mon abonnement
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
+              {status === "pending" && (
+                <Button onClick={handleRetry} className="w-full" variant="secondary">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Réessayer la vérification
+                </Button>
+              )}
+
+              {(status === "confirmed" || status === "pending") && (
+                <Button asChild className="w-full">
+                  <Link href="/receipts" className="inline-flex items-center justify-center gap-2">
+                    Voir mes reçus
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+
+              {status === "failed" && (
+                <Button asChild className="w-full" variant="secondary">
+                  <Link href="/missions" className="inline-flex items-center justify-center gap-2">
+                    Retour à mes missions
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+
               <Link
                 href="/home"
                 className="text-sm text-workon-muted hover:text-workon-ink transition-colors"
