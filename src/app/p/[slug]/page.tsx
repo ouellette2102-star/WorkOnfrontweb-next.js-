@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[#EAE6DF] bg-[#F9F8F5]/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-workon-border bg-workon-bg/90 backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-workon-accent flex items-center justify-center">
@@ -31,9 +31,9 @@ function Header() {
           </div>
           <span className="font-bold tracking-tight">WorkOn</span>
         </Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm text-[#706E6A]">
-          <Link href="/pros" className="hover:text-[#1B1A18] transition-colors">Travailleurs</Link>
-          <Link href="/missions" className="hover:text-[#1B1A18] transition-colors">Missions</Link>
+        <nav className="hidden md:flex items-center gap-6 text-sm text-workon-gray">
+          <Link href="/pros" className="hover:text-workon-ink transition-colors">Travailleurs</Link>
+          <Link href="/missions" className="hover:text-workon-ink transition-colors">Missions</Link>
         </nav>
         <UserNav />
       </div>
@@ -53,7 +53,7 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
                 ? "text-yellow-400"
                 : i < rating
                 ? "text-yellow-400/50"
-                : "text-[#EAE6DF]"
+                : "text-workon-border"
             }`}
           >
             ★
@@ -61,27 +61,27 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
         ))}
       </div>
       <span className="font-semibold">{rating.toFixed(1)}</span>
-      <span className="text-[#706E6A] text-sm">({count} avis)</span>
+      <span className="text-workon-gray text-sm">({count} avis)</span>
     </div>
   );
 }
 
 function ReviewCard({ r }: { r: FeaturedReview }) {
   return (
-    <div className="rounded-xl border border-[#EAE6DF] bg-white shadow-card p-4">
+    <div className="rounded-xl border border-workon-border bg-white shadow-card p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex gap-0.5">
           {Array.from({ length: 5 }).map((_, i) => (
-            <span key={i} className={i < r.rating ? "text-yellow-400 text-sm" : "text-[#EAE6DF] text-sm"}>★</span>
+            <span key={i} className={i < r.rating ? "text-yellow-400 text-sm" : "text-workon-border text-sm"}>★</span>
           ))}
         </div>
-        <span className="text-xs text-[#9C9A96]">
+        <span className="text-xs text-workon-muted">
           {new Date(r.createdAt).toLocaleDateString("fr-CA", { month: "short", year: "numeric" })}
         </span>
       </div>
-      <p className="text-sm text-[#1B1A18] leading-relaxed">&ldquo;{r.comment}&rdquo;</p>
+      <p className="text-sm text-workon-ink leading-relaxed">&ldquo;{r.comment}&rdquo;</p>
       {r.authorName && (
-        <p className="mt-2 text-xs text-[#9C9A96]">{r.authorName}</p>
+        <p className="mt-2 text-xs text-workon-muted">{r.authorName}</p>
       )}
     </div>
   );
@@ -153,7 +153,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
     worker.reviews.length > 0 ? worker.reviews : featuredReviews.slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
+    <main className="min-h-screen bg-workon-bg text-workon-ink">
       {/* JSON-LD Person structured data for SEO / rich results */}
       <script
         type="application/ld+json"
@@ -163,22 +163,22 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
 
       <div className="mx-auto max-w-4xl px-4 py-10">
         {/* Profile header */}
-        <div className="flex flex-col md:flex-row items-start gap-6 pb-8 border-b border-[#EAE6DF]">
+        <div className="flex flex-col md:flex-row items-start gap-6 pb-8 border-b border-workon-border">
           <div className="relative flex-shrink-0">
             {worker.photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={worker.photoUrl}
                 alt={worker.firstName}
-                className="h-24 w-24 rounded-2xl object-cover border border-[#EAE6DF]"
+                className="h-24 w-24 rounded-2xl object-cover border border-workon-border"
               />
             ) : (
-              <div className="h-24 w-24 rounded-2xl bg-[#134021]/20 border border-[#134021]/30 flex items-center justify-center">
-                <span className="text-2xl font-black text-[#134021]">{initials}</span>
+              <div className="h-24 w-24 rounded-2xl bg-workon-primary/20 border border-workon-primary/30 flex items-center justify-center">
+                <span className="text-2xl font-black text-workon-primary">{initials}</span>
               </div>
             )}
             {isVerified && (
-              <span className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-[#134021] border-2 border-[#F9F8F5] flex items-center justify-center">
+              <span className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-workon-primary border-2 border-workon-bg flex items-center justify-center">
                 <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
@@ -193,11 +193,11 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                   {worker.firstName} {worker.lastName[0]}.
                 </h1>
                 {worker.city && (
-                  <p className="text-[#706E6A] text-sm mt-0.5">📍 {worker.city}</p>
+                  <p className="text-workon-gray text-sm mt-0.5">📍 {worker.city}</p>
                 )}
               </div>
               {isVerified && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#134021]/10 text-[#134021] border border-[#134021]/20">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-workon-primary/10 text-workon-primary border border-workon-primary/20">
                   ✓ Vérifié
                 </span>
               )}
@@ -209,9 +209,9 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
               </div>
             )}
 
-            <div className="mt-4 flex flex-wrap gap-4 text-sm text-[#706E6A]">
+            <div className="mt-4 flex flex-wrap gap-4 text-sm text-workon-gray">
               <span>
-                <span className="font-semibold text-[#1B1A18]">{worker.completedMissions}</span> mission{worker.completedMissions !== 1 ? "s" : ""} complétée{worker.completedMissions !== 1 ? "s" : ""}
+                <span className="font-semibold text-workon-ink">{worker.completedMissions}</span> mission{worker.completedMissions !== 1 ? "s" : ""} complétée{worker.completedMissions !== 1 ? "s" : ""}
               </span>
               <span>
                 Membre depuis{" "}
@@ -227,7 +227,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                 {worker.badges.map((b) => (
                   <span
                     key={b.type}
-                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#134021]/10 text-[#134021] border border-[#134021]/20"
+                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-workon-primary/10 text-workon-primary border border-workon-primary/20"
                   >
                     {b.label}
                   </span>
@@ -237,7 +237,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
           </div>
 
           <div className="flex-shrink-0">
-            <Button className="bg-[#134021] hover:bg-[#0F3319] text-white" asChild>
+            <Button className="bg-workon-primary hover:bg-workon-primary-hover text-white" asChild>
               <Link href="/register?role=employer">Engager ce pro</Link>
             </Button>
           </div>
@@ -250,7 +250,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
             {worker.bio && (
               <section>
                 <h2 className="text-lg font-bold font-heading mb-3">À propos</h2>
-                <p className="text-[#706E6A] leading-relaxed text-sm">{worker.bio}</p>
+                <p className="text-workon-gray leading-relaxed text-sm">{worker.bio}</p>
               </section>
             )}
 
@@ -262,7 +262,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                   {worker.sectors.map((s) => (
                     <span
                       key={s}
-                      className="px-3 py-1.5 rounded-lg border border-[#EAE6DF] bg-white text-sm text-[#706E6A]"
+                      className="px-3 py-1.5 rounded-lg border border-workon-border bg-white text-sm text-workon-gray"
                     >
                       {s}
                     </span>
@@ -289,26 +289,26 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
           {/* Sidebar */}
           <aside className="space-y-4">
             {/* Stats card */}
-            <div className="rounded-xl border border-[#EAE6DF] bg-white shadow-card p-5 space-y-4">
-              <h3 className="font-bold text-sm text-[#706E6A] uppercase tracking-wide">Statistiques</h3>
+            <div className="rounded-xl border border-workon-border bg-white shadow-card p-5 space-y-4">
+              <h3 className="font-bold text-sm text-workon-gray uppercase tracking-wide">Statistiques</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#706E6A]">Missions</span>
+                  <span className="text-sm text-workon-gray">Missions</span>
                   <span className="font-bold">{worker.completedMissions}</span>
                 </div>
                 {worker.ratingAvg > 0 && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-[#706E6A]">Note moyenne</span>
+                    <span className="text-sm text-workon-gray">Note moyenne</span>
                     <span className="font-bold text-yellow-400">{worker.ratingAvg.toFixed(1)} ★</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#706E6A]">Secteurs</span>
+                  <span className="text-sm text-workon-gray">Secteurs</span>
                   <span className="font-bold">{worker.sectors.length || "—"}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#706E6A]">Statut</span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVerified ? "bg-green-500/15 text-green-400 border border-green-500/20" : "bg-[#F0EDE8] text-[#706E6A]"}`}>
+                  <span className="text-sm text-workon-gray">Statut</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVerified ? "bg-green-500/15 text-green-400 border border-green-500/20" : "bg-workon-bg-cream text-workon-gray"}`}>
                     {isVerified ? "Vérifié" : "Nouveau"}
                   </span>
                 </div>
@@ -316,21 +316,21 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
             </div>
 
             {/* CTA */}
-            <div className="rounded-3xl border border-[#134021]/25 bg-[#134021]/10 p-5">
+            <div className="rounded-3xl border border-workon-primary/25 bg-workon-primary/10 p-5">
               <h3 className="font-bold mb-1">Besoin de ce pro ?</h3>
-              <p className="text-xs text-[#706E6A] mb-4 leading-relaxed">
+              <p className="text-xs text-workon-gray mb-4 leading-relaxed">
                 Publiez votre mission et entrez en contact directement.
               </p>
-              <Button className="w-full bg-[#134021] hover:bg-[#0F3319] text-white" asChild>
+              <Button className="w-full bg-workon-primary hover:bg-workon-primary-hover text-white" asChild>
                 <Link href="/register?role=employer">Publier une mission</Link>
               </Button>
-              <p className="text-xs text-[#9C9A96] text-center mt-2">Gratuit pendant le lancement</p>
+              <p className="text-xs text-workon-muted text-center mt-2">Gratuit pendant le lancement</p>
             </div>
 
             {/* Back to list */}
             <Link
               href="/pros"
-              className="block text-center text-sm text-[#706E6A] hover:text-[#1B1A18] transition-colors py-2"
+              className="block text-center text-sm text-workon-gray hover:text-workon-ink transition-colors py-2"
             >
               ← Voir tous les travailleurs
             </Link>
@@ -338,9 +338,9 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <footer className="border-t border-[#EAE6DF] mt-10">
-        <div className="mx-auto max-w-4xl px-4 py-6 flex items-center justify-between text-xs text-[#9C9A96]">
-          <Link href="/" className="hover:text-[#706E6A]">WorkOn</Link>
+      <footer className="border-t border-workon-border mt-10">
+        <div className="mx-auto max-w-4xl px-4 py-6 flex items-center justify-between text-xs text-workon-muted">
+          <Link href="/" className="hover:text-workon-gray">WorkOn</Link>
           <p>Les travailleurs sont des prestataires autonomes.</p>
         </div>
       </footer>
