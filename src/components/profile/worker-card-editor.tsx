@@ -51,6 +51,12 @@ export function WorkerCardEditor() {
   const [draft, setDraft] = useState<CardDraft | null>(null);
   const [initial, setInitial] = useState<CardDraft | null>(null);
   const [newPhotoUrl, setNewPhotoUrl] = useState("");
+  // Hooks for the file-upload path must be declared before any early
+  // return — see Sentry WORKON-FRONTEND-3 (Rendered more hooks than
+  // during the previous render). Previously declared after the
+  // `if (isLoading || !draft) return …` guard below.
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const { data: me, isLoading } = useQuery({
     queryKey: ["me-profile-raw"],
@@ -148,9 +154,7 @@ export function WorkerCardEditor() {
   // R3.2 file-upload path — hits POST /users/me/gallery which saves the
   // file server-side and returns the updated user, so we can reflect the
   // canonical gallery immediately instead of waiting for the manual Save.
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [uploading, setUploading] = useState(false);
-
+  // (fileInputRef + uploading state declared at the top of the component.)
   async function handleFileUpload(file: File) {
     if (!draft) return;
     if (draft.gallery.length >= MAX_GALLERY) {
