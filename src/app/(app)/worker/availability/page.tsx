@@ -28,7 +28,7 @@ export default function AvailabilityPage() {
     mutationFn: () => api.setAvailability({ dayOfWeek: selectedDay, startTime, endTime }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["availability"] });
-      toast.success("Disponibilite ajoutee");
+      toast.success("Disponibilité ajoutée");
     },
     onError: () => toast.error("Erreur lors de l'ajout"),
   });
@@ -37,7 +37,7 @@ export default function AvailabilityPage() {
     mutationFn: () => api.blockTime({ specificDate: blockDate, startTime: "00:00", endTime: "23:59" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["availability"] });
-      toast.success("Date bloquee");
+      toast.success("Date bloquée");
       setBlockDate("");
       setBlockReason("");
       setShowBlockForm(false);
@@ -45,11 +45,17 @@ export default function AvailabilityPage() {
     onError: () => toast.error("Erreur lors du blocage"),
   });
 
-  const slotsByDay = (day: number) => slots?.filter((s) => s.dayOfWeek === day && !s.isBlocked) || [];
+  // Backend returns { recurring, blocked, specific }; the useQuery type is (historically) AvailabilitySlot[].
+  // Accept both shapes to match the existing defense in calendar/page.tsx and availability-editor.tsx.
+  const safeSlots: AvailabilitySlot[] = Array.isArray(slots)
+    ? slots
+    : ((slots as any)?.recurring ?? []);
+  const slotsByDay = (day: number) =>
+    safeSlots.filter((s) => s.dayOfWeek === day && !s.isBlocked);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
-      <h1 className="mb-6 text-2xl font-bold text-workon-ink">Mes disponibilites</h1>
+      <h1 className="mb-6 text-2xl font-bold text-workon-ink">Mes disponibilités</h1>
 
       {/* Day grid */}
       <div className="mb-6 grid grid-cols-7 gap-1">
@@ -67,7 +73,7 @@ export default function AvailabilityPage() {
             >
               <span className="block">{day.slice(0, 3)}</span>
               {count > 0 && (
-                <span className="mt-1 block text-[10px] opacity-70">{count} creneau{count > 1 ? "x" : ""}</span>
+                <span className="mt-1 block text-[10px] opacity-70">{count} créneau{count > 1 ? "x" : ""}</span>
               )}
             </button>
           );
@@ -86,7 +92,7 @@ export default function AvailabilityPage() {
           </div>
         ) : slotsByDay(selectedDay).length === 0 ? (
           <p className="rounded-xl border border-workon-border bg-white shadow-sm p-6 text-center text-sm text-workon-muted">
-            Aucun creneau pour cette journee
+            Aucun créneau pour cette journée
           </p>
         ) : (
           <div className="space-y-2">
@@ -111,11 +117,11 @@ export default function AvailabilityPage() {
       <div className="mb-6 rounded-xl border border-workon-border bg-white shadow-sm p-4">
         <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-workon-ink">
           <Plus className="h-4 w-4" />
-          Ajouter un creneau - {DAYS[selectedDay]}
+          Ajouter un créneau — {DAYS[selectedDay]}
         </h3>
         <div className="flex items-end gap-3">
           <div className="flex-1">
-            <label className="mb-1 block text-xs text-workon-muted">Debut</label>
+            <label className="mb-1 block text-xs text-workon-muted">Début</label>
             <Input
               type="time"
               value={startTime}
@@ -149,7 +155,7 @@ export default function AvailabilityPage() {
           className="flex items-center gap-2 text-sm font-semibold text-workon-ink"
         >
           <Ban className="h-4 w-4 text-red-400" />
-          Bloquer une date specifique
+          Bloquer une date spécifique
         </button>
 
         {showBlockForm && (
