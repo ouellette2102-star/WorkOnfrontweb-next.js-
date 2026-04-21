@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MissionPhotos } from "@/components/mission/mission-photos";
 import { MissionTimeline } from "@/components/mission/mission-timeline";
+import { PriceBreakdownCard } from "@/components/mission/price-breakdown-card";
 import { BoostCheckoutModal } from "@/components/boosts/boost-checkout-modal";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -439,18 +440,30 @@ function PayMissionButton({ missionId, price }: { missionId: string; price: numb
   };
 
   return (
-    <Button
-      onClick={handlePay}
-      disabled={loading}
-      className="w-full bg-workon-primary hover:bg-workon-primary-hover text-white rounded-2xl py-3"
-    >
-      {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-      ) : (
-        <DollarSign className="h-4 w-4 mr-2" />
-      )}
-      Payer la mission ({price > 0 ? `${price.toFixed(2)} $` : "prix à confirmer"})
-    </Button>
+    <PriceBreakdownCard priceDollars={price} testId="mission-pay-breakdown">
+      {({ preview, loading: previewLoading }) => {
+        const totalLabel = preview
+          ? `${preview.total.toFixed(2)} $`
+          : price > 0
+            ? `${price.toFixed(2)} $`
+            : "prix à confirmer";
+        return (
+          <Button
+            onClick={handlePay}
+            disabled={loading || previewLoading || price <= 0}
+            className="w-full bg-workon-primary hover:bg-workon-primary-hover text-white rounded-2xl py-3"
+            data-testid="mission-pay-button"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <DollarSign className="h-4 w-4 mr-2" />
+            )}
+            Payer la mission ({totalLabel})
+          </Button>
+        );
+      }}
+    </PriceBreakdownCard>
   );
 }
 

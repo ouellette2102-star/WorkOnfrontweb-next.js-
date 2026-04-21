@@ -213,11 +213,27 @@ export interface InvoiceResponse {
   paidAt: string | null;
 }
 
+/**
+ * Shape returned by `GET /api/v1/payments/preview`.
+ *
+ * All monetary fields are **dollars** (e.g. `subtotal: 100.0`, `total: 129.98`) —
+ * the backend formats at the boundary so the client can render 1:1.
+ *
+ * `platformFeePercent` is sourced from live config; `tpsRate`/`tvqRate` are
+ * the Quebec statutory rates and are `0` when `taxesEnabled` is false.
+ */
 export interface InvoicePreview {
-  subtotalCents: number;
-  platformFeeCents: number;
-  taxCents: number;
-  totalCents: number;
+  subtotal: number;
+  platformFee: number;
+  platformFeePercent: number;
+  taxes: number;
+  tps: number;
+  tpsRate: number;
+  tvq: number;
+  tvqRate: number;
+  taxesEnabled: boolean;
+  total: number;
+  currency: string;
 }
 
 export interface ContractResponse {
