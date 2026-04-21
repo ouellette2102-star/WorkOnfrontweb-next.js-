@@ -2,7 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { ArrowRight, CreditCard, FileText, Inbox } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
+import { useMode } from "@/contexts/mode-context";
 
 type InvoiceListItem = {
   id: string;
@@ -32,6 +34,7 @@ function formatAmount(value: number, currency: string): string {
 }
 
 export default function InvoicesListPage() {
+  const { mode } = useMode();
   const { data: invoices, isLoading, error } = useQuery({
     queryKey: ["invoices", "mine"],
     queryFn: () => apiFetch<InvoiceListItem[]>("/payments/invoices/mine"),
@@ -61,13 +64,62 @@ export default function InvoicesListPage() {
     <div className="mx-auto max-w-4xl p-6">
       <h1 className="mb-1 text-2xl font-bold text-workon-ink">Mes factures</h1>
       <p className="mb-6 text-sm text-workon-muted">
-        Toutes les factures où vous êtes le payeur.
+        Toutes les factures où tu es le payeur (mode Client).
       </p>
 
       {list.length === 0 ? (
-        <div className="rounded-2xl border border-workon-border bg-white p-8 text-center text-workon-muted">
-          Aucune facture pour le moment.
-        </div>
+        mode === "pro" ? (
+          // In Pro mode, the user earns — they are never the payer. Route
+          // them to /earnings instead of showing a dead-end empty state.
+          <div
+            className="rounded-2xl border border-workon-primary/20 bg-workon-primary/5 p-6"
+            data-testid="invoices-pro-redirect"
+          >
+            <div className="flex items-start gap-3">
+              <CreditCard className="mt-0.5 h-6 w-6 flex-shrink-0 text-workon-primary" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-workon-ink">
+                  Tu es en mode Pro — tes factures vivent dans{" "}
+                  <em>Mes revenus</em>.
+                </p>
+                <p className="mt-1 text-xs text-workon-muted">
+                  Cette page recense uniquement les missions que tu paies en
+                  tant que client. Pour suivre ce que tu gagnes, consulte tes
+                  revenus.
+                </p>
+                <Link
+                  href="/earnings"
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-workon-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-workon-primary-hover"
+                >
+                  Voir mes revenus <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="flex flex-col items-center gap-3 rounded-2xl border border-workon-border bg-white p-8 text-center"
+            data-testid="invoices-empty"
+          >
+            <Inbox className="h-8 w-8 text-workon-muted" />
+            <div>
+              <p className="text-sm font-semibold text-workon-ink">
+                Aucune facture pour le moment
+              </p>
+              <p className="mt-1 text-xs text-workon-muted">
+                Une facture sera créée ici dès qu&apos;un travailleur
+                complétera une de tes missions.
+              </p>
+            </div>
+            <Link
+              href="/missions/mine"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-workon-primary hover:underline"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Voir mes missions
+            </Link>
+          </div>
+        )
       ) : (
         <div className="space-y-3">
           {list.map((invoice) => {

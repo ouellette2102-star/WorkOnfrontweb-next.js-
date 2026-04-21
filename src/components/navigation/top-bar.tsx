@@ -93,12 +93,41 @@ export function TopBar() {
   return (
     <>
       <header className="sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-workon-border/50 bg-white/70 backdrop-blur-xl">
-        {/* Logo */}
-        <Link href="/home" className="flex items-center gap-0.5 text-xl font-bold font-heading">
-          <span className="text-[#1B1A18]">Work</span>
-          <MapPin className="h-5 w-5 text-workon-accent" />
-          <span className="text-[#1B1A18]">n</span>
-        </Link>
+        {/* Logo + always-visible mode pill so users know which side of the
+            marketplace they are looking at — the biggest source of confusion
+            before this change was discovering the Pro/Client toggle buried
+            inside the hamburger menu. */}
+        <div className="flex items-center gap-2 min-w-0">
+          <Link
+            href="/home"
+            className="flex items-center gap-0.5 text-xl font-bold font-heading"
+          >
+            <span className="text-[#1B1A18]">Work</span>
+            <MapPin className="h-5 w-5 text-workon-accent" />
+            <span className="text-[#1B1A18]">n</span>
+          </Link>
+          {user && (
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label={`Mode actuel : ${currentRoleLabel}. Cliquer pour changer.`}
+              data-testid="mode-pill"
+              data-mode={mode}
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide transition-colors ${
+                mode === "pro"
+                  ? "border-workon-primary/30 bg-workon-primary/10 text-workon-primary hover:bg-workon-primary/15"
+                  : "border-workon-accent/30 bg-workon-accent/10 text-workon-accent hover:bg-workon-accent/15"
+              }`}
+            >
+              {mode === "pro" ? (
+                <Briefcase className="h-3 w-3" />
+              ) : (
+                <Users className="h-3 w-3" />
+              )}
+              {currentRoleLabel}
+            </button>
+          )}
+        </div>
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
