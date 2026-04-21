@@ -10,6 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Loader2, X, Zap, Rocket, ShieldCheck, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TaxDisclaimer } from "@/components/ui/tax-disclaimer";
 import { toast } from "sonner";
 import { api, type BoostType } from "@/lib/api-client";
 
@@ -132,6 +133,11 @@ export function BoostCheckoutModal({
               <p className="text-sm text-workon-gray">
                 {(meta.priceCents / 100).toFixed(2)} $ CAD
               </p>
+              <TaxDisclaimer
+                preTaxAmount={meta.priceCents / 100}
+                compact
+                className="mt-0.5 block"
+              />
             </div>
           </div>
           <button

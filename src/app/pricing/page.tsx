@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, Loader2 } from "lucide-react";
 import { MarketingHeader } from "@/components/navigation/marketing-header";
+import { TaxDisclaimer } from "@/components/ui/tax-disclaimer";
 import { api } from "@/lib/api-client";
 import { toast } from "sonner";
 
@@ -45,6 +46,7 @@ function useCheckout() {
 function PlanCard({
   name,
   price,
+  priceAmount,
   tagline,
   features,
   cta,
@@ -54,7 +56,10 @@ function PlanCard({
   footnote,
 }: {
   name: string;
+  /** Display price, e.g. "19 $" or "0 $". Tax disclaimer is hidden for "0 $". */
   price: string;
+  /** Decimal pre-tax amount (e.g. 19) used to compute the TTC hint. Optional. */
+  priceAmount?: number;
   tagline: string;
   features: string[];
   cta: string;
@@ -82,6 +87,9 @@ function PlanCard({
       <div className="mt-4">
         <p className="text-4xl font-bold text-workon-ink">{price}</p>
         <p className="text-sm text-workon-gray mt-1">{tagline}</p>
+        {priceAmount !== undefined && priceAmount > 0 ? (
+          <TaxDisclaimer preTaxAmount={priceAmount} className="mt-1 block" />
+        ) : null}
       </div>
       <ul className="mt-5 space-y-2.5 text-sm text-workon-ink flex-1">
         {features.map((f) => (
@@ -156,6 +164,7 @@ export default function PricingPage() {
           <PlanCard
             name="Worker Pro"
             price="19 $"
+            priceAmount={19}
             tagline="/mois CAD"
             features={[
               "Badge vérifié",
@@ -173,6 +182,7 @@ export default function PricingPage() {
           <PlanCard
             name="Client Pro"
             price="39 $"
+            priceAmount={39}
             tagline="/mois CAD"
             features={[
               "Missions illimitées",
@@ -191,6 +201,7 @@ export default function PricingPage() {
           <PlanCard
             name="Client Business"
             price="99 $"
+            priceAmount={99}
             tagline="/mois CAD"
             features={[
               "Tout du Client Pro",
@@ -214,6 +225,7 @@ export default function PricingPage() {
             <div className="rounded-2xl bg-white border border-workon-border p-5 shadow-card">
               <p className="text-sm text-workon-gray">Mission urgente</p>
               <p className="text-2xl font-bold text-workon-ink mt-1">9 $</p>
+              <TaxDisclaimer preTaxAmount={9} className="mt-1 block" />
               <p className="text-xs text-workon-muted mt-2">
                 Push prioritaire aux pros à proximité, badge &laquo;&nbsp;urgent&nbsp;&raquo;.
               </p>
@@ -221,6 +233,7 @@ export default function PricingPage() {
             <div className="rounded-2xl bg-white border border-workon-border p-5 shadow-card">
               <p className="text-sm text-workon-gray">Top visibilité 48 h</p>
               <p className="text-2xl font-bold text-workon-ink mt-1">14 $</p>
+              <TaxDisclaimer preTaxAmount={14} className="mt-1 block" />
               <p className="text-xs text-workon-muted mt-2">
                 Profil ou mission en tête de liste et carte pendant 48 h.
               </p>
@@ -228,6 +241,7 @@ export default function PricingPage() {
             <div className="rounded-2xl bg-white border border-workon-border p-5 shadow-card">
               <p className="text-sm text-workon-gray">Vérification express</p>
               <p className="text-2xl font-bold text-workon-ink mt-1">19 $</p>
+              <TaxDisclaimer preTaxAmount={19} className="mt-1 block" />
               <p className="text-xs text-workon-muted mt-2">
                 Vérification identité sous 24 h (au lieu de 72 h).
               </p>

@@ -122,8 +122,14 @@ export function WorkerCard({ worker, className, hideActions = false }: WorkerCar
                 </span>
               ))}
               {(worker.hourlyRate ?? 0) > 0 && (
-                <span className="inline-flex items-center rounded-full bg-workon-primary/10 px-2.5 py-1 text-[11px] font-semibold text-workon-primary">
+                <span
+                  className="inline-flex items-center rounded-full bg-workon-primary/10 px-2.5 py-1 text-[11px] font-semibold text-workon-primary"
+                  title="Tarif horaire avant taxes TPS/TVQ"
+                >
                   À partir de {worker.hourlyRate} $/h
+                  <span className="ml-1 text-[9px] font-normal text-workon-primary/70">
+                    (avant taxes)
+                  </span>
                 </span>
               )}
             </div>

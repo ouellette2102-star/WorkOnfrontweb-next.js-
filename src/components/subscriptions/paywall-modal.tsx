@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Crown, Loader2, X } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { TaxDisclaimer } from "@/components/ui/tax-disclaimer";
 import { toast } from "sonner";
 
 type PaidPlan = "CLIENT_PRO" | "WORKER_PRO" | "CLIENT_BUSINESS";
@@ -99,6 +100,7 @@ export function PaywallModal({
             <span className="text-2xl font-bold text-workon-ink">39 $</span>
             <span className="text-workon-gray"> / mois CAD</span>
           </p>
+          <TaxDisclaimer preTaxAmount={39} className="mt-1 block" />
           <p className="text-xs text-workon-muted mt-1">
             Annulable à tout moment. Facture mensuelle via Stripe.
           </p>

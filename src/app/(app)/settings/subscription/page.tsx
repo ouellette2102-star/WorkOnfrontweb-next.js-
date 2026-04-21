@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, Crown, AlertTriangle, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { BoostCheckoutModal } from "@/components/boosts/boost-checkout-modal";
+import { TaxDisclaimer } from "@/components/ui/tax-disclaimer";
 
 const PLAN_LABEL: Record<string, string> = {
   FREE: "Gratuit",
@@ -244,6 +245,7 @@ export default function SubscriptionSettingsPage() {
             <p className="text-sm font-semibold text-workon-ink">
               Vérification express — 19 $
             </p>
+            <TaxDisclaimer preTaxAmount={19} className="mt-0.5 block" />
             <p className="text-xs text-workon-gray mt-1">
               Ton dossier KYC (ID + téléphone) traité en moins de 24h. Badge
               « vérifié » accéléré.
