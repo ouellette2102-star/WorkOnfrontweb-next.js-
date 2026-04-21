@@ -9,12 +9,25 @@ import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Shield, MapPin, Loader2, CalendarDays, ArrowLeft, MessageCircle, ArrowRightLeft } from "lucide-react";
+import { Star, Shield, MapPin, Loader2, CalendarDays, ArrowLeft, MessageCircle, ArrowRightLeft, Clock } from "lucide-react";
 import { BookingRecapCard } from "@/components/mission/booking-recap-card";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+
+const DAY_LABELS_SHORT = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+// Given dayOfWeek 0-6 (Sun-Sat), return the ISO date (YYYY-MM-DD) of the next
+// occurrence from today (never today, always strictly in the future) so a
+// client-initiated booking always lands on a confirmable slot.
+function nextDateForDayOfWeek(dow: number): string {
+  const today = new Date();
+  const diff = ((dow - today.getDay() + 7) % 7) || 7;
+  const next = new Date(today);
+  next.setDate(today.getDate() + diff);
+  return next.toISOString().slice(0, 10);
+}
 
 export default function ReservePage() {
   const { workerId } = useParams<{ workerId: string }>();
@@ -220,6 +233,50 @@ export default function ReservePage() {
           </div>
         </div>
 
+        {/* Availability picker — consumes worker.availability.recurring from /public/workers/by-id */}
+        <div className="rounded-xl border border-workon-border bg-white p-5 space-y-3 shadow-sm">
+          <h2 className="font-semibold text-workon-ink flex items-center gap-2">
+            <Clock className="h-4 w-4 text-workon-primary" />
+            Créneaux disponibles
+          </h2>
+          {worker.availability?.recurring?.length ? (
+            <>
+              <p className="text-xs text-workon-muted">
+                Cliquez un créneau pour le pré-remplir. Date et heure restent modifiables.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {worker.availability.recurring.map((slot, i) => {
+                  const date = nextDateForDayOfWeek(slot.dayOfWeek);
+                  const active = scheduledDate === date && scheduledTime === slot.startTime;
+                  return (
+                    <button
+                      key={`${slot.dayOfWeek}-${slot.startTime}-${i}`}
+                      type="button"
+                      onClick={() => {
+                        setScheduledDate(date);
+                        setScheduledTime(slot.startTime);
+                      }}
+                      className={cn(
+                        "rounded-full border px-3 py-1.5 text-xs font-medium transition",
+                        active
+                          ? "border-workon-primary bg-workon-primary text-white"
+                          : "border-workon-border bg-workon-bg text-workon-ink hover:border-workon-primary",
+                      )}
+                    >
+                      {DAY_LABELS_SHORT[slot.dayOfWeek]} · {slot.startTime}–{slot.endTime}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-workon-muted">
+              Ce professionnel n&apos;a pas encore configuré ses disponibilités.
+              Utilisez &quot;Envoyer une demande directe&quot; ci-dessous pour le contacter.
+            </p>
+          )}
+        </div>
+
         {/* Booking form */}
         <div className="rounded-xl border border-workon-border bg-white p-5 space-y-5 shadow-sm">
           <h2 className="font-semibold text-workon-ink flex items-center gap-2">
@@ -294,15 +351,6 @@ export default function ReservePage() {
               className="border-workon-border bg-workon-bg text-workon-ink placeholder:text-workon-muted/60 focus:ring-workon-primary/30 focus:border-workon-primary"
             />
           </div>
-        </div>
-
-        {/* Availability warning */}
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-          <p className="font-medium">Note</p>
-          <p className="text-xs mt-1">
-            Si ce professionnel n&apos;a pas configuré ses disponibilités, la réservation sera refusée.
-            Utilisez &quot;Envoyer un message direct&quot; ci-dessous pour le contacter sans réservation.
-          </p>
         </div>
 
         {/* Booking recap — price breakdown + contract + escrow notice */}
