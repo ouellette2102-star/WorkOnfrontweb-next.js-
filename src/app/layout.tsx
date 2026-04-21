@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Manrope, Bricolage_Grotesque } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "sonner";
@@ -9,6 +9,19 @@ const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
+});
+
+/**
+ * Bricolage Grotesque — free open-source display grotesque that stands
+ * in for Cabinet Grotesk (which the `.font-heading` class referenced but
+ * was never actually loaded, so headings quietly fell back to Manrope).
+ * Variable font so we get 400-800 without multiple weight requests.
+ */
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "600", "700", "800"],
 });
 
 const SITE_URL =
@@ -61,7 +74,7 @@ export default function RootLayout({
   return (
     <html lang="fr-CA">
       <body
-        className={`${manrope.variable} antialiased bg-background text-foreground`}
+        className={`${manrope.variable} ${bricolage.variable} antialiased bg-background text-foreground`}
       >
         <Toaster position="top-right" richColors closeButton theme="light" />
         <Providers>{children}</Providers>
