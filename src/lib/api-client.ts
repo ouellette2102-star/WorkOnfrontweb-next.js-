@@ -790,8 +790,37 @@ export const api = {
     apiFetch<DisputeResponse>("/disputes", { method: "POST", body: JSON.stringify(data) }),
   getDispute: (id: string) => apiFetch<DisputeResponse>(`/disputes/${id}`),
   getDisputeForMission: (missionId: string) => apiFetch<DisputeResponse>(`/disputes/mission/${missionId}`),
-  addDisputeEvidence: (disputeId: string, data: FormData) =>
-    apiFetch<unknown>(`/disputes/${disputeId}/evidence`, { method: "POST", body: data }),
+  /**
+   * Upload a photo / PDF to a dispute as evidence. Pairs with
+   * `POST /disputes/:id/evidence/upload` on the backend which
+   * multer-decodes the `file` field, persists the file under
+   * `uploads/disputes/<id>/`, and creates a `DisputeEvidence` row
+   * whose `url` points at the served static asset.
+   *
+   * Use `addDisputeTextEvidence` below for plain-text notes.
+   */
+  addDisputeEvidence: (
+    disputeId: string,
+    file: File,
+    opts?: { description?: string; type?: string },
+  ) => {
+    const body = new FormData();
+    body.append("file", file);
+    if (opts?.description) body.append("description", opts.description);
+    if (opts?.type) body.append("type", opts.type);
+    return apiFetch<{
+      id: string;
+      disputeId: string;
+      uploadedBy: string;
+      type: string;
+      url: string;
+      description: string | null;
+      createdAt: string;
+    }>(`/disputes/${disputeId}/evidence/upload`, {
+      method: "POST",
+      body,
+    });
+  },
   resolveDispute: (id: string, data: { resolution: string }) =>
     apiFetch<DisputeResponse>(`/disputes/${id}/resolve`, { method: "PATCH", body: JSON.stringify(data) }),
 

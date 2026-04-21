@@ -16,6 +16,8 @@ import {
   Gavel,
   Image as ImageIcon,
   ExternalLink,
+  Upload,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -349,13 +351,16 @@ function AddEvidenceForm({
 }) {
   const [type, setType] = useState(EVIDENCE_TYPES[0].value);
   const [content, setContent] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const requiresFile = type === "photo" || type === "document";
 
-  const submit = useMutation({
+  const textSubmit = useMutation({
     mutationFn: () =>
       api.addDisputeTextEvidence(disputeId, { type, content: content.trim() }),
     onSuccess: () => {
       toast.success("Preuve ajoutée");
       setContent("");
+      setFile(null);
       onAdded();
     },
     onError: (err) => {
@@ -365,7 +370,31 @@ function AddEvidenceForm({
     },
   });
 
-  const canSubmit = content.trim().length >= 3 && !submit.isPending;
+  const fileSubmit = useMutation({
+    mutationFn: () => {
+      if (!file) throw new Error("Aucun fichier sélectionné");
+      return api.addDisputeEvidence(disputeId, file, {
+        type,
+        description: content.trim() || file.name,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Fichier envoyé");
+      setContent("");
+      setFile(null);
+      onAdded();
+    },
+    onError: (err) => {
+      toast.error(
+        err instanceof Error ? err.message : "Impossible d'envoyer le fichier",
+      );
+    },
+  });
+
+  const submit = requiresFile ? fileSubmit : textSubmit;
+  const canSubmit = requiresFile
+    ? !!file && !fileSubmit.isPending && !textSubmit.isPending
+    : content.trim().length >= 3 && !textSubmit.isPending;
 
   return (
     <form
@@ -393,16 +422,84 @@ function AddEvidenceForm({
         </select>
       </div>
 
+      {requiresFile && (
+        <div>
+          <label className="mb-1 block text-xs font-medium text-workon-muted">
+            {type === "photo" ? "Photo (JPEG/PNG/WebP)" : "Document (PDF, image)"}
+          </label>
+          {file ? (
+            <div
+              className="flex items-center gap-3 rounded-lg border border-workon-border bg-workon-bg px-3 py-2"
+              data-testid="evidence-file-preview"
+            >
+              {file.type.startsWith("image/") ? (
+                <ImageIcon className="h-5 w-5 shrink-0 text-workon-primary" />
+              ) : (
+                <FileText className="h-5 w-5 shrink-0 text-workon-muted" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm text-workon-ink">{file.name}</p>
+                <p className="text-[10px] text-workon-muted">
+                  {(file.size / 1024).toFixed(0)} KB · {file.type || "unknown"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFile(null)}
+                aria-label="Retirer le fichier"
+                className="rounded-full p-1 text-workon-muted hover:bg-white hover:text-workon-ink"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <label
+              className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed border-workon-border bg-workon-bg px-3 py-5 text-center text-xs text-workon-muted transition-colors hover:border-workon-primary hover:text-workon-primary"
+              data-testid="evidence-file-picker"
+            >
+              <Upload className="h-4 w-4" />
+              <span className="font-medium">Choisir un fichier</span>
+              <span className="text-[10px]">
+                Max 10 MB · JPEG, PNG, WebP, GIF, PDF
+              </span>
+              <input
+                type="file"
+                className="sr-only"
+                accept={
+                  type === "photo"
+                    ? "image/jpeg,image/png,image/webp,image/gif"
+                    : "image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                }
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  if (f && f.size > 10 * 1024 * 1024) {
+                    toast.error("Fichier trop volumineux (max 10 MB)");
+                    return;
+                  }
+                  setFile(f);
+                }}
+              />
+            </label>
+          )}
+        </div>
+      )}
+
       <div>
         <label className="mb-1 block text-xs font-medium text-workon-muted">
-          Décrivez votre preuve
+          {requiresFile
+            ? "Description (optionnelle)"
+            : "Décrivez votre preuve"}
         </label>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={3}
           maxLength={2000}
-          placeholder="Ex. le travail n'a pas été livré selon les spécifications de la mission"
+          placeholder={
+            requiresFile
+              ? "Ex. photo avant travaux, pièce jointe PDF de la facture…"
+              : "Ex. le travail n'a pas été livré selon les spécifications de la mission"
+          }
           className="w-full resize-none rounded-lg border border-workon-border bg-white px-3 py-2 text-sm text-workon-ink placeholder:text-workon-muted focus:border-workon-primary focus:outline-none focus:ring-1 focus:ring-workon-primary-ring"
           data-testid="evidence-content"
         />
