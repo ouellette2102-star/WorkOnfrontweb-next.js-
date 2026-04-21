@@ -97,6 +97,15 @@ const typeConfig: Record<string, IconStyle> = {
   payout_failed:          { icon: CreditCard, color: "text-workon-accent", bgColor: "bg-workon-accent-subtle" },
   lead_delivered:         { icon: Briefcase, color: "text-workon-primary", bgColor: "bg-workon-primary-subtle" },
   swipe_match:            { icon: Heart, color: "text-pink-600", bgColor: "bg-pink-50" },
+
+  // Invoice-review loop (post-payment bilateral acceptance + escrow).
+  // Before this file change these 4 types fell back to the grey Bell,
+  // making the most important action-required notifications visually
+  // indistinguishable from marketing.
+  mission_completed_pay_now: { icon: CreditCard, color: "text-amber-600", bgColor: "bg-amber-50" },
+  invoice_review_pending:    { icon: FileSignature, color: "text-amber-600", bgColor: "bg-amber-50" },
+  invoice_disputed:          { icon: Shield, color: "text-red-600", bgColor: "bg-red-50" },
+  escrow_released:           { icon: CreditCard, color: "text-emerald-600", bgColor: "bg-emerald-50" },
 };
 
 function getConfig(type: string): IconStyle {
@@ -135,13 +144,23 @@ function pickString(p: Record<string, unknown>, key: string): string | null {
 function resolveActionUrl(n: Notification): string {
   const p = getPayload(n);
 
-  const explicit = pickString(p, "link") ?? pickString(p, "actionUrl");
+  // Explicit URL fields always win. `reviewUrl` is what the invoice
+  // flow emits on the backend (see invoice.service.ts createLocalNotification
+  // calls for invoice_review_pending / invoice_disputed / escrow_released).
+  // Without this line the 4 invoice-flow notifications all fell through to
+  // the default `/home` cul-de-sac even though they had a perfectly valid
+  // deep-link in their payload.
+  const explicit =
+    pickString(p, "link") ??
+    pickString(p, "actionUrl") ??
+    pickString(p, "reviewUrl");
   if (explicit) return explicit;
 
   const contractId = pickString(p, "contractId");
   const missionId = pickString(p, "missionId");
   const conversationId = pickString(p, "conversationId");
   const offerId = pickString(p, "offerId");
+  const invoiceId = pickString(p, "invoiceId");
 
   switch (n.type) {
     case "contract_received":
@@ -158,6 +177,7 @@ function resolveActionUrl(n: Notification): string {
     case "mission_accepted":
     case "mission_completed":
     case "mission_cancelled":
+    case "mission_completed_pay_now":
     case "MISSION_OFFER_ACCEPTED":
     case "MISSION_STARTED":
     case "MISSION_COMPLETED":
@@ -176,7 +196,24 @@ function resolveActionUrl(n: Notification): string {
     case "REVIEW_REMINDER":
       return "/reviews";
 
+    // Invoice-review loop (post-escrow bilateral acceptance).
+    // BE always ships `invoiceId` + `reviewUrl` in the payload; the
+    // `reviewUrl` short-circuit above handles the happy path. These
+    // case arms are the safety net when payload shape drifts.
+    case "invoice_review_pending":
+    case "invoice_disputed":
+      return invoiceId ? `/invoices/${invoiceId}/review` : "/invoices";
+
+    case "escrow_released":
+      // Worker-side confirmation. Land them on /earnings where the
+      // payout now shows as "Versé" — more useful than the invoice page.
+      return "/earnings";
+
     case "payout_failed":
+      // Always a Stripe Connect issue on the worker side — the action
+      // they need to take is in /worker/payments, not /earnings.
+      return "/worker/payments";
+
     case "PAYMENT_FAILED":
     case "PAYMENT_RECEIVED":
     case "PAYMENT_SENT":
