@@ -81,6 +81,15 @@ export interface PublicMission {
   priceRange: string;
   status: string;
   createdAt: string;
+  /**
+   * Boost flags — populated server-side by `PublicService.getPublicMissions`.
+   * `isUrgent` is only true while the URGENT_9 boost window is still open
+   * (BE normalises expired boosts). Older BE deployments may omit these
+   * fields entirely, so they are optional on the client.
+   */
+  isUrgent?: boolean;
+  urgentUntil?: string | null;
+  boostedUntil?: string | null;
 }
 
 export interface PublicMissionsResponse {

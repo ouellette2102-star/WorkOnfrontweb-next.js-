@@ -861,25 +861,36 @@ export default function MissionDetailPage() {
 
         {/* Owner: boost CTAs (only while mission is open or assigned) */}
         {isOwner && ["open", "assigned"].includes(mission.status) && (
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setBoostType("URGENT_9")}
-              className="rounded-2xl border-amber-300 text-amber-700 hover:bg-amber-50"
-            >
-              <Zap className="h-4 w-4 mr-1.5" />
-              Urgent 9 $
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setBoostType("TOP_48H_14")}
-              className="rounded-2xl border-blue-300 text-blue-700 hover:bg-blue-50"
-            >
-              <Rocket className="h-4 w-4 mr-1.5" />
-              Top 48h 14 $
-            </Button>
+          <div className="space-y-1 pt-1">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setBoostType("URGENT_9")}
+                className="rounded-2xl border-amber-300 text-amber-700 hover:bg-amber-50"
+              >
+                <Zap className="h-4 w-4 mr-1.5" />
+                Urgent 9 $
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setBoostType("TOP_48H_14")}
+                className="rounded-2xl border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <Rocket className="h-4 w-4 mr-1.5" />
+                Top 48h 14 $
+              </Button>
+            </div>
+            <div className="text-right">
+              <Link
+                href="/boosts"
+                className="text-[11px] font-medium text-workon-primary hover:underline"
+                data-testid="link-my-boosts-from-mission"
+              >
+                Voir mes boosts →
+              </Link>
+            </div>
           </div>
         )}
 
