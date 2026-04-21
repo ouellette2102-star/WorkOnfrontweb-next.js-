@@ -74,9 +74,15 @@ export function MissionCard({ mission }: MissionCardProps) {
           </div>
 
           <div className="flex items-center gap-3 text-xs text-workon-muted">
-            <span className="flex items-center gap-1 font-semibold text-workon-ink">
+            <span
+              className="flex items-center gap-1 font-semibold text-workon-ink"
+              title="Prix affiché avant taxes TPS/TVQ (5 % + 9,975 %)"
+            >
               <DollarSign className="h-3.5 w-3.5 text-emerald-600" />
               {mission.price}$
+              <span className="ml-0.5 text-[9px] font-normal text-workon-muted">
+                avant taxes
+              </span>
             </span>
             <span className="flex items-center gap-1">
               <MapPin className="h-3 w-3" />

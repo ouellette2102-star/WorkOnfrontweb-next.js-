@@ -20,6 +20,7 @@ import {
   type BoostStatus,
   type BoostType,
 } from "@/lib/api-client";
+import { TaxDisclaimer } from "@/components/ui/tax-disclaimer";
 
 /**
  * /boosts — user-facing history of one-shot paid boosts.
@@ -390,6 +391,7 @@ function UpsellCard({
           </span>
           <span className="text-sm font-bold text-workon-ink">{price}</span>
         </div>
+        <TaxDisclaimer compact className="mt-0.5 block" />
         <p className="mt-1 text-[11px] text-workon-muted">{meta.blurb}</p>
       </div>
       <span className="mt-3 inline-flex items-center gap-0.5 text-xs font-medium text-workon-primary">
