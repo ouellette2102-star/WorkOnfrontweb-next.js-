@@ -132,6 +132,10 @@ export interface WorkerProfile {
   portfolioPhotos?: string[];
   /** Trust tier from backend — aligns with LocalUser.trustTier Prisma enum. */
   trustTier?: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
+  /** Recurring weekly availability the /reserve picker offers (backend may omit). */
+  availability?: {
+    recurring: { dayOfWeek: number; startTime: string; endTime: string }[];
+  };
 }
 
 export interface ConversationItem {
