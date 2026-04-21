@@ -25,8 +25,8 @@ export default async function OnboardingPage() {
             <p className="text-sm uppercase tracking-[0.4em] text-workon-accent">Onboarding WorkOn</p>
             <h1 className="mt-4 text-4xl font-semibold font-heading md:text-5xl">Choisis ton profil</h1>
             <p className="mt-3 text-workon-muted">
-              Cette étape synchronise ton compte Clerk avec les outils WorkOn. Tu pourras modifier ces informations plus
-              tard depuis ton profil.
+              Dis-nous qui tu es pour qu’on adapte l’expérience — tu pourras modifier ces informations plus tard
+              depuis ton profil.
             </p>
           </div>
         </header>

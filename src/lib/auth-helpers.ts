@@ -1,8 +1,6 @@
 /**
  * Auth helpers for server components.
  * Delegates to server-auth.ts (JWT cookie-based).
- *
- * Legacy Clerk version archived at: src/legacy/clerk/auth-helpers-clerk.ts
  */
 
 import {

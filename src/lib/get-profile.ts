@@ -1,8 +1,6 @@
 /**
  * Server-side profile fetching for WorkOn.
- * Uses JWT cookie auth instead of Clerk.
- *
- * Legacy Clerk version archived at: src/legacy/clerk/get-profile-clerk.ts
+ * Uses the JWT cookie issued by LocalAuthService.
  */
 
 import { getServerToken } from "./server-auth";
@@ -20,7 +18,7 @@ const API_URL =
 
 /**
  * Get the current user profile from the backend (server-side).
- * Uses the JWT cookie token instead of Clerk getToken().
+ * Reads the JWT cookie directly (no Passport / no Clerk indirection).
  */
 export async function getCurrentProfile(
   _userId?: string | undefined | null,
