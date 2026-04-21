@@ -867,9 +867,89 @@ export default function MissionDetailPage() {
           <TimeLogButtons missionId={id} />
         )}
 
-        {/* Employer: pay completed mission */}
+        {/* Employer: pay completed mission.
+            Prefix with a contextual banner so the owner understands the
+            mission is waiting on *them* (the worker already delivered) —
+            aligns with the matching "awaiting payment" card the worker
+            sees on the other side of the transaction. */}
         {isOwner && mission.status === "completed" && (
-          <PayMissionButton missionId={id} price={mission.price} />
+          <>
+            <div
+              className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800"
+              data-testid="employer-pay-banner"
+            >
+              <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <span>
+                Le travailleur a terminé la mission. Paie pour libérer les fonds
+                et lui permettre de recevoir son versement.
+              </span>
+            </div>
+            <PayMissionButton missionId={id} price={mission.price} />
+          </>
+        )}
+
+        {/* Worker: mission completed, waiting on the employer.
+            Before this, a worker who hit "Terminer" saw the Pay button vanish
+            and nothing replace it — no trace of the pending payment. This
+            card explains the state and points to /earnings where the pending
+            amount is tracked. */}
+        {isAssigned && mission.status === "completed" && (
+          <div
+            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4"
+            data-testid="worker-awaiting-payment"
+          >
+            <div className="flex items-start gap-2">
+              <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-emerald-900">
+                  Mission complétée — en attente du paiement client
+                </p>
+                <p className="mt-1 text-xs text-emerald-800">
+                  Tu recevras{" "}
+                  <strong className="font-semibold">
+                    {(mission.price * 0.85).toFixed(2)} $
+                  </strong>{" "}
+                  (après commission WorkOn 15 %) dès que le client paie la
+                  facture.
+                </p>
+                <Link
+                  href="/earnings"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline"
+                  data-testid="link-earnings-from-mission"
+                >
+                  Voir mes revenus →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Worker: mission PAID — celebratory confirmation and nudge to
+            /earnings so they see the transaction landed. */}
+        {isAssigned && mission.status === "paid" && (
+          <div
+            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4"
+            data-testid="worker-payment-received"
+          >
+            <div className="flex items-start gap-2">
+              <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-emerald-900">
+                  Paiement reçu ✓
+                </p>
+                <p className="mt-1 text-xs text-emerald-800">
+                  Le client a réglé cette mission. Ton versement apparaît dans
+                  tes revenus.
+                </p>
+                <Link
+                  href="/earnings"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline"
+                >
+                  Voir mes revenus →
+                </Link>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Owner: boost CTAs (only while mission is open or assigned) */}
