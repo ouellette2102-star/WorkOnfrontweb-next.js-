@@ -203,14 +203,52 @@ export interface WorkerPayment {
 
 export interface InvoiceResponse {
   id: string;
-  localMissionId: string;
-  subtotalCents: number;
-  platformFeeCents: number;
-  taxCents: number;
-  totalCents: number;
+  invoiceNumber: string | null;
+  missionId: string | null;
+  // Monetary fields are in DOLLARS (backend formats at the boundary)
+  subtotal: number;
+  platformFee: number;
+  taxes: number;
+  tps: number;
+  tvq: number;
+  total: number;
+  currency: string;
   status: "PENDING" | "PROCESSING" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
+  description: string | null;
   createdAt: string;
   paidAt: string | null;
+  supplier: {
+    name: string | null;
+    address: string | null;
+    gstNumber: string | null;
+    qstNumber: string | null;
+  };
+  client: {
+    name: string | null;
+    address: string | null;
+  };
+  paymentTerms: string | null;
+  review: {
+    clientAcceptedAt: string | null;
+    workerAcceptedAt: string | null;
+    clientDisputedAt: string | null;
+    disputeReason: string | null;
+    escrowReleasedAt: string | null;
+  };
+}
+
+export interface InvoiceReviewState {
+  invoiceId: string;
+  invoiceNumber: string | null;
+  status: string;
+  viewerRole: "client" | "worker";
+  clientAcceptedAt: string | null;
+  workerAcceptedAt: string | null;
+  clientDisputedAt: string | null;
+  disputeReason: string | null;
+  escrowReleasedAt: string | null;
+  canAccept: boolean;
+  canDispute: boolean;
 }
 
 /**
@@ -761,6 +799,17 @@ export const api = {
   getMyInvoices: () => apiFetch<InvoiceResponse[]>("/payments/invoices/mine"),
   previewInvoice: (priceCents: number) =>
     apiFetch<InvoicePreview>(`/payments/preview?priceCents=${priceCents}`),
+
+  // Invoice bilateral acceptance (Issue #250)
+  getInvoiceReviewState: (id: string) =>
+    apiFetch<InvoiceReviewState>(`/payments/invoice/${id}/review-state`),
+  acceptInvoice: (id: string) =>
+    apiFetch<InvoiceReviewState>(`/payments/invoice/${id}/accept`, { method: "POST" }),
+  disputeInvoice: (id: string, reason: string) =>
+    apiFetch<InvoiceReviewState>(`/payments/invoice/${id}/dispute`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
 
   // Notifications
   getNotifications: (unreadOnly?: boolean) =>
