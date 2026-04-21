@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { MapPin, Clock, ArrowRight, ListFilter } from "lucide-react";
+import { MapPin, Clock, ArrowRight, ListFilter, Zap, Rocket } from "lucide-react";
 import {
   getPublicMissions,
   getSectorStats,
@@ -106,19 +106,51 @@ export default async function MissionsFeedPage({
 
 function MissionCard({ mission }: { mission: PublicMission }) {
   const createdAgo = timeAgo(new Date(mission.createdAt));
+  const isUrgent = !!mission.isUrgent;
+  const isBoosted =
+    !!mission.boostedUntil &&
+    new Date(mission.boostedUntil).getTime() > Date.now();
   return (
     <li
-      className="group flex flex-col overflow-hidden rounded-2xl border border-workon-border bg-white transition-colors hover:border-workon-primary/50"
+      className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition-colors ${
+        isUrgent
+          ? "border-amber-300 hover:border-amber-500"
+          : isBoosted
+            ? "border-blue-300 hover:border-blue-500"
+            : "border-workon-border hover:border-workon-primary/50"
+      }`}
       data-testid="mission-card"
+      data-urgent={isUrgent ? "true" : undefined}
+      data-boosted={isBoosted ? "true" : undefined}
     >
       <Link
         href={`/missions/${mission.id}`}
         className="flex h-full flex-col p-4"
       >
-        <div className="mb-2 flex items-center gap-2">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-full bg-workon-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-workon-primary">
             {mission.category}
           </span>
+          {isUrgent && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700"
+              data-testid="mission-urgent-badge"
+              title="Mission urgente — 24h"
+            >
+              <Zap className="h-3 w-3" />
+              Urgent
+            </span>
+          )}
+          {!isUrgent && isBoosted && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700"
+              data-testid="mission-boosted-badge"
+              title="Mission mise en avant"
+            >
+              <Rocket className="h-3 w-3" />
+              Top
+            </span>
+          )}
           <span className="inline-flex items-center gap-1 text-[10px] text-workon-muted">
             <Clock className="h-3 w-3" />
             {createdAgo}

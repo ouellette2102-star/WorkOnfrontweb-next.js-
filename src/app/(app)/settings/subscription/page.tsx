@@ -260,9 +260,16 @@ export default function SubscriptionSettingsPage() {
         </div>
       </div>
 
-      <div className="mt-6 text-center text-xs text-workon-muted">
+      <div className="mt-6 flex items-center justify-between text-xs text-workon-muted">
         <Link href="/settings" className="hover:text-workon-gray">
           ← Autres réglages
+        </Link>
+        <Link
+          href="/boosts"
+          className="font-medium text-workon-primary hover:underline"
+          data-testid="link-my-boosts"
+        >
+          Voir mes boosts →
         </Link>
       </div>
 
