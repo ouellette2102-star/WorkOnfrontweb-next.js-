@@ -168,7 +168,30 @@ function emitSessionExpired() {
   }
 }
 
-export async function refreshToken(): Promise<string | null> {
+/**
+ * In-flight promise mutex so concurrent 401s share a single refresh
+ * call. Without this, each parallel API call that hits 401 fires its
+ * own `/api/auth/refresh`. The backend now rotates refresh tokens on
+ * every call and blacklists the old one (single-use — security best
+ * practice landed in workon-backend #285), so only the **first**
+ * parallel refresh succeeds. Every later one receives the same cookie
+ * but, on the backend, it has just been invalidated → 401 → the proxy
+ * clears the cookies → the user is logged out mid-session.
+ *
+ * This was easy to reproduce: login, then fire 3 parallel refreshes
+ * with the same token — request #1 got 200, #2 and #3 got 401 with
+ * `TOKEN_EXPIRED`. That exact scenario hits on every app load because
+ * multiple React Query hooks fire at once and each runs its own
+ * 401 → refresh retry loop.
+ *
+ * The fix is a classic in-flight promise: if a refresh is pending,
+ * return the same promise to every concurrent caller. Reset once it
+ * resolves so the next genuine expiry (later in the session) can
+ * refresh again.
+ */
+let refreshInFlight: Promise<string | null> | null = null;
+
+async function doRefresh(): Promise<string | null> {
   try {
     const res = await fetch("/api/auth/refresh", {
       method: "POST",
@@ -188,6 +211,18 @@ export async function refreshToken(): Promise<string | null> {
     emitSessionExpired();
     return null;
   }
+}
+
+export async function refreshToken(): Promise<string | null> {
+  if (refreshInFlight) return refreshInFlight;
+
+  refreshInFlight = doRefresh().finally(() => {
+    // Release the mutex only after the in-flight refresh settles,
+    // so later genuine expiries can trigger a new refresh.
+    refreshInFlight = null;
+  });
+
+  return refreshInFlight;
 }
 
 export async function fetchCurrentUser(): Promise<AuthUser | null> {
