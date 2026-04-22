@@ -6,9 +6,19 @@
  * border accent.
  */
 
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+
+const trackMock = vi.fn();
+vi.mock("@/lib/analytics", () => ({
+  trackMissionCardClick: (...args: unknown[]) => trackMock(...args),
+}));
+
 import { MissionCard, type MissionCardInput } from "./mission-card";
+
+beforeEach(() => {
+  trackMock.mockClear();
+});
 
 const base: MissionCardInput = {
   id: "m_1",
@@ -144,5 +154,77 @@ describe("<MissionCard />", () => {
     expect(screen.queryByTestId("mission-card-cta")).toBeNull();
     // Status label is rendered
     expect(screen.getByText(/Annulée/)).toBeInTheDocument();
+  });
+
+  /* -------- Hero image (firstPhotoUrl) -------- */
+
+  it("renders the photo hero when firstPhotoUrl is provided", () => {
+    render(
+      <MissionCard
+        mission={{ ...base, firstPhotoUrl: "https://cdn.test/a.jpg" }}
+      />,
+    );
+    expect(screen.getByTestId("mission-card-photo")).toBeInTheDocument();
+    expect(screen.queryByTestId("mission-card-photo-fallback")).toBeNull();
+    const img = screen
+      .getByTestId("mission-card-photo")
+      .querySelector("img");
+    expect(img).not.toBeNull();
+    expect(img).toHaveAttribute("src", "https://cdn.test/a.jpg");
+  });
+
+  it("falls back to the gradient tile when firstPhotoUrl is absent/null", () => {
+    render(<MissionCard mission={{ ...base, firstPhotoUrl: null }} />);
+    expect(screen.queryByTestId("mission-card-photo")).toBeNull();
+    expect(
+      screen.getByTestId("mission-card-photo-fallback"),
+    ).toBeInTheDocument();
+  });
+
+  /* -------- Analytics click tracking -------- */
+
+  it("tracks a click on the card body with viaCTA=false", () => {
+    render(
+      <MissionCard
+        mission={{ ...base, firstPhotoUrl: "https://cdn.test/a.jpg" }}
+        source="public_feed"
+      />,
+    );
+    fireEvent.click(screen.getByTestId("mission-card-body"));
+    expect(trackMock).toHaveBeenCalledTimes(1);
+    expect(trackMock).toHaveBeenCalledWith({
+      missionId: base.id,
+      variant: "pro",
+      source: "public_feed",
+      hasPhoto: true,
+      viaCTA: false,
+    });
+  });
+
+  it("tracks a click on the CTA with viaCTA=true", () => {
+    render(
+      <MissionCard
+        mission={base}
+        variant="client"
+        source="employer_dashboard"
+      />,
+    );
+    fireEvent.click(screen.getByTestId("mission-card-cta"));
+    expect(trackMock).toHaveBeenCalledTimes(1);
+    expect(trackMock).toHaveBeenCalledWith({
+      missionId: base.id,
+      variant: "client",
+      source: "employer_dashboard",
+      hasPhoto: false,
+      viaCTA: true,
+    });
+  });
+
+  it("defaults source to 'other' when not specified", () => {
+    render(<MissionCard mission={base} />);
+    fireEvent.click(screen.getByTestId("mission-card-body"));
+    expect(trackMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source: "other" }),
+    );
   });
 });

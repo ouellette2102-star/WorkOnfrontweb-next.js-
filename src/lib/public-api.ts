@@ -90,6 +90,11 @@ export interface PublicMission {
   isUrgent?: boolean;
   urgentUntil?: string | null;
   boostedUntil?: string | null;
+  /**
+   * Oldest attached MissionPhoto URL, surfaced server-side. `null` when
+   * the mission has no photos. Drives the mission-card hero image.
+   */
+  firstPhotoUrl?: string | null;
 }
 
 export interface PublicMissionsResponse {

@@ -182,6 +182,7 @@ export default function MyMissionsPage() {
                 mission={mission}
                 variant={isEmployer ? "client" : "pro"}
                 showCTA={false}
+                source="mine"
               />
               {/* Employer: pending offers badge overlay */}
               {isEmployer && (offerCounts[mission.id] ?? 0) > 0 && (
