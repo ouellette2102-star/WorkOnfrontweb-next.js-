@@ -85,6 +85,11 @@ export interface MissionResponse {
   createdByUserId: string;
   assignedToUserId: string | null;
   distanceKm?: number | null;
+  /**
+   * Oldest attached photo URL, surfaced server-side. `null` when the mission
+   * has no photos. Drives the mission-card hero image.
+   */
+  firstPhotoUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 }

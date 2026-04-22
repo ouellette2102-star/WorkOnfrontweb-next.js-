@@ -82,7 +82,12 @@ export default async function MissionsFeedPage({
             data-testid="missions-feed-grid"
           >
             {feed.missions.map((m) => (
-              <MissionCard key={m.id} mission={m} variant="pro" />
+              <MissionCard
+                key={m.id}
+                mission={m}
+                variant="pro"
+                source="public_feed"
+              />
             ))}
           </div>
 

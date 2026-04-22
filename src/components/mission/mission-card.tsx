@@ -10,6 +10,10 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  trackMissionCardClick,
+  type MissionCardSource,
+} from "@/lib/analytics";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -38,6 +42,8 @@ export type MissionCardInput = {
   isUrgent?: boolean;
   /** Active TOP_48H boost window — public feed flag. */
   boostedUntil?: string | null;
+  /** Oldest attached photo URL — server-computed. Drives the hero image. */
+  firstPhotoUrl?: string | null;
 };
 
 /**
@@ -54,6 +60,11 @@ interface MissionCardProps {
   href?: string;
   /** Hide the bottom CTA (e.g. inside a parent link or recap list). */
   showCTA?: boolean;
+  /**
+   * Surface the card is rendered on — used for analytics segmentation.
+   * Defaults to `"other"` when not specified.
+   */
+  source?: MissionCardSource;
   className?: string;
 }
 
@@ -109,6 +120,7 @@ export function MissionCard({
   variant = "pro",
   href,
   showCTA = true,
+  source = "other",
   className,
 }: MissionCardProps) {
   // Freeze "now" at first render so the card stays idempotent on re-renders.
@@ -126,12 +138,23 @@ export function MissionCard({
   const status = mission.status ? statusConfig[mission.status] : undefined;
   const icon = categoryIcons[mission.category] ?? "⚡";
   const gradient = categoryGradients[mission.category] ?? categoryGradients.other;
+  const hasPhoto = !!mission.firstPhotoUrl;
 
   const priceLabel =
     mission.priceRange ??
     (mission.price != null ? `${mission.price}$` : null);
 
   const destination = href ?? `/missions/${mission.id}`;
+
+  const handleClick = (viaCTA: boolean) => () => {
+    trackMissionCardClick({
+      missionId: mission.id,
+      variant,
+      source,
+      hasPhoto,
+      viaCTA,
+    });
+  };
 
   const ctaLabel = variant === "client" ? "Recevoir des offres" : "Postuler";
   const ctaStyles =
@@ -165,6 +188,7 @@ export function MissionCard({
         href={destination}
         className="flex flex-1 flex-col gap-3 p-4"
         data-testid="mission-card-body"
+        onClick={handleClick(false)}
       >
         {/* Top signals row */}
         <div className="flex flex-wrap items-center gap-1.5">
@@ -201,17 +225,35 @@ export function MissionCard({
           )}
         </div>
 
-        {/* Hero row: icon tile + title */}
+        {/* Hero row: photo or gradient tile + title */}
         <div className="flex items-start gap-3">
-          <div
-            className={cn(
-              "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-2xl sm:h-16 sm:w-16 sm:text-3xl",
-              gradient,
-            )}
-            aria-hidden
-          >
-            {icon}
-          </div>
+          {hasPhoto ? (
+            <div
+              className="flex h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-workon-bg sm:h-16 sm:w-16"
+              data-testid="mission-card-photo"
+            >
+              {/* Plain <img> so any upload/CDN domain works without
+                  patching next.config.ts image remotePatterns. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={mission.firstPhotoUrl!}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              className={cn(
+                "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-2xl sm:h-16 sm:w-16 sm:text-3xl",
+                gradient,
+              )}
+              data-testid="mission-card-photo-fallback"
+              aria-hidden
+            >
+              {icon}
+            </div>
+          )}
 
           <div className="min-w-0 flex-1">
             <h3
@@ -275,6 +317,7 @@ export function MissionCard({
               ctaStyles,
             )}
             data-testid="mission-card-cta"
+            onClick={handleClick(true)}
           >
             {ctaLabel}
             <ArrowRight className="h-4 w-4" />
