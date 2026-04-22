@@ -9,12 +9,10 @@ import {
   Map as MapIcon,
   Navigation,
   Loader2,
-  ChevronRight,
-  DollarSign,
 } from "lucide-react";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MissionBottomSheet } from "@/components/map/mission-bottom-sheet";
+import { MissionCard } from "@/components/mission/mission-card";
 
 /**
  * Interactive map page — shows nearby missions.
@@ -191,44 +189,15 @@ export default function MapPage() {
           </div>
         ) : (
           missions.map((m) => (
-            <MissionCard key={m.id} mission={m} />
+            <MissionCard
+              key={m.id}
+              mission={m}
+              variant="pro"
+              source="map_list"
+            />
           ))
         )}
       </div>
     </div>
-  );
-}
-
-function MissionCard({ mission: m }: { mission: MissionResponse }) {
-  return (
-    <Link
-      href={`/missions/${m.id}`}
-      className="block p-4 rounded-2xl bg-white border border-workon-border hover:border-workon-primary/30 transition-colors"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-workon-ink text-sm truncate">{m.title}</p>
-          <p className="text-xs text-workon-gray mt-0.5">{m.city}</p>
-          <div className="flex items-center gap-3 mt-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-workon-primary-subtle text-workon-primary text-[11px] font-medium">
-              {m.category}
-            </span>
-            {m.distanceKm != null && (
-              <span className="text-[11px] text-workon-muted flex items-center gap-0.5">
-                <Navigation className="h-3 w-3" />
-                {m.distanceKm.toFixed(1)} km
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-col items-end shrink-0">
-          <span className="flex items-center gap-0.5 font-semibold text-workon-ink text-sm">
-            <DollarSign className="h-3.5 w-3.5" />
-            {m.price}
-          </span>
-          <ChevronRight className="h-4 w-4 text-workon-muted mt-2" />
-        </div>
-      </div>
-    </Link>
   );
 }
