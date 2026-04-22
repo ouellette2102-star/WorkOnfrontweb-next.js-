@@ -41,6 +41,16 @@ export const userMeSchema = z.object({
   city: z.string().nullable(),
   pictureUrl: z.string().nullable().optional(),
   role: z.string(),
+  // Revenu Québec IN-203 invoice fields. Optional on the wire so older
+  // BE deploys (or partial account states) keep hydrating; the UI
+  // treats undefined / null as "not filled yet".
+  businessName: z.string().nullable().optional(),
+  businessCategory: z.string().nullable().optional(),
+  businessDescription: z.string().nullable().optional(),
+  businessWebsite: z.string().nullable().optional(),
+  businessAddress: z.string().nullable().optional(),
+  gstNumber: z.string().nullable().optional(),
+  qstNumber: z.string().nullable().optional(),
 });
 
 export type UserMeResponse = z.infer<typeof userMeSchema>;

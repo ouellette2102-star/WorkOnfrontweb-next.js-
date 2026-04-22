@@ -681,6 +681,15 @@ export const api = {
     category?: string;
     serviceRadiusKm?: number;
     gallery?: string[];
+    // Revenu Québec IN-203 invoice fields (workers collecting TPS/TVQ
+    // and employers who want a legal client-snapshot).
+    businessName?: string;
+    businessCategory?: string;
+    businessDescription?: string;
+    businessWebsite?: string;
+    businessAddress?: string;
+    gstNumber?: string;
+    qstNumber?: string;
   }) =>
     apiFetch<unknown>("/users/me", { method: "PATCH", body: JSON.stringify(data) }),
   uploadProfilePicture: (file: File) => {
