@@ -19,6 +19,8 @@ export type MissionCardSource =
   | "public_feed"
   | "mine"
   | "employer_dashboard"
+  | "map_list"
+  | "map_pin"
   | "other";
 
 export interface MissionCardClickPayload {
