@@ -95,6 +95,11 @@ export interface PublicMission {
    * the mission has no photos. Drives the mission-card hero image.
    */
   firstPhotoUrl?: string | null;
+  /**
+   * Number of PENDING offers on the mission. Server-aggregated from
+   * LocalOffer. Drives the "X offres reçues" social-proof line.
+   */
+  offersCount?: number;
 }
 
 export interface PublicMissionsResponse {

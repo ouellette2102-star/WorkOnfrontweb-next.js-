@@ -227,4 +227,28 @@ describe("<MissionCard />", () => {
       expect.objectContaining({ source: "other" }),
     );
   });
+
+  /* -------- Social proof (offersCount) -------- */
+
+  it("renders the social-proof line when offersCount > 0 (plural)", () => {
+    render(<MissionCard mission={{ ...base, offersCount: 4 }} />);
+    const line = screen.getByTestId("mission-card-social-proof");
+    expect(line).toHaveTextContent("4 offres reçues");
+  });
+
+  it("renders singular 'offre reçue' when offersCount is 1", () => {
+    render(<MissionCard mission={{ ...base, offersCount: 1 }} />);
+    const line = screen.getByTestId("mission-card-social-proof");
+    expect(line).toHaveTextContent(/^1 offre reçue$/);
+  });
+
+  it("hides the social-proof line when offersCount is 0", () => {
+    render(<MissionCard mission={{ ...base, offersCount: 0 }} />);
+    expect(screen.queryByTestId("mission-card-social-proof")).toBeNull();
+  });
+
+  it("hides the social-proof line when offersCount is absent", () => {
+    render(<MissionCard mission={base} />);
+    expect(screen.queryByTestId("mission-card-social-proof")).toBeNull();
+  });
 });
