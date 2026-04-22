@@ -3,6 +3,7 @@
 import { ProfileForm } from "@/components/profile/profile-form";
 import { ProfileRolesCard } from "@/components/profile/profile-roles-card";
 import { WorkerCardEditor } from "@/components/profile/worker-card-editor";
+import { BusinessInfoEditor } from "@/components/profile/business-info-editor";
 import { useAuth } from "@/contexts/auth-context";
 import { Loader2 } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -48,6 +49,12 @@ export default function ProfilePage() {
       </div>
 
       <WorkerCardEditor />
+
+      {/* Revenu Québec IN-203 — legal snapshot fields printed on every
+          invoice issued through WorkOn. Kept below the public-profile
+          sections because these are private, legal fields — not
+          marketing content. */}
+      <BusinessInfoEditor />
     </div>
   );
 }
