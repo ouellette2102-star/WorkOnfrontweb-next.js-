@@ -178,7 +178,11 @@ export default function MyMissionsPage() {
         <div className="space-y-3">
           {filtered.map((mission) => (
             <div key={mission.id} className="relative">
-              <MissionCard mission={mission} />
+              <MissionCard
+                mission={mission}
+                variant={isEmployer ? "client" : "pro"}
+                showCTA={false}
+              />
               {/* Employer: pending offers badge overlay */}
               {isEmployer && (offerCounts[mission.id] ?? 0) > 0 && (
                 <div className="absolute top-3 right-3 z-10">

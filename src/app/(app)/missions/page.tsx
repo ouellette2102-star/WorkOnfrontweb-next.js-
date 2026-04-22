@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { MapPin, Clock, ArrowRight, ListFilter, Zap, Rocket } from "lucide-react";
+import { ArrowRight, ListFilter } from "lucide-react";
 import {
   getPublicMissions,
   getSectorStats,
   type PublicMission,
 } from "@/lib/public-api";
 import { MissionsFilterBar } from "./_components/missions-filter-bar";
+import { MissionCard } from "@/components/mission/mission-card";
 
 /**
  * /missions — public, open-mission feed.
@@ -76,14 +77,14 @@ export default async function MissionsFeedPage({
         <EmptyState category={category} city={city} />
       ) : (
         <>
-          <ul
+          <div
             className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
             data-testid="missions-feed-grid"
           >
             {feed.missions.map((m) => (
-              <MissionCard key={m.id} mission={m} />
+              <MissionCard key={m.id} mission={m} variant="pro" />
             ))}
-          </ul>
+          </div>
 
           {totalPages > 1 && (
             <Pagination
@@ -97,84 +98,6 @@ export default async function MissionsFeedPage({
         </>
       )}
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Mission card                                                       */
-/* ------------------------------------------------------------------ */
-
-function MissionCard({ mission }: { mission: PublicMission }) {
-  const createdAgo = timeAgo(new Date(mission.createdAt));
-  const isUrgent = !!mission.isUrgent;
-  const isBoosted =
-    !!mission.boostedUntil &&
-    new Date(mission.boostedUntil).getTime() > Date.now();
-  return (
-    <li
-      className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition-colors ${
-        isUrgent
-          ? "border-amber-300 hover:border-amber-500"
-          : isBoosted
-            ? "border-blue-300 hover:border-blue-500"
-            : "border-workon-border hover:border-workon-primary/50"
-      }`}
-      data-testid="mission-card"
-      data-urgent={isUrgent ? "true" : undefined}
-      data-boosted={isBoosted ? "true" : undefined}
-    >
-      <Link
-        href={`/missions/${mission.id}`}
-        className="flex h-full flex-col p-4"
-      >
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center rounded-full bg-workon-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-workon-primary">
-            {mission.category}
-          </span>
-          {isUrgent && (
-            <span
-              className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700"
-              data-testid="mission-urgent-badge"
-              title="Mission urgente — 24h"
-            >
-              <Zap className="h-3 w-3" />
-              Urgent
-            </span>
-          )}
-          {!isUrgent && isBoosted && (
-            <span
-              className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700"
-              data-testid="mission-boosted-badge"
-              title="Mission mise en avant"
-            >
-              <Rocket className="h-3 w-3" />
-              Top
-            </span>
-          )}
-          <span className="inline-flex items-center gap-1 text-[10px] text-workon-muted">
-            <Clock className="h-3 w-3" />
-            {createdAgo}
-          </span>
-        </div>
-
-        <h2 className="mb-1 line-clamp-2 text-sm font-semibold text-workon-ink group-hover:text-workon-primary">
-          {mission.title}
-        </h2>
-        <p className="mb-3 line-clamp-3 text-xs text-workon-muted">
-          {mission.description}
-        </p>
-
-        <div className="mt-auto flex items-center justify-between border-t border-workon-border pt-3">
-          <span className="inline-flex items-center gap-1 text-xs text-workon-muted">
-            <MapPin className="h-3.5 w-3.5" />
-            {mission.city}
-          </span>
-          <span className="text-sm font-semibold text-workon-ink">
-            {mission.priceRange}
-          </span>
-        </div>
-      </Link>
-    </li>
   );
 }
 
@@ -275,24 +198,3 @@ function Pagination({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Utils                                                              */
-/* ------------------------------------------------------------------ */
-
-function timeAgo(date: Date): string {
-  const now = Date.now();
-  const diff = now - date.getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return "à l'instant";
-  if (minutes < 60) return `il y a ${minutes} min`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `il y a ${hours} h`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `il y a ${days} j`;
-  const weeks = Math.floor(days / 7);
-  if (weeks < 5) return `il y a ${weeks} sem.`;
-  return date.toLocaleDateString("fr-CA", {
-    day: "numeric",
-    month: "short",
-  });
-}

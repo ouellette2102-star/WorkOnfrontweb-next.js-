@@ -141,7 +141,12 @@ export function EmployerDashboardClient() {
           {activeMissions.length > 0 ? (
             <div className="space-y-3">
               {activeMissions.slice(0, 4).map((m) => (
-                <MissionCard key={m.id} mission={m} />
+                <MissionCard
+                  key={m.id}
+                  mission={m}
+                  variant="client"
+                  showCTA={false}
+                />
               ))}
             </div>
           ) : (
