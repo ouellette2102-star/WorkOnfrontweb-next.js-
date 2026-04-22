@@ -90,6 +90,11 @@ export interface MissionResponse {
    * has no photos. Drives the mission-card hero image.
    */
   firstPhotoUrl?: string | null;
+  /**
+   * Number of PENDING offers received on this mission. Server-aggregated
+   * from LocalOffer. Drives the "X offres reçues" social-proof line.
+   */
+  offersCount?: number;
   createdAt: string;
   updatedAt: string;
 }

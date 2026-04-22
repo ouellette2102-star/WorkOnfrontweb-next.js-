@@ -8,6 +8,7 @@ import {
   Rocket,
   Sparkles,
   ArrowRight,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -44,6 +45,8 @@ export type MissionCardInput = {
   boostedUntil?: string | null;
   /** Oldest attached photo URL — server-computed. Drives the hero image. */
   firstPhotoUrl?: string | null;
+  /** PENDING-offer count — server-computed. Drives the social-proof line. */
+  offersCount?: number;
 };
 
 /**
@@ -303,6 +306,19 @@ export function MissionCard({
         {mission.description && (
           <p className="line-clamp-2 text-xs text-workon-muted">
             {mission.description}
+          </p>
+        )}
+
+        {/* Social proof — competitive pressure signal. Hidden at 0 so we
+            never display "0 offre" (worse than silence). */}
+        {mission.offersCount != null && mission.offersCount > 0 && (
+          <p
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-workon-primary"
+            data-testid="mission-card-social-proof"
+          >
+            <Users className="h-3.5 w-3.5" />
+            {mission.offersCount} offre{mission.offersCount > 1 ? "s" : ""}{" "}
+            reçue{mission.offersCount > 1 ? "s" : ""}
           </p>
         )}
       </Link>
