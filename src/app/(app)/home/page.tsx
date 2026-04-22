@@ -54,7 +54,11 @@ export default function HomePage() {
 
   const { data: featured, isLoading: isLoadingWorkers } = useQuery({
     queryKey: ["featured-workers-public"],
-    queryFn: () => getFeaturedWorkers(12),
+    // Over-fetch: the client-side blacklist below can drop a handful of
+    // results, and the backend now ranks real profiles first via a
+    // jobTitle/category filter. 24 keeps ~8 real cards reachable even if
+    // seed/test accounts slip through.
+    queryFn: () => getFeaturedWorkers(24),
     staleTime: 60_000,
   });
 
