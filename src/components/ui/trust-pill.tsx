@@ -19,19 +19,19 @@ export type TrustPillVariant =
 const VARIANT_CLASSES: Record<TrustPillVariant, string> = {
   // "Nouveau profil" — neutral, honest
   nouveau:
-    "bg-[#F0EDE8] text-[#706E6A] border border-[#EAE6DF]",
+    "bg-workon-bg-cream text-workon-gray border border-workon-border",
   // VERIFIED tier — first trust step (terracotta)
   verified:
     "bg-workon-accent/10 text-workon-accent border border-workon-accent/25",
   // TRUSTED tier — solid track record (green)
   trusted:
-    "bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/25",
-  // PREMIUM / top performer (gold)
+    "bg-workon-trust-green/10 text-workon-trust-green border border-workon-trust-green/25",
+  // PREMIUM / top performer (gold — intentional off-brand tier color, no token)
   premium:
     "bg-gradient-to-r from-[#D4922A]/15 to-[#D4922A]/10 text-[#D4922A] border border-[#D4922A]/30",
   // "Fiable" / "Ponctuel" behavioural badge
   fiable:
-    "bg-[#F9F8F5] text-[#706E6A] border border-[#EAE6DF]",
+    "bg-workon-bg text-workon-gray border border-workon-border",
 };
 
 const DEFAULT_LABEL: Record<TrustPillVariant, string> = {

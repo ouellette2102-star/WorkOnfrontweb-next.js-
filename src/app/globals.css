@@ -36,6 +36,16 @@
   --workon-muted: #9C9A96;
   --workon-trust-green: #22C55E;
 
+  /* Semantic status colors */
+  --workon-success: #16A34A;
+  --workon-success-subtle: rgba(22, 163, 74, 0.10);
+  --workon-warning: #D97706;
+  --workon-warning-subtle: rgba(217, 119, 6, 0.10);
+  --workon-error: #DC2626;
+  --workon-error-subtle: rgba(220, 38, 38, 0.10);
+  --workon-info: #2563EB;
+  --workon-info-subtle: rgba(37, 99, 235, 0.10);
+
   /* Backward-compat alias */
   --red-accent: var(--workon-accent);
 }
@@ -55,6 +65,14 @@
   --color-workon-gray: var(--workon-gray);
   --color-workon-muted: var(--workon-muted);
   --color-workon-trust-green: var(--workon-trust-green);
+  --color-workon-success: var(--workon-success);
+  --color-workon-success-subtle: var(--workon-success-subtle);
+  --color-workon-warning: var(--workon-warning);
+  --color-workon-warning-subtle: var(--workon-warning-subtle);
+  --color-workon-error: var(--workon-error);
+  --color-workon-error-subtle: var(--workon-error-subtle);
+  --color-workon-info: var(--workon-info);
+  --color-workon-info-subtle: var(--workon-info-subtle);
   --font-sans: var(--font-manrope), system-ui, sans-serif;
 }
 

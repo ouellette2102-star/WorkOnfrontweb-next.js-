@@ -8,13 +8,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#134021] text-white hover:bg-[#0F3319] shadow-sm shadow-[#134021]/20",
+        default: "bg-workon-primary text-white hover:bg-workon-primary-hover shadow-sm shadow-workon-primary/20",
         destructive: "bg-workon-accent text-white hover:bg-workon-accent-hover",
-        outline: "border border-[#EAE6DF] bg-transparent text-[#1B1A18] hover:bg-[#F0EDE8]",
-        secondary: "bg-[#F0EDE8] text-[#1B1A18] hover:bg-[#EAE6DF]",
-        ghost: "text-[#706E6A] hover:bg-[#F0EDE8] hover:text-[#1B1A18]",
+        outline: "border border-workon-border bg-transparent text-workon-ink hover:bg-workon-bg-cream",
+        secondary: "bg-workon-bg-cream text-workon-ink hover:bg-workon-border",
+        ghost: "text-workon-gray hover:bg-workon-bg-cream hover:text-workon-ink",
         link: "text-workon-accent underline-offset-4 hover:underline",
-        hero: "bg-[#134021] text-white hover:bg-[#0F3319] shadow-lg shadow-[#134021]/30 hover:shadow-[#134021]/40 transition-all rounded-2xl",
+        hero: "bg-workon-primary text-white hover:bg-workon-primary-hover shadow-lg shadow-workon-primary/30 hover:shadow-workon-primary/40 transition-all rounded-2xl",
       },
       size: {
         default: "h-10 px-4 py-2",
