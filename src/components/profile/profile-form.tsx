@@ -157,7 +157,7 @@ export function ProfileForm() {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploadingAvatar}
-          className="group relative h-24 w-24 overflow-hidden rounded-full border-2 border-workon-border bg-workon-bg transition hover:border-[#134021] focus:outline-none focus:ring-2 focus:ring-[#134021] focus:ring-offset-2 disabled:opacity-70"
+          className="group relative h-24 w-24 overflow-hidden rounded-full border-2 border-workon-border bg-workon-bg transition hover:border-workon-primary focus:outline-none focus:ring-2 focus:ring-workon-primary focus:ring-offset-2 disabled:opacity-70"
         >
           {avatarPreview ? (
             <img
@@ -187,7 +187,7 @@ export function ProfileForm() {
         {avatarMessage ? (
           <p
             className={`text-xs ${
-              avatarMessageType === "success" ? "text-[#22C55E]" : "text-workon-accent"
+              avatarMessageType === "success" ? "text-workon-trust-green" : "text-workon-accent"
             }`}
           >
             {avatarMessage}
@@ -201,7 +201,7 @@ export function ProfileForm() {
           type="text"
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-[#1B1A18] focus:border-[#134021] focus:outline-none"
+          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-workon-ink focus:border-workon-primary focus:outline-none"
           placeholder="Alex Tremblay"
         />
       </div>
@@ -212,7 +212,7 @@ export function ProfileForm() {
           type="tel"
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-[#1B1A18] focus:border-[#134021] focus:outline-none"
+          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-workon-ink focus:border-workon-primary focus:outline-none"
           placeholder="+1 514 555 1234"
         />
       </div>
@@ -223,7 +223,7 @@ export function ProfileForm() {
           type="text"
           value={city}
           onChange={(event) => setCity(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-[#1B1A18] focus:border-[#134021] focus:outline-none"
+          className="mt-2 w-full rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-workon-ink focus:border-workon-primary focus:outline-none"
           placeholder="Montréal, QC"
         />
       </div>
@@ -231,7 +231,7 @@ export function ProfileForm() {
       {statusMessage ? (
         <p
           className={`text-sm ${
-            status === "success" ? "text-[#22C55E]" : "text-workon-accent"
+            status === "success" ? "text-workon-trust-green" : "text-workon-accent"
           }`}
         >
           {statusMessage}
@@ -241,7 +241,7 @@ export function ProfileForm() {
       <button
         type="submit"
         disabled={isPending || !profile}
-        className="w-full rounded-2xl bg-[#134021] px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#0F3319] disabled:opacity-70 shadow-md shadow-[#134021]/25"
+        className="w-full rounded-2xl bg-workon-primary px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-workon-primary-hover disabled:opacity-70 shadow-md shadow-workon-primary/25"
       >
         {isPending ? "Enregistrement..." : "Sauvegarder"}
       </button>

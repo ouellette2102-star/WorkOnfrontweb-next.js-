@@ -253,7 +253,7 @@ function DifferentiationSection() {
               so the inverted card stays visually distinct from the page
               background regardless of light/dark mode. */}
           <div className="flex items-center">
-            <div className="rounded-2xl bg-[#1B1A18] p-8 md:p-10 w-full">
+            <div className="rounded-2xl bg-workon-ink p-8 md:p-10 w-full">
               <div className="h-14 w-14 rounded-2xl bg-workon-accent flex items-center justify-center mb-6">
                 <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />

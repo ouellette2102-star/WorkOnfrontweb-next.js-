@@ -109,9 +109,9 @@ export function TopBar() {
             href="/home"
             className="flex items-center gap-0.5 text-xl font-bold font-heading"
           >
-            <span className="text-[#1B1A18]">Work</span>
+            <span className="text-workon-ink">Work</span>
             <MapPin className="h-5 w-5 text-workon-accent" />
-            <span className="text-[#1B1A18]">n</span>
+            <span className="text-workon-ink">n</span>
           </Link>
           {user && (
             <button
@@ -144,7 +144,7 @@ export function TopBar() {
             className="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-workon-bg-cream transition-colors"
             aria-label={`Notifications${unread > 0 ? ` (${unread} non lues)` : ""}`}
           >
-            <Bell className="h-5 w-5 text-[#706E6A] hover:text-[#1B1A18] transition-colors" />
+            <Bell className="h-5 w-5 text-workon-gray hover:text-workon-ink transition-colors" />
             {unread > 0 && (
               <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-workon-accent text-[10px] font-bold text-white flex items-center justify-center">
                 {unread > 9 ? "9+" : unread}
@@ -159,9 +159,9 @@ export function TopBar() {
             aria-label="Menu"
           >
             {menuOpen ? (
-              <X className="h-5 w-5 text-[#706E6A] hover:text-[#1B1A18] transition-colors" />
+              <X className="h-5 w-5 text-workon-gray hover:text-workon-ink transition-colors" />
             ) : (
-              <Menu className="h-5 w-5 text-[#706E6A] hover:text-[#1B1A18] transition-colors" />
+              <Menu className="h-5 w-5 text-workon-gray hover:text-workon-ink transition-colors" />
             )}
           </button>
         </div>

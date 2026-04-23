@@ -58,7 +58,7 @@ export function QuickStatsCard() {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-32 animate-pulse rounded-3xl border border-[#EAE6DF] bg-white shadow-card"
+            className="h-32 animate-pulse rounded-3xl border border-workon-border bg-white shadow-card"
           />
         ))}
       </div>
@@ -91,43 +91,43 @@ export function QuickStatsCard() {
   return (
     <div className="mb-8 grid gap-4 md:grid-cols-4">
       {/* Missions actives */}
-      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
+      <div className="border border-workon-border rounded-3xl bg-white p-5 shadow-card">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-2xl text-workon-accent">*</span>
-          <span className="font-heading font-bold text-lg text-[#1B1A18]">{missionStats.active}</span>
+          <span className="font-heading font-bold text-lg text-workon-ink">{missionStats.active}</span>
         </div>
-        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Missions actives</p>
-        <p className="text-xs text-[#706E6A] mt-1">En cours ou reservees</p>
+        <p className="text-[10px] text-workon-gray uppercase tracking-wider">Missions actives</p>
+        <p className="text-xs text-workon-gray mt-1">En cours ou reservees</p>
       </div>
 
       {/* Missions completees */}
-      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
+      <div className="border border-workon-border rounded-3xl bg-white p-5 shadow-card">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-2xl text-[#2D8B55]">V</span>
-          <span className="font-heading font-bold text-lg text-[#1B1A18]">{missionStats.completed}</span>
+          <span className="font-heading font-bold text-lg text-workon-ink">{missionStats.completed}</span>
         </div>
-        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Completees</p>
-        <p className="text-xs text-[#706E6A] mt-1">Missions terminees</p>
+        <p className="text-[10px] text-workon-gray uppercase tracking-wider">Completees</p>
+        <p className="text-xs text-workon-gray mt-1">Missions terminees</p>
       </div>
 
       {/* Gains nets (real earnings API) */}
-      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card">
+      <div className="border border-workon-border rounded-3xl bg-white p-5 shadow-card">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-2xl text-[#D4922A]">$</span>
-          <span className="font-heading font-bold text-lg text-[#1B1A18]">
+          <span className="font-heading font-bold text-lg text-workon-ink">
             {(totalNet / 100).toFixed(0)}$
           </span>
         </div>
-        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider">Gains nets</p>
-        <p className="text-xs text-[#706E6A] mt-1">
+        <p className="text-[10px] text-workon-gray uppercase tracking-wider">Gains nets</p>
+        <p className="text-xs text-workon-gray mt-1">
           {totalPending > 0 ? `${(totalPending / 100).toFixed(0)}$ en attente` : "Via Stripe Connect"}
         </p>
       </div>
 
       {/* Score de confiance */}
-      <div className="border border-[#EAE6DF] rounded-3xl bg-white p-5 shadow-card flex flex-col items-center justify-center">
+      <div className="border border-workon-border rounded-3xl bg-white p-5 shadow-card flex flex-col items-center justify-center">
         <TrustScoreRing size={64} compact />
-        <p className="text-[10px] text-[#706E6A] uppercase tracking-wider mt-2">Score de confiance</p>
+        <p className="text-[10px] text-workon-gray uppercase tracking-wider mt-2">Score de confiance</p>
       </div>
     </div>
   );

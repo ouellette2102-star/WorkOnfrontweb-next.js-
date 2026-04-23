@@ -72,7 +72,7 @@ export function BottomNav() {
         href={tab.href}
         className={cn(
           "flex flex-col items-center justify-center gap-0.5 flex-1 h-full pt-2 transition-colors",
-          active ? "text-[#1B1A18]" : "text-[#9C9A96] hover:text-[#706E6A]",
+          active ? "text-workon-ink" : "text-workon-muted hover:text-workon-gray",
         )}
       >
         <div className="relative">
@@ -84,7 +84,7 @@ export function BottomNav() {
           )}
         </div>
         <span className="text-[10px] font-medium">{tab.label}</span>
-        {active && <div className="w-1 h-1 rounded-full bg-[#1B1A18] mt-0.5" />}
+        {active && <div className="w-1 h-1 rounded-full bg-workon-ink mt-0.5" />}
       </Link>
     );
   };
@@ -97,7 +97,7 @@ export function BottomNav() {
   const fabActive = isActive(fabHref);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#EAE6DF] bg-white/90 backdrop-blur-xl safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-workon-border bg-white/90 backdrop-blur-xl safe-area-bottom">
       <div className="relative flex items-end justify-around h-16 max-w-lg mx-auto px-4 pb-4 pt-0">
         {leftTabs.map(renderTab)}
 

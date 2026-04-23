@@ -132,7 +132,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
   }
 
   return (
-    <div className="rounded-xl border border-[#EAE6DF] bg-white p-4 text-[#1B1A18]">
+    <div className="rounded-xl border border-workon-border bg-white p-4 text-workon-ink">
       <div className="mb-3 flex items-center justify-between">
         <h4 className="text-lg font-semibold">Photos de la mission</h4>
         {canUpload && (
@@ -162,15 +162,15 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
       )}
 
       {isLoading ? (
-        <p className="text-[#706E6A]">Chargement des photos...</p>
+        <p className="text-workon-gray">Chargement des photos...</p>
       ) : photos.length === 0 ? (
-        <p className="text-[#706E6A]">Aucune photo pour le moment.</p>
+        <p className="text-workon-gray">Aucune photo pour le moment.</p>
       ) : (
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo) => (
             <div
               key={photo.id}
-              className="group relative cursor-pointer overflow-hidden rounded-xl border border-[#EAE6DF] transition hover:border-[#9C9A96]"
+              className="group relative cursor-pointer overflow-hidden rounded-xl border border-workon-border transition hover:border-workon-muted"
               onClick={() => setSelectedPhoto(photo)}
             >
               <div className="relative aspect-square">
@@ -230,7 +230,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
               )}
               <Button
                 onClick={() => setSelectedPhoto(null)}
-                className="rounded-xl bg-[#EAE6DF] px-4 py-2 text-sm font-semibold text-[#1B1A18] transition hover:bg-[#DDD9D2]"
+                className="rounded-xl bg-workon-border px-4 py-2 text-sm font-semibold text-workon-ink transition hover:bg-[#DDD9D2]"
               >
                 Fermer
               </Button>

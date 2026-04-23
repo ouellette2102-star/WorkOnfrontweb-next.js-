@@ -46,13 +46,13 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="relative w-full max-w-4xl rounded-3xl border border-[#EAE6DF] bg-white p-6 shadow-card">
+      <div className="relative w-full max-w-4xl rounded-3xl border border-workon-border bg-white p-6 shadow-card">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-2xl font-bold text-[#1B1A18]">Photos de la mission</h3>
+          <h3 className="text-2xl font-bold text-workon-ink">Photos de la mission</h3>
           <button
             onClick={onClose}
-            className="rounded-full p-2 text-[#706E6A] transition hover:bg-[#F9F8F5] hover:text-[#1B1A18]"
+            className="rounded-full p-2 text-workon-gray transition hover:bg-workon-bg hover:text-workon-ink"
           >
             <X className="h-6 w-6" />
           </button>
@@ -64,15 +64,15 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="aspect-square animate-pulse rounded-xl bg-[#EAE6DF]"
+                className="aspect-square animate-pulse rounded-xl bg-workon-border"
               />
             ))}
           </div>
         ) : photos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <span className="mb-4 text-6xl">📸</span>
-            <p className="text-lg font-semibold text-[#1B1A18]">Aucune photo</p>
-            <p className="text-[#706E6A]">Aucune photo n'a été uploadée pour cette mission</p>
+            <p className="text-lg font-semibold text-workon-ink">Aucune photo</p>
+            <p className="text-workon-gray">Aucune photo n'a été uploadée pour cette mission</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
@@ -80,7 +80,7 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
               <button
                 key={photo.id}
                 onClick={() => setSelectedPhoto(photo)}
-                className="group relative aspect-square overflow-hidden rounded-xl border border-[#EAE6DF] bg-[#F9F8F5] transition hover:border-[#134021]"
+                className="group relative aspect-square overflow-hidden rounded-xl border border-workon-border bg-workon-bg transition hover:border-workon-primary"
               >
                 <img
                   src={photo.url}
@@ -89,7 +89,7 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
                 />
                 {photo.uploadedAt && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                    <p className="text-xs text-[#1B1A18]">
+                    <p className="text-xs text-workon-ink">
                       {new Date(photo.uploadedAt).toLocaleDateString("fr-CA")}
                     </p>
                   </div>
@@ -104,7 +104,7 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
           <Button
             onClick={onClose}
             variant="outline"
-            className="border-[#EAE6DF] text-[#1B1A18] hover:bg-[#F9F8F5]"
+            className="border-workon-border text-workon-ink hover:bg-workon-bg"
           >
             Fermer
           </Button>

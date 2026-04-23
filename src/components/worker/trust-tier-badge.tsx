@@ -26,7 +26,7 @@ const TIER_CONFIG: Record<
   TRUSTED: {
     icon: ShieldCheck,
     label: "De confiance",
-    className: "bg-[#22C55E] text-white",
+    className: "bg-workon-trust-green text-white",
   },
   PREMIUM: {
     icon: Crown,

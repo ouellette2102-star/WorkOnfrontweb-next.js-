@@ -95,7 +95,7 @@ export function TrustScoreRing({ size = 120, label, compact = false }: TrustScor
         style={{ width: size, height: size }}
       >
         <div
-          className="rounded-full bg-[#EAE6DF]"
+          className="rounded-full bg-workon-border"
           style={{ width: size, height: size }}
         />
       </div>
@@ -142,14 +142,14 @@ export function TrustScoreRing({ size = 120, label, compact = false }: TrustScor
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span
-            className="font-heading font-black text-[#1B1A18] leading-none"
+            className="font-heading font-black text-workon-ink leading-none"
             style={{ fontSize }}
           >
             {hasData ? animatedScore : "—"}
           </span>
           {!compact && (
             <span
-              className="text-[#706E6A] leading-none mt-0.5"
+              className="text-workon-gray leading-none mt-0.5"
               style={{ fontSize: subFontSize }}
             >
               {hasData ? "/ 100" : "Nouveau"}

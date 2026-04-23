@@ -12,10 +12,10 @@ export default function StripeOnboardingRefreshPage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F9F8F5]">
+    <div className="flex min-h-screen items-center justify-center bg-workon-bg">
       <div className="text-center">
-        <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#134021] border-t-transparent"></div>
-        <p className="text-[#706E6A]">Redirection...</p>
+        <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-workon-primary border-t-transparent"></div>
+        <p className="text-workon-gray">Redirection...</p>
       </div>
     </div>
   );

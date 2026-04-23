@@ -48,7 +48,7 @@ export function WhyChooseBlock({
   return (
     <section
       className={cn(
-        isDark ? "bg-[#F9F8F5] text-[#1B1A18]" : "bg-white text-[#1B1A18]",
+        isDark ? "bg-workon-bg text-workon-ink" : "bg-white text-workon-ink",
         className,
       )}
     >
@@ -62,7 +62,7 @@ export function WhyChooseBlock({
           <h2
             className={cn(
               "text-3xl md:text-[2.5rem] font-bold leading-tight tracking-tight",
-              isDark ? "text-[#1B1A18]" : "text-[#1B1A18]",
+              isDark ? "text-workon-ink" : "text-workon-ink",
             )}
           >
             {title}
@@ -71,7 +71,7 @@ export function WhyChooseBlock({
             <p
               className={cn(
                 "mt-4 text-lg leading-relaxed",
-                isDark ? "text-[#706E6A]" : "text-[#706E6A]",
+                isDark ? "text-workon-gray" : "text-workon-gray",
               )}
             >
               {subtitle}
@@ -86,8 +86,8 @@ export function WhyChooseBlock({
               className={cn(
                 "rounded-3xl border p-6 transition-all hover:-translate-y-0.5",
                 isDark
-                  ? "bg-white border-[#EAE6DF] hover:border-[#134021]/30 shadow-card"
-                  : "border-[#EAE6DF] bg-[#F9F8F5] hover:border-[#134021]/30 hover:shadow-lg hover:shadow-[#134021]/5",
+                  ? "bg-white border-workon-border hover:border-workon-primary/30 shadow-card"
+                  : "border-workon-border bg-workon-bg hover:border-workon-primary/30 hover:shadow-lg hover:shadow-workon-primary/5",
               )}
             >
               <div
@@ -103,7 +103,7 @@ export function WhyChooseBlock({
               <h3
                 className={cn(
                   "font-bold text-base mb-2",
-                  isDark ? "text-[#1B1A18]" : "text-[#1B1A18]",
+                  isDark ? "text-workon-ink" : "text-workon-ink",
                 )}
               >
                 {item.title}
@@ -111,7 +111,7 @@ export function WhyChooseBlock({
               <p
                 className={cn(
                   "text-sm leading-relaxed",
-                  isDark ? "text-[#706E6A]" : "text-[#706E6A]",
+                  isDark ? "text-workon-gray" : "text-workon-gray",
                 )}
               >
                 {item.desc}

@@ -37,9 +37,9 @@ export function ProfileCompletionCard() {
     score >= 80 ? "#134021" : score >= 50 ? "#D4922A" : "#C96646";
 
   return (
-    <div className="mb-6 bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
+    <div className="mb-6 bg-white border border-workon-border rounded-3xl p-5 shadow-card">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-heading font-bold text-base text-[#1B1A18]">
+        <h3 className="font-heading font-bold text-base text-workon-ink">
           Profil incomplet
         </h3>
         <span
@@ -51,7 +51,7 @@ export function ProfileCompletionCard() {
       </div>
 
       {/* Progress bar */}
-      <div className="h-2 w-full rounded-full bg-[#EAE6DF] mb-3">
+      <div className="h-2 w-full rounded-full bg-workon-border mb-3">
         <div
           className="h-2 rounded-full transition-all duration-500"
           style={{
@@ -64,14 +64,14 @@ export function ProfileCompletionCard() {
       {/* Missing fields */}
       {missingFields.length > 0 && (
         <div className="mb-3">
-          <p className="text-xs text-[#706E6A] mb-1.5">
+          <p className="text-xs text-workon-gray mb-1.5">
             Il te manque :
           </p>
           <div className="flex flex-wrap gap-1.5">
             {missingFields.map((field) => (
               <span
                 key={field}
-                className="inline-block rounded-full bg-[#F5F2ED] px-2.5 py-0.5 text-xs text-[#706E6A]"
+                className="inline-block rounded-full bg-[#F5F2ED] px-2.5 py-0.5 text-xs text-workon-gray"
               >
                 {FIELD_LABELS[field] || field}
               </span>

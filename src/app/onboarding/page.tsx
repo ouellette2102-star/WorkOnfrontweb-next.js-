@@ -15,10 +15,10 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F9F8F5] text-[#1B1A18]">
+    <main className="min-h-screen bg-workon-bg text-workon-ink">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-12">
         <header className="space-y-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-workon-muted hover:text-[#1B1A18]">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm text-workon-muted hover:text-workon-ink">
             ← Retour à l’accueil
           </Link>
           <div>
