@@ -140,13 +140,13 @@ export function SkillSelector() {
             {selectedSkills.map((skill) => (
               <span
                 key={skill.id}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[#134021]/20 bg-[#134021]/10 px-3 py-1.5 text-sm font-medium text-[#134021]"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-workon-primary/20 bg-workon-primary/10 px-3 py-1.5 text-sm font-medium text-workon-primary"
               >
                 {skill.name}
                 <button
                   type="button"
                   onClick={() => removeSkill(skill.id)}
-                  className="rounded-full p-0.5 transition hover:bg-[#134021]/20"
+                  className="rounded-full p-0.5 transition hover:bg-workon-primary/20"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -164,7 +164,7 @@ export function SkillSelector() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher une competence..."
-          className="w-full rounded-2xl border border-workon-border bg-workon-bg py-3 pl-10 pr-4 text-[#1B1A18] placeholder-workon-muted/50 focus:border-[#134021] focus:outline-none"
+          className="w-full rounded-2xl border border-workon-border bg-workon-bg py-3 pl-10 pr-4 text-workon-ink placeholder-workon-muted/50 focus:border-workon-primary focus:outline-none"
         />
       </div>
 
@@ -175,8 +175,8 @@ export function SkillSelector() {
           onClick={() => setSelectedCategory(null)}
           className={`rounded-xl px-3 py-1.5 text-sm font-medium transition ${
             selectedCategory === null
-              ? "bg-[#134021] text-white shadow-sm"
-              : "border border-workon-border bg-white text-workon-muted hover:border-[#134021]/40 hover:text-[#134021]"
+              ? "bg-workon-primary text-white shadow-sm"
+              : "border border-workon-border bg-white text-workon-muted hover:border-workon-primary/40 hover:text-workon-primary"
           }`}
         >
           Toutes
@@ -188,8 +188,8 @@ export function SkillSelector() {
             onClick={() => setSelectedCategory(cat.name)}
             className={`rounded-xl px-3 py-1.5 text-sm font-medium transition ${
               selectedCategory === cat.name
-                ? "bg-[#134021] text-white shadow-sm"
-                : "border border-workon-border bg-white text-workon-muted hover:border-[#134021]/40 hover:text-[#134021]"
+                ? "bg-workon-primary text-white shadow-sm"
+                : "border border-workon-border bg-white text-workon-muted hover:border-workon-primary/40 hover:text-workon-primary"
             }`}
           >
             {cat.icon ? `${cat.icon} ` : ""}
@@ -219,14 +219,14 @@ export function SkillSelector() {
                   onClick={() => toggleSkill(skill.id)}
                   className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm transition ${
                     isSelected
-                      ? "border-[#134021] bg-[#134021]/10 text-[#134021] font-medium"
-                      : "border-workon-border bg-white text-workon-ink hover:border-[#134021]/40"
+                      ? "border-workon-primary bg-workon-primary/10 text-workon-primary font-medium"
+                      : "border-workon-border bg-white text-workon-ink hover:border-workon-primary/40"
                   }`}
                 >
                   <span
                     className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
                       isSelected
-                        ? "border-[#134021] bg-[#134021] text-white"
+                        ? "border-workon-primary bg-workon-primary text-white"
                         : "border-workon-border bg-workon-bg"
                     }`}
                   >
@@ -245,7 +245,7 @@ export function SkillSelector() {
         type="button"
         onClick={handleSave}
         disabled={!dirty || saveMutation.isPending}
-        className="w-full rounded-2xl bg-[#134021] px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#0F3319] disabled:opacity-70 shadow-md shadow-[#134021]/25"
+        className="w-full rounded-2xl bg-workon-primary px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-workon-primary-hover disabled:opacity-70 shadow-md shadow-workon-primary/25"
       >
         {saveMutation.isPending ? (
           <span className="inline-flex items-center gap-2">

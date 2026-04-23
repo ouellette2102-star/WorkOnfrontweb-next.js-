@@ -147,12 +147,12 @@ export function CreateMissionForm() {
 
   if (success) {
     return (
-      <div className="rounded-3xl border border-[#22C55E]/25 bg-[#22C55E]/10 p-8 text-center shadow-card">
+      <div className="rounded-3xl border border-workon-trust-green/25 bg-workon-trust-green/10 p-8 text-center shadow-card">
         <div className="mb-4 text-4xl">✅</div>
-        <h3 className="mb-2 text-xl font-semibold text-[#1B1A18]">
+        <h3 className="mb-2 text-xl font-semibold text-workon-ink">
           Mission créée avec succès !
         </h3>
-        <p className="text-[#706E6A]">Redirection vers vos missions...</p>
+        <p className="text-workon-gray">Redirection vers vos missions...</p>
       </div>
     );
   }
@@ -161,7 +161,7 @@ export function CreateMissionForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Titre */}
       <div className="space-y-2">
-        <Label htmlFor="title" className="text-[#1B1A18]">
+        <Label htmlFor="title" className="text-workon-ink">
           Titre de la mission *
         </Label>
         <Input
@@ -170,14 +170,14 @@ export function CreateMissionForm() {
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
           placeholder="Ex: Rénovation de salle de bain"
-          className="border-[#EAE6DF] bg-white text-[#1B1A18] focus:border-[#134021]"
+          className="border-workon-border bg-white text-workon-ink focus:border-workon-primary"
           required
         />
       </div>
 
       {/* Description */}
       <div className="space-y-2">
-        <Label htmlFor="description" className="text-[#1B1A18]">
+        <Label htmlFor="description" className="text-workon-ink">
           Description *
         </Label>
         <Textarea
@@ -185,7 +185,7 @@ export function CreateMissionForm() {
           value={formData.description}
           onChange={(e) => handleChange("description", e.target.value)}
           placeholder="Décris la mission en détail — ce qu'il y a à faire, le matériel fourni, la durée estimée…"
-          className="min-h-[120px] border-[#EAE6DF] bg-white text-[#1B1A18] focus:border-[#134021]"
+          className="min-h-[120px] border-workon-border bg-white text-workon-ink focus:border-workon-primary"
           rows={5}
           required
         />
@@ -193,14 +193,14 @@ export function CreateMissionForm() {
 
       {/* Catégorie */}
       <div className="space-y-2">
-        <Label htmlFor="category" className="text-[#1B1A18]">
+        <Label htmlFor="category" className="text-workon-ink">
           Catégorie *
         </Label>
         <select
           id="category"
           value={formData.category}
           onChange={(e) => handleChange("category", e.target.value)}
-          className="w-full rounded-2xl border border-[#EAE6DF] bg-white px-4 py-3 text-[#1B1A18] focus:border-[#134021] focus:outline-none"
+          className="w-full rounded-2xl border border-workon-border bg-white px-4 py-3 text-workon-ink focus:border-workon-primary focus:outline-none"
           required
         >
           <option value="">Sélectionne une catégorie</option>
@@ -215,7 +215,7 @@ export function CreateMissionForm() {
       {/* Ville & Adresse */}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="city" className="text-[#1B1A18]">
+          <Label htmlFor="city" className="text-workon-ink">
             Ville *
           </Label>
           <Input
@@ -224,14 +224,14 @@ export function CreateMissionForm() {
             value={formData.city}
             onChange={(e) => handleChange("city", e.target.value)}
             placeholder="Montréal"
-            className="border-[#EAE6DF] bg-white text-[#1B1A18] focus:border-[#134021]"
+            className="border-workon-border bg-white text-workon-ink focus:border-workon-primary"
             required
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="address" className="text-[#1B1A18]">
+          <Label htmlFor="address" className="text-workon-ink">
             Adresse{" "}
-            <span className="text-[#9C9A96] text-xs font-normal">(facultatif)</span>
+            <span className="text-workon-muted text-xs font-normal">(facultatif)</span>
           </Label>
           <Input
             id="address"
@@ -239,14 +239,14 @@ export function CreateMissionForm() {
             value={formData.address}
             onChange={(e) => handleChange("address", e.target.value)}
             placeholder="123 rue Exemple"
-            className="border-[#EAE6DF] bg-white text-[#1B1A18] focus:border-[#134021]"
+            className="border-workon-border bg-white text-workon-ink focus:border-workon-primary"
           />
         </div>
       </div>
 
       {/* Budget */}
       <div className="space-y-2">
-        <Label htmlFor="price" className="text-[#1B1A18]">
+        <Label htmlFor="price" className="text-workon-ink">
           Budget ($) *
         </Label>
         <Input
@@ -257,10 +257,10 @@ export function CreateMissionForm() {
           value={formData.price}
           onChange={(e) => handleChange("price", e.target.value)}
           placeholder="150.00"
-          className="border-[#EAE6DF] bg-white text-[#1B1A18] focus:border-[#134021]"
+          className="border-workon-border bg-white text-workon-ink focus:border-workon-primary"
           required
         />
-        <p className="text-xs text-[#9C9A96]">
+        <p className="text-xs text-workon-muted">
           Montant total bloqué en escrow Stripe jusqu&apos;à la validation de la mission.
         </p>
       </div>

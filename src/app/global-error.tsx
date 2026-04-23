@@ -32,7 +32,7 @@ export default function GlobalError({
 
   return (
     <html lang="fr-CA">
-      <body className="bg-[#F9F8F5] text-[#1B1A18] antialiased">
+      <body className="bg-workon-bg text-workon-ink antialiased">
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-md w-full text-center space-y-8">
             {/* Icon - Critical error */}
@@ -54,10 +54,10 @@ export default function GlobalError({
 
             {/* Message */}
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold font-heading text-[#1B1A18]">
+              <h1 className="text-3xl font-bold font-heading text-workon-ink">
                 Erreur critique
               </h1>
-              <p className="text-[#706E6A] leading-relaxed">
+              <p className="text-workon-gray leading-relaxed">
                 L&apos;application a rencontré une erreur inattendue.
                 <br />
                 Veuillez réessayer ou recharger la page.
@@ -66,7 +66,7 @@ export default function GlobalError({
 
             {/* Error digest */}
             {error.digest && (
-              <p className="text-xs text-[#9C9A96] font-mono">
+              <p className="text-xs text-workon-muted font-mono">
                 Référence: {error.digest}
               </p>
             )}
@@ -84,28 +84,28 @@ export default function GlobalError({
             <div className="flex flex-col gap-3 pt-4">
               <button
                 onClick={() => reset()}
-                className="w-full px-6 py-4 rounded-xl bg-[#134021] hover:bg-[#0F3319] text-white font-semibold transition-colors shadow-lg shadow-[#134021]/30"
+                className="w-full px-6 py-4 rounded-xl bg-workon-primary hover:bg-workon-primary-hover text-white font-semibold transition-colors shadow-lg shadow-workon-primary/30"
               >
                 Réessayer
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="w-full px-6 py-4 rounded-xl bg-[#F0EDE8] hover:bg-[#EAE6DF] border border-[#EAE6DF] text-[#1B1A18] font-semibold transition-colors"
+                className="w-full px-6 py-4 rounded-xl bg-workon-bg-cream hover:bg-workon-border border border-workon-border text-workon-ink font-semibold transition-colors"
               >
                 Recharger la page
               </button>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Link ne fonctionne pas dans global-error (pas de context router) */}
               <a
                 href="/"
-                className="w-full px-6 py-4 rounded-xl bg-transparent text-[#706E6A] hover:text-[#1B1A18] font-medium transition-colors"
+                className="w-full px-6 py-4 rounded-xl bg-transparent text-workon-gray hover:text-workon-ink font-medium transition-colors"
               >
                 Retour à l&apos;accueil
               </a>
             </div>
 
             {/* Branding */}
-            <div className="pt-8 border-t border-[#EAE6DF]">
-              <p className="text-sm text-[#9C9A96]">
+            <div className="pt-8 border-t border-workon-border">
+              <p className="text-sm text-workon-muted">
                 WorkOn — Marketplace de services
               </p>
             </div>

@@ -85,15 +85,15 @@ export function AvailableMissionsCard() {
 
   if (isLoading) {
     return (
-      <div className="bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
-        <h2 className="mb-4 font-heading font-bold text-2xl text-[#1B1A18]">
+      <div className="bg-white border border-workon-border rounded-3xl p-5 shadow-card">
+        <h2 className="mb-4 font-heading font-bold text-2xl text-workon-ink">
           Missions Disponibles
         </h2>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-2xl border border-[#EAE6DF] bg-[#F9F8F5]"
+              className="h-24 animate-pulse rounded-2xl border border-workon-border bg-workon-bg"
             />
           ))}
         </div>
@@ -120,15 +120,15 @@ export function AvailableMissionsCard() {
 
   if (missions.length === 0) {
     return (
-      <div className="bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
+      <div className="bg-white border border-workon-border rounded-3xl p-5 shadow-card">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-heading font-bold text-2xl text-[#1B1A18]">
+          <h2 className="font-heading font-bold text-2xl text-workon-ink">
             Missions Disponibles
           </h2>
           <Link href="/worker/missions">
             <Button
               variant="outline"
-              className="border-[#EAE6DF] text-[#1B1A18] hover:bg-[#F9F8F5]"
+              className="border-workon-border text-workon-ink hover:bg-workon-bg"
             >
               Voir toutes
             </Button>
@@ -136,22 +136,22 @@ export function AvailableMissionsCard() {
         </div>
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <span className="mb-2 text-4xl">🔍</span>
-          <p className="text-[#706E6A]">Aucune mission disponible pour le moment</p>
+          <p className="text-workon-gray">Aucune mission disponible pour le moment</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
+    <div className="bg-white border border-workon-border rounded-3xl p-5 shadow-card">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-heading font-bold text-2xl text-[#1B1A18]">
+        <h2 className="font-heading font-bold text-2xl text-workon-ink">
           Missions Disponibles
         </h2>
         <Link href="/worker/missions">
           <Button
             variant="outline"
-            className="border-[#EAE6DF] text-[#1B1A18] hover:bg-[#F9F8F5]"
+            className="border-workon-border text-workon-ink hover:bg-workon-bg"
           >
             Voir toutes
           </Button>
@@ -162,11 +162,11 @@ export function AvailableMissionsCard() {
         {missions.map((mission) => (
           <div
             key={mission.id}
-            className="group flex items-center justify-between bg-white border border-[#EAE6DF] rounded-2xl px-4 py-3.5 transition hover:shadow-soft"
+            className="group flex items-center justify-between bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft"
           >
             <div className="flex-1">
-              <h4 className="mb-1 font-semibold text-[#1B1A18]">{mission.title}</h4>
-              <div className="flex flex-wrap gap-3 text-sm text-[#706E6A]">
+              <h4 className="mb-1 font-semibold text-workon-ink">{mission.title}</h4>
+              <div className="flex flex-wrap gap-3 text-sm text-workon-gray">
                 {mission.city && <span>📍 {mission.city}</span>}
                 {mission.hourlyRate && (
                   <span className="font-semibold text-[#2D8B55]">
@@ -180,7 +180,7 @@ export function AvailableMissionsCard() {
             <Button
               onClick={() => handleReserve(mission.id)}
               disabled={reservingId === mission.id}
-              className="ml-4 bg-[#134021] text-white hover:bg-[#0F3319]"
+              className="ml-4 bg-workon-primary text-white hover:bg-workon-primary-hover"
             >
               {reservingId === mission.id ? "..." : "Réserver"}
             </Button>
@@ -190,7 +190,7 @@ export function AvailableMissionsCard() {
 
       {missions.length >= 3 && (
         <Link href="/worker/missions">
-          <p className="mt-4 text-center text-sm text-[#134021] hover:text-[#0F3319]">
+          <p className="mt-4 text-center text-sm text-workon-primary hover:text-workon-primary-hover">
             Voir toutes les missions disponibles →
           </p>
         </Link>

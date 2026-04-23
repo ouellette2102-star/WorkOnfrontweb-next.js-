@@ -15,7 +15,7 @@ const TABS: { label: string; value: LeadStatus | "all" }[] = [
 ];
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; bg: string; text: string }> = {
-  new: { label: "Nouveau", bg: "bg-[#22C55E]/10", text: "text-[#22C55E]" },
+  new: { label: "Nouveau", bg: "bg-workon-trust-green/10", text: "text-workon-trust-green" },
   contacted: { label: "Contact\u00e9", bg: "bg-[#3B82F6]/10", text: "text-[#3B82F6]" },
   qualified: { label: "Qualifi\u00e9", bg: "bg-[#8B5CF6]/10", text: "text-[#8B5CF6]" },
   converted: { label: "Converti", bg: "bg-[#166534]/10", text: "text-[#166534]" },

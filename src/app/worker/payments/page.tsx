@@ -109,7 +109,7 @@ function WorkerPaymentsContent() {
     switch (status) {
       case "SUCCEEDED":
         return (
-          <span className="rounded-full bg-[#22C55E]/15 border border-[#22C55E]/25 px-3 py-1 text-xs font-semibold text-[#22C55E]">
+          <span className="rounded-full bg-workon-trust-green/15 border border-workon-trust-green/25 px-3 py-1 text-xs font-semibold text-workon-trust-green">
             ✅ Payé
           </span>
         );
@@ -138,7 +138,7 @@ function WorkerPaymentsContent() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-workon-bg">
         <div className="text-center">
-          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-[#134021] border-t-transparent"></div>
+          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-workon-primary border-t-transparent"></div>
           <p className="text-workon-muted">Chargement...</p>
         </div>
       </div>
@@ -160,7 +160,7 @@ function WorkerPaymentsContent() {
 
         {/* Banner Onboarding */}
         {!isOnboarded && (
-          <div className="mb-8 rounded-3xl border border-[#134021]/30 bg-gradient-to-br from-[#134021]/15 via-[#134021]/5 to-transparent p-8 shadow-sm ">
+          <div className="mb-8 rounded-3xl border border-workon-primary/30 bg-gradient-to-br from-workon-primary/15 via-workon-primary/5 to-transparent p-8 shadow-sm ">
             <div className="mb-4 text-6xl">🚀</div>
             <h2 className="mb-3 text-2xl font-bold text-workon-ink">
               Complétez votre onboarding Stripe
@@ -186,10 +186,10 @@ function WorkerPaymentsContent() {
         {/* Stats Cards */}
         {isOnboarded && (
           <div className="mb-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-[#22C55E]/20 bg-gradient-to-br from-[#22C55E]/10 via-[#22C55E]/5 to-transparent p-6  shadow-sm">
+            <div className="rounded-3xl border border-workon-trust-green/20 bg-gradient-to-br from-workon-trust-green/10 via-workon-trust-green/5 to-transparent p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-3xl">💵</span>
-                <span className="text-3xl font-bold text-[#22C55E]">
+                <span className="text-3xl font-bold text-workon-trust-green">
                   {formatAmount(totalEarned)} $
                 </span>
               </div>
@@ -254,7 +254,7 @@ function WorkerPaymentsContent() {
                 {payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-center justify-between rounded-2xl border border-workon-border bg-white/60 p-4 transition-all hover:border-[#134021]/40 hover:-translate-y-0.5"
+                    className="flex items-center justify-between rounded-2xl border border-workon-border bg-white/60 p-4 transition-all hover:border-workon-primary/40 hover:-translate-y-0.5"
                   >
                     <div className="flex-1">
                       <h4 className="mb-1 font-semibold text-workon-ink">
@@ -276,7 +276,7 @@ function WorkerPaymentsContent() {
                     </div>
 
                     <div className="ml-4 text-right">
-                      <div className="mb-1 text-2xl font-bold text-[#22C55E]">
+                      <div className="mb-1 text-2xl font-bold text-workon-trust-green">
                         {formatAmount(payment.netAmountCents)} $
                       </div>
                       <div className="mb-2 text-xs text-workon-muted">

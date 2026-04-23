@@ -12,8 +12,8 @@ import { cn } from "@/lib/utils";
  */
 
 const PALETTE = [
-  { bg: "bg-[#134021]", text: "text-white" }, // workon primary (forest)
-  { bg: "bg-[#C96646]", text: "text-white" }, // workon accent (terracotta)
+  { bg: "bg-workon-primary", text: "text-white" }, // workon primary (forest)
+  { bg: "bg-workon-accent", text: "text-white" }, // workon accent (terracotta)
   { bg: "bg-[#8B5CF6]", text: "text-white" }, // violet
   { bg: "bg-[#2563EB]", text: "text-white" }, // blue
   { bg: "bg-[#0891B2]", text: "text-white" }, // cyan

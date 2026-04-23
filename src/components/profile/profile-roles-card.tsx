@@ -93,15 +93,15 @@ export function ProfileRolesCard() {
               onClick={() => setSelectedRole(option.key)}
               className={`rounded-2xl border px-4 py-5 text-left transition ${
                 isSelected
-                  ? "border-[#134021] bg-[#134021]/10"
-                  : "border-workon-border bg-workon-bg hover:border-[#134021]/40"
+                  ? "border-workon-primary bg-workon-primary/10"
+                  : "border-workon-border bg-workon-bg hover:border-workon-primary/40"
               }`}
             >
               <p className="text-xs uppercase tracking-[0.3em] text-workon-muted">{option.label}</p>
               <h3 className="mt-2 text-lg font-semibold">{option.label}</h3>
               <p className="mt-2 text-sm text-workon-muted">{option.description}</p>
               {isSelected ? (
-                <span className="mt-3 inline-flex rounded-full bg-[#134021]/15 border border-[#134021]/25 px-3 py-1 text-xs text-workon-accent">
+                <span className="mt-3 inline-flex rounded-full bg-workon-primary/15 border border-workon-primary/25 px-3 py-1 text-xs text-workon-accent">
                   Rôle principal
                 </span>
               ) : null}
@@ -115,14 +115,14 @@ export function ProfileRolesCard() {
           type="button"
           disabled={!selectedRole || isSubmitting || isUnchanged}
           onClick={handleSave}
-          className="rounded-full bg-[#134021] px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#0F3319] disabled:opacity-60 disabled:cursor-not-allowed"
+          className="rounded-full bg-workon-primary px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-workon-primary-hover disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Enregistrement..." : "Sauvegarder mon rôle"}
         </button>
         {statusMessage ? (
           <p
             className={`text-sm ${
-              status === "success" ? "text-[#22C55E]" : "text-workon-accent"
+              status === "success" ? "text-workon-trust-green" : "text-workon-accent"
             }`}
           >
             {statusMessage}

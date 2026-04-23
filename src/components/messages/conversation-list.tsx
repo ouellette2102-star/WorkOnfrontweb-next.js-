@@ -15,9 +15,9 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
   if (conversations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <MessageCircle className="mb-4 h-12 w-12 text-[#EAE6DF]" />
-        <h3 className="mb-2 text-lg font-semibold text-[#1B1A18]">Aucune conversation</h3>
-        <p className="text-sm text-[#706E6A]">
+        <MessageCircle className="mb-4 h-12 w-12 text-workon-border" />
+        <h3 className="mb-2 text-lg font-semibold text-workon-ink">Aucune conversation</h3>
+        <p className="text-sm text-workon-gray">
           Vos conversations apparaîtront ici lorsque vous réserverez une mission
         </p>
       </div>
@@ -25,7 +25,7 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
   }
 
   return (
-    <div className="divide-y divide-[#EAE6DF]">
+    <div className="divide-y divide-workon-border">
       {conversations.map((conv) => {
         // Skip pure conversations — this list component is mission-only legacy UI
         if (!conv.missionId) return null;
@@ -37,29 +37,29 @@ export function ConversationList({ conversations, selectedMissionId, onSelect }:
             onClick={() => onSelect(missionId)}
             className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors ${
               isSelected
-                ? "bg-[#134021]/10 border-l-2 border-[#134021]"
-                : "hover:bg-[#F0EDE8]"
+                ? "bg-workon-primary/10 border-l-2 border-workon-primary"
+                : "hover:bg-workon-bg-cream"
             }`}
           >
             {/* Avatar placeholder */}
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F0EDE8] text-sm font-bold text-[#1B1A18]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-workon-bg-cream text-sm font-bold text-workon-ink">
               {conv.otherUser.firstName?.[0]?.toUpperCase() ?? "?"}
             </div>
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <p className="truncate text-sm font-semibold text-[#1B1A18]">
+                <p className="truncate text-sm font-semibold text-workon-ink">
                   {conv.otherUser.firstName} {conv.otherUser.lastName}
                 </p>
-                <span className="shrink-0 text-xs text-[#9C9A96]">
+                <span className="shrink-0 text-xs text-workon-muted">
                   {formatDistanceToNow(new Date(conv.lastMessageAt), {
                     addSuffix: true,
                     locale: frCA,
                   })}
                 </span>
               </div>
-              <p className="truncate text-xs text-[#706E6A]">{conv.missionTitle}</p>
-              <p className="mt-0.5 truncate text-sm text-[#706E6A]">{conv.lastMessage}</p>
+              <p className="truncate text-xs text-workon-gray">{conv.missionTitle}</p>
+              <p className="mt-0.5 truncate text-sm text-workon-gray">{conv.lastMessage}</p>
             </div>
 
             {conv.unreadCount > 0 && (

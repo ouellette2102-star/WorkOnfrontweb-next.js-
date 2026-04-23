@@ -91,15 +91,15 @@ export function MissionHistoryCard() {
 
   if (isLoading) {
     return (
-      <div className="bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
-        <h2 className="mb-4 font-heading font-bold text-2xl text-[#1B1A18]">
+      <div className="bg-white border border-workon-border rounded-3xl p-5 shadow-card">
+        <h2 className="mb-4 font-heading font-bold text-2xl text-workon-ink">
           Historique des Missions
         </h2>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-2xl border border-[#EAE6DF] bg-[#F9F8F5]"
+              className="h-24 animate-pulse rounded-2xl border border-workon-border bg-workon-bg"
             />
           ))}
         </div>
@@ -109,13 +109,13 @@ export function MissionHistoryCard() {
 
   if (missions.length === 0) {
     return (
-      <div className="bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
-        <h2 className="mb-4 font-heading font-bold text-2xl text-[#1B1A18]">
+      <div className="bg-white border border-workon-border rounded-3xl p-5 shadow-card">
+        <h2 className="mb-4 font-heading font-bold text-2xl text-workon-ink">
           Historique des Missions
         </h2>
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <span className="mb-2 text-4xl">📋</span>
-          <p className="text-[#706E6A]">Aucune mission complétée pour le moment</p>
+          <p className="text-workon-gray">Aucune mission complétée pour le moment</p>
         </div>
       </div>
     );
@@ -123,8 +123,8 @@ export function MissionHistoryCard() {
 
   return (
     <>
-      <div className="bg-white border border-[#EAE6DF] rounded-3xl p-5 shadow-card">
-        <h2 className="mb-4 font-heading font-bold text-2xl text-[#1B1A18]">
+      <div className="bg-white border border-workon-border rounded-3xl p-5 shadow-card">
+        <h2 className="mb-4 font-heading font-bold text-2xl text-workon-ink">
           Historique des Missions
         </h2>
 
@@ -132,17 +132,17 @@ export function MissionHistoryCard() {
           {missions.map((mission) => (
             <div
               key={mission.id}
-              className="group flex items-center justify-between bg-white border border-[#EAE6DF] rounded-2xl px-4 py-3.5 hover:shadow-soft transition"
+              className="group flex items-center justify-between bg-white border border-workon-border rounded-2xl px-4 py-3.5 hover:shadow-soft transition"
             >
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <h4 className="font-semibold text-[#1B1A18]">{mission.title}</h4>
-                  <span className="rounded-full bg-[#134021]/10 px-2 py-0.5 text-xs font-semibold text-[#134021]">
+                  <h4 className="font-semibold text-workon-ink">{mission.title}</h4>
+                  <span className="rounded-full bg-workon-primary/10 px-2 py-0.5 text-xs font-semibold text-workon-primary">
                     ✅ Complétée
                   </span>
                 </div>
 
-                <div className="flex flex-wrap gap-4 text-sm text-[#706E6A]">
+                <div className="flex flex-wrap gap-4 text-sm text-workon-gray">
                   {mission.city && <span>📍 {mission.city}</span>}
 
                   {mission.completedAt && (
@@ -169,7 +169,7 @@ export function MissionHistoryCard() {
                 <Button
                   onClick={() => setSelectedMissionId(mission.id)}
                   variant="outline"
-                  className="border-[#EAE6DF] text-[#1B1A18] hover:bg-[#F9F8F5]"
+                  className="border-workon-border text-workon-ink hover:bg-workon-bg"
                   size="sm"
                 >
                   📸 Photos
@@ -180,7 +180,7 @@ export function MissionHistoryCard() {
         </div>
 
         {missions.length >= 5 && (
-          <p className="mt-4 text-center text-sm text-[#706E6A]">
+          <p className="mt-4 text-center text-sm text-workon-gray">
             Affichage des 5 dernières missions complétées
           </p>
         )}

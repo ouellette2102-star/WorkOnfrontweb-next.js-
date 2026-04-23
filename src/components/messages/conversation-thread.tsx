@@ -93,18 +93,18 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
   return (
     <div className="flex h-full flex-col">
       {/* Thread header */}
-      <div className="border-b border-[#EAE6DF] px-4 py-3">
-        <h2 className="text-sm font-semibold text-[#1B1A18]">{missionTitle}</h2>
+      <div className="border-b border-workon-border px-4 py-3">
+        <h2 className="text-sm font-semibold text-workon-ink">{missionTitle}</h2>
       </div>
 
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-[#9C9A96]" />
+            <Loader2 className="h-6 w-6 animate-spin text-workon-muted" />
           </div>
         ) : !messages || messages.length === 0 ? (
-          <div className="py-8 text-center text-sm text-[#9C9A96]">
+          <div className="py-8 text-center text-sm text-workon-muted">
             Aucun message. Commencez la conversation !
           </div>
         ) : (
@@ -119,14 +119,14 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                       isOwn
-                        ? "bg-[#134021] text-white shadow-sm shadow-[#134021]/30"
-                        : "bg-gray-100 text-[#1B1A18]"
+                        ? "bg-workon-primary text-white shadow-sm shadow-workon-primary/30"
+                        : "bg-gray-100 text-workon-ink"
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                     <p
                       className={`mt-1 text-[10px] ${
-                        isOwn ? "text-white/60" : "text-[#9C9A96]"
+                        isOwn ? "text-white/60" : "text-workon-muted"
                       }`}
                     >
                       {formatDistanceToNow(new Date(msg.createdAt), {
@@ -144,21 +144,21 @@ export function ConversationThread({ missionId, missionTitle }: Props) {
       </div>
 
       {/* Input area */}
-      <div className="border-t border-[#EAE6DF] px-4 py-3">
+      <div className="border-t border-workon-border px-4 py-3">
         <div className="flex items-end gap-2">
           <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Écrire un message..."
-            className="flex-1 resize-none rounded-xl border border-[#EAE6DF] bg-gray-100 px-4 py-2.5 text-sm text-[#1B1A18] placeholder-gray-400 focus:border-[#134021] focus:outline-none"
+            className="flex-1 resize-none rounded-xl border border-workon-border bg-gray-100 px-4 py-2.5 text-sm text-workon-ink placeholder-gray-400 focus:border-workon-primary focus:outline-none"
             rows={1}
             style={{ maxHeight: "120px" }}
           />
           <button
             onClick={handleSend}
             disabled={!newMessage.trim() || sending}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#134021] text-white transition hover:bg-[#0F3319] disabled:opacity-40 shadow-md shadow-[#134021]/25"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-workon-primary text-white transition hover:bg-workon-primary-hover disabled:opacity-40 shadow-md shadow-workon-primary/25"
           >
             {sending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

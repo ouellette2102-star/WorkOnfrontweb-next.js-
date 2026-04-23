@@ -128,7 +128,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                   className="w-24 h-24 rounded-full object-cover border-2 border-workon-accent"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-[#134021] flex items-center justify-center text-3xl font-bold">
+                <div className="w-24 h-24 rounded-full bg-workon-primary flex items-center justify-center text-3xl font-bold">
                   {pro.firstName[0]}
                   {pro.lastName[0]}
                 </div>
@@ -139,7 +139,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
               <div className="flex items-center gap-3 mb-1">
                 <h1 className="text-2xl font-bold">{pro.fullName}</h1>
                 {pro.verified && (
-                  <span className="bg-[#22C55E] text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                  <span className="bg-workon-trust-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
                     Vérifié
                   </span>
                 )}
@@ -184,7 +184,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
           <div className="mt-8 text-center">
             <a
               href="#demande"
-              className="inline-block bg-[#134021] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[#0F3319] transition-colors text-lg"
+              className="inline-block bg-workon-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-workon-primary-hover transition-colors text-lg"
             >
               Demander une soumission
             </a>
@@ -236,7 +236,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
         >
           {submitted ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-[#22C55E] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-workon-trust-green rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
@@ -274,7 +274,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, clientName: e.target.value });
                       if (errors.clientName) setErrors({ ...errors, clientName: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-workon-primary focus:border-transparent outline-none text-gray-900 ${
                       errors.clientName ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="Jean Tremblay"
@@ -297,7 +297,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, clientPhone: e.target.value });
                       if (errors.clientPhone) setErrors({ ...errors, clientPhone: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-workon-primary focus:border-transparent outline-none text-gray-900 ${
                       errors.clientPhone ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="514-555-1234"
@@ -319,7 +319,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, clientEmail: e.target.value });
                       if (errors.clientEmail) setErrors({ ...errors, clientEmail: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-workon-primary focus:border-transparent outline-none text-gray-900 ${
                       errors.clientEmail ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="jean@example.com"
@@ -342,7 +342,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                       setForm({ ...form, serviceRequested: e.target.value });
                       if (errors.serviceRequested) setErrors({ ...errors, serviceRequested: "" });
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none text-gray-900 ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-workon-primary focus:border-transparent outline-none text-gray-900 ${
                       errors.serviceRequested ? "border-red-400 bg-red-50" : "border-gray-200"
                     }`}
                     placeholder="Entretien paysager"
@@ -361,7 +361,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#134021] focus:border-transparent outline-none resize-none text-gray-900"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-workon-primary focus:border-transparent outline-none resize-none text-gray-900"
                     placeholder="Décrivez votre besoin..."
                   />
                 </div>
@@ -375,7 +375,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-[#134021] text-white font-semibold py-4 rounded-lg hover:bg-[#0F3319] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                  className="w-full bg-workon-primary text-white font-semibold py-4 rounded-lg hover:bg-workon-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                 >
                   {submitting ? "Envoi en cours..." : "Envoyer ma demande"}
                 </button>

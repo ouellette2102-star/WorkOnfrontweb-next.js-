@@ -25,14 +25,14 @@ export function Sidebar() {
   const { primaryRole } = usePrimaryRole();
 
   return (
-    <aside className="flex h-full flex-col gap-6 border-r border-[#EAE6DF] bg-white px-6 py-8 text-[#1B1A18]">
+    <aside className="flex h-full flex-col gap-6 border-r border-workon-border bg-white px-6 py-8 text-workon-ink">
       <div>
-        <Link href="/" className="flex items-center text-[#1B1A18]">
+        <Link href="/" className="flex items-center text-workon-ink">
           <WorkOnWordmark size="lg" />
         </Link>
-        <p className="mt-2 text-xs uppercase tracking-[0.4em] text-[#9C9A96]">Dashboard</p>
+        <p className="mt-2 text-xs uppercase tracking-[0.4em] text-workon-muted">Dashboard</p>
         {primaryRole ? (
-          <p className="mt-2 text-xs text-[#706E6A]">
+          <p className="mt-2 text-xs text-workon-gray">
             Rôle principal :{" "}
             <span className="font-semibold">
               {roleLabels[primaryRole] ?? "—"}
@@ -50,8 +50,8 @@ export function Sidebar() {
               href={link.href}
               className={`rounded-2xl px-4 py-3 transition ${
                 active
-                  ? "bg-[#134021] text-white shadow-md shadow-[#134021]/25"
-                  : "text-[#706E6A] hover:bg-[#F0EDE8] hover:text-[#1B1A18]"
+                  ? "bg-workon-primary text-white shadow-md shadow-workon-primary/25"
+                  : "text-workon-gray hover:bg-workon-bg-cream hover:text-workon-ink"
               }`}
             >
               {link.label}
@@ -62,7 +62,7 @@ export function Sidebar() {
 
       <button
         onClick={() => { logout(); window.location.href = "/sign-in"; }}
-        className="rounded-2xl border border-[#EAE6DF] px-4 py-3 text-sm text-[#706E6A] transition hover:text-[#1B1A18]"
+        className="rounded-2xl border border-workon-border px-4 py-3 text-sm text-workon-gray transition hover:text-workon-ink"
       >
         Déconnexion
       </button>

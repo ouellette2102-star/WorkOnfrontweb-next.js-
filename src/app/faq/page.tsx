@@ -47,7 +47,7 @@ const faqJsonLd = {
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-[#F9F8F5] text-[#1B1A18] p-4">
+    <div className="min-h-screen bg-workon-bg text-workon-ink p-4">
       {/* JSON-LD FAQPage for search engines */}
       <script
         type="application/ld+json"
@@ -64,7 +64,7 @@ export default function FAQPage() {
                 <CardTitle>{faq.question}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-[#706E6A]">{faq.answer}</p>
+                <p className="text-workon-gray">{faq.answer}</p>
               </CardContent>
             </Card>
           ))}

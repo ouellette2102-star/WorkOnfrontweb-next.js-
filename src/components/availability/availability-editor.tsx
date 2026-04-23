@@ -129,7 +129,7 @@ export function AvailabilityEditor() {
             key={name}
             className={`flex flex-col gap-3 rounded-xl border px-4 py-3 transition sm:flex-row sm:items-center sm:gap-4 ${
               day.enabled
-                ? "border-[#134021]/30 bg-[#134021]/5"
+                ? "border-workon-primary/30 bg-workon-primary/5"
                 : "border-workon-border bg-white"
             }`}
           >
@@ -141,7 +141,7 @@ export function AvailabilityEditor() {
                 aria-checked={day.enabled}
                 onClick={() => updateDay(i, { enabled: !day.enabled })}
                 className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-                  day.enabled ? "bg-[#134021]" : "bg-workon-border"
+                  day.enabled ? "bg-workon-primary" : "bg-workon-border"
                 }`}
               >
                 <span
@@ -152,7 +152,7 @@ export function AvailabilityEditor() {
               </button>
               <span
                 className={`text-sm font-medium ${
-                  day.enabled ? "text-[#134021]" : "text-workon-muted"
+                  day.enabled ? "text-workon-primary" : "text-workon-muted"
                 }`}
               >
                 {name}
@@ -165,7 +165,7 @@ export function AvailabilityEditor() {
                 <select
                   value={day.startTime}
                   onChange={(e) => updateDay(i, { startTime: e.target.value })}
-                  className="rounded-xl border border-workon-border bg-workon-bg px-3 py-2 text-sm text-[#1B1A18] focus:border-[#134021] focus:outline-none"
+                  className="rounded-xl border border-workon-border bg-workon-bg px-3 py-2 text-sm text-workon-ink focus:border-workon-primary focus:outline-none"
                 >
                   {TIME_OPTIONS.map((t) => (
                     <option key={t} value={t}>
@@ -177,7 +177,7 @@ export function AvailabilityEditor() {
                 <select
                   value={day.endTime}
                   onChange={(e) => updateDay(i, { endTime: e.target.value })}
-                  className="rounded-xl border border-workon-border bg-workon-bg px-3 py-2 text-sm text-[#1B1A18] focus:border-[#134021] focus:outline-none"
+                  className="rounded-xl border border-workon-border bg-workon-bg px-3 py-2 text-sm text-workon-ink focus:border-workon-primary focus:outline-none"
                 >
                   {TIME_OPTIONS.map((t) => (
                     <option key={t} value={t}>
@@ -198,7 +198,7 @@ export function AvailabilityEditor() {
         type="button"
         onClick={handleSave}
         disabled={!dirty || saveMutation.isPending}
-        className="w-full rounded-2xl bg-[#134021] px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#0F3319] disabled:opacity-70 shadow-md shadow-[#134021]/25"
+        className="w-full rounded-2xl bg-workon-primary px-6 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-workon-primary-hover disabled:opacity-70 shadow-md shadow-workon-primary/25"
       >
         {saveMutation.isPending ? (
           <span className="inline-flex items-center gap-2">
