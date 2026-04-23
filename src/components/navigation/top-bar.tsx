@@ -35,6 +35,7 @@ import {
   Inbox,
   Handshake,
   FileCheck,
+  Wallet,
 } from "lucide-react";
 
 /**
@@ -71,6 +72,12 @@ export function TopBar() {
     ...(mode === "pro"
       ? [
           { href: "/earnings", label: "Mes revenus", icon: CreditCard },
+          // "Mes paiements" (Stripe Connect) — distinct de "Mes revenus".
+          // Mes revenus = historique des montants payés par mission.
+          // Mes paiements = onboarding Stripe Connect + statut du compte.
+          // Sans cet item, un worker ne peut pas accéder à son onboarding
+          // autrement qu'en tapant l'URL — bloquant pour le revenu.
+          { href: "/worker/payments", label: "Mes paiements", icon: Wallet },
           // R3 orphans revealed — pages built, backends consumed, no nav
           // before this PR. Pro-side: leads delivered, bookings received,
           // availability calendar.
