@@ -2,10 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
-import { useMode } from "@/contexts/mode-context";
 import { api } from "@/lib/api-client";
-import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
-import { WorkerCard } from "@/components/worker/worker-card";
+import { WorkerCardFeed } from "@/components/worker/worker-card-feed";
 import { Button } from "@/components/ui/button";
 import { MissionProgressBar } from "@/components/mission/mission-progress-bar";
 import { SkeletonWorkerCard } from "@/components/ui/skeleton";
@@ -14,7 +12,6 @@ import type { WorkerProfile } from "@/lib/api-client";
 import {
   ArrowRight,
   Inbox,
-  FileText,
   Crown,
   ShieldCheck,
   FileCheck,
@@ -43,8 +40,6 @@ import { missionStatusLabel, missionStatusColor } from "@/lib/i18n-labels";
  */
 export default function HomePage() {
   const { user } = useAuth();
-  const { mode } = useMode();
-  const isPro = mode === "pro";
 
   const { data: stats } = useQuery({
     queryKey: ["home-stats"],
@@ -185,17 +180,12 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Stripe Connect gate (pro mode only — masqué après onboarding) */}
-      {isPro && <StripeConnectGate />}
-
       {/* ── 2. À TRAITER ────────────────────────────────────────── */}
       <ToDoSection
         pendingLeads={pendingLeads.length}
         quotaExceeded={
           quota && quota.limit !== null && quota.used >= quota.limit
         }
-        isPro={isPro}
-        hasPaidPlan={quota?.hasPaidPlan ?? false}
       />
 
       {/* ── 3. MISSIONS EN COURS ────────────────────────────────── */}
@@ -257,26 +247,13 @@ export default function HomePage() {
               Voir tout
             </Link>
           </div>
-          <div
-            className="flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-2 scrollbar-hide"
-            style={{ scrollPaddingLeft: "1rem" }}
-          >
+          <div className="space-y-4 max-w-[520px] mx-auto">
             {isLoadingWorkers
               ? Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={`skel-${i}`}
-                    className="shrink-0 w-[78vw] max-w-[300px] snap-start"
-                  >
-                    <SkeletonWorkerCard />
-                  </div>
+                  <SkeletonWorkerCard key={`skel-${i}`} />
                 ))
               : realWorkers.slice(0, 8).map((w) => (
-                  <div
-                    key={w.id}
-                    className="shrink-0 w-[78vw] max-w-[300px] snap-start"
-                  >
-                    <WorkerCard worker={w} />
-                  </div>
+                  <WorkerCardFeed key={w.id} worker={w} />
                 ))}
           </div>
         </section>
@@ -327,13 +304,9 @@ export default function HomePage() {
 function ToDoSection({
   pendingLeads,
   quotaExceeded,
-  isPro,
-  hasPaidPlan,
 }: {
   pendingLeads: number;
   quotaExceeded: boolean | null | undefined;
-  isPro: boolean;
-  hasPaidPlan: boolean;
 }) {
   const cards: Array<{
     key: string;
@@ -369,17 +342,8 @@ function ToDoSection({
     });
   }
 
-  if (isPro && !hasPaidPlan) {
-    cards.push({
-      key: "upsell-pro",
-      icon: <FileText className="h-5 w-5" />,
-      title: "Débloque 5 leads entrants par mois",
-      subtitle: "Abonne-toi à Pro — 19 $ / mois",
-      href: "/pricing",
-      cta: "Voir plans",
-      accent: "violet",
-    });
-  }
+  // Note: leads upsell moved to /leads/mine where it's contextually relevant
+  // (the page showing leads usage + plan gating).
 
   if (cards.length === 0) return null;
 

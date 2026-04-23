@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
+import { StripeOnboardingModal } from "@/components/worker/stripe-onboarding-modal";
+import { useAuth } from "@/contexts/auth-context";
 import {
   Loader2,
   Inbox,
@@ -47,12 +50,27 @@ type Delivery = {
 export default function LeadsInboxPage() {
   const router = useRouter();
   const qc = useQueryClient();
+  const { user } = useAuth();
+  const [stripeModalOpen, setStripeModalOpen] = useState(false);
+
+  const isWorker =
+    user?.role === "worker" ||
+    (user?.role as unknown as string) === "WORKER";
 
   const { data, isLoading } = useQuery({
     queryKey: ["leads-mine"],
     queryFn: () => api.getMyLeads(),
     refetchInterval: 30_000,
   });
+
+  const { data: stripeStatus } = useQuery({
+    queryKey: ["stripe-onboarding-status"],
+    queryFn: () => api.getStripeOnboardingStatus(),
+    enabled: isWorker,
+    staleTime: 60_000,
+  });
+
+  const isStripeOnboarded = stripeStatus?.onboarded ?? false;
 
   const acceptMutation = useMutation({
     mutationFn: (deliveryId: string) => api.acceptLeadDelivery(deliveryId),
@@ -86,6 +104,19 @@ export default function LeadsInboxPage() {
   const openMutation = useMutation({
     mutationFn: (deliveryId: string) => api.markLeadDeliveryOpened(deliveryId),
   });
+
+  /**
+   * Guard lead acceptance: workers must complete Stripe Connect
+   * onboarding before accepting leads (so they can actually be paid).
+   * If not onboarded, open the contextual modal instead of calling the API.
+   */
+  function handleAccept(deliveryId: string) {
+    if (isWorker && !isStripeOnboarded) {
+      setStripeModalOpen(true);
+      return;
+    }
+    acceptMutation.mutate(deliveryId);
+  }
 
   if (isLoading) {
     return (
@@ -185,7 +216,7 @@ export default function LeadsInboxPage() {
               onOpen={() => {
                 if (!d.openedAt) openMutation.mutate(d.id);
               }}
-              onAccept={() => acceptMutation.mutate(d.id)}
+              onAccept={() => handleAccept(d.id)}
               onDecline={() => declineMutation.mutate(d.id)}
               pending={
                 acceptMutation.isPending || declineMutation.isPending
@@ -194,6 +225,12 @@ export default function LeadsInboxPage() {
           ))}
         </div>
       )}
+
+      <StripeOnboardingModal
+        open={stripeModalOpen}
+        onOpenChange={setStripeModalOpen}
+        action="l'acceptation de ce lead"
+      />
     </div>
   );
 }
