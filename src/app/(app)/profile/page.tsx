@@ -4,6 +4,8 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { ProfileRolesCard } from "@/components/profile/profile-roles-card";
 import { WorkerCardEditor } from "@/components/profile/worker-card-editor";
 import { BusinessInfoEditor } from "@/components/profile/business-info-editor";
+import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
+import { IdentityVerifyGate } from "@/components/profile/identity-verify-gate";
 import { useAuth } from "@/contexts/auth-context";
 import { Loader2 } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -32,6 +34,14 @@ export default function ProfilePage() {
           Modifie ta photo, ton rôle et tes informations publiques.
         </p>
       </div>
+
+      {/* Worker-only: visible only when role=worker and onboarding incomplete.
+          Self-dismisses for clients and for workers already onboarded. */}
+      <StripeConnectGate />
+
+      {/* All roles: surfaces when trustTier === BASIC (unverified identity).
+          Auto-hides once phone/ID verification moves the tier up. */}
+      <IdentityVerifyGate />
 
       <div className="grid gap-10 lg:grid-cols-2">
         <ProfileRolesCard />

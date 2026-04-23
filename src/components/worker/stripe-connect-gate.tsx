@@ -8,10 +8,15 @@ import { getOnboardingStatus } from "@/lib/stripe-api";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { safeSessionStorage } from "@/lib/safe-storage";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * StripeConnectGate — reusable banner that surfaces when a worker
  * has NOT completed Stripe Connect onboarding.
+ *
+ * Worker-only: renders nothing when user.role !== 'worker' so it
+ * can be dropped on shared pages (e.g. /profile) without firing
+ * status checks for clients.
  */
 
 export interface StripeConnectGateProps {
@@ -23,10 +28,14 @@ export function StripeConnectGate({
   minCompletedMissions = 0,
   className,
 }: StripeConnectGateProps) {
+  const { user } = useAuth();
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
+  const isWorker = user?.role === "worker" || (user?.role as unknown as string) === "WORKER";
+
   useEffect(() => {
+    if (!isWorker) return;
     let cancelled = false;
     const run = async () => {
       try {
@@ -42,7 +51,7 @@ export function StripeConnectGate({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isWorker]);
 
   useEffect(() => {
     if (safeSessionStorage.getItem("workon:stripe-gate-dismissed") === "1") {
@@ -55,6 +64,7 @@ export function StripeConnectGate({
     safeSessionStorage.setItem("workon:stripe-gate-dismissed", "1");
   }
 
+  if (!isWorker) return null;
   if (onboarded === null) return null;
   if (onboarded) return null;
   if (dismissed) return null;
