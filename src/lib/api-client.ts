@@ -551,7 +551,20 @@ export const api = {
   },
 
   // Missions
-  createMission: (data: { title: string; description: string; category: string; price: number; latitude: number; longitude: number; city: string; address?: string }) =>
+  createMission: (data: {
+    title: string;
+    description: string;
+    category: string;
+    price: number;
+    latitude: number;
+    longitude: number;
+    city: string;
+    address?: string;
+    /** Estimated duration in minutes (15–43200). Optional at create time. */
+    durationMinutes?: number;
+    /** Client provides the material. Optional at create time. */
+    materialProvided?: boolean;
+  }) =>
     apiFetch<MissionResponse>("/missions-local", { method: "POST", body: JSON.stringify(data) }),
 
   expressDispatch: (data: { category: string; description: string; city: string; budget: number; latitude: number; longitude: number }) =>
