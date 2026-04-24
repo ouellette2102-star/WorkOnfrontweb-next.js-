@@ -533,7 +533,9 @@ export const api = {
   },
   getWorker: async (id: string): Promise<WorkerProfile> => {
     // /profiles/workers/:id returns 404 in production — use the public
-    // by-id endpoint and adapt to the WorkerProfile shape.
+    // by-id endpoint and adapt to the WorkerProfile shape. The raw type
+    // mirrors every field the BE exposes so new additions don't get
+    // silently dropped the way bio/skills/availability did before.
     const raw = await apiFetch<{
       id: string;
       firstName: string;
@@ -549,6 +551,13 @@ export const api = {
       badges: { label: string; type: string }[];
       trustTier: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
       portfolioPhotos: string[];
+      bio?: string | null;
+      skills?: { id: string; labelFr: string; category?: string | null }[];
+      availabilityPreview?: {
+        dayOfWeek: number;
+        startTime: string;
+        endTime: string;
+      }[];
     }>(`/public/workers/by-id/${id}`, { skipAuth: true });
     return {
       id: raw.id,
@@ -566,6 +575,9 @@ export const api = {
       badges: raw.badges,
       trustTier: raw.trustTier,
       portfolioPhotos: raw.portfolioPhotos,
+      bio: raw.bio ?? null,
+      skills: raw.skills ?? [],
+      availabilityPreview: raw.availabilityPreview ?? [],
     };
   },
 
