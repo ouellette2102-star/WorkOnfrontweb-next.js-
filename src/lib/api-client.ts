@@ -138,6 +138,12 @@ export interface WorkerProfile {
   completedMissions: number;
   badges: { label: string; type: string }[];
   hourlyRate?: number;
+  /** Worker bio / public description — surfaced on /worker/[id], /reserve, and card feed. */
+  bio?: string | null;
+  /** Skills list (localized labels), as returned by the public worker endpoint. */
+  skills?: { id: string; labelFr: string; category?: string | null }[];
+  /** Recurring weekly availability, shown on the card and on the reserve picker. */
+  availabilityPreview?: { dayOfWeek: number; startTime: string; endTime: string }[];
   /** Top N portfolio photo URLs, when the backend includes them. */
   portfolioPhotos?: string[];
   /** Trust tier from backend — aligns with LocalUser.trustTier Prisma enum. */
@@ -733,6 +739,21 @@ export const api = {
     formData.append("file", file);
     return apiFetch<unknown>("/users/me/picture", { method: "POST", body: formData });
   },
+  /** Append a photo to the worker gallery (max 12, 5 MB each, JPEG/PNG/WebP). */
+  uploadGalleryPhoto: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiFetch<{ gallery?: string[] }>("/users/me/gallery", {
+      method: "POST",
+      body: formData,
+    });
+  },
+  /** Remove a specific photo URL from the worker gallery. */
+  deleteGalleryPhoto: (url: string) =>
+    apiFetch<{ gallery?: string[] }>("/users/me/gallery", {
+      method: "DELETE",
+      body: JSON.stringify({ url }),
+    }),
   updateAvatar: (pictureUrl: string) =>
     apiFetch<unknown>("/users/me/avatar", {
       method: "PATCH",

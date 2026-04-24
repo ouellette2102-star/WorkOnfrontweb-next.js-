@@ -86,6 +86,11 @@ export function HeroWorkerCard({
                 📍 {worker.city}
               </p>
             )}
+            {worker.bio && (
+              <p className="text-xs text-workon-gray/80 mt-2 line-clamp-2 leading-snug">
+                {worker.bio}
+              </p>
+            )}
           </div>
           {hasReviews && (
             <div className="flex items-center gap-1 flex-shrink-0">

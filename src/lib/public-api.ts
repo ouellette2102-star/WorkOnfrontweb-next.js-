@@ -39,6 +39,11 @@ export interface FeaturedWorker {
   sector?: string;
   jobTitle?: string | null;
   hourlyRate?: number | null;
+  bio?: string | null;
+  /** Localized skill labels (FR) — populated by /public/workers/featured + /by-id. */
+  skills?: { id: string; labelFr: string; category?: string | null }[];
+  /** Recurring weekly availability surfaced to the card. */
+  availabilityPreview?: { dayOfWeek: number; startTime: string; endTime: string }[];
   portfolioPhotos?: string[];
   ratingAvg: number;
   ratingCount: number;
