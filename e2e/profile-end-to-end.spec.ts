@@ -107,24 +107,42 @@ test.describe("Phase 1 — profile end-to-end", () => {
     const bioResp = await saveBio;
     expect(bioResp.ok(), "PATCH /users/me must return 2xx").toBeTruthy();
 
-    // ── 4. Select a skill ───────────────────────────────────
-    // The skill-selector renders toggleable tiles — pick the first
-    // non-selected one.
-    const skillButtons = page.locator(
-      'button:has(svg.lucide-check)',
+    // ── 4. Select skills (Beauté → 2 tiles) ─────────────────
+    // Catalog is seeded in prod: "Beauté" contains 9 skills including
+    // "Coiffure" and "Barbier / coupe homme". We click the category
+    // first to narrow the list, then click the two specific tiles by
+    // name, then wait on PUT /workers/me/skills so we know the save
+    // landed before continuing.
+    const beauteCategory = page.getByRole("button", { name: /^💇 Beauté$/ });
+    await beauteCategory.scrollIntoViewIfNeeded();
+    await beauteCategory.click();
+
+    const coiffureTile = page.getByRole("button", { name: /^Coiffure$/ });
+    await expect(coiffureTile).toBeVisible({ timeout: 10_000 });
+    await coiffureTile.click();
+
+    const barbierTile = page.getByRole("button", {
+      name: /Barbier \/ coupe homme/,
+    });
+    await expect(barbierTile).toBeVisible();
+    await barbierTile.click();
+
+    const saveSkills = page.waitForResponse(
+      (r) =>
+        r.url().includes("/workers/me/skills") && r.request().method() === "PUT",
+      { timeout: 20_000 },
     );
-    const firstSkill = skillButtons.first();
-    if (await firstSkill.count()) {
-      await firstSkill.click();
-      await page
-        .getByRole("button", {
-          name: /Sauvegarder les comp[ée]tences|Compétences à jour/i,
-        })
-        .click()
-        .catch(() => {
-          // already up-to-date — skip
-        });
-    }
+    await page
+      .getByRole("button", { name: /Sauvegarder les comp[ée]tences/i })
+      .click();
+    const skillsResp = await saveSkills;
+    expect(
+      skillsResp.ok(),
+      "PUT /workers/me/skills must return 2xx — DTO validation drove #2",
+    ).toBeTruthy();
+    await expect(
+      page.getByRole("button", { name: /Comp[ée]tences à jour/i }),
+    ).toBeVisible({ timeout: 10_000 });
 
     // ── 5. Enable Monday 09:00–17:00 ────────────────────────
     const mondayToggle = page
@@ -165,7 +183,12 @@ test.describe("Phase 1 — profile end-to-end", () => {
     await expect(page.getByText(bioText)).toBeVisible({ timeout: 10_000 });
     // At least one availability chip (DAY · HH:MM–HH:MM pattern).
     await expect(
-      page.locator("text=/(Lun|Mar|Mer|Jeu|Ven|Sam|Dim) · \\d{2}:\\d{2}/"),
-    ).toHaveCount(1, { timeout: 10_000 });
+      page
+        .locator("text=/(Lun|Mar|Mer|Jeu|Ven|Sam|Dim) · \\d{2}:\\d{2}/")
+        .first(),
+    ).toBeVisible({ timeout: 10_000 });
+    // Both skills we saved appear as chips under "Compétences".
+    await expect(page.getByText(/^Coiffure$/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Barbier \/ coupe homme/)).toBeVisible();
   });
 });
