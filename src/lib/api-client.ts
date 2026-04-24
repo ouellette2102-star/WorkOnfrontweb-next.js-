@@ -393,9 +393,22 @@ export interface SupportTicket {
 }
 
 export interface VerificationStatus {
-  phoneVerified: boolean;
-  idVerified: boolean;
+  phone: {
+    verified: boolean;
+    verifiedAt: string | null;
+  };
+  identity: {
+    status: "NOT_STARTED" | "PENDING" | "VERIFIED" | "FAILED" | "EXPIRED";
+    verifiedAt: string | null;
+    provider: string | null;
+  };
+  bank: {
+    verified: boolean;
+    verifiedAt: string | null;
+    hasStripeAccount: boolean;
+  };
   trustTier: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
+  trustTierUpdatedAt: string | null;
 }
 
 export interface ReviewSummary {
@@ -998,10 +1011,23 @@ export const api = {
   closeTicket: (id: string) => apiFetch<SupportTicket>(`/support/tickets/${id}/close`, { method: "PATCH" }),
 
   // Identity Verification
-  startPhoneVerification: () => apiFetch<unknown>("/identity/verify/phone", { method: "POST" }),
+  startPhoneVerification: () =>
+    apiFetch<{ sent: boolean; expiresInSeconds: number; devOtp?: string }>(
+      "/identity/verify/phone",
+      { method: "POST" },
+    ),
   confirmPhoneOtp: (code: string) =>
-    apiFetch<unknown>("/identity/verify/phone/confirm", { method: "POST", body: JSON.stringify({ code }) }),
-  startIdVerification: () => apiFetch<unknown>("/identity/verify/id/start", { method: "POST" }),
+    apiFetch<{ verified: true; trustTier: string }>(
+      "/identity/verify/phone/confirm",
+      { method: "POST", body: JSON.stringify({ code }) },
+    ),
+  startIdVerification: () =>
+    apiFetch<{
+      status: string;
+      provider: string | null;
+      sessionUrl: string | null;
+      message: string;
+    }>("/identity/verify/id/start", { method: "POST" }),
   getVerificationStatus: () => apiFetch<VerificationStatus>("/identity/status"),
 
   // Devices
