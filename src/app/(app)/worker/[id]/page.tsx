@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { AvatarFallback } from "@/components/ui/avatar-fallback";
 import { TrustTierBadge } from "@/components/worker/trust-tier-badge";
 import { ContactWorkerButton } from "@/components/worker/contact-worker-button";
-import { Star, Shield, CheckCircle2, Loader2 } from "lucide-react";
+import { Star, Shield, CheckCircle2, Loader2, Clock, Sparkles } from "lucide-react";
+
+const DAY_LABELS_SHORT = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"] as const;
 import { cn } from "@/lib/utils";
 
 export default function WorkerProfilePage() {
@@ -122,6 +124,56 @@ export default function WorkerProfilePage() {
               À partir de {worker.hourlyRate} $/h
             </p>
           </div>
+        )}
+
+        {/* Bio — public "À propos" block fed from LocalUser.bio. */}
+        {worker.bio && worker.bio.trim().length > 0 && (
+          <section className="rounded-xl bg-white border border-workon-border p-4">
+            <h2 className="font-semibold text-workon-ink mb-2">À propos</h2>
+            <p className="text-sm text-workon-ink leading-relaxed whitespace-pre-line">
+              {worker.bio}
+            </p>
+          </section>
+        )}
+
+        {/* Skills — localized from the Skill catalog. */}
+        {(worker.skills ?? []).length > 0 && (
+          <section>
+            <h2 className="font-semibold text-workon-ink mb-2 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-workon-primary" />
+              Compétences
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {(worker.skills ?? []).map((s) => (
+                <span
+                  key={s.id}
+                  className="inline-flex items-center rounded-full bg-workon-primary/8 border border-workon-primary/20 px-3 py-1 text-xs font-medium text-workon-primary"
+                >
+                  {s.labelFr}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Availability preview — recurring weekly slots. */}
+        {(worker.availabilityPreview ?? []).length > 0 && (
+          <section>
+            <h2 className="font-semibold text-workon-ink mb-2 flex items-center gap-2">
+              <Clock className="h-4 w-4 text-workon-primary" />
+              Disponibilités
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {(worker.availabilityPreview ?? []).map((slot, i) => (
+                <span
+                  key={`${slot.dayOfWeek}-${slot.startTime}-${i}`}
+                  className="inline-flex items-center rounded-full bg-white border border-workon-border px-3 py-1 text-xs font-medium text-workon-ink"
+                >
+                  {DAY_LABELS_SHORT[slot.dayOfWeek]} · {slot.startTime}–{slot.endTime}
+                </span>
+              ))}
+            </div>
+          </section>
         )}
 
         {/* Portfolio — 3 thumbs */}
