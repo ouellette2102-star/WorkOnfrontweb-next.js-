@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Shield, Phone, CreditCard, CheckCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const TIER_CONFIG: Record<string, { label: string; color: string; description: string }> = {
   BASIC: { label: "Basique", color: "text-neutral-400 border-neutral-500/30 bg-neutral-500/10", description: "Compte non verifie" },
@@ -20,6 +21,7 @@ const TIERS_ORDER = ["BASIC", "VERIFIED", "TRUSTED", "PREMIUM"];
 
 export default function VerifyPage() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [otpCode, setOtpCode] = useState("");
 
@@ -28,33 +30,70 @@ export default function VerifyPage() {
     queryFn: () => api.getVerificationStatus(),
   });
 
+  // When Stripe Identity redirects back with ?stripe_identity=complete,
+  // re-fetch status so the UI reflects the new tier immediately.
+  useEffect(() => {
+    if (searchParams.get("stripe_identity") === "complete") {
+      queryClient.invalidateQueries({ queryKey: ["verification-status"] });
+      toast.success(
+        "Vérification soumise. Le résultat arrive sous quelques minutes.",
+      );
+    }
+  }, [searchParams, queryClient]);
+
   const phoneMutation = useMutation({
     mutationFn: () => api.startPhoneVerification(),
-    onSuccess: () => {
+    onSuccess: (res) => {
       setShowOtpInput(true);
-      toast.success("Code de verification envoye");
+      // Twilio not configured in prod — surface the devOtp in non-prod so
+      // testers can actually complete the flow. Backend strips it in prod.
+      if (res.devOtp) {
+        toast.success(`Code DEV: ${res.devOtp}`, { duration: 15_000 });
+      } else {
+        toast.success("Code de vérification envoyé par SMS");
+      }
     },
-    onError: () => toast.error("Erreur lors de l'envoi du code"),
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : "Erreur";
+      if (msg.includes("numéro") || msg.includes("téléphone")) {
+        toast.error("Ajoute ton numéro de téléphone dans ton profil d'abord");
+      } else if (msg.includes("déjà vérifié")) {
+        toast.info("Téléphone déjà vérifié");
+      } else {
+        toast.error(`Erreur lors de l'envoi du code: ${msg}`);
+      }
+    },
   });
 
   const confirmOtpMutation = useMutation({
     mutationFn: () => api.confirmPhoneOtp(otpCode),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["verification-status"] });
-      toast.success("Telephone verifie avec succes !");
+      toast.success("Téléphone vérifié avec succès !");
       setShowOtpInput(false);
       setOtpCode("");
     },
-    onError: () => toast.error("Code invalide"),
+    onError: () => toast.error("Code invalide ou expiré"),
   });
 
   const idMutation = useMutation({
     mutationFn: () => api.startIdVerification(),
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["verification-status"] });
-      toast.success("Verification d'identite lancee");
+      if (res.sessionUrl) {
+        toast.success("Redirection vers Stripe Identity…");
+        window.location.href = res.sessionUrl;
+      } else {
+        toast.info(
+          res.message ||
+            "Vérification d'identité non disponible sur ce serveur.",
+        );
+      }
     },
-    onError: () => toast.error("Erreur lors du lancement de la verification"),
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : "Erreur";
+      toast.error(`Impossible de démarrer la vérification: ${msg}`);
+    },
   });
 
   if (isLoading) {
@@ -67,6 +106,9 @@ export default function VerifyPage() {
 
   const tierConfig = status ? TIER_CONFIG[status.trustTier] || TIER_CONFIG.BASIC : TIER_CONFIG.BASIC;
   const currentTierIndex = status ? TIERS_ORDER.indexOf(status.trustTier) : 0;
+  const phoneVerified = status?.phone.verified ?? false;
+  const idVerified = status?.identity.status === "VERIFIED";
+  const idPending = status?.identity.status === "PENDING";
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
@@ -112,8 +154,8 @@ export default function VerifyPage() {
         <div className="rounded-xl border border-workon-border bg-white shadow-sm p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.phoneVerified ? "bg-green-500/20" : "bg-workon-bg"}`}>
-                {status?.phoneVerified ? (
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${phoneVerified ? "bg-green-500/20" : "bg-workon-bg"}`}>
+                {phoneVerified ? (
                   <CheckCircle className="h-5 w-5 text-green-400" />
                 ) : (
                   <Phone className="h-5 w-5 text-workon-muted" />
@@ -124,14 +166,14 @@ export default function VerifyPage() {
                 <p className="text-sm text-workon-muted">Confirmez votre numero par SMS</p>
               </div>
             </div>
-            {status?.phoneVerified && (
+            {phoneVerified && (
               <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
                 Verifie
               </span>
             )}
           </div>
 
-          {!status?.phoneVerified && !showOtpInput && (
+          {!phoneVerified && !showOtpInput && (
             <Button
               onClick={() => phoneMutation.mutate()}
               disabled={phoneMutation.isPending}
@@ -166,8 +208,8 @@ export default function VerifyPage() {
         <div className="rounded-xl border border-workon-border bg-white shadow-sm p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.idVerified ? "bg-green-500/20" : "bg-workon-bg"}`}>
-                {status?.idVerified ? (
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${idVerified ? "bg-green-500/20" : "bg-workon-bg"}`}>
+                {idVerified ? (
                   <CheckCircle className="h-5 w-5 text-green-400" />
                 ) : (
                   <CreditCard className="h-5 w-5 text-workon-muted" />
@@ -178,21 +220,33 @@ export default function VerifyPage() {
                 <p className="text-sm text-workon-muted">Soumettez une piece d&apos;identite officielle</p>
               </div>
             </div>
-            {status?.idVerified && (
+            {idVerified && (
               <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
                 Verifie
               </span>
             )}
+            {idPending && !idVerified && (
+              <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-600">
+                En cours
+              </span>
+            )}
           </div>
 
-          {!status?.idVerified && (
+          {idPending && !idVerified && (
+            <p className="mb-3 text-xs text-workon-muted">
+              Vérification soumise à Stripe Identity. Résultat sous quelques
+              minutes — rafraîchis cette page.
+            </p>
+          )}
+
+          {!idVerified && (
             <Button
               onClick={() => idMutation.mutate()}
               disabled={idMutation.isPending}
               className="bg-workon-primary hover:bg-workon-primary/90"
             >
               {idMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CreditCard className="mr-2 h-4 w-4" />}
-              Commencer la verification
+              {idPending ? "Reprendre la vérification" : "Commencer la vérification"}
             </Button>
           )}
         </div>
