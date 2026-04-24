@@ -28,7 +28,7 @@ export default function ContractsPage() {
         <div className="mb-8">
           <h1 className="mb-2 text-4xl font-bold text-workon-ink">Mes contrats</h1>
           <p className="text-lg text-workon-muted">
-            Consultez et g\u00e9rez vos contrats
+            Consultez et gérez vos contrats
           </p>
         </div>
 
@@ -51,7 +51,7 @@ export default function ContractsPage() {
               Aucun contrat
             </h3>
             <p className="text-workon-muted">
-              Vos contrats appara\u00eetront ici une fois cr\u00e9\u00e9s
+              Vos contrats apparaîtront ici une fois créés
             </p>
           </div>
         )}
@@ -74,7 +74,7 @@ export default function ContractsPage() {
                           </p>
                         )}
                         <p className="mt-2 text-sm text-workon-muted">
-                          Cr\u00e9\u00e9 le{" "}
+                          Créé le{" "}
                           {new Date(contract.createdAt).toLocaleDateString("fr-CA")}
                         </p>
                       </div>

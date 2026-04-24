@@ -68,17 +68,20 @@ export function AvailabilityEditor() {
     setDirty(false);
   }, [slots]);
 
-  // Save mutation
+  // Save mutation — surfaces the real error message so silent fails are debuggable.
   const saveMutation = useMutation({
     mutationFn: (enabledSlots: { dayOfWeek: number; startTime: string; endTime: string }[]) =>
       api.setMyAvailability(enabledSlots),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-availability"] });
+      queryClient.invalidateQueries({ queryKey: ["featured-workers-public"] });
       setDirty(false);
-      toast.success("Disponibilites sauvegardees");
+      toast.success("Disponibilités sauvegardées");
     },
-    onError: () => {
-      toast.error("Erreur lors de la sauvegarde des disponibilites");
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      console.error("[availability-editor] save failed:", err);
+      toast.error(`Échec de la sauvegarde : ${message}`);
     },
   });
 
@@ -193,7 +196,7 @@ export function AvailabilityEditor() {
         );
       })}
 
-      {/* Save button */}
+      {/* Save button + explicit saved state so the user never wonders if it persisted. */}
       <button
         type="button"
         onClick={handleSave}
@@ -205,10 +208,17 @@ export function AvailabilityEditor() {
             <Loader2 className="h-4 w-4 animate-spin" />
             Enregistrement...
           </span>
+        ) : dirty ? (
+          "Sauvegarder les disponibilités"
         ) : (
-          "Sauvegarder les disponibilites"
+          "Disponibilités à jour ✓"
         )}
       </button>
+      {!dirty && !saveMutation.isPending && (
+        <p className="text-center text-xs text-workon-muted">
+          Vos disponibilités sont enregistrées et visibles sur votre carte publique.
+        </p>
+      )}
     </div>
   );
 }

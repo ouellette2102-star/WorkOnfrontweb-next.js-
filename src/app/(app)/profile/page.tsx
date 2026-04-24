@@ -1,8 +1,8 @@
 "use client";
 
 import { ProfileForm } from "@/components/profile/profile-form";
-import { ProfileRolesCard } from "@/components/profile/profile-roles-card";
 import { WorkerCardEditor } from "@/components/profile/worker-card-editor";
+import { PortfolioUploader } from "@/components/profile/portfolio-uploader";
 import { BusinessInfoEditor } from "@/components/profile/business-info-editor";
 import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { IdentityVerifyGate } from "@/components/profile/identity-verify-gate";
@@ -31,7 +31,8 @@ export default function ProfilePage() {
         <p className="text-sm uppercase tracking-[0.4em] text-workon-accent">Profil</p>
         <h1 className="mt-3 text-4xl font-semibold">Tes informations</h1>
         <p className="mt-2 text-workon-muted">
-          Modifie ta photo, ton rôle et tes informations publiques.
+          Modifie ta photo et tes informations publiques. Change ton rôle
+          (Pro/Client) depuis le menu en haut à droite.
         </p>
       </div>
 
@@ -43,22 +44,23 @@ export default function ProfilePage() {
           Auto-hides once phone/ID verification moves the tier up. */}
       <IdentityVerifyGate />
 
-      <div className="grid gap-10 lg:grid-cols-2">
-        <ProfileRolesCard />
-
-        <section className="rounded-3xl border border-workon-border bg-white p-8 shadow-sm">
-          <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Infos publiques</p>
-          <h2 className="mt-3 text-2xl font-semibold">Profil affiché</h2>
-          <p className="mt-2 text-workon-muted">
-            Photo, nom, ville — visibles sur tes cartes WorkOn.
-          </p>
-          <div className="mt-6">
-            <ProfileForm />
-          </div>
-        </section>
-      </div>
+      <section className="rounded-3xl border border-workon-border bg-white p-8 shadow-sm">
+        <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Infos publiques</p>
+        <h2 className="mt-3 text-2xl font-semibold">Profil affiché</h2>
+        <p className="mt-2 text-workon-muted">
+          Photo, nom, ville — visibles sur tes cartes WorkOn.
+        </p>
+        <div className="mt-6">
+          <ProfileForm />
+        </div>
+      </section>
 
       <WorkerCardEditor />
+
+      {/* Portfolio gallery — feeds LocalUser.gallery, surfaced on the public
+          worker card + /worker/[id]. Backend endpoints already existed; the UI
+          was the missing piece (bug #5). */}
+      <PortfolioUploader />
 
       {/* Revenu Québec IN-203 — legal snapshot fields printed on every
           invoice issued through WorkOn. Kept below the public-profile

@@ -12,7 +12,12 @@ import {
   ShieldCheck,
   Quote,
   ChevronDown,
+  Clock,
+  Sparkles,
 } from "lucide-react";
+
+// Backend dayOfWeek convention: 0=Sunday, 1=Monday, ..., 6=Saturday.
+const DAY_LABELS_SHORT = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"] as const;
 import type { WorkerProfile } from "@/lib/api-client";
 import { TrustPill } from "@/components/ui/trust-pill";
 import { ContactWorkerButton } from "@/components/worker/contact-worker-button";
@@ -254,6 +259,58 @@ export function WorkerCardFeed({ worker, className }: WorkerCardFeedProps) {
 
           {expanded && (
             <div className="space-y-3 pt-1">
+              {/* Bio — public description set in /profile */}
+              {worker.bio && worker.bio.trim().length > 0 && (
+                <div className="rounded-xl bg-white border border-workon-border p-3">
+                  <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-1.5">
+                    À propos
+                  </p>
+                  <p className="text-xs text-workon-ink leading-relaxed whitespace-pre-line">
+                    {worker.bio}
+                  </p>
+                </div>
+              )}
+
+              {/* Skills — from LocalUser.skills joined with catalog */}
+              {(worker.skills ?? []).length > 0 && (
+                <div className="rounded-xl bg-white border border-workon-border p-3">
+                  <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3 text-workon-primary" />
+                    Compétences
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(worker.skills ?? []).slice(0, 8).map((s) => (
+                      <span
+                        key={s.id}
+                        className="inline-flex items-center rounded-full bg-workon-primary/8 border border-workon-primary/20 px-2 py-0.5 text-[11px] font-medium text-workon-primary"
+                      >
+                        {s.labelFr}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Availability preview — recurring weekly slots */}
+              {(worker.availabilityPreview ?? []).length > 0 && (
+                <div className="rounded-xl bg-white border border-workon-border p-3">
+                  <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                    <Clock className="h-3 w-3 text-workon-primary" />
+                    Disponibilités
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(worker.availabilityPreview ?? []).slice(0, 4).map((slot, i) => (
+                      <span
+                        key={`${slot.dayOfWeek}-${slot.startTime}-${i}`}
+                        className="inline-flex items-center rounded-full bg-workon-bg border border-workon-border px-2 py-0.5 text-[11px] font-medium text-workon-ink"
+                      >
+                        {DAY_LABELS_SHORT[slot.dayOfWeek]} · {slot.startTime}–{slot.endTime}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Pourquoi choisir */}
               <div className="rounded-xl bg-workon-bg border border-workon-border p-3 space-y-1.5">
                 <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2">

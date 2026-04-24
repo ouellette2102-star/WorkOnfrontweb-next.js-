@@ -88,7 +88,7 @@ export default function ContractDetailPage() {
                 Contrat #{contract.id.slice(0, 8)}
               </h1>
               <p className="text-sm text-workon-muted">
-                Cr\u00e9\u00e9 le{" "}
+                Créé le{" "}
                 {new Date(contract.createdAt).toLocaleDateString("fr-CA")}
               </p>
             </div>
@@ -103,7 +103,7 @@ export default function ContractDetailPage() {
           <div className="mb-6 space-y-4">
             {contract.localMissionId && (
               <div>
-                <p className="text-sm text-workon-muted">Mission associ\u00e9e</p>
+                <p className="text-sm text-workon-muted">Mission associée</p>
                 <p className="text-workon-ink">{contract.localMissionId}</p>
               </div>
             )}
@@ -114,7 +114,7 @@ export default function ContractDetailPage() {
               </div>
             )}
             <div>
-              <p className="text-sm text-workon-muted">Derni\u00e8re mise \u00e0 jour</p>
+              <p className="text-sm text-workon-muted">Dernière mise à jour</p>
               <p className="text-workon-muted">
                 {new Date(contract.updatedAt).toLocaleDateString("fr-CA")}
               </p>
@@ -171,7 +171,7 @@ export default function ContractDetailPage() {
                   disabled={statusMutation.isPending}
                   className="bg-blue-600 hover:bg-blue-500"
                 >
-                  Compl\u00e9ter
+                  Compléter
                 </Button>
                 <Button
                   onClick={() => statusMutation.mutate("CANCELLED")}
