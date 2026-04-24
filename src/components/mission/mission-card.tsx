@@ -9,6 +9,7 @@ import {
   Sparkles,
   ArrowRight,
   Users,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -47,6 +48,10 @@ export type MissionCardInput = {
   firstPhotoUrl?: string | null;
   /** PENDING-offer count — server-computed. Drives the social-proof line. */
   offersCount?: number;
+  /** Estimated duration in minutes. Null = not specified; UI shows "À préciser". */
+  durationMinutes?: number | null;
+  /** Client provides material. Null = not specified. */
+  materialProvided?: boolean | null;
 };
 
 /**
@@ -228,11 +233,11 @@ export function MissionCard({
           )}
         </div>
 
-        {/* Hero row: photo or gradient tile + title */}
+        {/* Hero row: bigger photo + title + location/distance */}
         <div className="flex items-start gap-3">
           {hasPhoto ? (
             <div
-              className="flex h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-workon-bg sm:h-16 sm:w-16"
+              className="relative flex h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl bg-workon-bg sm:h-28 sm:w-28"
               data-testid="mission-card-photo"
             >
               {/* Plain <img> so any upload/CDN domain works without
@@ -248,7 +253,7 @@ export function MissionCard({
           ) : (
             <div
               className={cn(
-                "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-2xl sm:h-16 sm:w-16 sm:text-3xl",
+                "flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-4xl sm:h-28 sm:w-28 sm:text-5xl",
                 gradient,
               )}
               data-testid="mission-card-photo-fallback"
@@ -271,56 +276,62 @@ export function MissionCard({
             <p className="mt-1 inline-flex items-center gap-1 text-xs text-workon-muted">
               <MapPin className="h-3 w-3" />
               {mission.city}
+              {mission.distanceKm != null && (
+                <span className="text-workon-gray">
+                  • à {mission.distanceKm.toFixed(1)} km
+                </span>
+              )}
             </p>
+            {/* Description snippet — small, greyed, only if present */}
+            {mission.description && (
+              <p className="mt-1.5 line-clamp-2 text-xs text-workon-muted">
+                {mission.description}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Budget hero — the single most important signal on the card */}
-        {priceLabel && (
-          <div
-            className="flex items-end justify-between gap-2 rounded-xl border border-workon-border/70 bg-gradient-to-br from-workon-bg to-white px-3 py-2.5"
-            data-testid="mission-card-budget"
-          >
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-workon-muted">
-                {variant === "pro" ? "Gain potentiel" : "Estimation"}
-              </p>
-              <p className="text-2xl font-extrabold leading-none text-workon-accent sm:text-3xl">
-                {priceLabel}
-              </p>
-            </div>
-            {mission.distanceKm != null && (
-              <div className="flex flex-col items-end text-right">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-workon-muted">
-                  Distance
-                </p>
-                <p className="text-base font-bold text-workon-ink sm:text-lg">
-                  {mission.distanceKm.toFixed(1)} km
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Stats row — 3 columns: Gain | Temps | Matériel (pro)
+                                     Budget | Offres | Depuis (client)
+            Data-honest: missing fields render as "À préciser" rather
+            than fake defaults. */}
+        <div
+          className="grid grid-cols-3 divide-x divide-workon-border/70 rounded-xl border border-workon-border/70 bg-gradient-to-br from-workon-bg to-white"
+          data-testid="mission-card-stats"
+        >
+          <Stat
+            label={variant === "pro" ? "Gain" : "Budget"}
+            value={priceLabel ?? "—"}
+            emphasis
+          />
+          <Stat
+            label="Temps"
+            value={formatDuration(mission.durationMinutes)}
+          />
+          <Stat
+            label="Matériel"
+            value={formatMaterial(mission.materialProvided)}
+          />
+        </div>
 
-        {/* Description snippet — small, greyed, only if present */}
-        {mission.description && (
-          <p className="line-clamp-2 text-xs text-workon-muted">
-            {mission.description}
-          </p>
-        )}
-
-        {/* Social proof — competitive pressure signal. Hidden at 0 so we
-            never display "0 offre" (worse than silence). */}
-        {mission.offersCount != null && mission.offersCount > 0 && (
-          <p
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-workon-primary"
-            data-testid="mission-card-social-proof"
-          >
-            <Users className="h-3.5 w-3.5" />
-            {mission.offersCount} offre{mission.offersCount > 1 ? "s" : ""}{" "}
-            reçue{mission.offersCount > 1 ? "s" : ""}
-          </p>
-        )}
+        {/* Trust + social proof row */}
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
+          <span className="inline-flex items-center gap-1 text-workon-gray">
+            <ShieldCheck className="h-3.5 w-3.5 text-workon-trust-green" />
+            Paiement sécurisé
+          </span>
+          {/* Social proof — hidden at 0 so we never display "0 offre". */}
+          {mission.offersCount != null && mission.offersCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1.5 font-semibold text-workon-primary"
+              data-testid="mission-card-social-proof"
+            >
+              <Users className="h-3.5 w-3.5" />
+              {mission.offersCount} offre{mission.offersCount > 1 ? "s" : ""}{" "}
+              reçue{mission.offersCount > 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
       </Link>
 
       {/* Inline CTA — big, shadowed, full-bleed on mobile */}
@@ -347,6 +358,50 @@ export function MissionCard({
 /* ------------------------------------------------------------------ */
 /*  Internals                                                          */
 /* ------------------------------------------------------------------ */
+
+function Stat({
+  label,
+  value,
+  emphasis,
+}: {
+  label: string;
+  value: string;
+  emphasis?: boolean;
+}) {
+  return (
+    <div className="flex flex-col items-center px-2 py-2 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-workon-muted">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "mt-0.5 font-bold leading-tight",
+          emphasis
+            ? "text-base text-workon-accent sm:text-lg"
+            : "text-sm text-workon-ink",
+        )}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+/** Human-friendly duration: 45 → "45 min"; 90 → "1h30"; 180 → "3h". */
+function formatDuration(minutes: number | null | undefined): string {
+  if (minutes == null) return "À préciser";
+  if (minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (m === 0) return `${h} h`;
+  return `${h}h${m.toString().padStart(2, "0")}`;
+}
+
+/** Material label. `null` = not specified, so we say so honestly. */
+function formatMaterial(value: boolean | null | undefined): string {
+  if (value == null) return "À préciser";
+  return value ? "Fourni" : "Non fourni";
+}
 
 function Badge({
   tone,

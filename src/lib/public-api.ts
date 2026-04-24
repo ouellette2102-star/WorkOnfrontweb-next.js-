@@ -100,6 +100,18 @@ export interface PublicMission {
    * LocalOffer. Drives the "X offres reçues" social-proof line.
    */
   offersCount?: number;
+  /**
+   * Estimated mission duration in minutes (15 min – 30 days). Null when
+   * the mission was created before the field existed or the client did
+   * not specify it. The card renders "À préciser" instead of a fake value.
+   */
+  durationMinutes?: number | null;
+  /**
+   * Whether the client provides the material. `null` = not specified
+   * (legacy or skipped at create time); `true` = fourni par le client;
+   * `false` = à la charge du pro.
+   */
+  materialProvided?: boolean | null;
 }
 
 export interface PublicMissionsResponse {

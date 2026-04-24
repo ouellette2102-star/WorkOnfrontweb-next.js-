@@ -76,6 +76,10 @@ export function CreateMissionForm() {
     city: "",
     address: "",
     price: "",
+    /** Preset minutes or "" if not specified. */
+    durationMinutes: "",
+    /** "yes" | "no" | "" (not specified). */
+    materialProvided: "",
   });
 
   const handleChange = (field: keyof typeof formData, value: string) => {
@@ -120,6 +124,16 @@ export function CreateMissionForm() {
 
         const { latitude, longitude } = await getCurrentLocation();
 
+        const durationNum = formData.durationMinutes
+          ? Number(formData.durationMinutes)
+          : undefined;
+        const materialBool =
+          formData.materialProvided === "yes"
+            ? true
+            : formData.materialProvided === "no"
+              ? false
+              : undefined;
+
         await api.createMission({
           title: formData.title.trim(),
           description: formData.description.trim(),
@@ -129,6 +143,8 @@ export function CreateMissionForm() {
           longitude,
           city: formData.city.trim(),
           address: formData.address.trim() || undefined,
+          durationMinutes: durationNum,
+          materialProvided: materialBool,
         });
 
         setSuccess(true);
@@ -241,6 +257,49 @@ export function CreateMissionForm() {
             placeholder="123 rue Exemple"
             className="border-workon-border bg-white text-workon-ink focus:border-workon-primary"
           />
+        </div>
+      </div>
+
+      {/* Durée & Matériel — both optional but improve card quality for workers */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="durationMinutes" className="text-workon-ink">
+            Durée estimée{" "}
+            <span className="text-workon-muted text-xs font-normal">(facultatif)</span>
+          </Label>
+          <select
+            id="durationMinutes"
+            value={formData.durationMinutes}
+            onChange={(e) => handleChange("durationMinutes", e.target.value)}
+            className="w-full rounded-2xl border border-workon-border bg-white px-4 py-3 text-workon-ink focus:border-workon-primary focus:outline-none"
+          >
+            <option value="">À préciser plus tard</option>
+            <option value="30">Moins de 1 h</option>
+            <option value="60">1 h</option>
+            <option value="90">1 h 30</option>
+            <option value="120">2 h</option>
+            <option value="180">3 h</option>
+            <option value="240">4 h</option>
+            <option value="480">1 journée (8 h)</option>
+            <option value="960">2 journées</option>
+            <option value="2880">Plusieurs jours</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="materialProvided" className="text-workon-ink">
+            Matériel fourni{" "}
+            <span className="text-workon-muted text-xs font-normal">(facultatif)</span>
+          </Label>
+          <select
+            id="materialProvided"
+            value={formData.materialProvided}
+            onChange={(e) => handleChange("materialProvided", e.target.value)}
+            className="w-full rounded-2xl border border-workon-border bg-white px-4 py-3 text-workon-ink focus:border-workon-primary focus:outline-none"
+          >
+            <option value="">À préciser plus tard</option>
+            <option value="yes">Oui, je fournis tout le matériel</option>
+            <option value="no">Non, le pro apporte son matériel</option>
+          </select>
         </div>
       </div>
 
