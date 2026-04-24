@@ -60,16 +60,19 @@ export function SkillSelector() {
     }
   }, [mySkills, dirty]);
 
-  // Save mutation
+  // Save mutation — surfaces error detail so silent fails are debuggable.
   const saveMutation = useMutation({
     mutationFn: (ids: string[]) => api.setMySkills(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-skills"] });
+      queryClient.invalidateQueries({ queryKey: ["featured-workers-public"] });
       setDirty(false);
-      toast.success("Competences sauvegardees");
+      toast.success("Compétences sauvegardées");
     },
-    onError: () => {
-      toast.error("Erreur lors de la sauvegarde");
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      console.error("[skill-selector] save failed:", err);
+      toast.error(`Échec de la sauvegarde : ${message}`);
     },
   });
 
@@ -111,7 +114,7 @@ export function SkillSelector() {
       next.delete(skillId);
       return next;
     });
-    setDirty(true);
+    setDirty(true); // ensure Save button becomes enabled after chip removal
   };
 
   const handleSave = () => {
@@ -240,7 +243,7 @@ export function SkillSelector() {
         )}
       </div>
 
-      {/* Save button */}
+      {/* Save button — explicit persisted state so the user never wonders. */}
       <button
         type="button"
         onClick={handleSave}
@@ -252,10 +255,17 @@ export function SkillSelector() {
             <Loader2 className="h-4 w-4 animate-spin" />
             Enregistrement...
           </span>
+        ) : dirty ? (
+          `Sauvegarder les compétences (${selectedIds.size})`
         ) : (
-          `Sauvegarder les competences (${selectedIds.size})`
+          `Compétences à jour ✓ (${selectedIds.size})`
         )}
       </button>
+      {!dirty && !saveMutation.isPending && selectedIds.size > 0 && (
+        <p className="text-center text-xs text-workon-muted">
+          Vos compétences sont enregistrées et visibles sur votre carte publique.
+        </p>
+      )}
     </div>
   );
 }

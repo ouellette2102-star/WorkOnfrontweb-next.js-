@@ -118,11 +118,10 @@ export function BusinessInfoEditor() {
       if (draft) setInitial(draft);
     },
     onError: (err) => {
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : "Impossible d'enregistrer les infos fiscales",
-      );
+      const message =
+        err instanceof Error ? err.message : "Erreur inconnue";
+      console.error("[business-info-editor] save failed:", err);
+      toast.error(`Impossible d'enregistrer les infos fiscales : ${message}`);
     },
   });
 
@@ -243,7 +242,11 @@ export function BusinessInfoEditor() {
           ) : (
             <Save className="h-4 w-4" />
           )}
-          Enregistrer
+          {mutation.isPending
+            ? "Enregistrement..."
+            : isDirty(draft, initial)
+              ? "Enregistrer"
+              : "Enregistré ✓"}
         </button>
       </div>
     </section>
