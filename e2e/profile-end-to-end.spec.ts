@@ -77,16 +77,35 @@ test.describe("Phase 1 — profile end-to-end", () => {
     await expect(page.getByTestId("business-info-editor")).toBeVisible();
 
     // ── 3. Fill bio in WorkerCardEditor ─────────────────────
+    // Bio field is a textarea with a distinctive placeholder and maxlength=1000.
+    // The surrounding <label> has no htmlFor, so getByLabel doesn't reach it.
     const bioText = `Test bio ${Date.now()} — visible on public card`;
-    const bioField = page.getByLabel(/Bio|À propos|Pr[ée]sentation/i).first();
+    const bioField = page
+      .locator('textarea[maxlength="1000"]')
+      .first();
+    await expect(bioField).toBeVisible({ timeout: 10_000 });
     await bioField.fill(bioText);
-    // WorkerCardEditor has a single Save button; click the nearest one.
-    await page
-      .getByRole("button", { name: /Sauvegarder|Enregistrer/i })
-      .first()
-      .click();
-    await expect(page.getByText(/sauvegard[ée]s?|enregistr[ée]s?/i).first())
-      .toBeVisible({ timeout: 8_000 });
+    // WorkerCardEditor's Save button is literally "Sauvegarder" (icon Save).
+    // We wait for the PATCH /users/me response so we know the save actually
+    // landed before moving on — toast text is ephemeral and button labels
+    // can falsely match a "sauvegard" regex while the mutation is still
+    // in flight.
+    const saveBio = page
+      .waitForResponse(
+        (r) => r.url().includes("/users/me") && r.request().method() === "PATCH",
+        { timeout: 20_000 },
+      );
+    // The page has two buttons with the exact label "Sauvegarder":
+    //  [0] ProfileForm (name/phone/city) — may be disabled on a fresh account
+    //      since phone/city are empty.
+    //  [1] WorkerCardEditor (bio / categories / gallery) — what we want.
+    const bioSaveBtn = page
+      .getByRole("button", { name: /^Sauvegarder$/i })
+      .nth(1);
+    await bioSaveBtn.scrollIntoViewIfNeeded();
+    await bioSaveBtn.click();
+    const bioResp = await saveBio;
+    expect(bioResp.ok(), "PATCH /users/me must return 2xx").toBeTruthy();
 
     // ── 4. Select a skill ───────────────────────────────────
     // The skill-selector renders toggleable tiles — pick the first
@@ -111,25 +130,28 @@ test.describe("Phase 1 — profile end-to-end", () => {
     const mondayToggle = page
       .locator('label:has-text("Lundi") button[role="switch"]')
       .first();
+    await expect(mondayToggle).toBeVisible({ timeout: 10_000 });
     if ((await mondayToggle.getAttribute("aria-checked")) === "false") {
       await mondayToggle.click();
+      await expect(mondayToggle).toHaveAttribute("aria-checked", "true");
     }
-    await page
-      .getByRole("button", {
-        name: /Sauvegarder les disponibilit[ée]s|Disponibilit[ée]s à jour/i,
-      })
-      .click()
-      .catch(() => {
-        // already up-to-date — skip
-      });
+    // Click Save only if the button is in its dirty state (if it's already
+    // "à jour", we don't need to save). Button flip to "à jour ✓" is the
+    // permanent, assertable state — the sonner toast is ephemeral.
+    const availSave = page.getByRole("button", {
+      name: /Sauvegarder les disponibilit[ée]s/i,
+    });
+    if (await availSave.isVisible().catch(() => false)) {
+      await availSave.click();
+    }
     await expect(
-      page.getByText(/Disponibilit[ée]s (sauvegard[ée]es|à jour)/i).first(),
-    ).toBeVisible({ timeout: 8_000 });
+      page.getByRole("button", { name: /Disponibilit[ée]s à jour/i }),
+    ).toBeVisible({ timeout: 15_000 });
 
     // ── 6. Reload and verify persistence ────────────────────
     await page.reload({ waitUntil: "domcontentloaded" });
-    await expect(page.getByLabel(/Bio|À propos|Pr[ée]sentation/i).first())
-      .toHaveValue(bioText, { timeout: 8_000 });
+    await expect(page.locator('textarea[maxlength="1000"]').first())
+      .toHaveValue(bioText, { timeout: 10_000 });
     // Monday switch must still be on after reload.
     await expect(
       page.locator('label:has-text("Lundi") button[role="switch"]').first(),
