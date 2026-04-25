@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { api, type SwipeMatch } from "@/lib/api-client";
@@ -39,6 +39,19 @@ export default function MatchesPage() {
     queryKey: ["swipe-matches"],
     queryFn: () => api.getMatches(),
   });
+
+  // #9 — On mount, mark all swipe_match notifications as read so the
+  // swipe-page badge ("Matchs [N]") decrements immediately. The
+  // backend bulk endpoint skips when there is nothing to do.
+  useEffect(() => {
+    api.markAllNotificationsRead("swipe_match").catch((err) => {
+      console.warn("[matches] failed to clear swipe_match badge:", err);
+    });
+    queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
+    queryClient.invalidateQueries({ queryKey: ["swipe-matches-unread-count"] });
+    // Only run once per /matches mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const createMission = useMutation({
     mutationFn: ({
@@ -95,7 +108,10 @@ export default function MatchesPage() {
     );
   }
 
-  const activeMatches = matches?.filter((m) => m.status === "ACTIVE") ?? [];
+  // BE enum is lowercase ("active"|"expired"|"converted"). Filtering
+  // on "ACTIVE" (uppercase) is the other half of bug #8 — it silently
+  // dropped every real match because the case never matched.
+  const activeMatches = matches?.filter((m) => m.status === "active") ?? [];
 
   return (
     <div className="min-h-screen bg-workon-bg px-4 pb-24 pt-6">
@@ -140,9 +156,14 @@ export default function MatchesPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {activeMatches.map((match, index) => (
+            {activeMatches.map((match, index) => {
+              // BE shape: { matchId, matchedAt, status, otherUser }.
+              // otherUser can be null if the LocalUser was deleted —
+              // skip the card in that case.
+              if (!match.otherUser) return null;
+              return (
               <motion.div
-                key={match.id}
+                key={match.matchId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
@@ -150,10 +171,10 @@ export default function MatchesPage() {
               >
                 <div className="flex items-center gap-3">
                   {/* Avatar */}
-                  {match.matchedUser.pictureUrl ? (
+                  {match.otherUser.pictureUrl ? (
                     <img
-                      src={match.matchedUser.pictureUrl}
-                      alt={match.matchedUser.firstName}
+                      src={match.otherUser.pictureUrl}
+                      alt={match.otherUser.firstName}
                       className="h-14 w-14 rounded-full border-2 border-workon-primary/20 object-cover"
                     />
                   ) : (
@@ -165,18 +186,17 @@ export default function MatchesPage() {
                   {/* Info */}
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-base font-semibold text-workon-ink">
-                      {match.matchedUser.firstName}{" "}
-                      {match.matchedUser.lastName}
+                      {match.otherUser.firstName} {match.otherUser.lastName}
                     </h3>
-                    {match.matchedUser.city && (
+                    {match.otherUser.city && (
                       <div className="flex items-center gap-1 text-xs text-workon-muted">
                         <MapPin className="h-3 w-3" />
-                        {match.matchedUser.city}
+                        {match.otherUser.city}
                       </div>
                     )}
                     <p className="mt-0.5 text-[10px] text-workon-muted">
                       Match le{" "}
-                      {new Date(match.createdAt).toLocaleDateString("fr-CA", {
+                      {new Date(match.matchedAt).toLocaleDateString("fr-CA", {
                         day: "numeric",
                         month: "short",
                       })}
@@ -185,7 +205,7 @@ export default function MatchesPage() {
 
                   {/* Action */}
                   <button
-                    onClick={() => setMissionModal(match.id)}
+                    onClick={() => setMissionModal(match.matchId)}
                     className="flex items-center gap-1.5 rounded-xl bg-workon-accent px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-workon-accent/90 active:scale-95"
                   >
                     <Briefcase className="h-3.5 w-3.5" />
@@ -193,7 +213,8 @@ export default function MatchesPage() {
                   </button>
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

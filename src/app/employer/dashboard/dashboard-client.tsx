@@ -50,8 +50,10 @@ export function EmployerDashboardClient() {
     ).length ?? 0;
   const pendingOffers =
     offers?.filter((o) => o.status === "PENDING").length ?? 0;
+  // BE enum is lowercase "active" (bug #8 — the old "ACTIVE" check
+  // silently dropped every match).
   const activeMatches =
-    matches?.filter((m: SwipeMatch) => m.status === "ACTIVE") ?? [];
+    matches?.filter((m: SwipeMatch) => m.status === "active") ?? [];
 
   // Skeleton placeholder for loading state
   const StatSkeleton = () => (
@@ -192,30 +194,32 @@ export function EmployerDashboardClient() {
 
           {activeMatches.length > 0 ? (
             <div className="space-y-3">
-              {activeMatches.slice(0, 5).map((match: SwipeMatch) => (
+              {activeMatches.slice(0, 5).map((match: SwipeMatch) => {
+                if (!match.otherUser) return null;
+                return (
                 <Link
-                  key={match.id}
-                  href={`/workers/${match.matchedUserId}`}
+                  key={match.matchId}
+                  href={`/worker/${match.otherUser.id}`}
                   className="flex items-center gap-3 rounded-xl border border-workon-border p-3 transition-all hover:border-workon-primary/30 hover:bg-workon-bg/50"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-workon-primary/10 text-sm font-bold text-workon-primary">
-                    {match.matchedUser?.firstName?.[0] ?? "?"}
-                    {match.matchedUser?.lastName?.[0] ?? ""}
+                    {match.otherUser.firstName?.[0] ?? "?"}
+                    {match.otherUser.lastName?.[0] ?? ""}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-workon-ink">
-                      {match.matchedUser?.firstName}{" "}
-                      {match.matchedUser?.lastName}
+                      {match.otherUser.firstName} {match.otherUser.lastName}
                     </p>
-                    {match.matchedUser?.city && (
+                    {match.otherUser.city && (
                       <p className="truncate text-xs text-workon-muted">
-                        {match.matchedUser.city}
+                        {match.otherUser.city}
                       </p>
                     )}
                   </div>
                   <ArrowRight className="h-4 w-4 shrink-0 text-workon-muted" />
                 </Link>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="py-8 text-center">
