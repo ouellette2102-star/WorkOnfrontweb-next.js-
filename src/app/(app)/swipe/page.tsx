@@ -69,7 +69,23 @@ export default function SwipePage() {
     queryFn: () => api.getMatches(),
   });
 
-  const matchCount = matches?.length ?? 0;
+  // Badge count = UNREAD swipe_match notifications, not the total number
+  // of active matches. This is the fix for bug #9: the previous version
+  // displayed matches.length, which never decreased even after the user
+  // opened /matches. Now the badge reflects "new matches you haven't
+  // seen yet" and drops to zero when /matches mounts and calls
+  // markAllNotificationsRead("swipe_match"). Poll every 20s to pick up
+  // new matches created in another tab or by the other user.
+  const { data: matchBadge } = useQuery({
+    queryKey: ["swipe-matches-unread-count"],
+    queryFn: () => api.getNotificationUnreadCount("swipe_match"),
+    refetchInterval: 20_000,
+  });
+  const matchCount = matchBadge?.count ?? 0;
+  // Keep the old "do we have any match at all" gate for the CTA card
+  // at the bottom of /swipe — an employer who already has a match but
+  // dismissed the notification should still see the link.
+  const hasAnyMatch = (matches?.length ?? 0) > 0;
 
   const swipeMutation = useMutation({
     mutationFn: (data: {
@@ -226,13 +242,15 @@ export default function SwipePage() {
             <p className="text-sm text-workon-muted">
               Reviens plus tard pour decouvrir de nouveaux profils.
             </p>
-            {matchCount > 0 && (
+            {hasAnyMatch && (
               <Link
                 href="/matches"
                 className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-2.5 text-sm font-medium text-white transition hover:bg-workon-primary/90"
               >
                 <Users className="h-4 w-4" />
-                Voir mes {matchCount} match{matchCount > 1 ? "s" : ""}
+                {matchCount > 0
+                  ? `Voir mes ${matchCount} nouveau${matchCount > 1 ? "x" : ""} match${matchCount > 1 ? "s" : ""}`
+                  : "Voir mes matchs"}
               </Link>
             )}
           </div>

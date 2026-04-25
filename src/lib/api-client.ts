@@ -378,13 +378,28 @@ export interface SwipeCandidate {
   hourlyRate: number | null;
 }
 
+/**
+ * Shape returned by GET /swipe/matches (backend/src/swipe/swipe.service.ts
+ * getMatches). Before Phase 2 the interface declared a fictional
+ * { id, userId, matchedUserId, matchedUser, status: "ACTIVE" } shape
+ * that never matched the wire format — the /matches page filtered
+ * m.status === "ACTIVE" against the real lowercase "active" and rendered
+ * "Aucun match" even when the backend returned a match (bug #8).
+ */
 export interface SwipeMatch {
-  id: string;
-  userId: string;
-  matchedUserId: string;
-  matchedUser: { id: string; firstName: string; lastName: string; city: string | null; pictureUrl: string | null };
-  status: "ACTIVE" | "EXPIRED";
-  createdAt: string;
+  matchId: string;
+  matchedAt: string;
+  /** Lowercase. BE enum: "active" | "expired" | "converted". */
+  status: "active" | "expired" | "converted";
+  otherUser: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    city: string | null;
+    pictureUrl: string | null;
+    role: "worker" | "employer" | "admin" | string;
+    category: string | null;
+  } | null;
 }
 
 export interface SupportTicket {
@@ -892,9 +907,26 @@ export const api = {
   // Notifications
   getNotifications: (unreadOnly?: boolean) =>
     apiFetch<unknown[]>(`/notifications${unreadOnly ? "?unreadOnly=true" : ""}`),
-  getNotificationUnreadCount: () => apiFetch<{ count: number }>("/notifications/unread-count"),
+  /**
+   * Unread count, optionally scoped to one notification type (e.g.
+   * "swipe_match" drives the /swipe "Matchs [N]" badge — bug #9).
+   * Omit the arg to get the global count the bell badge uses.
+   */
+  getNotificationUnreadCount: (type?: string) =>
+    apiFetch<{ count: number }>(
+      `/notifications/unread-count${type ? `?type=${encodeURIComponent(type)}` : ""}`,
+    ),
   markNotificationRead: (id: string) => apiFetch<void>(`/notifications/${id}/read`, { method: "PATCH" }),
-  markAllNotificationsRead: () => apiFetch<{ count: number }>("/notifications/read-all", { method: "PATCH" }),
+  /**
+   * Bulk mark-as-read. With `type`, only notifications of that type
+   * are cleared — used on /matches mount to drop the swipe_match badge
+   * while leaving the global bell count intact.
+   */
+  markAllNotificationsRead: (type?: string) =>
+    apiFetch<{ count: number }>(
+      `/notifications/read-all${type ? `?type=${encodeURIComponent(type)}` : ""}`,
+      { method: "PATCH" },
+    ),
 
   // Notification Preferences
   getNotificationPreferences: () =>
