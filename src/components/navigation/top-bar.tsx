@@ -1,41 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { useMode } from "@/contexts/mode-context";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
+import { HAMBURGER_ITEMS, isNavItemVisible } from "@/lib/nav";
 import {
   MapPin,
   Bell,
   Menu,
   X,
-  Home,
-  User,
   Briefcase,
-  Crown,
-  BarChart3,
-  Calendar,
-  CreditCard,
-  Receipt,
-  HelpCircle,
   LogOut,
   ChevronRight,
-  Shield,
-  Star,
-  Settings,
-  FileText,
-  AlertTriangle,
-  Gauge,
-  Wrench,
   Users,
-  ClipboardList,
-  Inbox,
-  Handshake,
-  FileCheck,
-  Wallet,
 } from "lucide-react";
 
 /**
@@ -64,38 +45,17 @@ export function TopBar() {
 
   const currentRoleLabel = mode === "pro" ? "Pro" : "Client";
 
-  // Hamburger menu — 5 essentiels + admin (si applicable).
-  // Les autres actions sont sur /home (feed contextuel), dans la BottomNav
-  // (missions/chat/pros/carte), ou dans /profile (détails compte).
-  const menuItems = [
-    { href: "/profile", label: "Mon profil", icon: User },
-    ...(mode === "pro"
-      ? [
-          { href: "/earnings", label: "Mes revenus", icon: CreditCard },
-          // "Mes paiements" (Stripe Connect) — distinct de "Mes revenus".
-          // Mes revenus = historique des montants payés par mission.
-          // Mes paiements = onboarding Stripe Connect + statut du compte.
-          // Sans cet item, un worker ne peut pas accéder à son onboarding
-          // autrement qu'en tapant l'URL — bloquant pour le revenu.
-          { href: "/worker/payments", label: "Mes paiements", icon: Wallet },
-          // R3 orphans revealed — pages built, backends consumed, no nav
-          // before this PR. Pro-side: leads delivered, bookings received,
-          // availability calendar.
-          { href: "/leads/mine", label: "Mes leads", icon: Inbox },
-          { href: "/bookings", label: "Mes réservations", icon: ClipboardList },
-          { href: "/calendar", label: "Disponibilités", icon: Calendar },
-        ]
-      : [{ href: "/invoices", label: "Mes factures", icon: FileText }]),
-    // Universal — both pro and client care about their contracts, reviews,
-    // and dispute history.
-    { href: "/contracts", label: "Mes contrats", icon: FileCheck },
-    { href: "/reviews", label: "Mes évaluations", icon: Star },
-    { href: "/disputes", label: "Litiges", icon: AlertTriangle },
-    { href: "/settings/subscription", label: "Mon abonnement", icon: Crown },
-    { href: "/support", label: "Aide & support", icon: HelpCircle },
-    { href: "/settings", label: "Paramètres", icon: Settings },
-    ...(user?.role === "admin" ? [{ href: "/admin", label: "Administration", icon: Wrench }] : []),
-  ];
+  // Hamburger items now come from the centralized nav contract
+  // (src/lib/nav.ts). This is also where "Mes affectations" /
+  // "Mes publications" lives now (#11) — it used to squat the FAB
+  // slot of the bottom nav.
+  const menuItems = useMemo(
+    () =>
+      HAMBURGER_ITEMS.filter((item) =>
+        isNavItemVisible(item, { mode, role: user?.role }),
+      ),
+    [mode, user?.role],
+  );
 
   return (
     <>
