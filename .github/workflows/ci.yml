@@ -69,3 +69,43 @@ jobs:
 
       - name: Run linter
         run: npm run lint --if-present || true
+
+  # Type-check — BLOCKING. Catches the "silent drop adapter" class of
+  # bug (the audit's pattern A): when a backend DTO field is added or
+  # changed, any frontend interface that declares the wire shape will
+  # type-error if it omits the field. Phase 1 #4 (bio dropped between
+  # FeaturedWorker → WorkerProfile) and Phase 2 #8 (SwipeMatch fictional
+  # interface) would both have failed this gate before merge.
+  typecheck:
+    name: TypeScript (frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+      - name: tsc --noEmit
+        run: npm run typecheck
+
+  # Nav contract — BLOCKING. Walks src/app/** and asserts every href in
+  # the centralised NAV_ITEMS contract resolves to a real page.tsx. This
+  # is the gate that catches the "orphan link" / pattern E class of bug
+  # (Phase 3 #10 #11). Scoped to the contract test so the broader
+  # vitest run doesn't trip on a known JSDOM/ESM issue in component
+  # tests (tracked separately).
+  nav-contract:
+    name: Nav route contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+      - name: vitest src/lib/nav.test.ts
+        run: npx vitest run src/lib/nav.test.ts
