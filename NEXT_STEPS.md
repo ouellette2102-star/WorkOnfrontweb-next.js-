@@ -1,120 +1,72 @@
-# Prochaines Étapes - WorkOn
+# WorkOn — État actuel et prochaines étapes
 
-## ✅ Complété
+> Cette fiche reflète **l'état réel du frontend Next.js**.
+> Elle remplace une version antérieure qui décrivait un stack abandonné
+> (Clerk + Mapbox + Inngest + UploadThing-only). À jour 2026-04-29.
 
-- [x] Structure Next.js 15 + TypeScript + Tailwind
-- [x] Schéma Prisma complet (User, WorkerProfile, Mission, etc.)
-- [x] Configuration Clerk avec middleware
-- [x] Pages principales (landing, dashboard, map, profile)
-- [x] Composants UI (carrousels, cartes, profils)
-- [x] Système de matching algorithmique
-- [x] Script de seed avec données de démo
-- [x] Configuration de base (ESLint, TypeScript, tests)
+## Stack effectif
 
-## 🚧 À Implémenter
+| Domaine | Choix | Notes |
+|---|---|---|
+| Framework | **Next.js 16** (Turbopack, app router) | React 19.2, TypeScript 5 |
+| Auth | **JWT natif via backend NestJS** | Clerk a été désactivé puis retiré du module backend (PR #278) |
+| Carte | **Leaflet + react-leaflet** | OpenStreetMap tiles, pas de Mapbox |
+| Données | **TanStack Query** + `lib/api-client.ts` | Backend Railway `workon-backend-production-8908` |
+| Paiements | **Stripe Connect Express** + Subscriptions + Boosts | clés Live actives |
+| Upload | **UploadThing** + `lib/upload-thing` | photo profile + portfolio |
+| Email | **Resend** (transactionnels frontend) + SendGrid côté backend | reset password = backend SendGrid |
+| Push | **Firebase FCM** côté backend (creds à set en prod) | non câblé service-worker frontend pour l'instant |
+| Real-time | **Socket.IO client** (`socket.io-client`) | chat mission live, fallback polling |
+| State | React Context (`auth-context`, `mode-context`) | pas de Redux, pas de Zustand |
+| Tests | **Playwright** (E2E) + **Vitest** (unit) | suites partielles, à étendre |
+| Monitoring | Sentry (`@sentry/nextjs`) | DSN injecté en build Vercel |
+| Analytics | non-décidé | PostHog pressenti, pas câblé |
 
-### Priorité Haute
+## Ce qui est implémenté côté frontend
 
-1. **Stripe Connect Integration**
-   - [ ] Configuration Stripe Connect pour travailleurs
-   - [ ] Webhooks Stripe (payment_intent, connect account)
-   - [ ] Logique de hold/capture des paiements
-   - [ ] Calcul des frais de plateforme (8-15%)
-   - [ ] Gestion des remboursements et disputes
+- Auth complet : `/register`, `/login`, `/forgot-password`, `/reset-password`, cookies httpOnly + localStorage
+- Onboarding : `/onboarding/role`, `/details`, `/employer`, `/success`
+- Découverte : `/swipe`, `/map`, `/missions`, `/pros` (à refondre — voir backlog QA)
+- Mission lifecycle : `/missions/new`, `/missions/[id]`, `/missions/mine`
+- Réservation : `/reserve/[workerId]` avec Stripe Checkout
+- Paiements : `/payments/success`, `/payments/cancel`, `/invoices/[id]/review` (acceptation bilatérale)
+- Chat : `/messages`, `/messages/[missionId]` (Socket.IO + polling fallback)
+- Premium : `/settings/subscription` avec 3 plans + 3 boosts
+- Compliance : `/legal/privacy` (Loi 25 v2.0), `/legal/terms`, `/legal/conformite-loi-25`
+- Admin : `/admin` (gating role=admin)
 
-2. **Onboarding Complet**
-   - [ ] Création automatique du profil User après sign-up Clerk
-   - [ ] Flow onboarding worker (catégories, compétences, portfolio)
-   - [ ] Flow onboarding client (création org, vérification)
-   - [ ] Acceptation des documents légaux (versionnés)
+## Backlog QA actif (Sprint 1-2-3)
 
-3. **Création de Mission (Server Action)**
-   - [ ] Action serveur pour créer une mission
-   - [ ] Validation Zod
-   - [ ] Géocodage de l'adresse (Mapbox Geocoding API)
-   - [ ] Déclenchement du matching automatique
+Voir le rapport QA dans `C:/Users/ouell/.claude-server-commander/workon_extract/`
+et la checklist exécutable dans la PR `qa-sprint-1`.
 
-4. **Matching Automatique**
-   - [ ] Job Inngest/Supabase cron pour matching
-   - [ ] Notification des travailleurs matchés
-   - [ ] Interface swipe deck pour accepter/refuser
+Sprint 1 (en cours) — fondations : encodage UTF-8, cleanup repo, DataLoader,
+copy mode-aware, format-date helpers, backend timingSafeEqual, durations CSS,
+migration middleware → proxy, next-intl.
 
-5. **Mapbox Integration**
-   - [ ] Initialisation de la carte Mapbox
-   - [ ] Clustering des pins
-   - [ ] Synchronisation carte/liste
-   - [ ] Filtres par distance
+Sprint 2 — bugs critiques : `/map` Leaflet crash, backend `GET /pros` +
+`/pros/{slug}`, refonte UI `/pros` (vraie liste browsable), `/swipe` =
+découverte de pros, `/map` = pins de missions, `/home` role-aware,
+`POST /boosts/checkout`, `/api/og` dynamique.
 
-### Priorité Moyenne
+Sprint 3 — polish : Trust Badge visible, profile édition, `/express`
+branding "Numéro Rouge", catégories normalisées, FAQ enrichie, tests E2E.
 
-6. **Système de Reviews**
-   - [ ] Formulaire de review après completion
-   - [ ] Modération des reviews
-   - [ ] Calcul automatique des ratings
+## Variables d'environnement requises
 
-7. **CRM Light**
-   - [ ] Inbox des leads (workers)
-   - [ ] Pipeline (Nouveau → Contacté → Devis → Gagné/Perdu)
-   - [ ] Templates d'emails Resend
-   - [ ] Favoris clients
+Voir `.env.example` à la racine. Les vars critiques en prod :
+- `NEXT_PUBLIC_API_URL` (Vercel) → backend Railway `/api/v1`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (Vercel) → Stripe Live
+- `NEXT_PUBLIC_SENTRY_DSN` (Vercel build) → Sentry projet WorkOn
+- 6× Firebase publishable keys (Vercel) → projet `workonv1`
+- `UPLOADTHING_TOKEN` (Vercel) → UploadThing app
 
-8. **UploadThing Integration**
-   - [ ] Upload avatars
-   - [ ] Upload portfolio (images/vidéos)
-   - [ ] Validation taille/type
+Côté backend Railway : `SENDGRID_API_KEY`, `FIREBASE_SERVICE_ACCOUNT_JSON`,
+`STRIPE_SECRET_KEY`, `JWT_SECRET`, `ADMIN_SECRET`, `DATABASE_URL`.
 
-9. **Notifications**
-   - [ ] Système de notifications en temps réel
-   - [ ] Notifications push (OneSignal - deferred)
-   - [ ] Centre de notifications
+## Liens utiles
 
-10. **Analytics & Monitoring**
-    - [ ] PostHog events tracking
-    - [ ] Sentry error tracking
-    - [ ] Vercel Analytics
-
-### Priorité Basse
-
-11. **Feature Flags**
-    - [ ] Middleware de feature flags
-    - [ ] Limites FREE tier
-    - [ ] Activation/désactivation de modules
-
-12. **Admin Panel**
-    - [ ] Dashboard admin
-    - [ ] Gestion utilisateurs
-    - [ ] Modération reviews
-    - [ ] Gestion disputes
-    - [ ] Ajustement des poids de matching
-
-13. **i18n**
-    - [ ] Configuration next-intl
-    - [ ] Traduction fr-CA / en-CA
-    - [ ] Sélecteur de langue
-
-14. **Tests E2E Complets**
-    - [ ] Test onboarding
-    - [ ] Test publication mission
-    - [ ] Test acceptation mission
-    - [ ] Test paiement
-    - [ ] Test review
-
-15. **Performance**
-    - [ ] Optimisation images (next/image)
-    - [ ] Lazy loading composants
-    - [ ] Lighthouse score ≥ 90
-
-## 📝 Notes
-
-- Les clés API doivent être configurées dans `.env.local`
-- Le seed crée des données de démo (200 workers, 60 missions)
-- Le matching algorithmique est implémenté mais nécessite un job pour s'exécuter automatiquement
-- Stripe Connect nécessite une configuration spécifique pour les marketplaces
-
-## 🔗 Liens Utiles
-
-- [Documentation Clerk](https://clerk.com/docs)
-- [Documentation Stripe Connect](https://stripe.com/docs/connect)
-- [Documentation Mapbox](https://docs.mapbox.com/)
-- [Documentation Prisma](https://www.prisma.io/docs)
-
+- [Next.js 16 docs](https://nextjs.org/docs)
+- [Stripe Connect Express](https://stripe.com/docs/connect/express-accounts)
+- [Loi 25 — CAI Québec](https://www.cai.gouv.qc.ca/)
+- [Tailwind v4](https://tailwindcss.com/docs)
