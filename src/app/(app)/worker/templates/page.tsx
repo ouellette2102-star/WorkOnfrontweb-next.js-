@@ -43,7 +43,7 @@ export default function TemplatesPage() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["templates"] });
-      toast.success("Modele cree");
+      toast.success("Modèle créé");
       setShowForm(false);
       setTitle("");
       setDescription("");
@@ -51,15 +51,15 @@ export default function TemplatesPage() {
       setPrice("");
       setRecurrence("ONCE");
     },
-    onError: () => toast.error("Erreur lors de la creation"),
+    onError: () => toast.error("Erreur lors de la création"),
   });
 
   const generateMutation = useMutation({
     mutationFn: (id: string) => api.generateFromTemplate(id),
     onSuccess: () => {
-      toast.success("Missions generees avec succes");
+      toast.success("Missions générées avec succès");
     },
-    onError: () => toast.error("Erreur lors de la generation"),
+    onError: () => toast.error("Erreur lors de la génération"),
   });
 
   const deactivateMutation = useMutation({

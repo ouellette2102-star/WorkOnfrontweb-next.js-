@@ -112,11 +112,11 @@ export default async function WorkerDashboardPage() {
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
                   <p className="text-[10px] text-workon-gray uppercase tracking-wider">Ville</p>
-                  <p className="text-workon-ink">{profile.city || "Non renseignee"}</p>
+                  <p className="text-workon-ink">{profile.city || "Non renseignée"}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-workon-gray uppercase tracking-wider">Telephone</p>
-                  <p className="text-workon-ink">{profile.phone || "Non renseigne"}</p>
+                  <p className="text-[10px] text-workon-gray uppercase tracking-wider">Téléphone</p>
+                  <p className="text-workon-ink">{profile.phone || "Non renseigné"}</p>
                 </div>
                 <div>
                   <p className="text-[10px] text-workon-gray uppercase tracking-wider">Email</p>

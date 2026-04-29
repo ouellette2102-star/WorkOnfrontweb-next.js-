@@ -1,8 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * JWT-based middleware (replaces Clerk)
- * Checks for auth token cookie on protected routes
+ * JWT-based proxy (replaces the deprecated `middleware` file convention
+ * in Next.js 16+ — see https://nextjs.org/docs/messages/middleware-to-proxy).
+ *
+ * QA report item #11 / Sprint 1: previously this lived at
+ * `src/middleware.ts`. Renamed to `proxy.ts` to silence the build
+ * warning. Behaviour is unchanged — same matcher, same token check,
+ * same redirect contract.
+ *
+ * Checks for the `workon_token` cookie on protected routes and
+ * redirects unauth visitors to /login while preserving the intended
+ * destination via `?redirect=`.
  */
 
 const PUBLIC_PATHS = [
@@ -13,7 +22,7 @@ const PUBLIC_PATHS = [
   "/forgot-password",
   // NOTE: /onboarding/* is intentionally NOT public. Every onboarding page
   // (role, details, success, employer) requires an authenticated user to
-  // PATCH /users/me. Middleware redirects unauth to /login before the
+  // PATCH /users/me. Proxy redirects unauth to /login before the
   // client-side guard fires, avoiding the pre-hydration flash of the form.
   "/pros",
   "/p/",
@@ -34,7 +43,7 @@ function isPublicPath(pathname: string): boolean {
   );
 }
 
-export default function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Skip static files and Next.js internals

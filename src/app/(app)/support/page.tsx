@@ -44,13 +44,13 @@ export default function SupportPage() {
     mutationFn: () => api.createTicket({ subject, description, category }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
-      toast.success("Ticket cree");
+      toast.success("Ticket créé");
       setShowCreate(false);
       setSubject("");
       setDescription("");
       setCategory("OTHER");
     },
-    onError: () => toast.error("Erreur lors de la creation du ticket"),
+    onError: () => toast.error("Erreur lors de la création du ticket"),
   });
 
   const replyMutation = useMutation({

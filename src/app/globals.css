@@ -48,6 +48,27 @@
 
   /* Backward-compat alias */
   --red-accent: var(--workon-accent);
+
+  /* ============================================================
+   * Animation durations — 3-tier system (QA report items #20, P1)
+   * ============================================================
+   * Use as CSS variables for transitions / animations to give the
+   * UI a consistent rhythm. Tailwind utilities can also reference
+   * these via `transition-[duration:var(--duration-standard)]` or
+   * `animation-duration: var(--duration-fast)` in custom CSS.
+   *
+   *   --duration-fast      150ms — micro-interactions: hover,
+   *                        focus rings, toggles, small icons.
+   *   --duration-standard  300ms — DEFAULT for transitions:
+   *                        modal in/out, page accordions,
+   *                        card hover lifts, drawer slides.
+   *   --duration-slow      500ms — celebrations only:
+   *                        match modal, payment success,
+   *                        review submitted toast.
+   */
+  --duration-fast: 150ms;
+  --duration-standard: 300ms;
+  --duration-slow: 500ms;
 }
 
 @theme inline {
