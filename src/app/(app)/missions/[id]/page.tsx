@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type OfferResponse, type BoostType } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
@@ -638,22 +638,29 @@ export default function MissionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
-  // QA report C8 / Sprint 2: when arriving here from /missions/new
-  // with `?created=1`, show a celebration banner with a share link.
-  // Dismissible — once closed, the param is stripped from the URL so
-  // a refresh doesn't bring it back.
-  const justCreated = searchParams.get("created") === "1";
-  const [showCreatedBanner, setShowCreatedBanner] = useState(justCreated);
+  // QA report C8 / Sprint 2: show a celebration banner when arriving
+  // from /missions/new (?created=1).
+  //
+  // HOTFIX: previously read via `useSearchParams()`, but in Next 16
+  // production builds that hook requires a Suspense boundary or it
+  // throws on rehydration after back-navigation — surfacing as the
+  // global error boundary ("Quelque chose s'est mal passé") roughly
+  // 5–20% of the time the user uses the browser Back button.
+  // Reading window.location.search inside useEffect is suspense-safe
+  // and works the same for our use case (single, dismissible flag).
+  const [showCreatedBanner, setShowCreatedBanner] = useState(false);
   useEffect(() => {
-    if (justCreated) setShowCreatedBanner(true);
-  }, [justCreated]);
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("created") === "1") setShowCreatedBanner(true);
+  }, []);
 
   const dismissCreatedBanner = () => {
     setShowCreatedBanner(false);
     // Strip the query param without a full reload
+    if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
     url.searchParams.delete("created");
     window.history.replaceState({}, "", url.toString());
