@@ -62,13 +62,13 @@ export default function MatchesPage() {
       data: { title: string; description?: string; price?: number; category: string };
     }) => api.createMissionFromMatch(matchId, data),
     onSuccess: () => {
-      toast.success("Mission creee avec succes !");
+      toast.success("Mission créée avec succès !");
       setMissionModal(null);
       setMissionForm({ title: "", description: "", price: "" });
       queryClient.invalidateQueries({ queryKey: ["swipe-matches"] });
     },
     onError: () => {
-      toast.error("Erreur lors de la creation de la mission");
+      toast.error("Erreur lors de la création de la mission");
     },
   });
 
@@ -101,7 +101,7 @@ export default function MatchesPage() {
       <div className="p-6">
         <div className="mx-auto max-w-md rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
           <p className="text-red-600">
-            Erreur de chargement. Reessaie plus tard.
+            Erreur de chargement. Réessaie plus tard.
           </p>
         </div>
       </div>
@@ -144,14 +144,14 @@ export default function MatchesPage() {
               Aucun match pour le moment
             </h3>
             <p className="mb-4 text-sm text-workon-muted">
-              Continuez a swiper pour trouver des profils compatibles.
+              Continuez à swiper pour trouver des profils compatibles.
             </p>
             <Link
               href="/swipe"
               className="inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-2.5 text-sm font-medium text-white transition hover:bg-workon-primary/90"
             >
               <Heart className="h-4 w-4" />
-              Decouvrir des profils
+              Découvrir des profils
             </Link>
           </div>
         ) : (

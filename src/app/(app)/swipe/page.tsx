@@ -198,7 +198,7 @@ export default function SwipePage() {
       <div className="p-6">
         <div className="mx-auto max-w-md rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
           <p className="text-red-600">
-            Erreur de chargement. Reessaie plus tard.
+            Erreur de chargement. Réessaie plus tard.
           </p>
         </div>
       </div>

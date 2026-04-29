@@ -34,10 +34,10 @@ export default function AdminPage() {
       <div className="mx-auto max-w-lg px-4 py-20 text-center">
         <ShieldAlert className="mx-auto mb-4 h-16 w-16 text-red-400" />
         <h1 className="text-2xl font-bold text-workon-ink mb-2">
-          Acces refuse
+          Accès refusé
         </h1>
         <p className="text-workon-muted">
-          Cette page est reservee aux administrateurs de la plateforme.
+          Cette page est réservée aux administrateurs de la plateforme.
         </p>
       </div>
     );
@@ -58,19 +58,19 @@ function AdminDashboard() {
   const reconcileMutation = useMutation({
     mutationFn: () => api.adminReconcile(),
     onSuccess: (data) => {
-      toast.success("Reconciliation terminee !");
+      toast.success("Réconciliation terminée !");
       setReconcileResult(JSON.stringify(data, null, 2));
     },
     onError: (err) =>
       toast.error(
-        err instanceof Error ? err.message : "Erreur lors de la reconciliation"
+        err instanceof Error ? err.message : "Erreur lors de la réconciliation"
       ),
   });
 
   const seedMutation = useMutation({
     mutationFn: () => api.adminSeedCatalog(),
     onSuccess: (data) => {
-      toast.success("Catalogue seed termine !");
+      toast.success("Catalogue seed terminé !");
       setSeedResult(JSON.stringify(data, null, 2));
     },
     onError: (err) =>
@@ -105,7 +105,7 @@ function AdminDashboard() {
           <>
             <StatCard
               icon={<Briefcase className="h-5 w-5 text-workon-primary" />}
-              label="Contrats completes"
+              label="Contrats complétés"
               value={stats.completedContracts}
             />
             <StatCard
@@ -141,7 +141,7 @@ function AdminDashboard() {
               </div>
               <div>
                 <h3 className="font-semibold text-workon-ink text-sm">
-                  Reconcilier paiements
+                  Réconcilier paiements
                 </h3>
                 <p className="text-xs text-workon-muted">
                   Synchronise les paiements Stripe avec la base
@@ -158,7 +158,7 @@ function AdminDashboard() {
               ) : (
                 <RefreshCw className="mr-2 h-4 w-4" />
               )}
-              Reconcilier
+              Réconcilier
             </Button>
             {reconcileResult && (
               <pre className="rounded-xl bg-workon-bg p-3 text-xs text-workon-muted overflow-auto max-h-32">
@@ -178,7 +178,7 @@ function AdminDashboard() {
                   Seed catalogue
                 </h3>
                 <p className="text-xs text-workon-muted">
-                  Reinitialise les categories et skills
+                  Réinitialise les catégories et skills
                 </p>
               </div>
             </div>
@@ -205,7 +205,7 @@ function AdminDashboard() {
 
       {/* Footer */}
       <div className="text-center text-xs text-workon-muted/60 pt-4 pb-4">
-        <p>WorkOn Administration - Actions reservees aux administrateurs</p>
+        <p>WorkOn Administration — Actions réservées aux administrateurs</p>
       </div>
     </div>
   );

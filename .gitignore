@@ -72,3 +72,6 @@ qa_mission_id.txt
 startdev.err
 
 .vercel
+
+# Backend-identity is a separate repo, never commit
+backend-identity/

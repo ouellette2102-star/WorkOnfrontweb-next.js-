@@ -3,14 +3,14 @@
 /**
  * Cookie Consent Banner - WorkOn
  *
- * Banniere de consentement aux cookies conforme a la Loi 25 du Quebec.
- * Affichee pour tous les visiteurs (authentifies ou non).
- * Le choix est persiste dans localStorage sous la cle "cookie-consent".
+ * Bannière de consentement aux cookies conforme à la Loi 25 du Québec.
+ * Affichée pour tous les visiteurs (authentifiés ou non).
+ * Le choix est persisté dans localStorage sous la clé "cookie-consent".
  *
  * Valeurs possibles:
- * - "accepted" : tous les cookies acceptes
+ * - "accepted" : tous les cookies acceptés
  * - "refused"  : seuls les cookies essentiels
- * - absent     : pas encore de choix -> afficher la banniere
+ * - absent     : pas encore de choix → afficher la bannière
  */
 
 import { useState, useEffect } from "react";
@@ -57,8 +57,8 @@ export function CookieConsent() {
         <div className="flex-1 text-sm leading-relaxed">
           <p>
             Ce site utilise des cookies essentiels au fonctionnement et, avec
-            votre accord, des cookies analytiques pour ameliorer votre
-            experience. Conformement a la{" "}
+            votre accord, des cookies analytiques pour améliorer votre
+            expérience. Conformément à la{" "}
             <strong>Loi 25 sur la protection des renseignements personnels</strong>
             , vous pouvez accepter ou refuser les cookies non essentiels.
           </p>
@@ -68,7 +68,7 @@ export function CookieConsent() {
               className="underline underline-offset-2 font-medium hover:opacity-80 transition-opacity"
               style={{ color: "var(--workon-primary, #134021)" }}
             >
-              Politique de confidentialite
+              Politique de confidentialité
             </Link>
           </p>
         </div>

@@ -48,7 +48,7 @@ export default function BookingsPage() {
     mutationFn: (id: string) => api.cancelBooking(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
-      toast.success("Reservation annulee");
+      toast.success("Réservation annulée");
     },
     onError: () => toast.error("Erreur lors de l'annulation"),
   });
@@ -57,15 +57,15 @@ export default function BookingsPage() {
     mutationFn: (id: string) => api.completeBooking(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
-      toast.success("Reservation terminee");
+      toast.success("Réservation terminée");
     },
-    onError: () => toast.error("Erreur lors de la completion"),
+    onError: () => toast.error("Erreur lors de la complétion"),
   });
 
   const tabs: { key: FilterTab; label: string }[] = [
     { key: "all", label: "Toutes" },
-    { key: "upcoming", label: "A venir" },
-    { key: "completed", label: "Terminees" },
+    { key: "upcoming", label: "À venir" },
+    { key: "completed", label: "Terminées" },
   ];
 
   return (

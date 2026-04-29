@@ -97,17 +97,17 @@ export function QuickStatsCard() {
           <span className="font-heading font-bold text-lg text-workon-ink">{missionStats.active}</span>
         </div>
         <p className="text-[10px] text-workon-gray uppercase tracking-wider">Missions actives</p>
-        <p className="text-xs text-workon-gray mt-1">En cours ou reservees</p>
+        <p className="text-xs text-workon-gray mt-1">En cours ou réservées</p>
       </div>
 
-      {/* Missions completees */}
+      {/* Missions complétées */}
       <div className="border border-workon-border rounded-3xl bg-white p-5 shadow-card">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-2xl text-[#2D8B55]">V</span>
           <span className="font-heading font-bold text-lg text-workon-ink">{missionStats.completed}</span>
         </div>
-        <p className="text-[10px] text-workon-gray uppercase tracking-wider">Completees</p>
-        <p className="text-xs text-workon-gray mt-1">Missions terminees</p>
+        <p className="text-[10px] text-workon-gray uppercase tracking-wider">Complétées</p>
+        <p className="text-xs text-workon-gray mt-1">Missions terminées</p>
       </div>
 
       {/* Gains nets (real earnings API) */}
