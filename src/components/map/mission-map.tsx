@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { MissionResponse } from "@/lib/api-client";
@@ -13,6 +13,14 @@ import "leaflet/dist/leaflet.css";
  * Custom DivIcon pins (green default, orange-red for boosted/urgent).
  * Pin click invokes parent-provided `onPinClick(mission)` — parent is
  * responsible for rendering the detail UI (bottom sheet on mobile).
+ *
+ * QA report C1 / Sprint 2: this previously crashed with
+ * "Map container is already initialized" under React 19 StrictMode
+ * + Next.js 16 because the underlying <div> kept its `_leaflet_id`
+ * across the StrictMode double-mount. Fixed by holding a ref to the
+ * Leaflet `Map` instance and explicitly calling `remove()` on unmount,
+ * plus a stable `mapKey` so React never reuses the same DOM node
+ * between mount cycles.
  */
 
 function createMissionIcon(boosted = false) {
@@ -98,8 +106,37 @@ export default function MissionMap({
             ? 10
             : 9;
 
+  // Stable per-instance key. React StrictMode mounts the component
+  // twice in dev — without a fresh key, the second mount tries to
+  // attach Leaflet to the same DOM node that still carries the
+  // first mount's _leaflet_id, throwing "Map container is already
+  // initialized". useState lazy-init guarantees the key is computed
+  // exactly once per real mount cycle (not once per render).
+  const [mapKey] = useState(
+    () => `mm-${Math.random().toString(36).slice(2, 11)}`,
+  );
+
+  // Hold the Leaflet Map instance so we can dispose it explicitly
+  // on unmount, freeing the underlying <div> from _leaflet_id.
+  const mapRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <MapContainer
+      key={mapKey}
+      ref={(instance) => {
+        if (instance) {
+          mapRef.current = instance;
+        }
+      }}
       center={center}
       zoom={zoom}
       className="h-[50vh] w-full rounded-2xl overflow-hidden border border-workon-border"

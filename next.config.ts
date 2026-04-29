@@ -100,13 +100,14 @@ const sentryBuildOptions = {
   hideSourceMaps: true,
 
   // Tree-shake Sentry debug helpers from the prod bundle.
-  // (replaces the deprecated `disableLogger: true` option from
-  // @sentry/nextjs ≥ 9.x — same effect, recommended config.)
-  webpack: {
-    treeshake: {
-      removeDebugLogging: true,
-    },
-  },
+  // Note: Sprint 2 attempted to migrate this to
+  // `webpack.treeshake.removeDebugLogging: true` per a deprecation
+  // warning, but that nested key is not actually understood by the
+  // current @sentry/nextjs build hooks and silently broke production
+  // (the nested options threw at runtime when Sentry initialised the
+  // client). Reverted to the documented `disableLogger: true` —
+  // still emits a build-time deprecation warning, but functional.
+  disableLogger: true,
 };
 
 export default withSentryConfig(nextConfig, sentryBuildOptions);
