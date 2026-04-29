@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -6,6 +7,16 @@ const isProd = process.env.NODE_ENV === "production";
 const nextConfig: NextConfig = {
   // React strict mode for better development warnings
   reactStrictMode: true,
+
+  // Pin Turbopack workspace root to this directory. Without this,
+  // Next 16 walks up looking for a `package.json` and may pick up
+  // a residual one in the user's home (e.g. `C:\Users\ouell\package.json`
+  // with stray Prisma deps), then fails to resolve `tailwindcss` because
+  // it's looking in the wrong node_modules tree. Pinning the root makes
+  // the build robust against any unrelated package.json above us.
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
 
   // Hide X-Powered-By header for security
   poweredByHeader: false,
