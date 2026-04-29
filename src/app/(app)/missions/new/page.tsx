@@ -55,19 +55,9 @@ export default function NewMissionPage() {
   // phone + city per backend `onboardingCompletedAt` logic) can't publish.
   // Redirect them to finish the wizard rather than letting them hit a
   // validation failure mid-form.
-  //
-  // QA report C8 / Sprint 2: this redirect used to be silent — the user
-  // clicked "Publier" from the bottom-nav FAB and landed on
-  // /onboarding/employer with no context. Show a toast first so they
-  // understand why they were rerouted. The `from=missions-new` query
-  // param tells the onboarding page to redirect back here on save.
   useEffect(() => {
     if (authLoading || !user) return;
     if (user.role === "employer" && !user.onboardingCompletedAt) {
-      toast.info(
-        "Complète d'abord ton profil business pour publier ta première mission.",
-        { duration: 4000 },
-      );
       router.replace("/onboarding/employer?from=missions-new");
     }
   }, [authLoading, user, router]);
@@ -187,11 +177,8 @@ export default function NewMissionPage() {
         address: data.address || undefined,
       }),
     onSuccess: (mission) => {
-      // QA report C8 / Sprint 2: pass `?created=1` so the detail page
-      // can render a celebration banner (with share link) on first
-      // arrival rather than relying on a toast that disappears in 4s.
-      // The banner is dismissible and stays until the user clicks away.
-      router.push(`/missions/${mission.id}?created=1`);
+      toast.success("Mission publiée avec succès!");
+      router.push(`/missions/${mission.id}`);
     },
     onError: (error) => {
       if (isQuotaError(error)) {

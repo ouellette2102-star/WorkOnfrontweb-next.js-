@@ -2,9 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
-import { useMode } from "@/contexts/mode-context";
-import { useCopy } from "@/lib/copy";
-import { formatFullDate } from "@/lib/format-date";
 import { api } from "@/lib/api-client";
 import { WorkerCardFeed } from "@/components/worker/worker-card-feed";
 import { Button } from "@/components/ui/button";
@@ -43,8 +40,6 @@ import { missionStatusLabel, missionStatusColor } from "@/lib/i18n-labels";
  */
 export default function HomePage() {
   const { user } = useAuth();
-  const { mode } = useMode();
-  const copy = useCopy();
 
   const { data: stats } = useQuery({
     queryKey: ["home-stats"],
@@ -143,10 +138,11 @@ export default function HomePage() {
       (d) => !d.acceptedAt && !d.declinedAt,
     ) ?? [];
 
-  // QA report M7 / Sprint 1 follow-up: include the year via the
-  // centralised helper so the banner reads "mercredi 29 avril 2026"
-  // instead of the legacy "Mercredi 29 Avril".
-  const todayLabel = formatFullDate(new Date());
+  const todayLabel = new Date().toLocaleDateString("fr-CA", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   const proCount = stats?.activeWorkers ?? realWorkers.length;
   const missionsThisMonth = stats?.openServiceCalls ?? 0;
@@ -266,10 +262,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Empty state — tout neuf, aucune mission, aucun pro.
-          QA report C2 / Sprint 2: copy + CTA now adapt to the active
-          mode. PRO sees "Trouve ta prochaine mission" → /missions.
-          CLIENT sees "Trouve un pro qualifié" → /pros. */}
+      {/* Empty state — tout neuf, aucune mission, aucun pro */}
       {activeMissions.length === 0 &&
         realWorkers.length === 0 &&
         pendingLeads.length === 0 && (
@@ -278,35 +271,29 @@ export default function HomePage() {
               <Sparkles className="h-5 w-5 text-workon-primary" />
             </div>
             <p className="text-sm font-semibold text-workon-ink">
-              {copy.home.welcomeBanner}
+              Bienvenue sur WorkOn
             </p>
-            <Button asChild variant="outline" size="sm" className="mt-3 rounded-xl">
-              <Link
-                href={mode === "pro" ? "/missions" : "/pros"}
-                className="inline-flex items-center gap-1.5"
-              >
-                {copy.home.welcomeCta}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
+            <p className="text-xs text-workon-muted mt-1">
+              Commence en appelant un pro — le bouton rouge en bas.
+            </p>
           </div>
         )}
 
-      {/* ── 5. Trust footer compact — pills role-aware ──────────── */}
+      {/* ── 5. Trust footer compact ─────────────────────────────── */}
       <div className="rounded-2xl bg-workon-bg-cream/60 border border-workon-border p-3">
         <div className="grid grid-cols-3 gap-2 text-[11px] text-workon-gray">
-          {copy.trustPills.map((label, i) => {
-            const Icon = i === 0 ? ShieldCheck : i === 1 ? FileCheck : BadgeCheck;
-            return (
-              <div
-                key={label}
-                className="flex items-center gap-1.5 justify-center"
-              >
-                <Icon className="h-3.5 w-3.5 text-workon-primary" />
-                <span>{label}</span>
-              </div>
-            );
-          })}
+          <div className="flex items-center gap-1.5 justify-center">
+            <ShieldCheck className="h-3.5 w-3.5 text-workon-primary" />
+            <span>Paiement Stripe</span>
+          </div>
+          <div className="flex items-center gap-1.5 justify-center">
+            <FileCheck className="h-3.5 w-3.5 text-workon-primary" />
+            <span>Contrat auto</span>
+          </div>
+          <div className="flex items-center gap-1.5 justify-center">
+            <BadgeCheck className="h-3.5 w-3.5 text-workon-primary" />
+            <span>Pros vérifiés</span>
+          </div>
         </div>
       </div>
     </div>

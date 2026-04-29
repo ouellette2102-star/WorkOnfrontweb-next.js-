@@ -27,7 +27,6 @@ const PUBLIC_PATHS = [
   "/pros",
   "/p/",
   "/pro/",
-  "/rejoindre-pro",
   "/missions",
   "/pricing",
   "/legal/",

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type OfferResponse, type BoostType } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
@@ -638,26 +638,7 @@ export default function MissionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-
-  // QA report C8 / Sprint 2: when arriving here from /missions/new
-  // with `?created=1`, show a celebration banner with a share link.
-  // Dismissible — once closed, the param is stripped from the URL so
-  // a refresh doesn't bring it back.
-  const justCreated = searchParams.get("created") === "1";
-  const [showCreatedBanner, setShowCreatedBanner] = useState(justCreated);
-  useEffect(() => {
-    if (justCreated) setShowCreatedBanner(true);
-  }, [justCreated]);
-
-  const dismissCreatedBanner = () => {
-    setShowCreatedBanner(false);
-    // Strip the query param without a full reload
-    const url = new URL(window.location.href);
-    url.searchParams.delete("created");
-    window.history.replaceState({}, "", url.toString());
-  };
 
   const [offerModalOpen, setOfferModalOpen] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -751,11 +732,6 @@ export default function MissionDetailPage() {
     cancelled: "Annulée",
   };
 
-  const shareUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/missions/${id}`
-      : `/missions/${id}`;
-
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
       {/* Back */}
@@ -766,68 +742,6 @@ export default function MissionDetailPage() {
         <ArrowLeft className="h-4 w-4" />
         Retour
       </Link>
-
-      {/* Mission-just-created celebration banner */}
-      {showCreatedBanner && isOwner && (
-        <div
-          className="rounded-2xl border border-workon-trust-green/30 bg-workon-trust-green/5 p-5 flex flex-col gap-3"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 flex-1">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-workon-trust-green/15 flex items-center justify-center text-xl">
-                🎉
-              </div>
-              <div>
-                <h2 className="font-semibold text-workon-ink">
-                  Mission publiée !
-                </h2>
-                <p className="text-sm text-workon-gray mt-0.5">
-                  Les pros à proximité reçoivent une notification. Partage le
-                  lien pour accélérer.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={dismissCreatedBanner}
-              className="flex-shrink-0 h-8 w-8 rounded-full hover:bg-workon-bg-cream flex items-center justify-center text-workon-muted hover:text-workon-ink transition-colors"
-              aria-label="Fermer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-xl"
-              onClick={() => {
-                navigator.clipboard
-                  .writeText(shareUrl)
-                  .then(() => toast.success("Lien copié"))
-                  .catch(() => toast.error("Impossible de copier le lien"));
-              }}
-            >
-              📋 Copier le lien
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-xl"
-              asChild
-            >
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Partager sur Facebook
-              </a>
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Header */}
       <div>
