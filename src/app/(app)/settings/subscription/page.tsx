@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, Crown, AlertTriangle, ShieldCheck } from "lucide-react";
+import { Loader2, CheckCircle2, Crown, AlertTriangle, ShieldCheck, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { BoostCheckoutModal } from "@/components/boosts/boost-checkout-modal";
 import { TaxDisclaimer } from "@/components/ui/tax-disclaimer";
@@ -72,6 +72,18 @@ export default function SubscriptionSettingsPage() {
     },
     onError: (err) => {
       toast.error("Impossible d'annuler", {
+        description: err instanceof Error ? err.message : "Erreur inconnue",
+      });
+    },
+  });
+
+  const portalMutation = useMutation({
+    mutationFn: () => api.createCustomerPortalSession(),
+    onSuccess: ({ url }) => {
+      window.location.href = url;
+    },
+    onError: (err) => {
+      toast.error("Impossible d'ouvrir le portail Stripe", {
         description: err instanceof Error ? err.message : "Erreur inconnue",
       });
     },
@@ -158,12 +170,37 @@ export default function SubscriptionSettingsPage() {
           </div>
         )}
 
-        {isPaid && !sub?.cancelAtPeriodEnd && (
+        {isPaid && (
           <div className="mt-5">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => portalMutation.mutate()}
+              disabled={portalMutation.isPending}
+              data-testid="btn-customer-portal"
+            >
+              {portalMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <ExternalLink className="h-4 w-4 mr-1.5" />
+                  Gérer paiement, factures et plan (Stripe)
+                </>
+              )}
+            </Button>
+            <p className="mt-2 text-xs text-workon-muted">
+              Mettre à jour ta carte, télécharger tes factures, ou changer de
+              plan via le portail Stripe sécurisé.
+            </p>
+          </div>
+        )}
+
+        {isPaid && !sub?.cancelAtPeriodEnd && (
+          <div className="mt-3">
             {!confirmCancel ? (
               <Button
-                variant="outline"
-                className="w-full"
+                variant="ghost"
+                className="w-full text-workon-muted hover:text-red-700"
                 onClick={() => setConfirmCancel(true)}
               >
                 Annuler mon abonnement

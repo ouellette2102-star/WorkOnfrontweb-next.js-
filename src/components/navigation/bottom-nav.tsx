@@ -41,12 +41,15 @@ export function BottomNav() {
   const pathname = usePathname();
   const { mode } = useMode();
 
+  // Unread messages badge — polled at the same 30s cadence as the
+  // notification badge in TopBar so the two background fetches stagger
+  // predictably and we don't double-tax the API in the same 20s window.
   const { data: unread } = useQuery({
     queryKey: ["unread-count"],
     queryFn: () => api.getUnreadCount(),
-    refetchInterval: 20_000,
+    refetchInterval: 30_000,
     refetchIntervalInBackground: false,
-    staleTime: 10_000,
+    staleTime: 15_000,
   });
 
   const isActive = (href: string) =>

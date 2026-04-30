@@ -7,6 +7,7 @@ import { TopBar } from "@/components/navigation/top-bar";
 import { ConsentProvider } from "@/components/consent-provider";
 import { ReviewPromptProvider } from "@/components/review-prompt-provider";
 import { PageTransition } from "@/components/page-transition";
+import { useDeviceRegistration } from "@/hooks/use-device-registration";
 import { Loader2 } from "lucide-react";
 
 /**
@@ -23,6 +24,7 @@ import { Loader2 } from "lucide-react";
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { isLoading, isAuthenticated } = useAuth();
+  useDeviceRegistration();
 
   if (isLoading) {
     return (
