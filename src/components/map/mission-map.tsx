@@ -82,7 +82,11 @@ function spreadOverlappingPins(
   missions: MissionResponse[],
   zoom: number,
 ): Array<MissionResponse & { displayLat: number; displayLng: number }> {
-  const ringRadiusDeg = 0.0006 * Math.pow(2, Math.max(0, 12 - zoom));
+  // Calibrated so siblings sit ~50 px apart at any zoom: at zoom 11
+  // (default 25 km radius), 0.014° latitude is ~1500 m and renders
+  // as ~40 px. Doubling the formula every two zoom levels keeps that
+  // pixel gap roughly constant as the user zooms in or out.
+  const ringRadiusDeg = 0.014 * Math.pow(2, 11 - zoom);
   const buckets = new Map<string, MissionResponse[]>();
   for (const m of missions) {
     if (typeof m.latitude !== "number" || typeof m.longitude !== "number") {
