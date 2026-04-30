@@ -848,6 +848,11 @@ export const api = {
   },
   cancelSubscription: () =>
     apiFetch<{ canceledAt: string }>("/subscriptions/cancel", { method: "POST" }),
+  createCustomerPortalSession: (returnUrl?: string) =>
+    apiFetch<{ url: string }>("/subscriptions/customer-portal", {
+      method: "POST",
+      body: JSON.stringify(returnUrl ? { returnUrl } : {}),
+    }),
   getMissionsQuota: async (): Promise<MissionsQuota> => {
     const raw = await apiFetch<unknown>("/usage/missions-count-month");
     return parseResponse(
@@ -1096,8 +1101,16 @@ export const api = {
   getVerificationStatus: () => apiFetch<VerificationStatus>("/identity/status"),
 
   // Devices
-  registerDevice: (data: { token: string; platform: string }) =>
-    apiFetch<unknown>("/devices", { method: "POST", body: JSON.stringify(data) }),
+  registerDevice: (data: {
+    deviceId: string;
+    platform: "web" | "ios" | "android";
+    pushToken?: string;
+    appVersion?: string;
+  }) =>
+    apiFetch<{ id: string; deviceId: string; platform: string }>("/devices", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   getMyDevices: () => apiFetch<unknown[]>("/devices/me"),
   unregisterDevice: (id: string) => apiFetch<void>(`/devices/${id}`, { method: "DELETE" }),
 

@@ -111,6 +111,31 @@ export default function OnboardingDetailsPage() {
           </div>
         )}
 
+        {user?.role === "worker" && (
+          <div
+            data-testid="onboarding-cnesst-notice"
+            className="mb-6 rounded-2xl border border-workon-border bg-workon-bg/40 p-4 text-sm text-workon-muted"
+          >
+            <p className="mb-2 font-semibold text-workon-ink">
+              Statut de travailleur autonome
+            </p>
+            <p>
+              En tant que travailleur autonome (TA) au Québec, tu es responsable
+              de tes propres déclarations fiscales (TPS/TVQ, impôts) et de ta
+              couverture CNESST. WorkOn ne retient pas d&apos;impôts à la source.{" "}
+              <a
+                href="https://www.cnesst.gouv.qc.ca/fr/conditions-travail/travailleur-autonome"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline hover:text-workon-ink"
+              >
+                En savoir plus sur la CNESST
+              </a>
+              .
+            </p>
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit}
           className="rounded-3xl border border-workon-border bg-white backdrop-blur-sm p-8 shadow-sm"

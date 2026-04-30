@@ -26,6 +26,7 @@ import {
   LogOut,
   Zap,
   Rocket,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -677,6 +678,18 @@ export default function MissionDetailPage() {
     enabled: !!id,
   });
 
+  // Workers must complete Stripe Identity before the API will let them
+  // create offers (backend `IdentityVerificationGuard`). Fetch the
+  // status alongside the mission so the action area can show a
+  // gating banner instead of letting them hit the 403 mid-form.
+  const { data: identity } = useQuery({
+    queryKey: ["identity-status"],
+    queryFn: () => api.getVerificationStatus(),
+    enabled: !!user && user.role === "worker",
+    staleTime: 30_000,
+  });
+  const idVerified = identity?.identity.status === "VERIFIED";
+
   const accept = useMutation({
     mutationFn: () => api.acceptMission(id),
     onSuccess: () => {
@@ -897,8 +910,34 @@ export default function MissionDetailPage() {
 
       {/* Actions */}
       <div className="space-y-3">
-        {/* Worker: make offer on open mission */}
-        {isWorker && mission.status === "open" && !isOwner && (
+        {/* Worker: make offer on open mission.
+            The backend's IdentityVerificationGuard 403s any offer/accept
+            from a worker whose `idVerificationStatus !== VERIFIED`. We
+            mirror that gate here so the user gets a useful CTA toward
+            /profile/verify instead of a generic toast after a wasted
+            form fill. */}
+        {isWorker && mission.status === "open" && !isOwner && !idVerified && (
+          <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 space-y-3">
+            <div className="flex items-start gap-2">
+              <ShieldCheck className="h-5 w-5 text-amber-700 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-amber-900">
+                <p className="font-semibold">Vérifie ton identité pour postuler</p>
+                <p className="mt-0.5 text-xs text-amber-800">
+                  WorkOn exige une pièce d&apos;identité Stripe avant qu&apos;un
+                  travailleur puisse faire une offre. Ça prend ~3 minutes.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/profile/verify"
+              className="block w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-center py-2.5 font-semibold text-sm"
+            >
+              Vérifier mon identité
+            </Link>
+          </div>
+        )}
+
+        {isWorker && mission.status === "open" && !isOwner && idVerified && (
           <>
             <Button
               onClick={() => setOfferModalOpen(true)}
