@@ -690,6 +690,19 @@ export default function MissionDetailPage() {
   });
   const idVerified = identity?.identity.status === "VERIFIED";
 
+  // Worker Stripe Connect onboarding — required so the platform can
+  // transfer the worker's share when the employer pays at completion.
+  // Without it the funds sit on the platform balance until the worker
+  // onboards retroactively. Surface the missing step BEFORE the worker
+  // commits to a mission (rather than after they finish the work).
+  const { data: connectStatus } = useQuery({
+    queryKey: ["stripe-connect-status"],
+    queryFn: () => api.getStripeOnboardingStatus(),
+    enabled: !!user && user.role === "worker" && idVerified,
+    staleTime: 30_000,
+  });
+  const connectOnboarded = connectStatus?.onboarded === true;
+
   const accept = useMutation({
     mutationFn: () => api.acceptMission(id),
     onSuccess: () => {
@@ -911,11 +924,15 @@ export default function MissionDetailPage() {
       {/* Actions */}
       <div className="space-y-3">
         {/* Worker: make offer on open mission.
-            The backend's IdentityVerificationGuard 403s any offer/accept
-            from a worker whose `idVerificationStatus !== VERIFIED`. We
-            mirror that gate here so the user gets a useful CTA toward
-            /profile/verify instead of a generic toast after a wasted
-            form fill. */}
+            Two pre-flight gates mirror what the backend will enforce:
+              1. IdentityVerificationGuard — blocks POST /offers if
+                 idVerificationStatus !== 'VERIFIED'.
+              2. Stripe Connect onboarding — without it, the platform
+                 can't transfer the worker's share when the mission
+                 completes; funds queue on the platform balance.
+            Both gates point the worker to the page that resolves
+            them so they don't hit a 403 (or a silent payout failure)
+            after committing. */}
         {isWorker && mission.status === "open" && !isOwner && !idVerified && (
           <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 space-y-3">
             <div className="flex items-start gap-2">
@@ -937,30 +954,65 @@ export default function MissionDetailPage() {
           </div>
         )}
 
-        {isWorker && mission.status === "open" && !isOwner && idVerified && (
-          <>
-            <Button
-              onClick={() => setOfferModalOpen(true)}
-              className="w-full bg-workon-primary hover:bg-workon-primary-hover text-white rounded-2xl py-3"
+        {isWorker &&
+          mission.status === "open" &&
+          !isOwner &&
+          idVerified &&
+          !connectOnboarded && (
+            <div
+              className="rounded-2xl border border-amber-300 bg-amber-50 p-4 space-y-3"
+              data-testid="stripe-connect-gate-mission"
             >
-              <Send className="h-4 w-4 mr-2" />
-              Faire une offre
-            </Button>
-            <Button
-              onClick={() => accept.mutate()}
-              disabled={accept.isPending}
-              variant="outline"
-              className="w-full rounded-2xl py-3 border-workon-border text-workon-ink hover:bg-workon-bg"
-            >
-              {accept.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <CheckCircle className="h-4 w-4 mr-2" />
-              )}
-              Accepter au prix affiché
-            </Button>
-          </>
-        )}
+              <div className="flex items-start gap-2">
+                <DollarSign className="h-5 w-5 text-amber-700 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-amber-900">
+                  <p className="font-semibold">
+                    Configure ton paiement Stripe pour recevoir les fonds
+                  </p>
+                  <p className="mt-0.5 text-xs text-amber-800">
+                    Stripe Connect est nécessaire pour qu&apos;on puisse te
+                    virer ta part quand la mission est payée. Ça prend
+                    2 minutes.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/worker/payments"
+                className="block w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-center py-2.5 font-semibold text-sm"
+              >
+                Configurer Stripe
+              </Link>
+            </div>
+          )}
+
+        {isWorker &&
+          mission.status === "open" &&
+          !isOwner &&
+          idVerified &&
+          connectOnboarded && (
+            <>
+              <Button
+                onClick={() => setOfferModalOpen(true)}
+                className="w-full bg-workon-primary hover:bg-workon-primary-hover text-white rounded-2xl py-3"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Faire une offre
+              </Button>
+              <Button
+                onClick={() => accept.mutate()}
+                disabled={accept.isPending}
+                variant="outline"
+                className="w-full rounded-2xl py-3 border-workon-border text-workon-ink hover:bg-workon-bg"
+              >
+                {accept.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                )}
+                Accepter au prix affiché
+              </Button>
+            </>
+          )}
 
         {/* Assigned worker: start */}
         {isAssigned && mission.status === "assigned" && (
