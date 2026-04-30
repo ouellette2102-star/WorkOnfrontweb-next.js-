@@ -1074,7 +1074,17 @@ export const api = {
   // Support
   createTicket: (data: { subject: string; description: string; category?: string; priority?: string }) =>
     apiFetch<SupportTicket>("/support/tickets", { method: "POST", body: JSON.stringify(data) }),
-  getMyTickets: () => apiFetch<SupportTicket[]>("/support/tickets"),
+  // Backend wraps the list in `{ tickets, total, page, limit }` (paginated).
+  // Unwrap so the page can keep treating the result as a flat array — the
+  // raw envelope made `tickets.map(...)` throw `A.map is not a function`
+  // on /support (Sentry: 3 events in the last 24 h).
+  getMyTickets: async (): Promise<SupportTicket[]> => {
+    const raw = await apiFetch<
+      { tickets: SupportTicket[] } | SupportTicket[]
+    >("/support/tickets");
+    if (Array.isArray(raw)) return raw;
+    return Array.isArray(raw?.tickets) ? raw.tickets : [];
+  },
   getTicket: (id: string) => apiFetch<SupportTicket>(`/support/tickets/${id}`),
   addTicketMessage: (id: string, data: { content: string }) =>
     apiFetch<unknown>(`/support/tickets/${id}/messages`, { method: "POST", body: JSON.stringify(data) }),
