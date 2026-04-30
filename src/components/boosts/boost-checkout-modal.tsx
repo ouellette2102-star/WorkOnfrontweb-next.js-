@@ -205,10 +205,16 @@ function BoostPaymentForm({
 
     setProcessing(true);
     try {
+      // Stripe redirects here only when the payment requires off-site
+      // 3DS / Apple Pay confirmation — `redirect: "if_required"` keeps
+      // the happy-path (card with no SCA challenge) inside the modal.
+      // /boosts is a single landing that handles every boost type, so
+      // the user lands somewhere coherent regardless of which CTA they
+      // clicked.
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/settings/subscription?boost=1`,
+          return_url: `${window.location.origin}/boosts?confirmed=1`,
         },
         redirect: "if_required",
       });

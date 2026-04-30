@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import Link from "next/link";
 import {
   Zap,
@@ -237,10 +239,43 @@ function Section({
 }
 
 export default function BoostsPage() {
+  const qc = useQueryClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const justConfirmed = searchParams.get("confirmed") === "1";
+
+  // After Stripe checkout success the modal redirects (only when SCA
+  // forced an off-site step) to /boosts?confirmed=1. Poll for ~30 s so
+  // we pick up the webhook flipping PENDING → PAID, then strip the
+  // query param so a refresh doesn't keep polling.
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["my-boosts"],
     queryFn: () => api.getMyBoosts(),
+    refetchInterval: justConfirmed ? 3000 : false,
   });
+
+  const toastedRef = useRef(false);
+  useEffect(() => {
+    if (!justConfirmed) return;
+    if (toastedRef.current) return;
+    toastedRef.current = true;
+    toast.success("Paiement reçu — boost en cours d'activation");
+  }, [justConfirmed]);
+
+  // Once the latest boost flips to PAID, stop polling by removing the
+  // ?confirmed=1 flag from the URL.
+  useEffect(() => {
+    if (!justConfirmed) return;
+    if (!Array.isArray(data) || data.length === 0) return;
+    const latestPaid = data.some(
+      (b) =>
+        b.status === "PAID" &&
+        new Date(b.createdAt).getTime() > Date.now() - 5 * 60_000,
+    );
+    if (latestPaid) {
+      router.replace("/boosts");
+    }
+  }, [justConfirmed, data, router]);
 
   const buckets = useMemo<Bucketed>(
     () => bucketBoosts(Array.isArray(data) ? data : []),
