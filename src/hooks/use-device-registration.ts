@@ -3,9 +3,11 @@
 import { useEffect } from "react";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { requestFcmToken } from "@/lib/firebase-client";
 
 const DEVICE_ID_KEY = "workon_device_id";
 const REGISTERED_AT_KEY = "workon_device_registered_at";
+const FCM_TOKEN_KEY = "workon_fcm_token";
 const REGISTER_TTL_MS = 24 * 60 * 60 * 1000; // 1 day
 
 function getOrCreateDeviceId(): string {
@@ -54,16 +56,35 @@ export function useDeviceRegistration() {
       process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ||
       "dev";
 
-    api
-      .registerDevice({ deviceId, platform: "web", appVersion })
-      .then(() => {
+    (async () => {
+      // Best-effort FCM token. Returns null when Firebase isn't
+      // configured, the browser doesn't support push, or the user
+      // declines the permission. The device row still gets created
+      // either way so the BE can see active sessions.
+      let pushToken: string | undefined;
+      try {
+        const token = await requestFcmToken();
+        if (token) {
+          pushToken = token;
+          window.localStorage.setItem(FCM_TOKEN_KEY, token);
+        }
+      } catch {
+        /* swallow — registration must not block on push */
+      }
+
+      try {
+        await api.registerDevice({
+          deviceId,
+          platform: "web",
+          appVersion,
+          ...(pushToken ? { pushToken } : {}),
+        });
         window.localStorage.setItem(REGISTERED_AT_KEY, String(Date.now()));
-      })
-      .catch((err) => {
-        // Non-blocking — silent failure is fine, device push is opt-in.
+      } catch (err) {
         if (process.env.NODE_ENV !== "production") {
           console.warn("[device-registration] failed", err);
         }
-      });
+      }
+    })();
   }, [isAuthenticated, isLoading]);
 }
