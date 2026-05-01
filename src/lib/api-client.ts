@@ -1232,6 +1232,43 @@ export const api = {
   adminSeedCatalog: () =>
     apiFetch<unknown>("/admin/seed-catalog", { method: "POST" }),
 
+  // Admin — VERIFY_EXPRESS_19 reviewer queue
+  adminListVerifyExpressQueue: () =>
+    apiFetch<{
+      items: Array<{
+        boostId: string;
+        paidAt: string | null;
+        expiresAt: string | null;
+        stripePaymentIntentId: string | null;
+        user: {
+          id: string;
+          email: string;
+          firstName: string;
+          lastName: string;
+          phone: string | null;
+          phoneVerified: boolean;
+          idVerificationStatus: string;
+          idVerifiedAt: string | null;
+          trustTier: string;
+          gallery: string[];
+        } | undefined;
+      }>;
+      total: number;
+    }>("/admin/verify-express/queue"),
+  adminApproveVerifyExpress: (boostId: string) =>
+    apiFetch<{
+      user: { id: string; idVerificationStatus: string; trustTier: string };
+      trustTier: string;
+    }>(`/admin/verify-express/${boostId}/approve`, { method: "POST" }),
+  adminRejectVerifyExpress: (boostId: string, reason?: string) =>
+    apiFetch<{
+      user: { id: string; idVerificationStatus: string };
+      reason: string | null;
+    }>(`/admin/verify-express/${boostId}/reject`, {
+      method: "POST",
+      body: JSON.stringify(reason ? { reason } : {}),
+    }),
+
   // Legacy Missions (Clerk-era endpoints, kept for backward compatibility)
   legacy: {
     getMissions: () => apiFetch<unknown[]>("/missions/mine"),
