@@ -33,10 +33,30 @@ interface ProData {
 async function getProBySlug(slug: string): Promise<ProData | null> {
   if (!API_BASE) return null;
   try {
+    // Cache successful responses for 60 s (ISR), but never cache the
+    // miss path. The previous behavior cached the entire page with a
+    // 404 status when the upstream API briefly 500-d (e.g. during a
+    // schema drift) — Sentry-recovered fixes then took 5+ minutes to
+    // surface in the UI because the cached 404 stayed sticky. Splitting
+    // success vs failure paths keeps ISR fast on the happy path while
+    // letting the next request after a recovery render fresh data.
     const res = await fetch(`${API_BASE}/api/v1/pros/${slug}`, {
       next: { revalidate: 60 },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // Re-fetch with no-store so the framework doesn't pin the
+      // failure to the cached entry. The caller will treat null as
+      // notFound() but won't poison ISR.
+      try {
+        const retry = await fetch(`${API_BASE}/api/v1/pros/${slug}`, {
+          cache: "no-store",
+        });
+        if (!retry.ok) return null;
+        return retry.json();
+      } catch {
+        return null;
+      }
+    }
     return res.json();
   } catch {
     return null;
