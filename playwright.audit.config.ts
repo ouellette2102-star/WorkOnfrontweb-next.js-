@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  testMatch: /admin-verify-express-visual\.spec\.ts/,
+  testMatch: /(admin-verify-express-visual|notifications-actionurl-visual)\.spec\.ts/,
   retries: 0,
   workers: 1,
   reporter: "line",

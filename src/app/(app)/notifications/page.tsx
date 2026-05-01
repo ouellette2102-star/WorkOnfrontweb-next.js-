@@ -54,6 +54,10 @@ interface Notification {
     actionUrl?: string;
     [key: string]: unknown;
   };
+  // Top-level actionUrl from LocalNotification.actionUrl column.
+  // The BE now sets this for messages, leads, offers, contracts, swipe
+  // matches; routing here always wins over payload-derived fallbacks.
+  actionUrl?: string | null;
   readAt: string | null;
   createdAt: string;
 }
@@ -144,12 +148,20 @@ function pickString(p: Record<string, unknown>, key: string): string | null {
 function resolveActionUrl(n: Notification): string {
   const p = getPayload(n);
 
-  // Explicit URL fields always win. `reviewUrl` is what the invoice
-  // flow emits on the backend (see invoice.service.ts createLocalNotification
-  // calls for invoice_review_pending / invoice_disputed / escrow_released).
-  // Without this line the 4 invoice-flow notifications all fell through to
-  // the default `/home` cul-de-sac even though they had a perfectly valid
-  // deep-link in their payload.
+  // Top-level `actionUrl` from LocalNotification.actionUrl column wins
+  // over everything — the backend sets this explicitly per call site
+  // (messages → /messages/:id, leads → /leads/mine, offers → /offers/:id,
+  // contracts → /contracts/:id, swipe match → /matches).
+  if (typeof n.actionUrl === "string" && n.actionUrl.length > 0) {
+    return n.actionUrl;
+  }
+
+  // Explicit URL fields in the payload come next. `reviewUrl` is what
+  // the invoice flow emits on the backend (see invoice.service.ts
+  // createLocalNotification calls for invoice_review_pending /
+  // invoice_disputed / escrow_released). Without this line the 4
+  // invoice-flow notifications all fell through to the default `/home`
+  // cul-de-sac even though they had a perfectly valid deep-link.
   const explicit =
     pickString(p, "link") ??
     pickString(p, "actionUrl") ??
