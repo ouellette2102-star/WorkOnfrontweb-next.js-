@@ -52,7 +52,7 @@ async function getProBySlug(slug: string): Promise<ProData | null> {
     // surface in the UI because the cached 404 stayed sticky. Splitting
     // success vs failure paths keeps ISR fast on the happy path while
     // letting the next request after a recovery render fresh data.
-    const res = await fetch(`${API_BASE}/api/v1/pros/${slug}`, {
+    const res = await fetch(`${API_BASE}/pros/${slug}`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) {
@@ -60,7 +60,7 @@ async function getProBySlug(slug: string): Promise<ProData | null> {
       // failure to the cached entry. The caller will treat null as
       // notFound() but won't poison ISR.
       try {
-        const retry = await fetch(`${API_BASE}/api/v1/pros/${slug}`, {
+        const retry = await fetch(`${API_BASE}/pros/${slug}`, {
           cache: "no-store",
         });
         if (!retry.ok) return null;
