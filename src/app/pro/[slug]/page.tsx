@@ -2,6 +2,18 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProProfile } from "./pro-profile";
 
+// Disable ISR/SSG for this route. We hit the cache-poisoning trap in
+// PR #224: notFound() pinned the 404 page in ISR for hours after the
+// backend recovered from schema drift. force-dynamic guarantees a
+// fresh fetch on every request, so a backend recovery is reflected
+// instantly on /pro/[slug]. Vercel's Edge cache and the upstream
+// API's own cache cover the freshness story — ISR was overhead with
+// real downside.
+//
+// SEO is preserved: every request still server-renders the full page
+// with metadata; we just don't keep the rendered output around.
+export const dynamic = "force-dynamic";
+
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "";
 
