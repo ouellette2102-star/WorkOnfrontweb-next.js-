@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api, type HomeStats } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
@@ -14,6 +15,8 @@ import {
   Briefcase,
   Activity,
   ShieldAlert,
+  ShieldCheck,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -124,6 +127,29 @@ function AdminDashboard() {
             Statistiques indisponibles
           </div>
         )}
+      </div>
+
+      {/* Reviewer queues — high-priority operational pages */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-bold text-workon-ink">Files d&apos;attente</h2>
+        <Link
+          href="/admin/verify-express"
+          data-testid="link-verify-express-queue"
+          className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 hover:bg-emerald-100 transition-colors"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
+            <ShieldCheck className="h-5 w-5 text-emerald-700" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-emerald-900">
+              Vérification express ($19)
+            </p>
+            <p className="text-xs text-emerald-700">
+              Approuver/rejeter les demandes KYC payées — délai 24h
+            </p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-emerald-700" />
+        </Link>
       </div>
 
       {/* Admin Actions */}
