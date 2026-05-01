@@ -83,7 +83,10 @@ export function ProProfile({ pro }: { pro: ProData }) {
     setSubmitting(true);
 
     try {
-      const res = await fetch(`${API_BASE}/api/v1/leads`, {
+      // API_BASE already includes /api/v1 (matches NEXT_PUBLIC_API_URL
+      // convention used everywhere in api-client.ts). Adding /api/v1
+      // again here doubled the prefix and 404'd every submission.
+      const res = await fetch(`${API_BASE}/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
