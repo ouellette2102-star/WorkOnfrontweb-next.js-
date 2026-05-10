@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+export const CANONICAL_WORKON_HOST = "workonapp.vercel.app";
+
 /**
  * JWT-based proxy (replaces the deprecated `middleware` file convention
  * in Next.js 16+ — see https://nextjs.org/docs/messages/middleware-to-proxy).
@@ -35,6 +37,22 @@ const PUBLIC_PATHS = [
   "/api/",
 ];
 
+export function getCanonicalWorkOnUrl(
+  currentUrl: Pick<URL, "hostname" | "toString">,
+): URL | null {
+  const hostname = currentUrl.hostname.toLowerCase();
+
+  if (hostname === CANONICAL_WORKON_HOST) return null;
+  if (!hostname.endsWith(".vercel.app")) return null;
+  if (!hostname.startsWith("workonapp-")) return null;
+
+  const canonicalUrl = new URL(currentUrl.toString());
+  canonicalUrl.protocol = "https:";
+  canonicalUrl.hostname = CANONICAL_WORKON_HOST;
+  canonicalUrl.port = "";
+  return canonicalUrl;
+}
+
 function isPublicPath(pathname: string): boolean {
   // Exact matches
   if (PUBLIC_PATHS.includes(pathname)) return true;
@@ -46,6 +64,11 @@ function isPublicPath(pathname: string): boolean {
 
 export default function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  const canonicalUrl = getCanonicalWorkOnUrl(req.nextUrl);
+  if (canonicalUrl) {
+    return NextResponse.redirect(canonicalUrl, 307);
+  }
 
   // Skip static files and Next.js internals
   if (
