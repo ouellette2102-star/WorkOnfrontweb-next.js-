@@ -3,13 +3,11 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
   useCallback,
   type ReactNode,
 } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { api } from "@/lib/api-client";
 import { safeLocalStorage } from "@/lib/safe-storage";
 
 type Mode = "pro" | "client";
@@ -29,39 +27,17 @@ function defaultModeFromRole(role?: string): Mode {
 }
 
 export function ModeProvider({ children }: { children: ReactNode }) {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const [mode, setModeState] = useState<Mode>(() => {
     const stored = safeLocalStorage.getItem(STORAGE_KEY) as Mode | null;
     if (stored === "pro" || stored === "client") return stored;
     return defaultModeFromRole(user?.role);
   });
 
-  // Sync default from user role on first load (when no localStorage value)
-  useEffect(() => {
-    if (!user) return;
-    const stored = safeLocalStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      const def = defaultModeFromRole(user.role);
-      setModeState(def);
-    }
-  }, [user]);
-
-  const setMode = useCallback(
-    async (newMode: Mode) => {
-      setModeState(newMode);
-      safeLocalStorage.setItem(STORAGE_KEY, newMode);
-
-      // Sync role to backend
-      const backendRole = newMode === "pro" ? "worker" : "employer";
-      try {
-        await api.updateProfile({ role: backendRole } as Parameters<typeof api.updateProfile>[0]);
-        await refreshUser();
-      } catch {
-        // Silent fail — the UI already switched, backend sync is best-effort
-      }
-    },
-    [refreshUser],
-  );
+  const setMode = useCallback((newMode: Mode) => {
+    setModeState(newMode);
+    safeLocalStorage.setItem(STORAGE_KEY, newMode);
+  }, []);
 
   return (
     <ModeContext.Provider value={{ mode, setMode }}>
