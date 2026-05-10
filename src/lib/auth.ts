@@ -114,6 +114,33 @@ function clearAuth() {
   safeLocalStorage.removeItem(USER_KEY);
 }
 
+interface AccessTokenPayload {
+  sub?: string;
+  role?: string;
+}
+
+function decodeAccessTokenPayload(token: string | null): AccessTokenPayload | null {
+  if (!token) return null;
+  const payload = token.split(".")[1];
+  if (!payload) return null;
+
+  try {
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(
+      normalized.length + ((4 - (normalized.length % 4)) % 4),
+      "=",
+    );
+    return JSON.parse(atob(padded)) as AccessTokenPayload;
+  } catch {
+    return null;
+  }
+}
+
+function localAccessTokenMatchesUser(user: AuthUser): boolean {
+  const payload = decodeAccessTokenPayload(getAccessToken());
+  return payload?.sub === user.id && payload?.role === user.role;
+}
+
 // --- API Calls (all via same-origin proxy routes) ---
 
 export async function login(dto: LoginDto): Promise<{ user: AuthUser }> {
@@ -238,6 +265,9 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
     if (!res.ok) return null;
     const user = await res.json();
     safeLocalStorage.setItem(USER_KEY, JSON.stringify(user));
+    if (!localAccessTokenMatchesUser(user)) {
+      await refreshToken();
+    }
     return user;
   } catch {
     return null;
