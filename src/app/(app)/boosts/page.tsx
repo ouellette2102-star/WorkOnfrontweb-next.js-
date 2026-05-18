@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -86,8 +86,8 @@ function formatDate(iso: string): string {
   });
 }
 
-function timeRemaining(iso: string): string {
-  const diff = new Date(iso).getTime() - Date.now();
+function timeRemaining(iso: string, now: number): string {
+  const diff = new Date(iso).getTime() - now;
   if (diff <= 0) return "expiré";
   const hours = Math.floor(diff / 3_600_000);
   if (hours < 1) {
@@ -105,8 +105,7 @@ type Bucketed = {
   pending: BoostHistoryItem[];
 };
 
-function bucketBoosts(items: BoostHistoryItem[]): Bucketed {
-  const now = Date.now();
+function bucketBoosts(items: BoostHistoryItem[], now: number): Bucketed {
   const active: BoostHistoryItem[] = [];
   const past: BoostHistoryItem[] = [];
   const pending: BoostHistoryItem[] = [];
@@ -163,13 +162,13 @@ function StatusBadge({ status }: { status: BoostStatus }) {
   );
 }
 
-function BoostRow({ boost }: { boost: BoostHistoryItem }) {
+function BoostRow({ boost, now }: { boost: BoostHistoryItem; now: number }) {
   const meta = TYPE_META[boost.type];
   const Icon = meta.icon;
   const active =
     boost.status === "PAID" &&
     !!boost.expiresAt &&
-    new Date(boost.expiresAt).getTime() > Date.now();
+    new Date(boost.expiresAt).getTime() > now;
 
   return (
     <li
@@ -199,7 +198,7 @@ function BoostRow({ boost }: { boost: BoostHistoryItem }) {
           {boost.expiresAt && (
             <span>
               {active
-                ? `· ${timeRemaining(boost.expiresAt)}`
+                ? `· ${timeRemaining(boost.expiresAt, now)}`
                 : `· expiré le ${formatDate(boost.expiresAt)}`}
             </span>
           )}
@@ -239,7 +238,6 @@ function Section({
 }
 
 export default function BoostsPage() {
-  const qc = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();
   const justConfirmed = searchParams.get("confirmed") === "1";
@@ -248,7 +246,7 @@ export default function BoostsPage() {
   // forced an off-site step) to /boosts?confirmed=1. Poll for ~30 s so
   // we pick up the webhook flipping PENDING → PAID, then strip the
   // query param so a refresh doesn't keep polling.
-  const { data, isLoading, error, refetch, isRefetching } = useQuery({
+  const { data, isLoading, error, refetch, isRefetching, dataUpdatedAt } = useQuery({
     queryKey: ["my-boosts"],
     queryFn: () => api.getMyBoosts(),
     refetchInterval: justConfirmed ? 3000 : false,
@@ -277,9 +275,12 @@ export default function BoostsPage() {
     }
   }, [justConfirmed, data, router]);
 
+  const [initialNow] = useState(() => Date.now());
+  const now = dataUpdatedAt || initialNow;
+
   const buckets = useMemo<Bucketed>(
-    () => bucketBoosts(Array.isArray(data) ? data : []),
-    [data],
+    () => bucketBoosts(Array.isArray(data) ? data : [], now),
+    [data, now],
   );
 
   return (
@@ -326,17 +327,17 @@ export default function BoostsPage() {
             <>
               <Section title="Actifs" count={buckets.active.length}>
                 {buckets.active.map((b) => (
-                  <BoostRow key={b.id} boost={b} />
+                  <BoostRow key={b.id} boost={b} now={now} />
                 ))}
               </Section>
               <Section title="En attente" count={buckets.pending.length}>
                 {buckets.pending.map((b) => (
-                  <BoostRow key={b.id} boost={b} />
+                  <BoostRow key={b.id} boost={b} now={now} />
                 ))}
               </Section>
               <Section title="Historique" count={buckets.past.length}>
                 {buckets.past.map((b) => (
-                  <BoostRow key={b.id} boost={b} />
+                  <BoostRow key={b.id} boost={b} now={now} />
                 ))}
               </Section>
             </>

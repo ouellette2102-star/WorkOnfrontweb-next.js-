@@ -76,14 +76,14 @@ export default function StripeOnboardingReturnPage() {
               Onboarding incomplet
             </h1>
             <p className="mb-6 text-workon-muted">
-              Il semble que votre onboarding Stripe n'est pas encore terminé.
+              Il semble que votre onboarding Stripe n&apos;est pas encore terminé.
               Veuillez compléter toutes les étapes requises.
             </p>
             <Button
               onClick={() => router.push("/worker/payments")}
               className="rounded-xl bg-red-600 px-8 py-3 text-lg font-semibold text-white hover:bg-red-500"
             >
-              Reprendre l'onboarding
+              Reprendre l&apos;onboarding
             </Button>
           </>
         )}

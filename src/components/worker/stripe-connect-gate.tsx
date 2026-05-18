@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 import { getAccessToken } from "@/lib/auth";
@@ -24,13 +24,25 @@ export interface StripeConnectGateProps {
   className?: string;
 }
 
+const DISMISSED_STORAGE_KEY = "workon:stripe-gate-dismissed";
+const subscribeNoop = () => () => {};
+const getStoredDismissed = () =>
+  safeSessionStorage.getItem(DISMISSED_STORAGE_KEY) === "1";
+const getServerDismissed = () => true;
+
 export function StripeConnectGate({
   minCompletedMissions = 0,
   className,
 }: StripeConnectGateProps) {
   const { user } = useAuth();
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
-  const [dismissed, setDismissed] = useState(false);
+  const storedDismissed = useSyncExternalStore(
+    subscribeNoop,
+    getStoredDismissed,
+    getServerDismissed,
+  );
+  const [dismissedOverride, setDismissedOverride] = useState<boolean | null>(null);
+  const dismissed = dismissedOverride ?? storedDismissed;
 
   const isWorker = user?.role === "worker" || (user?.role as unknown as string) === "WORKER";
 
@@ -53,15 +65,9 @@ export function StripeConnectGate({
     };
   }, [isWorker]);
 
-  useEffect(() => {
-    if (safeSessionStorage.getItem("workon:stripe-gate-dismissed") === "1") {
-      setDismissed(true);
-    }
-  }, []);
-
   function handleDismiss() {
-    setDismissed(true);
-    safeSessionStorage.setItem("workon:stripe-gate-dismissed", "1");
+    setDismissedOverride(true);
+    safeSessionStorage.setItem(DISMISSED_STORAGE_KEY, "1");
   }
 
   if (!isWorker) return null;

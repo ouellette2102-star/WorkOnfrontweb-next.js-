@@ -21,7 +21,7 @@ export async function apiFetch<T>(path: string, options: FetchOptions = {}): Pro
   const headers = new Headers(fetchOptions.headers);
 
   if (!skipAuth) {
-    let token = getAccessToken();
+    const token = getAccessToken();
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
@@ -182,6 +182,27 @@ export interface CategoryResponse {
   icon: string | null;
   residentialAllowed: boolean;
 }
+
+export interface CatalogSkill {
+  id: string;
+  name: string;
+  nameEn?: string | null;
+  categoryId?: string | null;
+  category?: { id: string; name: string; nameEn?: string | null } | null;
+}
+
+export interface CatalogSkillsResponse {
+  data: CatalogSkill[];
+  meta: Record<string, unknown>;
+}
+
+export type WorkerSkillSelection =
+  | string
+  | {
+      id?: string;
+      skillId?: string;
+      name?: string | null;
+    };
 
 export interface HomeStats {
   completedContracts: number;
@@ -531,7 +552,7 @@ export const api = {
     const q = new URLSearchParams();
     if (params?.categoryName) q.set("categoryName", params.categoryName);
     if (params?.q) q.set("q", params.q);
-    return apiFetch<{ data: any[]; meta: any }>(`/catalog/skills?${q}`, { skipAuth: true });
+    return apiFetch<CatalogSkillsResponse>(`/catalog/skills?${q}`, { skipAuth: true });
   },
 
   // Workers (public)
@@ -731,8 +752,8 @@ export const api = {
     }),
 
   // Worker Skills
-  getMySkills: () => apiFetch<any[]>("/workers/me/skills"),
-  setMySkills: (skillIds: string[]) => apiFetch<any[]>("/workers/me/skills", {
+  getMySkills: () => apiFetch<WorkerSkillSelection[]>("/workers/me/skills"),
+  setMySkills: (skillIds: string[]) => apiFetch<WorkerSkillSelection[]>("/workers/me/skills", {
     method: "PUT",
     body: JSON.stringify({ skillIds }),
   }),

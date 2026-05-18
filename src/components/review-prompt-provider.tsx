@@ -1,18 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
+import { safeLocalStorage } from "@/lib/safe-storage";
 import { ReviewPromptModal } from "./review-prompt-modal";
 
 const DISMISSED_STORAGE_KEY = "workon.review-prompt.dismissed";
 
-function loadDismissed(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+function getDismissedRaw(): string {
+  return safeLocalStorage.getItem(DISMISSED_STORAGE_KEY) ?? "[]";
+}
+
+function parseDismissed(raw: string): Set<string> {
   try {
-    const raw = window.localStorage.getItem(DISMISSED_STORAGE_KEY);
-    if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     return new Set(Array.isArray(parsed) ? parsed : []);
   } catch {
@@ -21,15 +23,19 @@ function loadDismissed(): Set<string> {
 }
 
 function persistDismissed(set: Set<string>) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(
-      DISMISSED_STORAGE_KEY,
-      JSON.stringify(Array.from(set)),
-    );
-  } catch {
-    // Quota full / private mode — skip.
-  }
+  safeLocalStorage.setItem(
+    DISMISSED_STORAGE_KEY,
+    JSON.stringify(Array.from(set)),
+  );
+}
+
+function subscribeDismissed(onChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === DISMISSED_STORAGE_KEY) onChange();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => window.removeEventListener("storage", onStorage);
 }
 
 /**
@@ -47,12 +53,17 @@ export function ReviewPromptProvider({
   children: React.ReactNode;
 }) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
-
-  // Hydrate dismissed set on mount (client only).
-  useEffect(() => {
-    setDismissed(loadDismissed());
-  }, []);
+  const dismissedRaw = useSyncExternalStore(
+    subscribeDismissed,
+    getDismissedRaw,
+    () => "[]",
+  );
+  const storedDismissed = useMemo(
+    () => parseDismissed(dismissedRaw),
+    [dismissedRaw],
+  );
+  const [dismissedOverride, setDismissedOverride] = useState<Set<string> | null>(null);
+  const dismissed = dismissedOverride ?? storedDismissed;
 
   const { data: pending, refetch } = useQuery({
     queryKey: ["reviews-pending-for-me"],
@@ -71,13 +82,13 @@ export function ReviewPromptProvider({
   }, [pending, dismissed]);
 
   const markDismissed = useCallback((missionId: string) => {
-    setDismissed((prev) => {
-      const next = new Set(prev);
+    setDismissedOverride((prev) => {
+      const next = new Set(prev ?? dismissed);
       next.add(missionId);
       persistDismissed(next);
       return next;
     });
-  }, []);
+  }, [dismissed]);
 
   const handleSubmitted = useCallback(
     async (missionId: string) => {

@@ -51,7 +51,11 @@ export default function MessagesPage() {
         <div className="space-y-1">
           {conversations.map((conv) => (
             <ConversationRow
-              key={conv.conversationId ?? conv.missionId ?? Math.random()}
+              key={
+                conv.conversationId ??
+                conv.missionId ??
+                `${conv.otherUser.id}-${conv.lastMessageAt}`
+              }
               conversation={conv}
             />
           ))}

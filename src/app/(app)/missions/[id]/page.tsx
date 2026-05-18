@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type OfferResponse, type BoostType } from "@/lib/api-client";
@@ -651,12 +651,11 @@ export default function MissionDetailPage() {
   // 5–20% of the time the user uses the browser Back button.
   // Reading window.location.search inside useEffect is suspense-safe
   // and works the same for our use case (single, dismissible flag).
-  const [showCreatedBanner, setShowCreatedBanner] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const [showCreatedBanner, setShowCreatedBanner] = useState(() => {
+    if (typeof window === "undefined") return false;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("created") === "1") setShowCreatedBanner(true);
-  }, []);
+    return params.get("created") === "1";
+  });
 
   const dismissCreatedBanner = () => {
     setShowCreatedBanner(false);

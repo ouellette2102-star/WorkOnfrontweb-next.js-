@@ -253,6 +253,7 @@ function DeliveryCard({
   const isDeclined = Boolean(delivery.declinedAt);
   const isProcessed = isAccepted || isDeclined;
   const isNew = !delivery.openedAt && !isProcessed;
+  const [renderedAt] = useState(() => Date.now());
 
   return (
     <div
@@ -276,7 +277,12 @@ function DeliveryCard({
                 NOUVEAU
               </span>
             )}
-            <FreshBadge createdAt={delivery.deliveredAt} freshMinutes={10} label="< 10 min" />
+            <FreshBadge
+              createdAt={delivery.deliveredAt}
+              freshMinutes={10}
+              now={renderedAt}
+              label="< 10 min"
+            />
           </div>
           <p className="text-xs text-workon-muted mt-0.5">
             Reçu{" "}

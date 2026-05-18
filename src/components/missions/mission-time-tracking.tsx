@@ -23,16 +23,10 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  // Missions terminées ou annulées : pas de tracking
-  if (mission.status === "COMPLETED" || mission.status === "CANCELLED") {
-    return null;
-  }
-
-  // Si la mission n'est pas réservée, pas de tracking
-  if (mission.status === "CREATED") {
-    return null;
-  }
+  const trackingDisabled =
+    mission.status === "COMPLETED" ||
+    mission.status === "CANCELLED" ||
+    mission.status === "CREATED";
 
   const loadLogs = async () => {
     try {
@@ -47,9 +41,14 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
   };
 
   useEffect(() => {
+    if (trackingDisabled) return;
     loadLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mission.id]);
+  }, [mission.id, trackingDisabled]);
+
+  if (trackingDisabled) {
+    return null;
+  }
 
   const handleCheckIn = async () => {
     setIsLoading(true);
