@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 
 const trackMock = vi.fn();
 vi.mock("@/lib/analytics", () => ({
@@ -32,6 +32,13 @@ const base: MissionCardInput = {
   price: 180,
   distanceKm: 2.5,
 };
+
+function clickWithoutNavigation(element: HTMLElement) {
+  element.addEventListener("click", (event) => event.preventDefault(), {
+    once: true,
+  });
+  fireEvent.click(element);
+}
 
 describe("<MissionCard />", () => {
   it("renders pro variant with 'Postuler' CTA by default", () => {
@@ -59,30 +66,29 @@ describe("<MissionCard />", () => {
     expect(screen.queryByTestId("mission-card-cta")).toBeNull();
   });
 
-  it("shows distance in the budget hero when provided", () => {
+  it("shows distance in the location row when provided", () => {
     render(<MissionCard mission={base} />);
-    const budget = screen.getByTestId("mission-card-budget");
-    expect(budget).toHaveTextContent(/2\.5 km/);
+    expect(screen.getByTestId("mission-card-body")).toHaveTextContent(
+      /2\.5 km/,
+    );
   });
 
-  it("shows the title and price inside the budget hero", () => {
+  it("shows the title and price inside the stats row", () => {
     render(<MissionCard mission={base} />);
     expect(screen.getByTestId("mission-card-title")).toHaveTextContent(
       /Plombier pour fuite/,
     );
-    expect(screen.getByTestId("mission-card-budget")).toHaveTextContent(
+    expect(screen.getByTestId("mission-card-stats")).toHaveTextContent(
       /180\$/,
     );
   });
 
-  it("uses 'Gain potentiel' label for pro variant and 'Estimation' for client", () => {
+  it("uses 'Gain' label for pro variant and 'Budget' for client", () => {
     const { rerender } = render(<MissionCard mission={base} variant="pro" />);
-    expect(screen.getByTestId("mission-card-budget")).toHaveTextContent(
-      /Gain potentiel/i,
-    );
+    expect(screen.getByTestId("mission-card-stats")).toHaveTextContent(/Gain/i);
     rerender(<MissionCard mission={base} variant="client" />);
-    expect(screen.getByTestId("mission-card-budget")).toHaveTextContent(
-      /Estimation/i,
+    expect(screen.getByTestId("mission-card-stats")).toHaveTextContent(
+      /Budget/i,
     );
   });
 
@@ -93,19 +99,20 @@ describe("<MissionCard />", () => {
       priceRange: "$80–$120",
     };
     render(<MissionCard mission={publicShape} />);
-    expect(screen.getByTestId("mission-card-budget")).toHaveTextContent(
+    expect(screen.getByTestId("mission-card-stats")).toHaveTextContent(
       "$80–$120",
     );
   });
 
-  it("omits the budget hero when no price is available", () => {
+  it("renders a price placeholder when no price is available", () => {
     const noPrice: MissionCardInput = {
       ...base,
       price: undefined,
       priceRange: undefined,
     };
     render(<MissionCard mission={noPrice} />);
-    expect(screen.queryByTestId("mission-card-budget")).toBeNull();
+    const stats = screen.getByTestId("mission-card-stats");
+    expect(within(stats).getByText("—")).toBeInTheDocument();
   });
 
   it("renders the Urgent badge when isUrgent is true", () => {
@@ -190,7 +197,7 @@ describe("<MissionCard />", () => {
         source="public_feed"
       />,
     );
-    fireEvent.click(screen.getByTestId("mission-card-body"));
+    clickWithoutNavigation(screen.getByTestId("mission-card-body"));
     expect(trackMock).toHaveBeenCalledTimes(1);
     expect(trackMock).toHaveBeenCalledWith({
       missionId: base.id,
@@ -209,7 +216,7 @@ describe("<MissionCard />", () => {
         source="employer_dashboard"
       />,
     );
-    fireEvent.click(screen.getByTestId("mission-card-cta"));
+    clickWithoutNavigation(screen.getByTestId("mission-card-cta"));
     expect(trackMock).toHaveBeenCalledTimes(1);
     expect(trackMock).toHaveBeenCalledWith({
       missionId: base.id,
@@ -222,7 +229,7 @@ describe("<MissionCard />", () => {
 
   it("defaults source to 'other' when not specified", () => {
     render(<MissionCard mission={base} />);
-    fireEvent.click(screen.getByTestId("mission-card-body"));
+    clickWithoutNavigation(screen.getByTestId("mission-card-body"));
     expect(trackMock).toHaveBeenCalledWith(
       expect.objectContaining({ source: "other" }),
     );
