@@ -60,7 +60,7 @@ export function MarketingHeader({
         <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-workon-gray">
           {items.map((item) => (
             <Link
-              key={item.href}
+              key={`${item.href}-${item.label}`}
               href={item.href}
               className="transition-colors hover:text-workon-ink"
             >
