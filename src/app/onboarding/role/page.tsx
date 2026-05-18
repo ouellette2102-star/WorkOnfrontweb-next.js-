@@ -80,7 +80,7 @@ export default function OnboardingRolePage() {
                 Je suis Travailleur
               </h2>
               <p className="text-workon-muted">
-                Je cherche des missions et je veux gagner de l'argent en
+                Je cherche des missions et je veux gagner de l&apos;argent en
                 travaillant
               </p>
             </div>

@@ -49,7 +49,7 @@ export default function AvailabilityPage() {
   // Accept both shapes to match the existing defense in calendar/page.tsx and availability-editor.tsx.
   const safeSlots: AvailabilitySlot[] = Array.isArray(slots)
     ? slots
-    : ((slots as any)?.recurring ?? []);
+    : (slots?.recurring ?? []);
   const slotsByDay = (day: number) =>
     safeSlots.filter((s) => s.dayOfWeek === day && !s.isBlocked);
 

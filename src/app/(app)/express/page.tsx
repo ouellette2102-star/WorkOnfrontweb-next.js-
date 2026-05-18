@@ -46,29 +46,6 @@ export default function ExpressPage() {
   const [gpsStatus, setGpsStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [result, setResult] = useState<ExpressResult | null>(null);
 
-  // Mode gate: pro mode users see a prompt to switch
-  if (mode === "pro") {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-8">
-        <div className="flex flex-col items-center text-center space-y-4">
-          <ArrowRightLeft className="h-12 w-12 text-workon-accent" />
-          <h1 className="text-xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
-            Fonctionnalité Mode Client
-          </h1>
-          <p className="text-sm text-workon-gray">
-            Le dispatch express est disponible en Mode Client. Passe en mode Client pour dispatcher une mission.
-          </p>
-          <Button
-            onClick={() => setMode("client")}
-            className="bg-workon-primary hover:bg-workon-primary/90 text-white rounded-2xl px-6 py-3"
-          >
-            Passer en Mode Client
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   // Fetch categories from backend
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -100,7 +77,7 @@ export default function ExpressPage() {
   }, []);
 
   useEffect(() => {
-    detectGPS();
+    queueMicrotask(detectGPS);
   }, [detectGPS]);
 
   // Express dispatch mutation — calls POST /missions-local/express
@@ -124,6 +101,29 @@ export default function ExpressPage() {
   });
 
   const canSubmit = description.trim().length > 0 && latitude !== null;
+
+  // Mode gate: pro mode users see a prompt to switch
+  if (mode === "pro") {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-8">
+        <div className="flex flex-col items-center text-center space-y-4">
+          <ArrowRightLeft className="h-12 w-12 text-workon-accent" />
+          <h1 className="text-xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
+            Fonctionnalité Mode Client
+          </h1>
+          <p className="text-sm text-workon-gray">
+            Le dispatch express est disponible en Mode Client. Passe en mode Client pour dispatcher une mission.
+          </p>
+          <Button
+            onClick={() => setMode("client")}
+            className="bg-workon-primary hover:bg-workon-primary/90 text-white rounded-2xl px-6 py-3"
+          >
+            Passer en Mode Client
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Result screen
   if (result) {

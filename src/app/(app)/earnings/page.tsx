@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, type EarningsSummary } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -50,6 +50,11 @@ type EarningsHistoryResponse = {
   totalPages: number;
 };
 
+type EarningsSummaryWithLifetime = EarningsSummary & {
+  totalLifetimeGross?: number;
+  totalLifetimeNet?: number;
+};
+
 export default function EarningsPage() {
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -84,12 +89,15 @@ export default function EarningsPage() {
 
   const isLoading = summaryLoading;
   const hasError = summaryError; // history error is handled per-section, not page-wide
+  const earningsSummary = summary as EarningsSummaryWithLifetime | undefined;
 
-  const summaryCards = summary
+  const summaryCards = earningsSummary
     ? [
         {
           label: "Total brut",
-          value: formatCADFromDollars((summary as any).totalLifetimeGross ?? (summary as any).totalGross ?? 0),
+          value: formatCADFromDollars(
+            earningsSummary.totalLifetimeGross ?? earningsSummary.totalGross ?? 0,
+          ),
           icon: <DollarSign className="h-5 w-5" />,
           color: "text-workon-primary",
           bg: "bg-workon-primary/10",
@@ -97,28 +105,30 @@ export default function EarningsPage() {
         {
           label: "Total net",
           sublabel: "Après commission",
-          value: formatCADFromDollars((summary as any).totalLifetimeNet ?? (summary as any).totalNet ?? 0),
+          value: formatCADFromDollars(
+            earningsSummary.totalLifetimeNet ?? earningsSummary.totalNet ?? 0,
+          ),
           icon: <TrendingUp className="h-5 w-5" />,
           color: "text-green-600",
           bg: "bg-green-50",
         },
         {
           label: "Total versé",
-          value: formatCADFromDollars(summary.totalPaid),
+          value: formatCADFromDollars(earningsSummary.totalPaid),
           icon: <CheckCircle className="h-5 w-5" />,
           color: "text-workon-primary",
           bg: "bg-workon-primary/10",
         },
         {
           label: "En attente",
-          value: formatCADFromDollars(summary.totalPending),
+          value: formatCADFromDollars(earningsSummary.totalPending),
           icon: <Clock className="h-5 w-5" />,
           color: "text-workon-accent",
           bg: "bg-workon-accent/10",
         },
         {
           label: "Commission",
-          value: `${(summary.commissionRate * 100).toFixed(0)}%`,
+          value: `${(earningsSummary.commissionRate * 100).toFixed(0)}%`,
           icon: <Percent className="h-5 w-5" />,
           color: "text-workon-muted",
           bg: "bg-gray-100",

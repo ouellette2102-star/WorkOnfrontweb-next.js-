@@ -125,7 +125,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
             Chat non disponible
           </h3>
           <p className="mb-6 text-white/70">
-            Le chat pour cette mission n'est pas encore activé.
+            Le chat pour cette mission n&apos;est pas encore activé.
             Il sera disponible une fois la mission confirmée.
           </p>
           <Button

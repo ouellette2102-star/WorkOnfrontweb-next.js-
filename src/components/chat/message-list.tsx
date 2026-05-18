@@ -21,7 +21,7 @@ export function MessageList({ messages, currentUserId }: MessageListProps) {
         <div>
           <div className="mb-4 text-5xl">💬</div>
           <p className="text-white/70">
-            Aucun message pour l'instant. Commencez la conversation !
+            Aucun message pour l&apos;instant. Commencez la conversation !
           </p>
         </div>
       </div>

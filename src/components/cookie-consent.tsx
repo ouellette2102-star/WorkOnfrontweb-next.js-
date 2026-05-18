@@ -13,7 +13,7 @@
  * - absent     : pas encore de choix → afficher la bannière
  */
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { safeLocalStorage } from "@/lib/safe-storage";
 
@@ -21,20 +21,22 @@ const STORAGE_KEY = "cookie-consent";
 
 type ConsentValue = "accepted" | "refused";
 
-export function CookieConsent() {
-  const [visible, setVisible] = useState(false);
+const subscribeNoop = () => () => {};
+const getStoredConsent = () => Boolean(safeLocalStorage.getItem(STORAGE_KEY));
+const getServerConsent = () => true;
 
-  useEffect(() => {
-    // Show banner only if no choice has been recorded yet
-    const stored = safeLocalStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      setVisible(true);
-    }
-  }, []);
+export function CookieConsent() {
+  const hasStoredConsent = useSyncExternalStore(
+    subscribeNoop,
+    getStoredConsent,
+    getServerConsent,
+  );
+  const [visibleOverride, setVisibleOverride] = useState<boolean | null>(null);
+  const visible = visibleOverride ?? !hasStoredConsent;
 
   const handleChoice = (value: ConsentValue) => {
     safeLocalStorage.setItem(STORAGE_KEY, value);
-    setVisible(false);
+    setVisibleOverride(false);
   };
 
   if (!visible) return null;

@@ -49,11 +49,10 @@ jobs:
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
-  # Lint check (non-blocking)
+  # Lint check (blocking)
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -68,7 +67,7 @@ jobs:
         run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Run linter
-        run: npm run lint --if-present || true
+        run: npm run lint --if-present
 
   # Type-check — BLOCKING. Catches the "silent drop adapter" class of
   # bug (the audit's pattern A): when a backend DTO field is added or

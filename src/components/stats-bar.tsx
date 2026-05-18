@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, type MissionResponse } from "@/lib/api-client";
 import { Zap, Users, Briefcase, TrendingUp } from "lucide-react";
 import { safeLocalStorage } from "@/lib/safe-storage";
 
@@ -34,10 +34,10 @@ export function StatsBar() {
   });
 
   const openCount = Array.isArray(missions)
-    ? missions.filter((m: any) => m.status === "open").length
+    ? missions.filter((m: MissionResponse) => m.status === "open").length
     : 0;
   const activeCount = Array.isArray(missions)
-    ? missions.filter((m: any) => m.status !== "open" && m.status !== "cancelled").length
+    ? missions.filter((m: MissionResponse) => m.status !== "open" && m.status !== "cancelled").length
     : 0;
   const workerCount = Array.isArray(workers) ? workers.length : 0;
   const matchRate =

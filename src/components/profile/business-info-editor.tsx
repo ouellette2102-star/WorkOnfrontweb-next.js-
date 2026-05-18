@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Save, ShieldCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ type Draft = {
   qstNumber: string;
 };
 
-function toDraft(src: Partial<Draft> & Record<string, unknown>): Draft {
+function toDraft(src: Partial<Record<keyof Draft, unknown>>): Draft {
   const str = (v: unknown): string =>
     typeof v === "string" ? v : v == null ? "" : String(v);
   return {
@@ -76,8 +76,7 @@ function validateField(value: string, kind: "gst" | "qst"): string | null {
 
 export function BusinessInfoEditor() {
   const qc = useQueryClient();
-  const [draft, setDraft] = useState<Draft | null>(null);
-  const [initial, setInitial] = useState<Draft | null>(null);
+  const [draftOverride, setDraftOverride] = useState<Draft | null>(null);
 
   const { data: me, isLoading } = useQuery({
     queryKey: ["me-business-info"],
@@ -90,13 +89,8 @@ export function BusinessInfoEditor() {
       }>("/users/me"),
   });
 
-  useEffect(() => {
-    if (me && !draft) {
-      const d = toDraft(me as Record<string, unknown>);
-      setDraft(d);
-      setInitial(d);
-    }
-  }, [me, draft]);
+  const initial = useMemo(() => (me ? toDraft(me) : null), [me]);
+  const draft = draftOverride ?? initial;
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -115,7 +109,7 @@ export function BusinessInfoEditor() {
       qc.invalidateQueries({ queryKey: ["me-business-info"] });
       qc.invalidateQueries({ queryKey: ["me-profile-raw"] });
       qc.invalidateQueries({ queryKey: ["me-profile"] });
-      if (draft) setInitial(draft);
+      setDraftOverride(null);
     },
     onError: (err) => {
       const message =
@@ -189,7 +183,7 @@ export function BusinessInfoEditor() {
           value={draft.businessName}
           maxLength={120}
           onChange={(v) =>
-            setDraft((d) => (d ? { ...d, businessName: v } : d))
+            setDraftOverride((d) => ({ ...(d ?? draft), businessName: v }))
           }
         />
         <Field
@@ -199,7 +193,7 @@ export function BusinessInfoEditor() {
           value={draft.businessAddress}
           maxLength={200}
           onChange={(v) =>
-            setDraft((d) => (d ? { ...d, businessAddress: v } : d))
+            setDraftOverride((d) => ({ ...(d ?? draft), businessAddress: v }))
           }
         />
 
@@ -212,7 +206,7 @@ export function BusinessInfoEditor() {
             maxLength={32}
             error={gstError}
             onChange={(v) =>
-              setDraft((d) => (d ? { ...d, gstNumber: v } : d))
+              setDraftOverride((d) => ({ ...(d ?? draft), gstNumber: v }))
             }
           />
           <Field
@@ -223,7 +217,7 @@ export function BusinessInfoEditor() {
             maxLength={32}
             error={qstError}
             onChange={(v) =>
-              setDraft((d) => (d ? { ...d, qstNumber: v } : d))
+              setDraftOverride((d) => ({ ...(d ?? draft), qstNumber: v }))
             }
           />
         </div>

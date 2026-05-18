@@ -250,7 +250,7 @@ function WorkerMissionsContent() {
               Aucune mission disponible
             </h3>
             <p className="text-center text-sm text-workon-gray">
-              Essayez d'élargir votre rayon de recherche ou de modifier les filtres.
+              Essayez d&apos;élargir votre rayon de recherche ou de modifier les filtres.
             </p>
           </div>
         )}

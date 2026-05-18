@@ -1,31 +1,31 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import {
+  api,
+  type CatalogSkill,
+  type CategoryResponse,
+  type WorkerSkillSelection,
+} from "@/lib/api-client";
 import { toast } from "sonner";
 import { Check, X, Search, Loader2 } from "lucide-react";
 
-interface Skill {
-  id: string;
-  name: string;
-  nameEn?: string | null;
-  categoryId?: string;
-  category?: { id: string; name: string };
+type Skill = CatalogSkill;
+
+function getSavedSkillId(skill: WorkerSkillSelection): string {
+  return typeof skill === "string" ? skill : (skill.id ?? skill.skillId ?? "");
 }
 
-interface Category {
-  id: string;
-  name: string;
-  nameEn?: string | null;
-  icon?: string | null;
+function getSavedSkillName(skill: WorkerSkillSelection, fallback: string): string {
+  return typeof skill === "string" ? fallback : (skill.name ?? fallback);
 }
 
 export function SkillSelector() {
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIdsOverride, setSelectedIdsOverride] = useState<Set<string> | null>(null);
   const [dirty, setDirty] = useState(false);
 
   // Fetch categories
@@ -44,7 +44,7 @@ export function SkillSelector() {
       }),
   });
 
-  const skills: Skill[] = skillsData?.data ?? [];
+  const skills: Skill[] = useMemo(() => skillsData?.data ?? [], [skillsData?.data]);
 
   // Fetch worker's current skills
   const { data: mySkills, isLoading: loadingMySkills } = useQuery({
@@ -53,12 +53,11 @@ export function SkillSelector() {
     retry: false,
   });
 
-  // Initialize selected IDs from worker's saved skills
-  useEffect(() => {
-    if (mySkills && Array.isArray(mySkills) && !dirty) {
-      setSelectedIds(new Set(mySkills.map((s: any) => s.id ?? s.skillId ?? s)));
-    }
-  }, [mySkills, dirty]);
+  const savedSelectedIds = useMemo(
+    () => new Set((mySkills ?? []).map(getSavedSkillId).filter(Boolean)),
+    [mySkills],
+  );
+  const selectedIds = selectedIdsOverride ?? savedSelectedIds;
 
   // Save mutation — surfaces error detail so silent fails are debuggable.
   const saveMutation = useMutation({
@@ -66,6 +65,7 @@ export function SkillSelector() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-skills"] });
       queryClient.invalidateQueries({ queryKey: ["featured-workers-public"] });
+      setSelectedIdsOverride(null);
       setDirty(false);
       toast.success("Compétences sauvegardées");
     },
@@ -84,9 +84,10 @@ export function SkillSelector() {
     for (const s of skills) allKnown.set(s.id, s);
     if (mySkills) {
       for (const s of mySkills) {
-        const id = s.id ?? s.skillId ?? s;
+        const id = getSavedSkillId(s);
+        if (!id) continue;
         if (!allKnown.has(id)) {
-          allKnown.set(id, { id, name: s.name ?? id });
+          allKnown.set(id, { id, name: getSavedSkillName(s, id) });
         }
       }
     }
@@ -96,8 +97,8 @@ export function SkillSelector() {
   }, [selectedIds, skills, mySkills]);
 
   const toggleSkill = (skillId: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
+    setSelectedIdsOverride((prev) => {
+      const next = new Set(prev ?? selectedIds);
       if (next.has(skillId)) {
         next.delete(skillId);
       } else {
@@ -109,8 +110,8 @@ export function SkillSelector() {
   };
 
   const removeSkill = (skillId: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
+    setSelectedIdsOverride((prev) => {
+      const next = new Set(prev ?? selectedIds);
       next.delete(skillId);
       return next;
     });
@@ -184,7 +185,7 @@ export function SkillSelector() {
         >
           Toutes
         </button>
-        {(categories as Category[]).map((cat) => (
+        {categories.map((cat: CategoryResponse) => (
           <button
             key={cat.id}
             type="button"

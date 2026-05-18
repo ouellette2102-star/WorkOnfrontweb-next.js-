@@ -15,6 +15,14 @@ import {
   ArrowRight,
 } from "lucide-react";
 
+function StatSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-8 w-16 rounded bg-gray-200" />
+    </div>
+  );
+}
+
 export function EmployerDashboardClient() {
   const { data: missions, isLoading: missionsLoading } = useQuery({
     queryKey: ["my-missions"],
@@ -54,13 +62,6 @@ export function EmployerDashboardClient() {
   // silently dropped every match).
   const activeMatches =
     matches?.filter((m: SwipeMatch) => m.status === "active") ?? [];
-
-  // Skeleton placeholder for loading state
-  const StatSkeleton = () => (
-    <div className="animate-pulse">
-      <div className="h-8 w-16 rounded bg-gray-200" />
-    </div>
-  );
 
   return (
     <div className="space-y-8">

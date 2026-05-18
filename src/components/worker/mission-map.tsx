@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { Map as LeafletMap } from "leaflet";
 import type { MissionFeedItem } from "@/types/mission";
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
 
 export function MissionMap({ missions, userLocation, onReserve }: Props) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
     // Vérifier que Leaflet est disponible (dynamique import pour SSR)
@@ -30,7 +31,7 @@ export function MissionMap({ missions, userLocation, onReserve }: Props) {
       if (!mapContainerRef.current || mapRef.current) return;
 
       // Définir les icônes par défaut de Leaflet
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
         iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { getWebSocketBaseUrl } from "@/lib/env";
 import { getAccessToken } from "@/lib/auth";
@@ -74,24 +74,28 @@ export function useMissionChatSocket({
   }, [onError]);
 
   useEffect(() => {
+    const setStatusAfterEffect = (nextStatus: ChatSocketStatus) => {
+      queueMicrotask(() => setStatus(nextStatus));
+    };
+
     if (!enabled || !missionId) {
-      setStatus("idle");
+      setStatusAfterEffect("idle");
       return;
     }
 
     const token = getAccessToken();
     if (!token) {
-      setStatus("idle");
+      setStatusAfterEffect("idle");
       return;
     }
 
     const baseUrl = getWebSocketBaseUrl();
     if (!baseUrl) {
-      setStatus("error");
+      setStatusAfterEffect("error");
       return;
     }
 
-    setStatus("connecting");
+    setStatusAfterEffect("connecting");
 
     const socket = io(`${baseUrl}/chat`, {
       query: { token },
@@ -122,7 +126,6 @@ export function useMissionChatSocket({
       // Don't blow up the UI — the polling fallback in the consuming
       // component will keep things working. We just log a single warn
       // so it's debuggable in DevTools without spamming.
-      // eslint-disable-next-line no-console
       console.warn("[chat-socket] connect error:", err.message);
       setStatus("error");
       onErrorRef.current?.(err.message);
@@ -133,7 +136,6 @@ export function useMissionChatSocket({
     };
 
     const handleServerError = (payload: { message?: string }) => {
-      // eslint-disable-next-line no-console
       console.warn("[chat-socket] server error:", payload?.message ?? "unknown");
       setStatus("error");
       onErrorRef.current?.(payload?.message ?? "Erreur du serveur de chat");
@@ -164,21 +166,13 @@ export function useMissionChatSocket({
     // We intentionally only re-run when missionId or enabled flips.
     // The callback refs above keep onNewMessage / onError fresh
     // without tearing down the socket on every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [missionId, enabled]);
 
   const isConnected = status === "connected";
 
-  return useStableReturn(status, isConnected);
+  return useMemo(() => ({ status, isConnected }), [status, isConnected]);
 }
 
 // Tiny stability helper — keeps the returned object reference equal
 // across renders when nothing changed, so consumers using the result
 // in their own deps don't trigger unnecessary effects.
-function useStableReturn(status: ChatSocketStatus, isConnected: boolean) {
-  const ref = useRef({ status, isConnected });
-  if (ref.current.status !== status || ref.current.isConnected !== isConnected) {
-    ref.current = { status, isConnected };
-  }
-  return ref.current;
-}

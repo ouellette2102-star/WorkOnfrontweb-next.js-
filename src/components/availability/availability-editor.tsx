@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, type AvailabilitySlot } from "@/lib/api-client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -34,12 +34,49 @@ interface DayState {
 
 const DEFAULT_DAY: DayState = { enabled: false, startTime: "09:00", endTime: "17:00" };
 
+type AvailabilityResponse = {
+  recurring: AvailabilitySlot[];
+  blocked: AvailabilitySlot[];
+  specific: AvailabilitySlot[];
+};
+
+function defaultDays(): DayState[] {
+  return Array.from({ length: 7 }, () => ({ ...DEFAULT_DAY }));
+}
+
+function getRecurringSlots(
+  slots: AvailabilityResponse | AvailabilitySlot[] | undefined,
+): AvailabilitySlot[] {
+  return Array.isArray(slots) ? slots : (slots?.recurring ?? []);
+}
+
+function daysFromSlots(slots: AvailabilitySlot[]): DayState[] {
+  const next = defaultDays();
+  for (const slot of slots) {
+    const displayIdx = DOW_TO_DISPLAY[slot.dayOfWeek];
+    if (displayIdx !== undefined) {
+      next[displayIdx] = {
+        enabled: true,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+      };
+    }
+  }
+  return next;
+}
+
+function daysEqual(a: DayState[], b: DayState[]): boolean {
+  return a.every(
+    (day, index) =>
+      day.enabled === b[index]?.enabled &&
+      day.startTime === b[index]?.startTime &&
+      day.endTime === b[index]?.endTime,
+  );
+}
+
 export function AvailabilityEditor() {
   const queryClient = useQueryClient();
-  const [days, setDays] = useState<DayState[]>(
-    Array.from({ length: 7 }, () => ({ ...DEFAULT_DAY })),
-  );
-  const [dirty, setDirty] = useState(false);
+  const [editedDays, setEditedDays] = useState<DayState[] | null>(null);
 
   // Fetch existing availability
   const { data: slots, isLoading } = useQuery({
@@ -48,25 +85,12 @@ export function AvailabilityEditor() {
     retry: false,
   });
 
-  // Populate state from fetched slots
-  useEffect(() => {
-    if (!slots) return;
-    // Backend returns { recurring, blocked, specific } — use recurring slots
-    const slotList = Array.isArray(slots) ? slots : (slots as any).recurring ?? [];
-    const next: DayState[] = Array.from({ length: 7 }, () => ({ ...DEFAULT_DAY }));
-    for (const slot of slotList) {
-      const displayIdx = DOW_TO_DISPLAY[slot.dayOfWeek];
-      if (displayIdx !== undefined) {
-        next[displayIdx] = {
-          enabled: true,
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-        };
-      }
-    }
-    setDays(next);
-    setDirty(false);
-  }, [slots]);
+  const savedDays = useMemo(
+    () => daysFromSlots(getRecurringSlots(slots)),
+    [slots],
+  );
+  const days = editedDays ?? savedDays;
+  const dirty = editedDays !== null && !daysEqual(editedDays, savedDays);
 
   // Save mutation — surfaces the real error message so silent fails are debuggable.
   const saveMutation = useMutation({
@@ -75,7 +99,7 @@ export function AvailabilityEditor() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-availability"] });
       queryClient.invalidateQueries({ queryKey: ["featured-workers-public"] });
-      setDirty(false);
+      setEditedDays(null);
       toast.success("Disponibilités sauvegardées");
     },
     onError: (err: unknown) => {
@@ -86,12 +110,12 @@ export function AvailabilityEditor() {
   });
 
   const updateDay = (index: number, patch: Partial<DayState>) => {
-    setDays((prev) => {
-      const next = [...prev];
+    setEditedDays((prev) => {
+      const base = prev ?? days;
+      const next = [...base];
       next[index] = { ...next[index], ...patch };
       return next;
     });
-    setDirty(true);
   };
 
   const handleSave = () => {

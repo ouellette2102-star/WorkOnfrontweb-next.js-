@@ -72,7 +72,7 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <span className="mb-4 text-6xl">📸</span>
             <p className="text-lg font-semibold text-workon-ink">Aucune photo</p>
-            <p className="text-workon-gray">Aucune photo n'a été uploadée pour cette mission</p>
+            <p className="text-workon-gray">Aucune photo n&apos;a été uploadée pour cette mission</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">

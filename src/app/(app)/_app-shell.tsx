@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ModeProvider } from "@/contexts/mode-context";
 import { BottomNav } from "@/components/navigation/bottom-nav";
@@ -24,7 +26,14 @@ import { Loader2 } from "lucide-react";
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
   useDeviceRegistration();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   if (isLoading) {
     return (
@@ -35,9 +44,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   if (!isAuthenticated) {
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
-    }
     return null;
   }
 

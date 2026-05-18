@@ -11,18 +11,20 @@ import { cn } from "@/lib/utils";
 export function FreshBadge({
   createdAt,
   freshMinutes = 10,
+  now,
   className,
   label = "Nouveau",
 }: {
   createdAt: string | Date | null | undefined;
   freshMinutes?: number;
+  now: number;
   className?: string;
   label?: string;
 }) {
   if (!createdAt) return null;
   const ms = new Date(createdAt).getTime();
   if (Number.isNaN(ms)) return null;
-  const ageMinutes = (Date.now() - ms) / 60_000;
+  const ageMinutes = (now - ms) / 60_000;
   if (ageMinutes > freshMinutes || ageMinutes < 0) return null;
 
   return (
