@@ -18,7 +18,8 @@
     "smoke": "playwright test e2e/smoke.spec.ts --project=chromium",
     "smoke:headed": "playwright test e2e/smoke.spec.ts --project=chromium --headed",
     "audit:critical": "npm audit --audit-level=critical",
-    "audit:prod": "npm audit --omit=dev"
+    "audit:prod": "npm audit --omit=dev",
+    "audit:release": "npm audit --audit-level=high"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
