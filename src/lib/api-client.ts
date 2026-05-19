@@ -697,7 +697,18 @@ export const api = {
       "GET /messages-local/conversations",
     ) as unknown as ConversationItem[];
   },
-  getThread: (missionId: string) => apiFetch<ChatMessage[]>(`/messages-local/thread/${missionId}`),
+  getThread: async (missionId: string) => {
+    const raw = await apiFetch<unknown>(`/messages-local/thread/${missionId}`);
+    if (Array.isArray(raw)) return raw as ChatMessage[];
+    if (
+      raw &&
+      typeof raw === "object" &&
+      Array.isArray((raw as { messages?: unknown }).messages)
+    ) {
+      return (raw as { messages: ChatMessage[] }).messages;
+    }
+    return [];
+  },
   sendMessage: (data: { missionId: string; content: string }) =>
     apiFetch<ChatMessage>("/messages-local", { method: "POST", body: JSON.stringify(data) }),
   /**

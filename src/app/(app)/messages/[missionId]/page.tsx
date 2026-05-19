@@ -141,6 +141,7 @@ export default function ChatThreadPage() {
             className="flex-1 rounded-2xl border border-workon-border bg-workon-bg px-4 py-2.5 text-sm text-workon-ink placeholder:text-workon-muted focus:border-workon-primary focus:ring-1 focus:ring-workon-primary-ring"
           />
           <button
+            aria-label="Envoyer le message"
             onClick={handleSend}
             disabled={!message.trim() || sendMessage.isPending}
             className="shrink-0 h-10 w-10 rounded-full bg-workon-primary text-white flex items-center justify-center disabled:opacity-50 hover:bg-workon-primary-hover transition-colors"
