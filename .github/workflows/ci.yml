@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  # Security audit - blocks on CRITICAL vulnerabilities
+  # Security audit - blocks high and critical vulnerabilities
   security:
     name: Security Audit
     runs-on: ubuntu-latest
@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts
 
-      - name: Audit for CRITICAL vulnerabilities
-        run: npm audit --audit-level=critical
+      - name: Release dependency audit
+        run: npm run audit:release
 
   # Build verification
   build:
