@@ -648,9 +648,9 @@ export const api = {
     return apiFetch<{ missions: MissionMapItem[]; count: number }>(`/missions-local/map?${q}`);
   },
 
-  getNearbyMissions: (params: { latitude: number; longitude: number; radiusKm?: number; category?: string; sort?: string }) => {
+  getNearbyMissions: (params: { latitude: number; longitude: number; radius?: number; category?: string; sort?: string }) => {
     const q = new URLSearchParams({ latitude: String(params.latitude), longitude: String(params.longitude) });
-    if (params.radiusKm) q.set("radiusKm", String(params.radiusKm));
+    if (params.radius) q.set("radius", String(params.radius));
     if (params.category) q.set("category", params.category);
     if (params.sort) q.set("sort", params.sort);
     return apiFetch<MissionResponse[]>(`/missions-local/nearby?${q}`);

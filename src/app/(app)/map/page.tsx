@@ -79,7 +79,7 @@ export default function MapPage() {
       api.getNearbyMissions({
         latitude,
         longitude,
-        radiusKm,
+        radius: radiusKm,
         category: category || undefined,
       }),
     enabled: latitude !== 0,

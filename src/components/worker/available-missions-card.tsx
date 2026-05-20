@@ -48,7 +48,7 @@ export function AvailableMissionsCard() {
       const raw = await api.getNearbyMissions({
         latitude: coords.latitude,
         longitude: coords.longitude,
-        radiusKm: 50,
+        radius: 50,
       });
       const available = raw.map(missionResponseToMission);
       // Limiter à 3 pour la version compacte
