@@ -24,6 +24,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
 import { PaywallModal, isQuotaError } from "@/components/subscriptions/paywall-modal";
+import {
+  MISSION_CATEGORY_OPTIONS,
+  MISSION_CATEGORY_VALUES,
+  isMissionCategory,
+} from "@/lib/mission-categories";
 
 // --- Validation schema ---
 
@@ -36,7 +41,12 @@ const missionSchema = z.object({
     .string()
     .min(10, "La description doit contenir au moins 10 caractères")
     .max(2000, "La description ne peut pas dépasser 2000 caractères"),
-  category: z.string().min(1, "Veuillez choisir une catégorie"),
+  category: z
+    .string()
+    .refine(
+      (value) => (MISSION_CATEGORY_VALUES as readonly string[]).includes(value),
+      "Veuillez choisir une catégorie",
+    ),
   price: z
     .number({ invalid_type_error: "Veuillez entrer un montant valide" })
     .min(1, "Le budget doit être d'au moins 1 $")
@@ -97,13 +107,6 @@ export default function NewMissionPage() {
     !quota.hasPaidPlan &&
     quota.limit !== null &&
     quota.used >= quota.limit;
-
-  // Categories from backend
-  const { data: categories, isLoading: categoriesLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => api.getCategories(),
-    staleTime: 60_000,
-  });
 
   // Form setup
   const {
@@ -177,8 +180,12 @@ export default function NewMissionPage() {
   }, [gpsStatus, latitude, longitude, setValue]);
 
   const createMissionRequest = useCallback(
-    (data: MissionFormData) =>
-      api.createMission({
+    (data: MissionFormData) => {
+      if (!isMissionCategory(data.category)) {
+        throw new Error("Veuillez choisir une catégorie");
+      }
+
+      return api.createMission({
         title: data.title,
         description: data.description,
         category: data.category,
@@ -187,7 +194,8 @@ export default function NewMissionPage() {
         longitude: longitude ?? -73.5673,
         city: data.city,
         address: data.address || undefined,
-      }),
+      });
+    },
     [latitude, longitude],
   );
 
@@ -400,41 +408,25 @@ export default function NewMissionPage() {
             <label className="text-sm font-medium text-workon-ink mb-2 block">
               Catégorie *
             </label>
-            {categoriesLoading ? (
-              <div className="flex items-center gap-2 py-2">
-                <Loader2 className="h-4 w-4 animate-spin text-workon-primary" />
-                <span className="text-sm text-workon-muted">
-                  Chargement des catégories...
-                </span>
-              </div>
-            ) : categories && categories.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() =>
-                      setValue("category", cat.name, { shouldValidate: true })
-                    }
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors border ${
-                      selectedCategory === cat.name
-                        ? "bg-workon-primary text-white border-workon-primary"
-                        : "bg-white text-workon-ink border-workon-border hover:border-workon-primary"
-                    }`}
-                  >
-                    {cat.icon ? `${cat.icon} ` : ""}
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <input
-                type="text"
-                {...register("category")}
-                placeholder="Ex: Plomberie, Électricité, Ménage..."
-                className="w-full rounded-2xl border border-workon-border bg-white px-4 py-3 text-sm text-workon-ink placeholder:text-workon-muted focus:border-workon-primary focus:ring-2 focus:ring-workon-primary/40 outline-none transition-colors"
-              />
-            )}
+            <input type="hidden" {...register("category")} />
+            <div className="flex flex-wrap gap-2">
+              {MISSION_CATEGORY_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() =>
+                    setValue("category", option.value, { shouldValidate: true })
+                  }
+                  className={`px-3 py-1.5 rounded-full text-sm transition-colors border ${
+                    selectedCategory === option.value
+                      ? "bg-workon-primary text-white border-workon-primary"
+                      : "bg-white text-workon-ink border-workon-border hover:border-workon-primary"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
             {errors.category && (
               <p className="text-xs text-workon-accent mt-1.5">
                 {errors.category.message}

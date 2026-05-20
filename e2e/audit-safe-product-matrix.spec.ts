@@ -22,6 +22,7 @@ interface AuditUser {
 interface MissionRecord {
   id: string;
   title: string;
+  category?: string;
   status: string;
   createdByUserId: string;
   assignedToUserId: string | null;
@@ -240,8 +241,12 @@ test.describe.serial("audit-safe product matrix", () => {
     await page.getByRole("button", { name: /Publier la mission/i }).click();
     const createdMission = await createMissionResponse;
     expect(createdMission.ok(), "POST /missions-local from UI").toBe(true);
+    expect(createdMission.request().postDataJSON()).toMatchObject({
+      category: "cleaning",
+    });
     const mission = (await createdMission.json()) as MissionRecord;
     expect(mission.title).toBe(title);
+    expect(mission.category).toBe("cleaning");
     expect(mission.createdByUserId).toBe(client.id);
 
     const missionAfterCreate = await apiGet<MissionRecord>(
@@ -250,6 +255,7 @@ test.describe.serial("audit-safe product matrix", () => {
       client,
     );
     expect(missionAfterCreate.status).toBe("open");
+    expect(missionAfterCreate.category).toBe("cleaning");
     await page.waitForURL(new RegExp(`/missions/${mission.id}`), { timeout: 20_000 });
     await expect(page.getByText(title)).toBeVisible({ timeout: 10_000 });
 
