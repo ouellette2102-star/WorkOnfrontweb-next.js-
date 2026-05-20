@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import L from "leaflet";
-import type { MissionResponse } from "@/lib/api-client";
+import type { MissionMapItem } from "@/lib/api-client";
 import "leaflet/dist/leaflet.css";
 
 /**
@@ -50,13 +50,13 @@ const missionIcon = createMissionIcon(false);
 const boostedMissionIcon = createMissionIcon(true);
 
 interface MissionMapProps {
-  missions: MissionResponse[];
+  missions: MissionMapItem[];
   center: [number, number];
   radiusKm: number;
-  onPinClick?: (mission: MissionResponse) => void;
+  onPinClick?: (mission: MissionMapItem) => void;
 }
 
-function isBoosted(m: MissionResponse): boolean {
+function isBoosted(m: MissionMapItem): boolean {
   const boostedUntil = (m as unknown as { boostedUntil?: string | null })
     .boostedUntil;
   const urgentUntil = (m as unknown as { urgentUntil?: string | null })
@@ -79,15 +79,15 @@ function isBoosted(m: MissionResponse): boolean {
  * degrees, scaled by zoom so the ring shrinks as the user zooms in.
  */
 function spreadOverlappingPins(
-  missions: MissionResponse[],
+  missions: MissionMapItem[],
   zoom: number,
-): Array<MissionResponse & { displayLat: number; displayLng: number }> {
+): Array<MissionMapItem & { displayLat: number; displayLng: number }> {
   // Calibrated so siblings sit ~50 px apart at any zoom: at zoom 11
   // (default 25 km radius), 0.014° latitude is ~1500 m and renders
   // as ~40 px. Doubling the formula every two zoom levels keeps that
   // pixel gap roughly constant as the user zooms in or out.
   const ringRadiusDeg = 0.014 * Math.pow(2, 11 - zoom);
-  const buckets = new Map<string, MissionResponse[]>();
+  const buckets = new Map<string, MissionMapItem[]>();
   for (const m of missions) {
     if (typeof m.latitude !== "number" || typeof m.longitude !== "number") {
       continue;
@@ -99,7 +99,7 @@ function spreadOverlappingPins(
   }
 
   const spread: Array<
-    MissionResponse & { displayLat: number; displayLng: number }
+    MissionMapItem & { displayLat: number; displayLng: number }
   > = [];
   for (const bucket of buckets.values()) {
     if (bucket.length === 1) {

@@ -30,7 +30,7 @@ export type MissionCardInput = {
   id: string;
   title: string;
   category: string;
-  city: string;
+  city?: string;
   createdAt: string;
   description?: string;
   status?: string;
@@ -275,7 +275,7 @@ export function MissionCard({
             </h3>
             <p className="mt-1 inline-flex items-center gap-1 text-xs text-workon-muted">
               <MapPin className="h-3 w-3" />
-              {mission.city}
+              {mission.city ?? "Ville non precisee"}
               {mission.distanceKm != null && (
                 <span className="text-workon-gray">
                   • à {mission.distanceKm.toFixed(1)} km
