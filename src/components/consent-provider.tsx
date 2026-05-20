@@ -1,31 +1,22 @@
 "use client";
 
-/**
- * Consent Provider - WorkOn
- *
- * Provider global pour la gestion du consentement légal.
- * Affiche le modal bloquant si le consentement est manquant.
- *
- * IMPORTANT:
- * - Vérifie le consentement à chaque changement d'auth
- * - Bloque toute navigation sans consentement valide
- * - Pas de bypass possible
- *
- * Conformité: Loi 25 Québec, GDPR, Apple App Store, Google Play
- */
-
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { getAccessToken } from "@/lib/auth";
 import { ConsentModal } from "./consent-modal";
 import {
-  getConsentStatus,
   acceptAllDocuments,
+  getActiveVersions,
+  getConsentStatus,
+  isLegalDocumentType,
+  normalizeLegalVersions,
+  REQUIRED_LEGAL_DOCUMENTS,
   type ConsentStatus,
+  type LegalDocumentType,
+  type LegalVersions,
 } from "@/lib/compliance-api";
 
 type PendingAction = {
-  execute: () => Promise<void>;
   resolve: () => void;
   reject: (error: Error) => void;
 };
@@ -36,9 +27,8 @@ type ConsentContextType = {
   missingDocuments: string[];
   refreshConsentStatus: () => Promise<void>;
   /**
-   * Trigger the consent modal from API error handler.
-   * Returns a promise that resolves when consent is accepted,
-   * allowing the caller to retry the failed action.
+   * Trigger the consent modal from API error handling.
+   * Resolves only after backend /compliance/status confirms completion.
    */
   requireConsent: () => Promise<void>;
 };
@@ -59,118 +49,150 @@ type ConsentProviderProps = {
   children: React.ReactNode;
 };
 
+function incompleteConsentStatus(missing = REQUIRED_LEGAL_DOCUMENTS): ConsentStatus {
+  return {
+    isComplete: false,
+    documents: {},
+    missing: [...missing],
+  };
+}
+
+function toLegalDocuments(missingDocuments: string[]): LegalDocumentType[] {
+  const documents = missingDocuments.filter(isLegalDocumentType);
+  return documents.length > 0 ? documents : [...REQUIRED_LEGAL_DOCUMENTS];
+}
+
+function rejectPendingActions(actions: React.MutableRefObject<PendingAction[]>, error: Error) {
+  const pending = actions.current;
+  actions.current = [];
+  pending.forEach((action) => action.reject(error));
+}
+
+function resolvePendingActions(actions: React.MutableRefObject<PendingAction[]>) {
+  const pending = actions.current;
+  actions.current = [];
+  pending.forEach((action) => action.resolve());
+}
+
 export function ConsentProvider({ children }: ConsentProviderProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [consentStatus, setConsentStatus] = useState<ConsentStatus | null>(null);
+  const [activeVersions, setActiveVersions] = useState<LegalVersions>(
+    normalizeLegalVersions(),
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
-  // Queue of pending actions waiting for consent
   const pendingActionsRef = useRef<PendingAction[]>([]);
 
-  /**
-   * Vérifier le statut de consentement
-   */
-  const checkConsentStatus = useCallback(async () => {
+  const checkConsentStatus = useCallback(async (): Promise<ConsentStatus | null> => {
     if (!isAuthenticated) {
       setConsentStatus(null);
+      setStatusError(null);
       setIsLoading(false);
       setShowModal(false);
-      return;
+      return null;
     }
 
+    const token = getAccessToken();
+    if (!token) {
+      const fallback = incompleteConsentStatus();
+      setConsentStatus(fallback);
+      setStatusError(
+        "Session locale incomplete: reconnecte-toi ou accepte les documents avant de continuer.",
+      );
+      setIsLoading(false);
+      setShowModal(true);
+      return fallback;
+    }
+
+    const versionsPromise = getActiveVersions()
+      .then((result) => {
+        setActiveVersions(result.versions);
+        return result.versions;
+      })
+      .catch((error) => {
+        console.warn("[ConsentProvider] active versions unavailable:", error);
+        return null;
+      });
+
     try {
-      const token = getAccessToken();
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
       const status = await getConsentStatus(token);
-      setConsentStatus(status);
+      await versionsPromise;
 
-      // Afficher le modal si consentement incomplet
-      if (!status.isComplete) {
-        setShowModal(true);
-      } else {
-        setShowModal(false);
-      }
+      setConsentStatus(status);
+      setStatusError(null);
+      setShowModal(!status.isComplete);
+      return status;
     } catch (error) {
-      console.error("[ConsentProvider] Erreur vérification consentement:", error);
-      // En cas d'erreur, on ne bloque pas (fail-open pour UX)
-      // Le backend bloquera de toute façon les requêtes critiques
-      setConsentStatus(null);
+      console.error("[ConsentProvider] consent status check failed:", error);
+      await versionsPromise;
+
+      const fallback = incompleteConsentStatus();
+      setConsentStatus(fallback);
+      setStatusError(
+        "Impossible de verifier le consentement. WorkOn bloque les actions critiques jusqu'a confirmation.",
+      );
+      setShowModal(true);
+      return null;
     } finally {
       setIsLoading(false);
     }
   }, [isAuthenticated]);
 
-  /**
-   * Rafraîchir le statut de consentement (exposé via context)
-   */
   const refreshConsentStatus = useCallback(async () => {
     setIsLoading(true);
     await checkConsentStatus();
   }, [checkConsentStatus]);
 
-  /**
-   * Accepter tous les documents
-   */
   const handleAccept = useCallback(async () => {
     const token = getAccessToken();
     if (!token) {
-      throw new Error("Non authentifié");
+      const error = new Error("Non authentifie");
+      rejectPendingActions(pendingActionsRef, error);
+      throw error;
     }
 
-    const result = await acceptAllDocuments(token);
+    const documentsToAccept = toLegalDocuments(consentStatus?.missing ?? []);
+    setIsLoading(true);
 
-    if (result.success) {
-      // Rafraîchir le statut
-      await checkConsentStatus();
+    const result = await acceptAllDocuments(token, documentsToAccept);
+    if (!result.success) {
+      const error = new Error("Impossible d'enregistrer votre consentement");
+      rejectPendingActions(pendingActionsRef, error);
+      throw error;
+    }
 
-      // Résoudre toutes les actions en attente
-      const pending = pendingActionsRef.current;
-      pendingActionsRef.current = [];
-      pending.forEach((action) => action.resolve());
-    } else {
-      // Rejeter toutes les actions en attente
-      const pending = pendingActionsRef.current;
-      pendingActionsRef.current = [];
-      pending.forEach((action) =>
-        action.reject(new Error("Consentement non accepté"))
+    const confirmedStatus = await checkConsentStatus();
+    if (!confirmedStatus?.isComplete) {
+      const error = new Error(
+        "Consentement envoye, mais le statut n'est pas encore confirme.",
       );
-      throw new Error("Impossible d'enregistrer votre consentement");
+      rejectPendingActions(pendingActionsRef, error);
+      throw error;
     }
-  }, [checkConsentStatus]);
 
-  /**
-   * Déclencher le modal de consentement depuis un gestionnaire d'erreur API.
-   * Retourne une promesse qui se résout quand le consentement est accepté.
-   */
+    resolvePendingActions(pendingActionsRef);
+  }, [checkConsentStatus, consentStatus?.missing]);
+
   const requireConsent = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
-      // Ajouter à la file d'attente
-      pendingActionsRef.current.push({
-        execute: async () => {},
-        resolve,
-        reject,
-      });
-
-      // Afficher le modal
+      pendingActionsRef.current.push({ resolve, reject });
       setShowModal(true);
     });
   }, []);
 
-  // Vérifier le consentement au chargement et quand l'auth change
   useEffect(() => {
     if (!authLoading) {
-      checkConsentStatus();
+      void checkConsentStatus();
     }
   }, [authLoading, isAuthenticated, checkConsentStatus]);
 
   const isConsentComplete = consentStatus?.isComplete ?? false;
-  const missingDocuments = consentStatus?.missing ?? [];
+  const missingDocuments =
+    consentStatus?.missing.length ? consentStatus.missing : showModal ? [...REQUIRED_LEGAL_DOCUMENTS] : [];
 
   return (
     <ConsentContext.Provider
@@ -184,11 +206,12 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
     >
       {children}
 
-      {/* Modal de consentement bloquant */}
       <ConsentModal
         isOpen={showModal && isAuthenticated === true}
         onAccept={handleAccept}
         missingDocuments={missingDocuments}
+        versions={activeVersions}
+        statusError={statusError}
         isLoading={isLoading}
       />
     </ConsentContext.Provider>

@@ -8,6 +8,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { useConsent } from "@/components/consent-provider";
+import { isConsentRequiredError } from "@/lib/api-consent-handler";
 import {
   ArrowLeft,
   Loader2,
@@ -50,6 +52,7 @@ type MissionFormData = z.infer<typeof missionSchema>;
 export default function NewMissionPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
+  const { requireConsent } = useConsent();
 
   // T44 guard: employers without a completed onboarding (businessName +
   // phone + city per backend `onboardingCompletedAt` logic) can't publish.
@@ -173,9 +176,8 @@ export default function NewMissionPage() {
       });
   }, [gpsStatus, latitude, longitude, setValue]);
 
-  // Submit mutation
-  const createMission = useMutation({
-    mutationFn: (data: MissionFormData) =>
+  const createMissionRequest = useCallback(
+    (data: MissionFormData) =>
       api.createMission({
         title: data.title,
         description: data.description,
@@ -186,6 +188,12 @@ export default function NewMissionPage() {
         city: data.city,
         address: data.address || undefined,
       }),
+    [latitude, longitude],
+  );
+
+  // Submit mutation
+  const createMission = useMutation({
+    mutationFn: createMissionRequest,
     onSuccess: (mission) => {
       // QA report C8 / Sprint 2: pass `?created=1` so the detail page
       // can render a celebration banner (with share link) on first
@@ -193,7 +201,22 @@ export default function NewMissionPage() {
       // The banner is dismissible and stays until the user clicks away.
       router.push(`/missions/${mission.id}?created=1`);
     },
-    onError: (error) => {
+    onError: async (error, variables) => {
+      if (isConsentRequiredError(error)) {
+        try {
+          await requireConsent();
+          const mission = await createMissionRequest(variables);
+          router.push(`/missions/${mission.id}?created=1`);
+        } catch (consentError) {
+          toast.error(
+            consentError instanceof Error
+              ? consentError.message
+              : "Consentement requis pour publier une mission",
+          );
+        }
+        return;
+      }
+
       if (isQuotaError(error)) {
         setPaywallOpen(true);
         return;

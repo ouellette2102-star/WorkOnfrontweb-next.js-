@@ -25,7 +25,23 @@ export const ACTIVE_LEGAL_VERSIONS = {
   PRIVACY: "1.0",
 } as const;
 
-export type LegalDocumentType = keyof typeof ACTIVE_LEGAL_VERSIONS;
+export const REQUIRED_LEGAL_DOCUMENTS = ["TERMS", "PRIVACY"] as const;
+
+export type LegalDocumentType = (typeof REQUIRED_LEGAL_DOCUMENTS)[number];
+export type LegalVersions = Record<LegalDocumentType, string>;
+
+export function isLegalDocumentType(value: string): value is LegalDocumentType {
+  return (REQUIRED_LEGAL_DOCUMENTS as readonly string[]).includes(value);
+}
+
+export function normalizeLegalVersions(
+  versions?: Partial<Record<LegalDocumentType, string>> | Record<string, string> | null,
+): LegalVersions {
+  return {
+    TERMS: versions?.TERMS || ACTIVE_LEGAL_VERSIONS.TERMS,
+    PRIVACY: versions?.PRIVACY || ACTIVE_LEGAL_VERSIONS.PRIVACY,
+  };
+}
 
 export type ConsentStatus = {
   isComplete: boolean;
@@ -55,13 +71,18 @@ export type AcceptConsentResponse = {
  * Authorization header even when a token is cached.
  */
 export async function getActiveVersions(): Promise<{
-  versions: typeof ACTIVE_LEGAL_VERSIONS;
-  updatedAt: string;
+  versions: LegalVersions;
+  updatedAt?: string;
 }> {
-  return apiFetch<{
-    versions: typeof ACTIVE_LEGAL_VERSIONS;
-    updatedAt: string;
+  const response = await apiFetch<{
+    versions?: Record<string, string>;
+    updatedAt?: string;
   }>("/compliance/versions", { skipAuth: true });
+
+  return {
+    ...response,
+    versions: normalizeLegalVersions(response.versions),
+  };
 }
 
 /** Vérifier le statut de consentement de l'utilisateur. */
@@ -89,15 +110,18 @@ export async function acceptDocument(
  */
 export async function acceptAllDocuments(
   token: string,
+  documents: readonly LegalDocumentType[] = REQUIRED_LEGAL_DOCUMENTS,
 ): Promise<{ success: boolean; results: AcceptConsentResponse[] }> {
-  const [termsResult, privacyResult] = await Promise.all([
-    acceptDocument(token, "TERMS", ACTIVE_LEGAL_VERSIONS.TERMS),
-    acceptDocument(token, "PRIVACY", ACTIVE_LEGAL_VERSIONS.PRIVACY),
-  ]);
+  const { versions } = await getActiveVersions();
+  const results = await Promise.all(
+    documents.map((documentType) =>
+      acceptDocument(token, documentType, versions[documentType]),
+    ),
+  );
 
   return {
-    success: termsResult.accepted && privacyResult.accepted,
-    results: [termsResult, privacyResult],
+    success: results.every((result) => result.accepted || result.alreadyAccepted),
+    results,
   };
 }
 

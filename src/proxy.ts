@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export const CANONICAL_WORKON_HOST = "workonapp.vercel.app";
+export const VERCEL_PRODUCTION_ENV = "production";
 
 /**
  * JWT-based proxy (replaces the deprecated `middleware` file convention
@@ -37,9 +38,18 @@ const PUBLIC_PATHS = [
   "/api/",
 ];
 
+export function shouldRedirectToCanonicalHost(
+  vercelEnv = process.env.VERCEL_ENV,
+): boolean {
+  return vercelEnv === VERCEL_PRODUCTION_ENV;
+}
+
 export function getCanonicalWorkOnUrl(
   currentUrl: Pick<URL, "hostname" | "toString">,
+  vercelEnv = process.env.VERCEL_ENV,
 ): URL | null {
+  if (!shouldRedirectToCanonicalHost(vercelEnv)) return null;
+
   const hostname = currentUrl.hostname.toLowerCase();
 
   if (hostname === CANONICAL_WORKON_HOST) return null;

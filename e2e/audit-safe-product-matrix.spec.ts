@@ -135,9 +135,14 @@ async function cleanupUsers(request: APIRequestContext) {
   }
 }
 
-async function bridgeLocalBackendCors(page: Page, request: APIRequestContext) {
+async function bridgeBackendCorsWhenNeeded(page: Page, request: APIRequestContext) {
   const frontendHost = new URL(BASE_URL).hostname;
-  if (frontendHost !== "127.0.0.1" && frontendHost !== "localhost") return;
+  const shouldBridge =
+    process.env.BRIDGE_BACKEND_CORS === "true" ||
+    frontendHost === "127.0.0.1" ||
+    frontendHost === "localhost";
+
+  if (!shouldBridge) return;
 
   const frontendOrigin = new URL(BASE_URL).origin;
   const corsHeaders = {
@@ -195,7 +200,7 @@ test.describe.serial("audit-safe product matrix", () => {
   });
 
   test("audit core: client mission -> worker start -> chat round-trip", async ({ page, request }) => {
-    await bridgeLocalBackendCors(page, request);
+    await bridgeBackendCorsWhenNeeded(page, request);
 
     const client = await registerAuditUser(page, "residential_client", "client");
     const worker = await registerAuditUser(page, "worker", "worker");
