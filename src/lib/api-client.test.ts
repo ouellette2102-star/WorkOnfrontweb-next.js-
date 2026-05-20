@@ -75,3 +75,60 @@ describe("api.getMissionMapPins", () => {
   });
 });
 
+describe("api.createMission", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("posts the documented /missions-local payload with an enum category", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: "lm_test",
+          title: "Deneigement entree",
+          description: "Mission test",
+          category: "snow_removal",
+          status: "open",
+          price: 75,
+          latitude: 45.5017,
+          longitude: -73.5673,
+          city: "Montreal",
+          address: null,
+          createdByUserId: "usr_test",
+          assignedToUserId: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }),
+        {
+          status: 201,
+          headers: { "content-type": "application/json" },
+        },
+      ),
+    );
+
+    await api.createMission({
+      title: "Deneigement entree",
+      description: "Mission test",
+      category: "snow_removal",
+      price: 75,
+      latitude: 45.5017,
+      longitude: -73.5673,
+      city: "Montreal",
+      address: "123 Audit Street",
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(new URL(String(url)).pathname).toBe("/api/v1/missions-local");
+    expect(init?.method).toBe("POST");
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      title: "Deneigement entree",
+      category: "snow_removal",
+      price: 75,
+      latitude: 45.5017,
+      longitude: -73.5673,
+      city: "Montreal",
+    });
+  });
+});
+

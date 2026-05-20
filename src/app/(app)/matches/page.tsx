@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { api, type SwipeMatch } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
+import type { MissionCategory } from "@/lib/mission-categories";
 import { toast } from "sonner";
 import Link from "next/link";
 import {
@@ -59,7 +60,7 @@ export default function MatchesPage() {
       data,
     }: {
       matchId: string;
-      data: { title: string; description?: string; price?: number; category: string };
+      data: { title: string; description?: string; price?: number; category: MissionCategory };
     }) => api.createMissionFromMatch(matchId, data),
     onSuccess: () => {
       toast.success("Mission créée avec succès !");

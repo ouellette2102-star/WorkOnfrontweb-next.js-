@@ -11,6 +11,7 @@ import {
   type Subscription,
   type MissionsQuota,
 } from "./api-schemas";
+import type { MissionCategory } from "./mission-categories";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
@@ -621,7 +622,7 @@ export const api = {
   createMission: (data: {
     title: string;
     description: string;
-    category: string;
+    category: MissionCategory;
     price: number;
     latitude: number;
     longitude: number;
@@ -1100,7 +1101,7 @@ export const api = {
   recordSwipe: (data: { candidateId: string; action: "LIKE" | "PASS" | "SUPERLIKE" }) =>
     apiFetch<{ matched: boolean; matchId?: string }>("/swipe/action", { method: "POST", body: JSON.stringify(data) }),
   getMatches: () => apiFetch<SwipeMatch[]>("/swipe/matches"),
-  createMissionFromMatch: (matchId: string, data: { title?: string; description?: string; price?: number; category: string }) =>
+  createMissionFromMatch: (matchId: string, data: { title?: string; description?: string; price?: number; category: MissionCategory }) =>
     apiFetch<MissionResponse>("/swipe/matches/mission", { method: "POST", body: JSON.stringify({ matchId, ...data }) }),
 
   // Support

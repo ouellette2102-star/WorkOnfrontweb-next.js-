@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MISSION_CATEGORY_OPTIONS, isMissionCategory } from "@/lib/mission-categories";
 
 /**
  * CreateMissionForm — wires straight to `api.createMission` → POST
@@ -31,18 +32,6 @@ import { Textarea } from "@/components/ui/textarea";
  * backend anyway — so the shim bug was masked by a second validation
  * bug. Both are fixed in this PR.
  */
-
-const CATEGORIES = [
-  { value: "cleaning", label: "Ménage" },
-  { value: "construction", label: "Construction" },
-  { value: "renovation", label: "Rénovation" },
-  { value: "plumbing", label: "Plomberie" },
-  { value: "electrical", label: "Électricité" },
-  { value: "painting", label: "Peinture" },
-  { value: "gardening", label: "Jardinage" },
-  { value: "moving", label: "Déménagement" },
-  { value: "other", label: "Autre" },
-] as const;
 
 // Fallback centroid (Montréal) used when geolocation is denied or
 // unavailable. The backend uses these for nearby-search so a sensible
@@ -91,6 +80,7 @@ export function CreateMissionForm() {
     e.preventDefault();
     setError(null);
     setSuccess(false);
+    const category = formData.category;
 
     // Validation — match what the backend actually requires.
     if (!formData.title.trim()) {
@@ -101,7 +91,7 @@ export function CreateMissionForm() {
       setError("La description est obligatoire");
       return;
     }
-    if (!formData.category) {
+    if (!isMissionCategory(category)) {
       setError("Choisis une catégorie");
       return;
     }
@@ -137,7 +127,7 @@ export function CreateMissionForm() {
         await api.createMission({
           title: formData.title.trim(),
           description: formData.description.trim(),
-          category: formData.category,
+          category,
           price: priceNum,
           latitude,
           longitude,
@@ -220,7 +210,7 @@ export function CreateMissionForm() {
           required
         >
           <option value="">Sélectionne une catégorie</option>
-          {CATEGORIES.map((cat) => (
+          {MISSION_CATEGORY_OPTIONS.map((cat) => (
             <option key={cat.value} value={cat.value}>
               {cat.label}
             </option>
