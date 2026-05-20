@@ -25,9 +25,9 @@ import {
  * (src/lib/nav.ts) so labels, hrefs and role gates live in one
  * place and a route-exists test can guard them.
  *
- * Bug #10 fix: Pro FAB points at `/missions` (browse open work,
- * an action) instead of `/missions/mine` (a passive list — moved
- * to the hamburger as part of #11).
+ * Bug #10 + P2-B fix: Pro FAB points at `/worker/missions` (authenticated
+ * nearby worker feed) instead of `/missions/mine` (a passive list — moved
+ * to the hamburger as part of #11) or the public `/missions` feed.
  */
 
 // Bottom nav uses two icons not declared in the contract (Home + Map are

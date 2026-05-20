@@ -14,7 +14,7 @@ export function StatsBar() {
     queryKey: ["stats-nearby-missions"],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/missions-local/nearby?latitude=45.5&longitude=-73.5&radiusKm=100`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"}/missions-local/nearby?latitude=45.5&longitude=-73.5&radius=100`,
         {
           headers: {
             Authorization: `Bearer ${safeLocalStorage.getItem("workon_token") ?? ""}`,

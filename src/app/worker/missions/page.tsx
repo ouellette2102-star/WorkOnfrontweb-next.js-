@@ -87,7 +87,7 @@ function WorkerMissionsContent() {
       const raw = await api.getNearbyMissions({
         latitude: userLocation.lat,
         longitude: userLocation.lng,
-        radiusKm:
+        radius:
           maxDistance === "unlimited" ? undefined : Number(maxDistance),
         category: category || undefined,
       });

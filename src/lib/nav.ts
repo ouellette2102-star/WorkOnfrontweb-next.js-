@@ -7,8 +7,9 @@
  * across components.
  *
  * The Phase 3 fix for bugs #10 / #11 lives here:
- *   - #10 — the pro FAB now points at `/missions` (browse open work,
- *     a real action) instead of `/missions/mine` (a passive list view).
+ *   - #10 — the pro FAB now points at `/worker/missions` (browse open
+ *     work from the authenticated worker feed) instead of `/missions/mine`
+ *     (a passive list view).
  *   - #11 — "Mes affectations" / "Mes missions" is moved into the
  *     hamburger so the FAB slot stays an action button.
  *
@@ -250,11 +251,10 @@ export const BOTTOM_NAV_RIGHT: NavItem[] = [
 /**
  * FAB — center slot of the bottom nav. ONE entry per mode.
  *
- * #10 fix: pro FAB used to point at `/missions/mine`, which is a
- * passive list view, not an action. The user explicitly asked for
- * "un bouton d'action". We now route to `/missions` (the public
- * open-mission feed) because the worker's primary action is "find
- * work to take", not "look at what I already have".
+ * #10 + P2-B fix: pro FAB used to point at `/missions/mine`, which is a
+ * passive list view, then at `/missions`, which is a public-feed surface.
+ * Route the worker primary action to `/worker/missions` so the canonical
+ * entrypoint uses the documented `/missions-local/nearby` backend contract.
  *
  * Client FAB stays on `/missions/new` (publish a demand) — already an
  * action.
@@ -263,10 +263,10 @@ export const BOTTOM_NAV_FAB: Record<NavMode, NavItem> = {
   pro: {
     id: "fab-pro",
     label: "Missions",
-    href: "/missions",
+    href: "/worker/missions",
     icon: Briefcase,
     visibleIn: { modes: ["pro"] },
-    intent: "Pro action — browse open missions (primary CTA)",
+    intent: "Pro action — browse nearby missions from the worker feed",
   },
   client: {
     id: "fab-client",

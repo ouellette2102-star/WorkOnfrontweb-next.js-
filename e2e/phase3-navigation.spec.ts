@@ -2,9 +2,10 @@
  * E2E proof for Phase 3 — Navigation contractualisée (#10 #11).
  *
  * Verifies the new nav contract on a live worker session:
- *   - Bottom-nav FAB in PRO mode → label "Missions", links to /missions
- *     (the open-mission feed). Old behaviour pointed at /missions/mine
- *     (a passive list view, the "no action" symptom of #10).
+ *   - Bottom-nav FAB in PRO mode → label "Missions", links to
+ *     /worker/missions (the authenticated nearby worker feed). Old
+ *     behaviour pointed at /missions/mine (a passive list view, the "no
+ *     action" symptom of #10), then /missions (the public feed surface).
  *   - Bottom-nav FAB in CLIENT mode → label "Publier", links to
  *     /missions/new. Unchanged but exercised here as regression guard.
  *   - Hamburger contains "Mes affectations" → /missions/mine in Pro
@@ -72,7 +73,7 @@ test.describe("Phase 3 — navigation contract (#10 #11)", () => {
     // its parent container.
     const proFab = page.getByTestId("nav-fab-pro");
     await expect(proFab).toBeVisible({ timeout: 10_000 });
-    await expect(proFab).toHaveAttribute("href", "/missions");
+    await expect(proFab).toHaveAttribute("href", "/worker/missions");
     const proFabBlock = proFab.locator("..");
     await expect(proFabBlock).toContainText("Missions");
 
