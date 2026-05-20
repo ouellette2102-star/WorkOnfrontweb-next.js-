@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
+import { normalizeBackendError } from "@/lib/backend-error";
 import { ArrowLeft } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
@@ -28,7 +29,7 @@ export default function ForgotPasswordPage() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || "Erreur");
+        throw new Error(normalizeBackendError(err, "Erreur", res.status).message);
       }
       setSent(true);
     } catch (err) {

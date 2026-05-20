@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendErrorBody } from "@/lib/backend-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
@@ -24,11 +25,11 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    const data = await backendRes.json();
+    const data = await backendRes.json().catch(() => ({}));
 
     if (!backendRes.ok) {
       return NextResponse.json(
-        { message: data.message || "Échec de la connexion" },
+        buildBackendErrorBody(data, "Échec de la connexion", backendRes.status),
         { status: backendRes.status },
       );
     }
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     return response;
   } catch {
     return NextResponse.json(
-      { message: "Erreur serveur" },
+      buildBackendErrorBody(null, "Erreur serveur", 500),
       { status: 500 },
     );
   }
