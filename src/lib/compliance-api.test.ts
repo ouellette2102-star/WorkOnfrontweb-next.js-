@@ -1,9 +1,12 @@
 // @vitest-environment node
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import {
+  acceptAllDocuments,
   cancelAccountDeletion,
   downloadMyDataAsJson,
+  getActiveVersions,
   getMyData,
+  normalizeLegalVersions,
   requestAccountDeletion,
 } from "./compliance-api";
 
@@ -18,6 +21,75 @@ const mockedApiFetch = apiFetch as unknown as ReturnType<typeof vi.fn>;
 describe("compliance-api — data rights", () => {
   beforeEach(() => {
     mockedApiFetch.mockReset();
+  });
+
+  it("getActiveVersions normalizes backend versions and uses skipAuth", async () => {
+    mockedApiFetch.mockResolvedValueOnce({
+      versions: { TERMS: "2026-05-terms", PRIVACY: "2026-05-privacy" },
+      updatedAt: "2026-05-19T00:00:00Z",
+    });
+
+    const out = await getActiveVersions();
+
+    expect(mockedApiFetch).toHaveBeenCalledWith(
+      "/compliance/versions",
+      { skipAuth: true },
+    );
+    expect(out.versions).toEqual({
+      TERMS: "2026-05-terms",
+      PRIVACY: "2026-05-privacy",
+    });
+  });
+
+  it("acceptAllDocuments fetches active backend versions before accepting", async () => {
+    mockedApiFetch
+      .mockResolvedValueOnce({
+        versions: { TERMS: "terms-live", PRIVACY: "privacy-live" },
+      })
+      .mockResolvedValueOnce({
+        accepted: true,
+        documentType: "TERMS",
+        version: "terms-live",
+        acceptedAt: "2026-05-19T00:00:00Z",
+      })
+      .mockResolvedValueOnce({
+        accepted: true,
+        documentType: "PRIVACY",
+        version: "privacy-live",
+        acceptedAt: "2026-05-19T00:00:00Z",
+      });
+
+    const out = await acceptAllDocuments("token");
+
+    expect(out.success).toBe(true);
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(
+      1,
+      "/compliance/versions",
+      { skipAuth: true },
+    );
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(
+      2,
+      "/compliance/accept",
+      {
+        method: "POST",
+        body: JSON.stringify({ documentType: "TERMS", version: "terms-live" }),
+      },
+    );
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(
+      3,
+      "/compliance/accept",
+      {
+        method: "POST",
+        body: JSON.stringify({ documentType: "PRIVACY", version: "privacy-live" }),
+      },
+    );
+  });
+
+  it("normalizeLegalVersions falls back only for missing values", () => {
+    expect(normalizeLegalVersions({ TERMS: "terms-live" })).toEqual({
+      TERMS: "terms-live",
+      PRIVACY: "1.0",
+    });
   });
 
   it("getMyData calls /compliance/my-data", async () => {

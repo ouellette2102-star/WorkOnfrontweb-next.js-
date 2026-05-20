@@ -7,7 +7,18 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/auth-context";
-import { api } from "@/lib/api-client";
+import { getAccessToken } from "@/lib/auth";
+import {
+  acceptAllDocuments,
+  getActiveVersions,
+  getConsentStatus,
+  isLegalDocumentType,
+  normalizeLegalVersions,
+  REQUIRED_LEGAL_DOCUMENTS,
+  type LegalDocumentType,
+  type LegalVersions,
+} from "@/lib/compliance-api";
+import { ConsentModal } from "@/components/consent-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +64,14 @@ function RegisterInner() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [credentials, setCredentials] = useState<Step1Data | null>(null);
+  const [consentOpen, setConsentOpen] = useState(false);
+  const [consentVersions, setConsentVersions] = useState<LegalVersions>(
+    normalizeLegalVersions(),
+  );
+  const [consentMissing, setConsentMissing] = useState<string[]>([
+    ...REQUIRED_LEGAL_DOCUMENTS,
+  ]);
+  const [consentStatusError, setConsentStatusError] = useState<string | null>(null);
 
   const step1Form = useForm<Step1Data>({ resolver: zodResolver(step1Schema) });
   const step3Form = useForm<Step3Data>({ resolver: zodResolver(step3Schema) });
@@ -71,6 +90,67 @@ function RegisterInner() {
   }
 
   // Step 3: Profile details → register
+  async function openRegisterConsentGate() {
+    setConsentStatusError(null);
+
+    try {
+      const active = await getActiveVersions();
+      setConsentVersions(active.versions);
+    } catch (err) {
+      console.warn("[register] active legal versions unavailable", err);
+      setConsentStatusError(
+        "Impossible de charger les versions legales actives. Elles seront verifiees avant l'acceptation.",
+      );
+    }
+
+    try {
+      const status = await getConsentStatus();
+      if (status.isComplete) {
+        setStep(4);
+        return;
+      }
+      setConsentMissing(
+        status.missing.length > 0 ? status.missing : [...REQUIRED_LEGAL_DOCUMENTS],
+      );
+    } catch (err) {
+      console.warn("[register] consent status unavailable", err);
+      setConsentMissing([...REQUIRED_LEGAL_DOCUMENTS]);
+      setConsentStatusError(
+        "Impossible de confirmer ton statut de consentement. WorkOn demande une acceptation explicite avant de continuer.",
+      );
+    }
+
+    setConsentOpen(true);
+  }
+
+  async function handleRegisterConsentAccept() {
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error("Session locale incomplete. Reconnecte-toi pour continuer.");
+    }
+
+    const documents = consentMissing.filter(isLegalDocumentType);
+    const documentsToAccept: readonly LegalDocumentType[] =
+      documents.length > 0 ? documents : REQUIRED_LEGAL_DOCUMENTS;
+
+    const result = await acceptAllDocuments(token, documentsToAccept);
+    if (!result.success) {
+      throw new Error("Impossible d'enregistrer le consentement.");
+    }
+
+    const status = await getConsentStatus(token);
+    if (!status.isComplete) {
+      setConsentMissing(
+        status.missing.length > 0 ? status.missing : [...REQUIRED_LEGAL_DOCUMENTS],
+      );
+      throw new Error("Consentement envoye, mais le statut n'est pas encore confirme.");
+    }
+
+    setConsentOpen(false);
+    setConsentStatusError(null);
+    setStep(4);
+  }
+
   async function onStep3(data: Step3Data) {
     if (!credentials) return;
     setError("");
@@ -98,20 +178,7 @@ function RegisterInner() {
         city: data.city,
       });
 
-      // Auto-accept terms + privacy (non-blocking)
-      try {
-        const versions = await api.getConsentVersions();
-        if (versions.versions.TERMS) {
-          await api.acceptDocument("TERMS", versions.versions.TERMS);
-        }
-        if (versions.versions.PRIVACY) {
-          await api.acceptDocument("PRIVACY", versions.versions.PRIVACY);
-        }
-      } catch (err) {
-        console.warn("[register] consent auto-accept failed", err);
-      }
-
-      setStep(4);
+      await openRegisterConsentGate();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur d'inscription");
     } finally {
@@ -405,6 +472,15 @@ function RegisterInner() {
           </div>
         )}
       </div>
+
+      <ConsentModal
+        isOpen={consentOpen}
+        onAccept={handleRegisterConsentAccept}
+        missingDocuments={consentMissing}
+        versions={consentVersions}
+        statusError={consentStatusError}
+        isLoading={loading}
+      />
     </div>
   );
 }

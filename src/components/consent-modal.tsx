@@ -24,23 +24,36 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ACTIVE_LEGAL_VERSIONS } from "@/lib/compliance-api";
+import {
+  ACTIVE_LEGAL_VERSIONS,
+  type LegalVersions,
+} from "@/lib/compliance-api";
 
 type ConsentModalProps = {
   isOpen: boolean;
   onAccept: () => Promise<void>;
   missingDocuments: string[];
+  versions?: LegalVersions;
+  statusError?: string | null;
   isLoading?: boolean;
 };
 
-export function ConsentModal({
+export function ConsentModal(props: ConsentModalProps) {
+  if (!props.isOpen) return null;
+  return <ConsentModalBody {...props} />;
+}
+
+function ConsentModalBody({
   isOpen,
   onAccept,
   missingDocuments,
+  versions = ACTIVE_LEGAL_VERSIONS,
+  statusError = null,
   isLoading = false,
 }: ConsentModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasConfirmed, setHasConfirmed] = useState(false);
 
   const handleAccept = async () => {
     setIsSubmitting(true);
@@ -93,7 +106,7 @@ export function ConsentModal({
               <DocumentCard
                 icon={<FileText className="w-5 h-5" />}
                 title="Conditions d'utilisation"
-                version={ACTIVE_LEGAL_VERSIONS.TERMS}
+                version={versions.TERMS}
                 href="/legal/terms"
               />
             )}
@@ -102,13 +115,20 @@ export function ConsentModal({
               <DocumentCard
                 icon={<Shield className="w-5 h-5" />}
                 title="Politique de confidentialité"
-                version={ACTIVE_LEGAL_VERSIONS.PRIVACY}
+                version={versions.PRIVACY}
                 href="/legal/privacy"
               />
             )}
           </div>
 
           {/* Résumé */}
+          {statusError && (
+            <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-700">{statusError}</p>
+            </div>
+          )}
+
           <div className="p-4 bg-workon-bg rounded-lg border border-workon-border">
             <h4 className="font-medium text-workon-ink mb-2">En acceptant, vous confirmez :</h4>
             <ul className="text-sm text-workon-gray space-y-1.5">
@@ -134,13 +154,26 @@ export function ConsentModal({
               <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
+          <label className="flex items-start gap-3 rounded-lg border border-workon-border bg-white p-4 text-left text-sm text-workon-gray">
+            <input
+              type="checkbox"
+              checked={hasConfirmed}
+              onChange={(event) => setHasConfirmed(event.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-workon-border text-workon-primary focus:ring-workon-primary"
+            />
+            <span>
+              J&apos;ai ouvert les documents requis, je comprends les conditions
+              d&apos;utilisation et la politique de confidentialite, et je les
+              accepte explicitement.
+            </span>
+          </label>
         </div>
 
         {/* Bouton d'acceptation */}
         <div className="pt-2">
           <Button
             onClick={handleAccept}
-            disabled={isSubmitting || isLoading}
+            disabled={!hasConfirmed || isSubmitting || isLoading}
             className="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold py-6"
           >
             {isSubmitting || isLoading ? (
@@ -154,8 +187,8 @@ export function ConsentModal({
           </Button>
 
           <p className="text-xs text-workon-muted text-center mt-4">
-            Version TERMS v{ACTIVE_LEGAL_VERSIONS.TERMS} • Version PRIVACY v
-            {ACTIVE_LEGAL_VERSIONS.PRIVACY}
+            Version TERMS v{versions.TERMS} • Version PRIVACY v
+            {versions.PRIVACY}
           </p>
         </div>
       </DialogContent>
