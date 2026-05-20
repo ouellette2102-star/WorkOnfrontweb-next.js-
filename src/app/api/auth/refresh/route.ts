@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendErrorBody } from "@/lib/backend-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     if (!refreshToken) {
       return NextResponse.json(
-        { message: "Pas de refresh token" },
+        buildBackendErrorBody(null, "Pas de refresh token", 401),
         { status: 401 },
       );
     }
@@ -31,18 +32,18 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ refreshToken }),
     });
 
+    const data = await backendRes.json().catch(() => ({}));
+
     if (!backendRes.ok) {
       // Clear invalid cookies
       const response = NextResponse.json(
-        { message: "Session expirée" },
+        buildBackendErrorBody(data, "Session expirée", backendRes.status),
         { status: 401 },
       );
       response.cookies.delete("workon_token");
       response.cookies.delete("workon_refresh");
       return response;
     }
-
-    const data = await backendRes.json();
 
     // Return new tokens in body so the client can update its localStorage
     // cache. The httpOnly cookies below stay in sync.
@@ -59,6 +60,9 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch {
-    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json(
+      buildBackendErrorBody(null, "Erreur serveur", 500),
+      { status: 500 },
+    );
   }
 }

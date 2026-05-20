@@ -110,6 +110,12 @@ test.describe("Phase 4 — password reset wiring (#13)", () => {
       .getByTestId("reset-password-confirm")
       .fill("brandNewPassword42");
 
+    const resetRequest = page.waitForRequest(
+      (r) =>
+        r.url().includes("/auth/reset-password") &&
+        r.method() === "POST",
+      { timeout: 15_000 },
+    );
     const resetReq = page.waitForResponse(
       (r) =>
         r.url().includes("/auth/reset-password") &&
@@ -117,7 +123,16 @@ test.describe("Phase 4 — password reset wiring (#13)", () => {
       { timeout: 15_000 },
     );
     await page.getByTestId("reset-password-submit").click();
-    const resetResp = await resetReq;
+    const [resetPayloadRequest, resetResp] = await Promise.all([
+      resetRequest,
+      resetReq,
+    ]);
+    const resetPayload = resetPayloadRequest.postDataJSON() as Record<string, unknown>;
+    expect(resetPayload).toMatchObject({
+      token: "bogusbogusbogus",
+      newPassword: "brandNewPassword42",
+    });
+    expect(resetPayload.password).toBeUndefined();
     // Bogus token → BE returns 400. The page surfaces err.message.
     expect(resetResp.status()).toBe(400);
     await expect(
