@@ -16,6 +16,8 @@ The suite creates `audit-e2e-*` users with `acceptTerms: true`, exercises real U
 
 When `BASE_URL` is `localhost` or `127.0.0.1`, the suite installs a Playwright transport bridge for browser-origin CORS only. It still sends real requests to `API_BASE` and does not mock backend data or responses.
 
+For Vercel preview deployments whose branch alias is not present in backend CORS allowlists, set `BRIDGE_BACKEND_CORS=true` to install the same transport bridge explicitly. Use this only to validate preview branch UI against the real backend; production release proof must still run without the bridge on `https://workonapp.vercel.app`.
+
 ## Covered Chains
 
 | Flow | Proof |
