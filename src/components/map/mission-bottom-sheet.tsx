@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import type { MissionResponse } from "@/lib/api-client";
+import type { MissionMapItem } from "@/lib/api-client";
 import { MissionCard } from "@/components/mission/mission-card";
 
 /**
@@ -15,7 +15,7 @@ export function MissionBottomSheet({
   mission,
   onClose,
 }: {
-  mission: MissionResponse | null;
+  mission: MissionMapItem | null;
   onClose: () => void;
 }) {
   if (!mission) return null;

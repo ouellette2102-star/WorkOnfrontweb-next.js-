@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api, type MissionResponse } from "@/lib/api-client";
+import { api, type MissionMapItem } from "@/lib/api-client";
 import {
   MapPin,
   List,
@@ -38,6 +38,19 @@ const MissionMap = dynamic(() => import("@/components/map/mission-map"), {
 
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
+function radiusToBbox(latitude: number, longitude: number, radiusKm: number) {
+  const latDelta = radiusKm / 111.32;
+  const lngScale = Math.max(0.01, Math.cos((latitude * Math.PI) / 180));
+  const lngDelta = radiusKm / (111.32 * lngScale);
+
+  return {
+    north: latitude + latDelta,
+    south: latitude - latDelta,
+    east: longitude + lngDelta,
+    west: longitude - lngDelta,
+  };
+}
+
 export default function MapPage() {
   const [view, setView] = useState<"map" | "list">("map");
   const [latitude, setLatitude] = useState(45.5017);
@@ -46,7 +59,7 @@ export default function MapPage() {
   const [category, setCategory] = useState("");
   const [gpsActive, setGpsActive] = useState(false);
   const [selectedMission, setSelectedMission] =
-    useState<MissionResponse | null>(null);
+    useState<MissionMapItem | null>(null);
 
   const detectGPS = useCallback(() => {
     if (!navigator.geolocation) return;
@@ -73,18 +86,35 @@ export default function MapPage() {
     staleTime: 60_000,
   });
 
-  const { data: missions, isLoading } = useQuery({
-    queryKey: ["nearby-missions", latitude, longitude, radiusKm, category],
+  const bbox = useMemo(
+    () => radiusToBbox(latitude, longitude, radiusKm),
+    [latitude, longitude, radiusKm],
+  );
+
+  const {
+    data: mapData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "mission-map-pins",
+      bbox.north,
+      bbox.south,
+      bbox.east,
+      bbox.west,
+      category,
+    ],
     queryFn: () =>
-      api.getNearbyMissions({
-        latitude,
-        longitude,
-        radius: radiusKm,
+      api.getMissionMapPins({
+        ...bbox,
         category: category || undefined,
       }),
     enabled: latitude !== 0,
     staleTime: 30_000,
   });
+  const missions = mapData?.missions ?? [];
 
   return (
     <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
@@ -163,7 +193,7 @@ export default function MapPage() {
       {/* Map view */}
       {view === "map" && (
         <MissionMap
-          missions={missions ?? []}
+          missions={missions}
           center={[latitude, longitude]}
           radiusKm={radiusKm}
           onPinClick={setSelectedMission}
@@ -182,7 +212,23 @@ export default function MapPage() {
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-workon-muted" />
           </div>
-        ) : !missions || missions.length === 0 ? (
+        ) : isError ? (
+          <div className="rounded-2xl border border-workon-accent/30 bg-workon-accent/5 p-4 text-center">
+            <p className="text-sm font-medium text-workon-accent">
+              Impossible de charger la carte.
+            </p>
+            <p className="mt-1 text-xs text-workon-muted">
+              {error instanceof Error ? error.message : "Reessaie dans un instant."}
+            </p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="mt-3 rounded-full bg-workon-accent px-4 py-2 text-xs font-semibold text-white"
+            >
+              Reessayer
+            </button>
+          </div>
+        ) : missions.length === 0 ? (
           <div className="text-center py-12">
             <MapPin className="h-8 w-8 mx-auto text-workon-muted mb-2" />
             <p className="text-sm text-workon-gray">Aucune opportunité dans ce rayon</p>

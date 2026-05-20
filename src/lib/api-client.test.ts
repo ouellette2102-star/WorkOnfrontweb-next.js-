@@ -39,3 +39,39 @@ describe("api.getNearbyMissions", () => {
   });
 });
 
+describe("api.getMissionMapPins", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("uses the live bbox query params for /missions-local/map", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ missions: [], count: 0 }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    await api.getMissionMapPins({
+      north: 45.55,
+      south: 45.45,
+      east: -73.5,
+      west: -73.7,
+      category: "plumbing",
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const url = new URL(String(fetchSpy.mock.calls[0][0]));
+    expect(url.pathname).toBe("/api/v1/missions-local/map");
+    expect(url.searchParams.get("north")).toBe("45.55");
+    expect(url.searchParams.get("south")).toBe("45.45");
+    expect(url.searchParams.get("east")).toBe("-73.5");
+    expect(url.searchParams.get("west")).toBe("-73.7");
+    expect(url.searchParams.get("category")).toBe("plumbing");
+    expect(url.searchParams.has("minLat")).toBe(false);
+    expect(url.searchParams.has("maxLat")).toBe(false);
+    expect(url.searchParams.has("minLng")).toBe(false);
+    expect(url.searchParams.has("maxLng")).toBe(false);
+  });
+});
+
