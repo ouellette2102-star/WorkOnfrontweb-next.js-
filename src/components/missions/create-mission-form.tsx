@@ -212,7 +212,7 @@ export function CreateMissionForm() {
           <option value="">Sélectionne une catégorie</option>
           {MISSION_CATEGORY_OPTIONS.map((cat) => (
             <option key={cat.value} value={cat.value}>
-              {cat.label}
+              {cat.icon} {cat.label}
             </option>
           ))}
         </select>

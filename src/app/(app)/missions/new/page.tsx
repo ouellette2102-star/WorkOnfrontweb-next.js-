@@ -414,15 +414,17 @@ export default function NewMissionPage() {
                 <button
                   key={option.value}
                   type="button"
+                  aria-pressed={selectedCategory === option.value}
                   onClick={() =>
                     setValue("category", option.value, { shouldValidate: true })
                   }
-                  className={`px-3 py-1.5 rounded-full text-sm transition-colors border ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors border ${
                     selectedCategory === option.value
                       ? "bg-workon-primary text-white border-workon-primary"
                       : "bg-white text-workon-ink border-workon-border hover:border-workon-primary"
                   }`}
                 >
+                  <span aria-hidden="true">{option.icon}</span>
                   {option.label}
                 </button>
               ))}
