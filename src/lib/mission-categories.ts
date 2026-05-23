@@ -12,15 +12,15 @@ export const MISSION_CATEGORY_VALUES = [
 export type MissionCategory = (typeof MISSION_CATEGORY_VALUES)[number];
 
 export const MISSION_CATEGORY_OPTIONS = [
-  { value: "cleaning", label: "Ménage / entretien" },
-  { value: "snow_removal", label: "Déneigement" },
-  { value: "moving", label: "Déménagement" },
-  { value: "handyman", label: "Petits travaux" },
-  { value: "gardening", label: "Jardinage" },
-  { value: "painting", label: "Peinture" },
-  { value: "delivery", label: "Livraison" },
-  { value: "other", label: "Autre" },
-] satisfies readonly { value: MissionCategory; label: string }[];
+  { value: "cleaning", label: "Ménage / entretien", icon: "🧹" },
+  { value: "snow_removal", label: "Déneigement", icon: "❄️" },
+  { value: "moving", label: "Déménagement", icon: "📦" },
+  { value: "handyman", label: "Petits travaux", icon: "🔧" },
+  { value: "gardening", label: "Jardinage", icon: "🌿" },
+  { value: "painting", label: "Peinture", icon: "🎨" },
+  { value: "delivery", label: "Livraison", icon: "🚚" },
+  { value: "other", label: "Autre", icon: "✨" },
+] satisfies readonly { value: MissionCategory; label: string; icon: string }[];
 
 export function isMissionCategory(value: string): value is MissionCategory {
   return (MISSION_CATEGORY_VALUES as readonly string[]).includes(value);

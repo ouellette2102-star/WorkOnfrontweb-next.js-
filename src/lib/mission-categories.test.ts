@@ -31,6 +31,7 @@ describe("mission categories", () => {
 
   it("keeps every UI option backed by an official payload value", () => {
     expect(MISSION_CATEGORY_OPTIONS.every((option) => isMissionCategory(option.value))).toBe(true);
+    expect(MISSION_CATEGORY_OPTIONS.every((option) => option.icon.length > 0)).toBe(true);
     expect(getMissionCategoryLabel("snow_removal")).toBe("Déneigement");
   });
 });
