@@ -17,6 +17,8 @@ import {
   Heart,
   CheckCheck,
   Loader2,
+  RefreshCcw,
+  TriangleAlert,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -261,7 +263,13 @@ export default function NotificationsPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { data: notifications, isLoading } = useQuery({
+  const {
+    data: notifications,
+    isError,
+    isFetching,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["notifications"],
     queryFn: () => api.getNotifications() as Promise<Notification[]>,
   });
@@ -307,6 +315,31 @@ export default function NotificationsPage() {
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-workon-muted" />
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="h-16 w-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
+            <TriangleAlert className="h-8 w-8 text-red-500" />
+          </div>
+          <p className="text-workon-ink text-sm font-medium">
+            Impossible de charger les notifications
+          </p>
+          <p className="text-workon-muted text-xs mt-1">
+            Verifiez votre connexion et reessayez.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-workon-border bg-white px-4 py-2 text-sm font-medium text-workon-ink transition hover:bg-workon-bg-cream disabled:opacity-60"
+          >
+            {isFetching ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCcw className="h-4 w-4" />
+            )}
+            Reessayer
+          </button>
         </div>
       ) : !notifications || notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">

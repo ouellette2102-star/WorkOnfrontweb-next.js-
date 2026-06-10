@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type ChatMessage } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import { useMissionChatSocket } from "@/hooks/use-mission-chat-socket";
-import { Send, Loader2, ArrowLeft } from "lucide-react";
+import { Send, Loader2, ArrowLeft, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -50,7 +50,13 @@ export default function ChatThreadPage() {
     onNewMessage: handleIncomingMessage,
   });
 
-  const { data: messagesRaw, isLoading } = useQuery({
+  const {
+    data: messagesRaw,
+    isError,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["thread", missionId],
     queryFn: () => api.getThread(missionId),
     refetchInterval: isConnected ? 15_000 : 3_000,
@@ -68,7 +74,7 @@ export default function ChatThreadPage() {
       api.markRead(missionId).then(() => {
         queryClient.invalidateQueries({ queryKey: ["unread-count"] });
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
-      });
+      }).catch(() => undefined);
     }
   }, [missionId, messages.length, queryClient]);
 
@@ -118,6 +124,29 @@ export default function ChatThreadPage() {
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-workon-muted" />
           </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
+              <TriangleAlert className="h-6 w-6 text-red-500" />
+            </div>
+            <p className="text-sm font-medium text-workon-ink">
+              Impossible de charger la conversation
+            </p>
+            <p className="mt-1 text-xs text-workon-muted">
+              Verifiez votre connexion et reessayez.
+            </p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-workon-border bg-white px-4 py-2 text-sm font-medium text-workon-ink transition hover:bg-workon-bg-cream disabled:opacity-60"
+            >
+              {isFetching ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : null}
+              Reessayer
+            </button>
+          </div>
         ) : messages.length === 0 ? (
           <p className="text-center text-sm text-workon-muted py-8">
             Commencez la conversation
@@ -153,6 +182,11 @@ export default function ChatThreadPage() {
             )}
           </button>
         </div>
+        {sendMessage.isError && (
+          <p className="mt-2 text-center text-xs text-red-600">
+            Message non envoye. Reessayez dans un instant.
+          </p>
+        )}
       </div>
     </div>
   );
