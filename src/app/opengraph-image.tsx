@@ -62,7 +62,11 @@ export default async function Image() {
           </div>
         </div>
 
-        {/* Middle: tagline */}
+        {/* Middle: tagline.
+            Satori (next/og) aborts mid-stream on any element holding both a
+            text node and a child element without explicit display:flex —
+            the request then returns 200 image/png with an empty body. Keep
+            each line a single text node. */}
         <div
           style={{
             display: "flex",
@@ -72,7 +76,8 @@ export default async function Image() {
         >
           <div
             style={{
-              color: "white",
+              display: "flex",
+              flexDirection: "column",
               fontSize: "72px",
               fontWeight: 800,
               letterSpacing: "-0.03em",
@@ -80,8 +85,8 @@ export default async function Image() {
               maxWidth: "1000px",
             }}
           >
-            Une ligne directe vers le{" "}
-            <span style={{ color: "#C96646" }}>travail instantané</span>.
+            <div style={{ color: "white" }}>Une ligne directe vers</div>
+            <div style={{ color: "#C96646" }}>le travail instantané.</div>
           </div>
           <div
             style={{
@@ -103,10 +108,13 @@ export default async function Image() {
             gap: "16px",
           }}
         >
+          {/* Text-only labels: emoji glyphs make Satori fetch twemoji
+              assets from a CDN at request time on the edge runtime —
+              one more way for the render to die silently. */}
           {[
-            { label: "⚡ 0% commission", bg: "rgba(255,77,28,0.15)", fg: "#FF8C5A", border: "rgba(255,77,28,0.4)" },
-            { label: "🔒 Escrow Stripe", bg: "rgba(34,197,94,0.15)", fg: "#4ADE80", border: "rgba(34,197,94,0.4)" },
-            { label: "📍 Québec", bg: "rgba(255,255,255,0.08)", fg: "rgba(255,255,255,0.8)", border: "rgba(255,255,255,0.2)" },
+            { label: "0% commission", bg: "rgba(255,77,28,0.15)", fg: "#FF8C5A", border: "rgba(255,77,28,0.4)" },
+            { label: "Escrow Stripe", bg: "rgba(34,197,94,0.15)", fg: "#4ADE80", border: "rgba(34,197,94,0.4)" },
+            { label: "Québec", bg: "rgba(255,255,255,0.08)", fg: "rgba(255,255,255,0.8)", border: "rgba(255,255,255,0.2)" },
           ].map((pill) => (
             <div
               key={pill.label}
