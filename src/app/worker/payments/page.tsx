@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import {
   getOnboardingStatus,
   createOnboardingLink,
-  getWorkerPayments,
   type WorkerPayment,
 } from "@/lib/stripe-api";
+import { api } from "@/lib/api-client";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { toast } from "sonner";
@@ -64,7 +64,9 @@ function WorkerPaymentsContent() {
         const token = getAccessToken();
         if (!token) return;
 
-        const data = await getWorkerPayments(token);
+        // Real payouts from the Invoice/escrow flow (source of truth), not the
+        // legacy /stripe/worker/history which reads the dead Clerk-era table.
+        const data = await api.getWorkerEarningsPayments();
         setPayments(data);
       } catch (error) {
         console.error("Erreur lors du chargement des paiements:", error);

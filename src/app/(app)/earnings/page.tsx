@@ -83,8 +83,8 @@ export default function EarningsPage() {
     data: payments,
     isLoading: paymentsLoading,
   } = useQuery({
-    queryKey: ["worker-payment-history"],
-    queryFn: () => api.getWorkerPaymentHistory(),
+    queryKey: ["worker-earnings-payments"],
+    queryFn: () => api.getWorkerEarningsPayments(),
   });
 
   const isLoading = summaryLoading;
@@ -104,7 +104,7 @@ export default function EarningsPage() {
         },
         {
           label: "Total net",
-          sublabel: "Après commission",
+          sublabel: "Tu gardes 100%",
           value: formatCADFromDollars(
             earningsSummary.totalLifetimeNet ?? earningsSummary.totalNet ?? 0,
           ),
@@ -127,11 +127,12 @@ export default function EarningsPage() {
           bg: "bg-workon-accent/10",
         },
         {
-          label: "Commission",
-          value: `${(earningsSummary.commissionRate * 100).toFixed(0)}%`,
+          label: "Ta part",
+          sublabel: "Frais payés par le client",
+          value: "100%",
           icon: <Percent className="h-5 w-5" />,
-          color: "text-workon-muted",
-          bg: "bg-gray-100",
+          color: "text-green-600",
+          bg: "bg-green-50",
         },
       ]
     : [];
