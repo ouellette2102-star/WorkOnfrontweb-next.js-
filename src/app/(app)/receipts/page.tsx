@@ -39,8 +39,8 @@ export default function ReceiptsPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["worker-payment-history"],
-    queryFn: () => api.getWorkerPaymentHistory(),
+    queryKey: ["worker-earnings-payments"],
+    queryFn: () => api.getWorkerEarningsPayments(),
   });
 
   return (

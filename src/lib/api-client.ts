@@ -215,6 +215,11 @@ export interface WorkerPayment {
   status: "PENDING" | "SUCCEEDED" | "FAILED";
   completedAt: string | null;
   createdAt: string;
+  // Present on the invoice/escrow source (GET /earnings/payments); absent on the
+  // legacy GET /stripe/worker/history.
+  invoiceNumber?: string | null;
+  stripeTransferId?: string | null;
+  escrowReleasedAt?: string | null;
 }
 
 export interface InvoiceResponse {
@@ -805,6 +810,12 @@ export const api = {
     return apiFetch<unknown>(`/earnings/history${qs ? `?${qs}` : ""}`);
   },
   getEarningsByMission: (missionId: string) => apiFetch<unknown>(`/earnings/by-mission/${missionId}`),
+
+  // Real worker payouts from the Invoice/escrow flow (source of truth).
+  // Replaces getWorkerPaymentHistory() (legacy /stripe/worker/history reads the
+  // dead Clerk-era Payment table and returns nothing for the real journey).
+  getWorkerEarningsPayments: () =>
+    apiFetch<WorkerPayment[]>("/earnings/payments"),
 
   // Payments
   createPaymentIntent: (data: { missionId: string; amount: number }) =>
