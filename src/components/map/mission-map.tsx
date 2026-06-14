@@ -20,34 +20,22 @@ import "leaflet/dist/leaflet.css";
  * every pin stays clickable instead of stacking into one.
  */
 
-function createMissionIcon(boosted = false) {
-  const color = boosted ? "#C96646" : "#134021";
+function createMissionIcon(mission: MissionMapItem) {
+  const boosted = isBoosted(mission);
+  const price =
+    typeof mission.price === "number" && Number.isFinite(mission.price)
+      ? `${Math.round(mission.price)}$`
+      : "Mission";
   return L.divIcon({
-    className: "mission-pin",
-    html: `<div style="
-      width: 32px; height: 32px;
-      background: ${color};
-      border: 3px solid white;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-      cursor: pointer;
-    "><div style="
-      width: 8px; height: 8px;
-      background: white;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-    "></div></div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
+    className: "mission-pin-shell",
+    html: `<div class="mission-pin-marker ${boosted ? "is-priority" : ""}">
+      <span>${price}</span>
+    </div>`,
+    iconSize: [58, 38],
+    iconAnchor: [29, 36],
+    popupAnchor: [0, -36],
   });
 }
-
-const missionIcon = createMissionIcon(false);
-const boostedMissionIcon = createMissionIcon(true);
 
 interface MissionMapProps {
   missions: MissionMapItem[];
@@ -170,7 +158,7 @@ export default function MissionMap({
     });
 
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
       {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
@@ -218,7 +206,7 @@ export default function MissionMap({
     layer.clearLayers();
     for (const m of displayMissions) {
       const marker = L.marker([m.displayLat, m.displayLng], {
-        icon: isBoosted(m) ? boostedMissionIcon : missionIcon,
+        icon: createMissionIcon(m),
       });
       marker.on("click", () => {
         onPinClickRef.current?.(m);
@@ -230,7 +218,7 @@ export default function MissionMap({
   return (
     <div
       ref={containerRef}
-      className="h-[50vh] w-full rounded-2xl overflow-hidden border border-workon-border"
+      className="workon-leaflet h-[58vh] min-h-[430px] w-full overflow-hidden rounded-[28px] border border-workon-border shadow-card"
     />
   );
 }

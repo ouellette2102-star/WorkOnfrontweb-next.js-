@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { MapPin, ShieldCheck, X } from "lucide-react";
 import type { MissionMapItem } from "@/lib/api-client";
 import { MissionCard } from "@/components/mission/mission-card";
 
@@ -28,31 +28,42 @@ export function MissionBottomSheet({
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40 animate-in fade-in duration-200" />
 
-      {/* Sheet */}
       <div
-        className="relative w-full max-w-lg rounded-t-3xl bg-white shadow-xl animate-in slide-in-from-bottom duration-300"
+        className="relative w-full max-w-lg rounded-t-[32px] border border-white/70 bg-workon-surface shadow-2xl animate-in slide-in-from-bottom duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-2 pb-1">
-          <div className="h-1 w-10 rounded-full bg-workon-border" />
+        <div className="flex justify-center pb-1 pt-3">
+          <div className="h-1.5 w-12 rounded-full bg-workon-stone-subtle" />
         </div>
 
-        {/* Close button */}
         <button
           onClick={onClose}
           aria-label="Fermer"
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-full hover:bg-workon-bg-cream"
+          className="absolute right-4 top-4 z-10 rounded-full border border-workon-border bg-white p-2 shadow-sm hover:bg-workon-bg-cream"
         >
-          <X className="h-4 w-4 text-workon-muted" />
+          <X className="h-4 w-4 text-workon-stone" />
         </button>
 
         <div className="px-4 pb-5 pt-2">
+          <div className="mb-3 pr-12">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-workon-primary-subtle px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-workon-primary">
+              <MapPin className="h-3.5 w-3.5" />
+              Opportunite selectionnee
+            </p>
+            <h2 className="mt-2 font-heading text-xl font-bold leading-tight text-workon-ink">
+              Verifie le potentiel avant de postuler.
+            </h2>
+            <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-workon-stone">
+              <ShieldCheck className="h-3.5 w-3.5 text-workon-trust-green" />
+              Paiement securise, contrat protege, suivi WorkOn.
+            </p>
+          </div>
+
           <MissionCard
             mission={mission}
             variant="pro"
             source="map_pin"
-            className="border-0 shadow-none hover:translate-y-0 hover:shadow-none"
+            className="border-workon-border shadow-card hover:translate-y-0 hover:shadow-card"
           />
         </div>
       </div>
