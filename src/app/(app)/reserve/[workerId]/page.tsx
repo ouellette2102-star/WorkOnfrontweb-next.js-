@@ -262,31 +262,40 @@ export default function ReservePage() {
                 text="Ces informations deviennent la base de la demande et du recapitulatif."
               />
 
-              <div className="mt-5 grid gap-4">
-                <div className="space-y-2">
-                  <Label className="text-workon-ink">Titre de la reservation *</Label>
-                  <Input
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                    placeholder="Ex: Nettoyage residentiel"
+                <div className="mt-5 grid gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="reservation-title" className="text-workon-ink">
+                      Titre de la reservation *
+                    </Label>
+                    <Input
+                      id="reservation-title"
+                      value={title}
+                      onChange={(event) => setTitle(event.target.value)}
+                      placeholder="Ex: Nettoyage residentiel"
                     className="h-11 scroll-mb-[180px] rounded-2xl bg-white"
                   />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-workon-ink">Date souhaitee *</Label>
+                    <Label htmlFor="reservation-date" className="text-workon-ink">
+                      Date souhaitee *
+                    </Label>
                     <Input
+                      id="reservation-date"
                       type="date"
-                    min={minDate}
-                    value={scheduledDate}
-                    onChange={(event) => setScheduledDate(event.target.value)}
+                      min={minDate}
+                      value={scheduledDate}
+                      onChange={(event) => setScheduledDate(event.target.value)}
                       className="h-11 scroll-mb-[180px] rounded-2xl bg-white"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-workon-ink">Heure *</Label>
+                    <Label htmlFor="reservation-time" className="text-workon-ink">
+                      Heure *
+                    </Label>
                     <Input
+                      id="reservation-time"
                       type="time"
                       value={scheduledTime}
                       onChange={(event) => setScheduledTime(event.target.value)}
@@ -297,8 +306,11 @@ export default function ReservePage() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-workon-ink">Duree (minutes) *</Label>
+                    <Label htmlFor="reservation-duration" className="text-workon-ink">
+                      Duree (minutes) *
+                    </Label>
                     <Input
+                      id="reservation-duration"
                       type="number"
                       min={15}
                       step={15}
@@ -308,8 +320,11 @@ export default function ReservePage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-workon-ink">Prix propose ($CAD) *</Label>
+                    <Label htmlFor="reservation-price" className="text-workon-ink">
+                      Prix propose ($CAD) *
+                    </Label>
                     <Input
+                      id="reservation-price"
                       type="number"
                       min={0}
                       value={price}
@@ -321,8 +336,11 @@ export default function ReservePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-workon-ink">Description (optionnel)</Label>
+                  <Label htmlFor="reservation-description" className="text-workon-ink">
+                    Description (optionnel)
+                  </Label>
                   <Textarea
+                    id="reservation-description"
                     placeholder="Adresse, contraintes, materiel, acces, photos disponibles, attentes..."
                     rows={4}
                     value={description}

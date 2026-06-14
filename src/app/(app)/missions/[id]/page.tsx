@@ -8,11 +8,12 @@ import { useAuth } from "@/contexts/auth-context";
 import {
   MapPin,
   DollarSign,
-  Calendar,
+  Clock3,
   Tag,
   Loader2,
   ArrowLeft,
   CheckCircle,
+  FileCheck,
   MessageCircle,
   Play,
   XCircle,
@@ -27,6 +28,8 @@ import {
   Zap,
   Rocket,
   ShieldCheck,
+  WalletCards,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -623,6 +626,70 @@ function TimeLogButtons({ missionId }: { missionId: string }) {
   );
 }
 
+function DetailMetric({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-workon-line bg-white/75 p-3">
+      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-workon-stone">
+        <Icon className="h-3.5 w-3.5 text-workon-copper" />
+        {label}
+      </div>
+      <p className="mt-1 truncate text-sm font-black text-workon-ink">{value}</p>
+    </div>
+  );
+}
+
+function TrustSignal({
+  icon: Icon,
+  title,
+  text,
+}: {
+  icon: LucideIcon;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="flex gap-3 rounded-2xl border border-workon-line bg-white/70 p-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-workon-primary/10">
+        <Icon className="h-5 w-5 text-workon-primary" />
+      </div>
+      <div>
+        <p className="text-sm font-black text-workon-ink">{title}</p>
+        <p className="mt-0.5 text-xs leading-relaxed text-workon-muted">{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+  text,
+}: {
+  eyebrow: string;
+  title: string;
+  text?: string;
+}) {
+  return (
+    <div>
+      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
+        {eyebrow}
+      </p>
+      <h2 className="mt-1 font-[family-name:var(--font-cabinet)] text-lg font-black text-workon-ink">
+        {title}
+      </h2>
+      {text && <p className="mt-1 text-xs leading-relaxed text-workon-muted">{text}</p>}
+    </div>
+  );
+}
+
 // ---------- Main Page ----------
 
 /**
@@ -787,13 +854,14 @@ export default function MissionDetailPage() {
     typeof window !== "undefined"
       ? `${window.location.origin}/missions/${id}`
       : `/missions/${id}`;
+  const statusLabel = statusLabels[mission.status] ?? mission.status;
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+    <div className="mx-auto max-w-5xl px-4 py-5 pb-10 space-y-5">
       {/* Back */}
       <Link
         href="/missions/mine"
-        className="flex items-center gap-1 text-sm text-workon-muted hover:text-workon-ink"
+        className="inline-flex items-center gap-2 rounded-full border border-workon-border bg-white px-3 py-2 text-sm font-bold text-workon-stone shadow-sm transition hover:border-workon-primary/30 hover:text-workon-ink"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour
@@ -862,66 +930,153 @@ export default function MissionDetailPage() {
       )}
 
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
+      <section className="workon-dark-panel overflow-hidden rounded-[30px] p-5 shadow-lg shadow-workon-primary/15">
+        <div className="relative z-10 space-y-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-black ${
+                statusColors[mission.status] ?? "border border-white/10 bg-white/10 text-white"
+              }`}
+            >
+              {statusLabel}
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-white/70">
+              Contrat WorkOn
+            </span>
+          </div>
+
+          <div>
+            <h1 className="font-[family-name:var(--font-cabinet)] text-3xl font-black tracking-tight text-white sm:text-4xl">
+              {mission.title}
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/72">
+              {mission.description}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
+                Budget
+              </p>
+              <p className="mt-1 text-xl font-black text-white">
+                {mission.price > 0 ? `${mission.price} $` : "A confirmer"}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
+                Ville
+              </p>
+              <p className="mt-1 truncate text-xl font-black text-white">
+                {mission.city}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
+                Offres
+              </p>
+              <p className="mt-1 text-xl font-black text-white">
+                {mission.offersCount ?? 0}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
+                Publiee
+              </p>
+              <p className="mt-1 truncate text-sm font-black text-white">
+                {formatDistanceToNow(new Date(mission.createdAt), {
+                  addSuffix: true,
+                  locale: fr,
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Details card */}
+      <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
+        <SectionHeading
+          eyebrow="Mission"
+          title="Details operationnels"
+          text="Les informations essentielles pour evaluer, accepter ou suivre la mission."
+        />
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <DetailMetric icon={Tag} label="Categorie" value={mission.category} />
+          <DetailMetric
+            icon={DollarSign}
+            label="Budget"
+            value={mission.price > 0 ? `${mission.price} $ CAD` : "Prix a confirmer"}
+          />
+          <DetailMetric icon={MapPin} label="Lieu" value={mission.city} />
+          <DetailMetric
+            icon={Clock3}
+            label="Mise a jour"
+            value={formatDistanceToNow(new Date(mission.updatedAt), {
+              addSuffix: true,
+              locale: fr,
+            })}
+          />
+        </div>
+        {mission.address && (
+          <div className="mt-4 rounded-2xl border border-workon-line bg-white/70 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
+              Adresse
+            </p>
+            <p className="mt-1 text-sm font-semibold text-workon-ink">
+              {mission.address}
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* Timeline */}
+      <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
+        <SectionHeading
+          eyebrow="Progression"
+          title="Statut de la mission"
+          text="Suivi clair du cycle publication, assignation, execution, paiement."
+        />
+        <div className="mt-5">
+          <MissionTimeline
+            status={mission.status}
+            createdAt={mission.createdAt}
+            updatedAt={mission.updatedAt}
+            assignedToUserId={mission.assignedToUserId}
+          />
+        </div>
+      </section>
+
+      {/* Photos */}
+      <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
+        <SectionHeading
+          eyebrow="Preuves"
+          title="Photos et contexte"
+          text="Les visuels reduisent les malentendus avant, pendant et apres la mission."
+        />
+        <div className="mt-5">
+          <MissionPhotos missionId={id} canEdit={isOwner || isAssigned} />
+        </div>
+      </section>
+
+      {/* Actions */}
+      <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <SectionHeading
+            eyebrow="Action"
+            title="Prochaine decision"
+            text="Les gestes critiques restent visibles avec le contexte de confiance."
+          />
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            className={`rounded-full px-3 py-1 text-xs font-black ${
               statusColors[mission.status] ?? "bg-gray-50 text-gray-700"
             }`}
           >
-            {statusLabels[mission.status] ?? mission.status}
+            {statusLabel}
           </span>
         </div>
-        <h1 className="text-2xl font-bold text-workon-ink font-[family-name:var(--font-cabinet)]">
-          {mission.title}
-        </h1>
-      </div>
-
-      {/* Details card */}
-      <div className="p-4 rounded-2xl bg-white border border-workon-border space-y-3">
-        <p className="text-sm text-workon-gray">{mission.description}</p>
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="flex items-center gap-2 text-sm">
-            <Tag className="h-4 w-4 text-workon-primary" />
-            <span className="text-workon-ink">{mission.category}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <DollarSign className="h-4 w-4 text-workon-primary" />
-            <span className="text-workon-ink font-semibold">
-              {mission.price} $
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="h-4 w-4 text-workon-primary" />
-            <span className="text-workon-ink">{mission.city}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="h-4 w-4 text-workon-primary" />
-            <span className="text-workon-muted">
-              {formatDistanceToNow(new Date(mission.createdAt), {
-                addSuffix: true,
-                locale: fr,
-              })}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Timeline */}
-      <MissionTimeline
-        status={mission.status}
-        createdAt={mission.createdAt}
-        updatedAt={mission.updatedAt}
-        assignedToUserId={mission.assignedToUserId}
-      />
-
-      {/* Photos */}
-      <div className="p-4 rounded-2xl bg-white border border-workon-border">
-        <MissionPhotos missionId={id} canEdit={isOwner || isAssigned} />
-      </div>
-
-      {/* Actions */}
-      <div className="space-y-3">
+        <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="space-y-3">
         {/* Worker: make offer on open mission.
             Two pre-flight gates mirror what the backend will enforce:
               1. IdentityVerificationGuard — blocks POST /offers if
@@ -1202,7 +1357,27 @@ export default function MissionDetailPage() {
               Annuler la mission
             </button>
           )}
-      </div>
+          </div>
+
+          <div className="space-y-3">
+            <TrustSignal
+              icon={ShieldCheck}
+              title="Contrat protege"
+              text="Statut, preuves et conditions restent rattaches a la mission."
+            />
+            <TrustSignal
+              icon={WalletCards}
+              title="Paiement securise"
+              text="Paiement, revenus et commission restent lisibles dans le dossier."
+            />
+            <TrustSignal
+              icon={FileCheck}
+              title="Historique utile"
+              text="Messages, offres, photos et litiges restent retrouvables."
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Employer: received offers */}
       {isOwner && (
