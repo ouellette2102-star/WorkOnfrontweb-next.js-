@@ -74,7 +74,7 @@ export function BottomNav() {
   const fabActive = isActive(fab.href);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
       <div className="mx-auto max-w-lg px-3 pb-3">
         <div className="relative flex h-[70px] items-end justify-around rounded-[24px] border border-workon-border/90 bg-workon-surface/92 px-3 pb-3 pt-1 shadow-[0_18px_45px_rgba(27,26,24,0.16)] backdrop-blur-xl">
           {BOTTOM_NAV_LEFT.map(renderTab)}
