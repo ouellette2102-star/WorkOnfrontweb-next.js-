@@ -163,14 +163,14 @@ function WorkerPaymentsContent() {
         {/* Banner Onboarding */}
         {!isOnboarded && (
           <div className="mb-8 rounded-3xl border border-workon-primary/30 bg-gradient-to-br from-workon-primary/15 via-workon-primary/5 to-transparent p-8 shadow-sm ">
-            <div className="mb-4 text-6xl">🚀</div>
+            <div className="mb-4 text-6xl">💳</div>
             <h2 className="mb-3 text-2xl font-bold text-workon-ink">
-              Complétez votre onboarding Stripe
+              Configure tes paiements
             </h2>
             <p className="mb-6 text-workon-muted">
-              Pour recevoir des paiements, vous devez d&apos;abord configurer
-              votre compte Stripe Connect. Ce processus ne prend que quelques
-              minutes.
+              Pour recevoir ton argent directement sur ton compte bancaire,
+              configure ton compte de paiement. Ça prend quelques minutes — à
+              faire une seule fois.
             </p>
             <Button
               onClick={handleStartOnboarding}
@@ -178,9 +178,7 @@ function WorkerPaymentsContent() {
               variant="hero"
               size="hero"
             >
-              {isCreatingLink
-                ? "Chargement..."
-                : "Commencer l'onboarding Stripe"}
+              {isCreatingLink ? "Chargement..." : "Configurer mes paiements"}
             </Button>
           </div>
         )}
