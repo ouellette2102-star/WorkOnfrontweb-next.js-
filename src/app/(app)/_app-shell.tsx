@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ConsentProvider>
       <ReviewPromptProvider>
         <ModeProvider>
-          <div className="min-h-dvh pb-20 bg-workon-bg">
+          <div className="min-h-dvh bg-workon-bg pb-20 lg:pb-0">
             <TopBar />
             <main>
               <PageTransition>{children}</PageTransition>
