@@ -1,4 +1,4 @@
-import { CheckCircle2, ShieldCheck, Crown } from "lucide-react";
+import { AlertCircle, CheckCircle2, ShieldCheck, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -6,7 +6,10 @@ import { cn } from "@/lib/utils";
  * backend `LocalUser.trustTier` enum. Designed to sit as an overlay on
  * a worker card photo (top-right corner).
  *
- * BASIC    → no badge rendered (nothing to show off)
+ * BASIC    → hidden by default. Pass `showBasic` to render a muted
+ *            "À vérifier" pill — used on the user's OWN profile so they
+ *            see they haven't completed phone OTP yet. Never surface
+ *            BASIC publicly (stigmatizes unverified users).
  * VERIFIED → ✓ Vérifié       (terracotta)
  * TRUSTED  → 🛡 De confiance (green)
  * PREMIUM  → 👑 Top Performer (gold)
@@ -15,9 +18,14 @@ import { cn } from "@/lib/utils";
 export type TrustTier = "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
 
 const TIER_CONFIG: Record<
-  Exclude<TrustTier, "BASIC">,
+  TrustTier,
   { icon: typeof CheckCircle2; label: string; className: string }
 > = {
+  BASIC: {
+    icon: AlertCircle,
+    label: "À vérifier",
+    className: "bg-workon-bg text-workon-muted border border-workon-border",
+  },
   VERIFIED: {
     icon: CheckCircle2,
     label: "Vérifié",
@@ -38,13 +46,16 @@ const TIER_CONFIG: Record<
 export function TrustTierBadge({
   tier,
   compact = false,
+  showBasic = false,
   className,
 }: {
   tier?: TrustTier;
   compact?: boolean;
+  showBasic?: boolean;
   className?: string;
 }) {
-  if (!tier || tier === "BASIC") return null;
+  if (!tier) return null;
+  if (tier === "BASIC" && !showBasic) return null;
   const config = TIER_CONFIG[tier];
   const Icon = config.icon;
 
