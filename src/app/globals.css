@@ -206,6 +206,61 @@ body {
 .shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 8px 22px rgba(27,26,24,0.05); }
 .shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
 
+/* Premium Leaflet layer used by /map. Leaflet markers are injected
+ * outside React, so the pin styling lives globally. */
+.workon-leaflet .leaflet-tile {
+  filter: saturate(0.78) contrast(0.98) sepia(0.08);
+}
+
+.workon-leaflet .leaflet-control-attribution {
+  border-top-left-radius: 10px;
+  background: rgba(255, 253, 248, 0.82);
+  color: var(--workon-stone);
+  font-size: 9px;
+}
+
+.mission-pin-shell {
+  background: transparent;
+  border: 0;
+}
+
+.mission-pin-marker {
+  position: relative;
+  display: inline-flex;
+  min-width: 52px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.96);
+  border-radius: 999px 999px 999px 10px;
+  background: var(--workon-primary);
+  box-shadow: 0 12px 24px rgba(9, 37, 26, 0.26);
+  color: white;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0;
+  transform: rotate(-3deg);
+}
+
+.mission-pin-marker::after {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(255, 255, 255, 0.96);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.96);
+  background: inherit;
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.mission-pin-marker.is-priority {
+  background: var(--workon-copper);
+  box-shadow: 0 12px 24px rgba(185, 107, 67, 0.30);
+}
+
 /* Heading font — Bricolage Grotesque (loaded via next/font in layout.tsx)
  * with Manrope and the system stack as fallbacks. Bricolage is a free
  * open-source display grotesque that fills the role the unloadable

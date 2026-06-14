@@ -1,40 +1,42 @@
 "use client";
 
-declare global { interface Window { __lastDrag?: number } }
+declare global {
+  interface Window {
+    __lastDrag?: number;
+  }
+}
 
-import { useState, useCallback } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import { api, type SwipeCandidate } from "@/lib/api-client";
-import { useAuth } from "@/contexts/auth-context";
+import Link from "next/link";
+import { useCallback, useMemo, useState, type ComponentType } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
+import {
+  ArrowUp,
+  Briefcase,
+  CheckCircle,
+  ChevronRight,
+  Clock3,
+  Heart,
+  Loader2,
+  MapPin,
+  MessageCircle,
+  Quote,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Users,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { MatchCelebrationModal } from "@/components/match-celebration-modal";
-import Link from "next/link";
-import {
-  MapPin,
-  Star,
-  Loader2,
-  Heart,
-  X,
-  MessageCircle,
-  Users,
-  ArrowUp,
-  CheckCircle,
-  ShieldCheck,
-  Quote,
-} from "lucide-react";
 import { TrustPill } from "@/components/ui/trust-pill";
+import { api, type SwipeCandidate } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/utils";
 
-const SWIPE_THRESHOLD = 100; // px offset to trigger
-const VELOCITY_THRESHOLD = 500; // px/s velocity to trigger
+const SWIPE_THRESHOLD = 100;
+const VELOCITY_THRESHOLD = 500;
 
-/**
- * /swipe — Discover pros (employers) or missions (workers)
- *
- * Role-aware: employers swipe through workers, workers swipe through employers.
- * Drag left = PASS, drag right = LIKE, drag up = SUPERLIKE.
- */
 export default function SwipePage() {
   const { user } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,12 +50,11 @@ export default function SwipePage() {
   } | null>(null);
 
   const targetRole = user?.role === "employer" ? "worker" : "employer";
-  const pageTitle =
-    user?.role === "employer" ? "Trouver un pro" : "Trouver un client";
-  const pageSubtitle =
-    user?.role === "employer"
-      ? "Swipez pour decouvrir les meilleurs travailleurs"
-      : "Swipez pour decouvrir des opportunites";
+  const isHiring = targetRole === "worker";
+  const pageTitle = isHiring ? "Trouver un pro" : "Trouver un client";
+  const pageSubtitle = isHiring
+    ? "Des profils qualifies avec preuves de confiance."
+    : "Des opportunites pertinentes pour remplir ton horaire.";
 
   const {
     data: candidates,
@@ -69,33 +70,22 @@ export default function SwipePage() {
     queryFn: () => api.getMatches(),
   });
 
-  // Badge count = UNREAD swipe_match notifications, not the total number
-  // of active matches. This is the fix for bug #9: the previous version
-  // displayed matches.length, which never decreased even after the user
-  // opened /matches. Now the badge reflects "new matches you haven't
-  // seen yet" and drops to zero when /matches mounts and calls
-  // markAllNotificationsRead("swipe_match"). Poll every 20s to pick up
-  // new matches created in another tab or by the other user.
   const { data: matchBadge } = useQuery({
     queryKey: ["swipe-matches-unread-count"],
     queryFn: () => api.getNotificationUnreadCount("swipe_match"),
     refetchInterval: 20_000,
   });
+
   const matchCount = matchBadge?.count ?? 0;
-  // Keep the old "do we have any match at all" gate for the CTA card
-  // at the bottom of /swipe — an employer who already has a match but
-  // dismissed the notification should still see the link.
   const hasAnyMatch = (matches?.length ?? 0) > 0;
 
   const swipeMutation = useMutation({
     mutationFn: (data: {
       candidateId: string;
       action: "LIKE" | "PASS" | "SUPERLIKE";
-      // Carry the candidate through the mutation so onSuccess can surface
-      // the right card in the celebration modal (the mutation fn ignores
-      // it — backend only sees candidateId + action).
       _candidate: SwipeCandidate;
-    }) => api.recordSwipe({ candidateId: data.candidateId, action: data.action }),
+    }) =>
+      api.recordSwipe({ candidateId: data.candidateId, action: data.action }),
     onSuccess: (result, variables) => {
       if (result.matched && result.matchId) {
         setMatchCelebration({
@@ -110,7 +100,25 @@ export default function SwipePage() {
   });
 
   const current = candidates?.[currentIndex];
-  const remaining = (candidates?.length ?? 0) - currentIndex - 1;
+  const nextCandidate = candidates?.[currentIndex + 1];
+  const remaining = Math.max((candidates?.length ?? 0) - currentIndex - 1, 0);
+  const progress =
+    candidates && candidates.length > 0
+      ? Math.min(100, ((currentIndex + 1) / candidates.length) * 100)
+      : 0;
+
+  const stackStats = useMemo(
+    () => ({
+      total: candidates?.length ?? 0,
+      premium:
+        candidates?.filter((candidate) =>
+          ["PREMIUM", "TRUSTED"].includes(candidate.trustTier),
+        ).length ?? 0,
+      local:
+        candidates?.filter((candidate) => Boolean(candidate.city)).length ?? 0,
+    }),
+    [candidates],
+  );
 
   const advance = useCallback(() => {
     setCurrentIndex((i) => i + 1);
@@ -122,7 +130,7 @@ export default function SwipePage() {
     (action: "PASS" | "LIKE" | "SUPERLIKE") => {
       if (!current || swipeMutation.isPending) return;
       setExitDirection(
-        action === "PASS" ? "left" : action === "LIKE" ? "right" : "up"
+        action === "PASS" ? "left" : action === "LIKE" ? "right" : "up",
       );
       swipeMutation.mutate({
         candidateId: current.id,
@@ -131,59 +139,44 @@ export default function SwipePage() {
       });
       setTimeout(advance, 300);
     },
-    [current, swipeMutation, advance]
+    [advance, current, swipeMutation],
   );
 
   const handleDragEnd = useCallback(
     (_: unknown, info: PanInfo) => {
       const { offset, velocity } = info;
 
-      // Up swipe = SUPERLIKE (check first so it takes priority)
-      if (
-        offset.y < -SWIPE_THRESHOLD ||
-        velocity.y < -VELOCITY_THRESHOLD
-      ) {
+      if (offset.y < -SWIPE_THRESHOLD || velocity.y < -VELOCITY_THRESHOLD) {
         handleSwipe("SUPERLIKE");
         return;
       }
 
-      // Right swipe = LIKE
-      if (
-        offset.x > SWIPE_THRESHOLD ||
-        velocity.x > VELOCITY_THRESHOLD
-      ) {
+      if (offset.x > SWIPE_THRESHOLD || velocity.x > VELOCITY_THRESHOLD) {
         handleSwipe("LIKE");
         return;
       }
 
-      // Left swipe = PASS
-      if (
-        offset.x < -SWIPE_THRESHOLD ||
-        velocity.x < -VELOCITY_THRESHOLD
-      ) {
+      if (offset.x < -SWIPE_THRESHOLD || velocity.x < -VELOCITY_THRESHOLD) {
         handleSwipe("PASS");
         return;
       }
 
-      // Not enough — snap back
       setDragOffset({ x: 0, y: 0 });
     },
-    [handleSwipe]
+    [handleSwipe],
   );
 
-  // Compute overlay opacity from drag offset
   const likeOpacity = Math.min(Math.max(dragOffset.x / SWIPE_THRESHOLD, 0), 1);
   const passOpacity = Math.min(
     Math.max(-dragOffset.x / SWIPE_THRESHOLD, 0),
-    1
+    1,
   );
   const superlikeOpacity = Math.min(
     Math.max(-dragOffset.y / SWIPE_THRESHOLD, 0),
-    1
+    1,
   );
-  const rotation = dragOffset.x * 0.05; // slight tilt
+  const rotation = dragOffset.x * 0.045;
 
-  // --- Loading ---
   if (isLoading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
@@ -192,13 +185,15 @@ export default function SwipePage() {
     );
   }
 
-  // --- Error ---
   if (error) {
     return (
-      <div className="p-6">
-        <div className="mx-auto max-w-md rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-          <p className="text-red-600">
-            Erreur de chargement. Réessaie plus tard.
+      <div className="px-4 py-6 pb-28">
+        <div className="mx-auto max-w-md rounded-[28px] border border-workon-accent/25 bg-workon-accent-subtle p-8 text-center">
+          <p className="font-semibold text-workon-accent">
+            Erreur de chargement.
+          </p>
+          <p className="mt-1 text-sm text-workon-stone">
+            Reessaie plus tard ou verifie ta connexion.
           </p>
         </div>
       </div>
@@ -206,332 +201,174 @@ export default function SwipePage() {
   }
 
   return (
-    <div className="min-h-screen bg-workon-bg px-4 pb-24 pt-6">
-      <div className="mx-auto max-w-md">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-workon-ink">{pageTitle}</h1>
-            <p className="text-sm text-workon-muted">{pageSubtitle}</p>
+    <div className="mx-auto max-w-xl space-y-5 px-4 py-5 pb-28">
+      <header className="workon-dark-panel overflow-hidden rounded-[28px] p-5 shadow-lg shadow-workon-primary/15">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">
+              <Sparkles className="h-3.5 w-3.5 text-workon-gold" />
+              Matching WorkOn
+            </p>
+            <h1 className="mt-2 font-heading text-2xl font-bold leading-tight text-white">
+              {pageTitle}
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              {pageSubtitle}
+            </p>
           </div>
 
-          {/* Matches badge */}
           <Link
             href="/matches"
-            className="relative flex items-center gap-1.5 rounded-2xl border border-workon-border bg-white px-4 py-2 text-sm font-medium text-workon-primary shadow-sm transition hover:bg-workon-primary/5 active:scale-95"
+            className="relative inline-flex h-11 shrink-0 items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-3 text-sm font-bold text-white transition hover:bg-white/15"
           >
             <Users className="h-4 w-4" />
-            <span>Matchs</span>
+            Matchs
             {matchCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-workon-accent text-[10px] font-bold text-white">
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-workon-copper px-1 text-[10px] font-black text-white">
                 {matchCount}
               </span>
             )}
           </Link>
         </div>
 
-        {/* Empty state */}
-        {!current ? (
-          <div className="rounded-3xl border border-workon-border bg-white p-12 text-center shadow-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-workon-primary/10">
-              <Heart className="h-8 w-8 text-workon-primary" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold text-workon-ink">
-              Tous les profils parcourus !
-            </h3>
-            <p className="text-sm text-workon-muted">
-              Reviens plus tard pour decouvrir de nouveaux profils.
-            </p>
-            {hasAnyMatch && (
-              <Link
-                href="/matches"
-                className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-2.5 text-sm font-medium text-white transition hover:bg-workon-primary/90"
-              >
-                <Users className="h-4 w-4" />
-                {matchCount > 0
-                  ? `Voir mes ${matchCount} nouveau${matchCount > 1 ? "x" : ""} match${matchCount > 1 ? "s" : ""}`
-                  : "Voir mes matchs"}
-              </Link>
-            )}
-          </div>
-        ) : (
-          <>
-            {/* Progress */}
-            <div className="mb-3 flex items-center justify-between text-xs text-workon-muted">
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <HeroMetric
+            label="Pile"
+            value={String(stackStats.total)}
+            icon={Briefcase}
+          />
+          <HeroMetric
+            label="Confiance"
+            value={String(stackStats.premium)}
+            icon={ShieldCheck}
+          />
+          <HeroMetric label="Local" value={String(stackStats.local)} icon={MapPin} />
+        </div>
+      </header>
+
+      {!current ? (
+        <EmptySwipeState hasAnyMatch={hasAnyMatch} matchCount={matchCount} />
+      ) : (
+        <>
+          <section className="workon-premium-card rounded-[24px] p-4">
+            <div className="flex items-center justify-between gap-4 text-xs font-bold text-workon-stone">
               <span>
-                {currentIndex + 1} / {candidates?.length ?? 0}
+                Profil {currentIndex + 1} / {candidates?.length ?? 0}
               </span>
               <span>
                 {remaining} restant{remaining > 1 ? "s" : ""}
               </span>
             </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-workon-bg-cream">
+              <div
+                className="h-full rounded-full bg-workon-primary transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </section>
 
-            {/* Card */}
-            <div className="relative min-h-[520px]">
-              <AnimatePresence initial={false}>
-                <motion.div
-                  key={current.id}
-                  drag
-                  dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-                  dragElastic={0.9}
-                  onDrag={(_, info) => {
-                    // Only update state every ~32ms to avoid excessive re-renders
-                    const now = Date.now();
-                    if (!window.__lastDrag || now - window.__lastDrag > 32) {
-                      window.__lastDrag = now;
-                      setDragOffset({ x: info.offset.x, y: info.offset.y });
-                    }
-                  }}
-                  onDragEnd={handleDragEnd}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    x: 0,
-                    y: 0,
-                    rotateZ: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.85,
-                    x:
-                      exitDirection === "left"
-                        ? -400
-                        : exitDirection === "right"
-                          ? 400
-                          : 0,
-                    y: exitDirection === "up" ? -400 : 0,
-                    rotateZ:
-                      exitDirection === "left"
-                        ? -25
-                        : exitDirection === "right"
-                          ? 25
-                          : 0,
-                  }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  style={{ rotate: rotation, touchAction: "none" }}
-                  className="relative w-full cursor-grab overflow-hidden rounded-3xl border border-workon-border bg-white shadow-md active:cursor-grabbing"
-                >
-                  {/* Drag overlays */}
-                  {/* LIKE overlay (right) — green */}
-                  <div
-                    className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-green-500/20"
-                    style={{ opacity: likeOpacity }}
-                  >
-                    <div
-                      className="rounded-2xl border-4 border-green-500 px-6 py-3"
-                      style={{ opacity: likeOpacity }}
-                    >
-                      <span className="text-3xl font-black uppercase text-green-500">
-                        J&apos;aime
+          <ActionDock
+            disabled={swipeMutation.isPending}
+            onPass={() => handleSwipe("PASS")}
+            onLike={() => handleSwipe("LIKE")}
+            onSuperLike={() => handleSwipe("SUPERLIKE")}
+          />
+
+          <section className="relative min-h-[690px]">
+            {nextCandidate && <StackPreview candidate={nextCandidate} />}
+
+            <AnimatePresence initial={false}>
+              <motion.article
+                key={current.id}
+                drag
+                dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+                dragElastic={0.88}
+                onDrag={(_, info) => {
+                  const now = Date.now();
+                  if (!window.__lastDrag || now - window.__lastDrag > 32) {
+                    window.__lastDrag = now;
+                    setDragOffset({ x: info.offset.x, y: info.offset.y });
+                  }
+                }}
+                onDragEnd={handleDragEnd}
+                initial={{ opacity: 0, scale: 0.94, y: 12 }}
+                animate={{ opacity: 1, scale: 1, x: 0, y: 0, rotateZ: 0 }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.86,
+                  x:
+                    exitDirection === "left"
+                      ? -420
+                      : exitDirection === "right"
+                        ? 420
+                        : 0,
+                  y: exitDirection === "up" ? -420 : 0,
+                  rotateZ:
+                    exitDirection === "left"
+                      ? -20
+                      : exitDirection === "right"
+                        ? 20
+                        : 0,
+                }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                style={{ rotate: rotation, touchAction: "none" }}
+                className="relative z-10 w-full cursor-grab overflow-hidden rounded-[32px] border border-workon-line bg-white shadow-xl shadow-workon-ink/10 active:cursor-grabbing"
+              >
+                <SwipeOverlay
+                  tone="like"
+                  opacity={likeOpacity}
+                  label="Matcher"
+                />
+                <SwipeOverlay tone="pass" opacity={passOpacity} label="Passer" />
+                <SwipeOverlay
+                  tone="super"
+                  opacity={superlikeOpacity}
+                  label="Prioritaire"
+                />
+
+                <CandidateHero candidate={current} isHiring={isHiring} />
+
+                <div className="space-y-4 p-4">
+                  <CandidateSummary candidate={current} />
+                  <CandidateStats candidate={current} />
+                  <WhyMatch candidate={current} isHiring={isHiring} />
+                  <ReviewSignal candidate={current} />
+
+                  {current.bio && (
+                    <p className="line-clamp-3 rounded-2xl border border-workon-border bg-workon-bg px-4 py-3 text-sm leading-relaxed text-workon-stone">
+                      {current.bio}
+                    </p>
+                  )}
+
+                  <div className="flex items-start gap-2 border-t border-workon-border pt-3 text-[11px] font-medium leading-relaxed text-workon-stone">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-workon-trust-green" />
+                    Paiement securise, contrat protege et messagerie deverrouillee
+                    apres match.
+                  </div>
+
+                  <div className="flex justify-center">
+                    <div className="grid grid-cols-3 rounded-full bg-workon-bg px-3 py-2 text-[10px] font-bold text-workon-stone">
+                      <span className="flex items-center gap-1 px-2">
+                        <X className="h-3 w-3" />
+                        Gauche
+                      </span>
+                      <span className="flex items-center gap-1 px-2">
+                        <ArrowUp className="h-3 w-3" />
+                        Priorite
+                      </span>
+                      <span className="flex items-center gap-1 px-2">
+                        <Heart className="h-3 w-3" />
+                        Droite
                       </span>
                     </div>
                   </div>
+                </div>
+              </motion.article>
+            </AnimatePresence>
+          </section>
 
-                  {/* PASS overlay (left) — red */}
-                  <div
-                    className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-red-500/20"
-                    style={{ opacity: passOpacity }}
-                  >
-                    <div
-                      className="rounded-2xl border-4 border-red-500 px-6 py-3"
-                      style={{ opacity: passOpacity }}
-                    >
-                      <span className="text-3xl font-black uppercase text-red-500">
-                        Passer
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* SUPERLIKE overlay (up) — blue */}
-                  <div
-                    className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-blue-500/20"
-                    style={{ opacity: superlikeOpacity }}
-                  >
-                    <div
-                      className="rounded-2xl border-4 border-blue-500 px-6 py-3"
-                      style={{ opacity: superlikeOpacity }}
-                    >
-                      <span className="text-3xl font-black uppercase text-blue-500">
-                        Super
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 1. Hero photo pleine largeur */}
-                  <Link href={`/worker/${current.id}`} className="block relative h-56 bg-gradient-to-br from-workon-primary/20 to-workon-primary/40 overflow-hidden">
-                    {current.pictureUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={current.pictureUrl} alt={current.firstName} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center">
-                        <span className="text-6xl font-bold text-workon-primary/60 select-none">
-                          {(current.firstName?.[0] ?? "").toUpperCase()}{(current.lastName?.[0] ?? "").toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                    <div className="absolute top-3 left-3">
-                      <TrustPill variant={
-                        current.trustTier === "PREMIUM" ? "premium"
-                        : current.trustTier === "TRUSTED" ? "trusted"
-                        : current.trustTier === "VERIFIED" ? "verified"
-                        : current.reviewCount === 0 ? "nouveau"
-                        : "fiable"
-                      } />
-                    </div>
-                  </Link>
-
-                  <div className="p-4 space-y-3">
-                    {/* 2. Nom + métier + ville */}
-                    <div>
-                      <h3 className="font-bold text-lg text-workon-ink leading-tight">
-                        {current.firstName} {current.lastName}
-                      </h3>
-                      <p className="text-sm text-workon-muted mt-0.5 flex items-center gap-1 flex-wrap">
-                        {current.jobTitle || current.category || "Professionnel"}
-                        {current.city && (
-                          <>
-                            <span className="text-workon-border">·</span>
-                            <span className="inline-flex items-center gap-0.5">
-                              <MapPin className="h-3 w-3" />{current.city}
-                            </span>
-                          </>
-                        )}
-                      </p>
-                    </div>
-
-                    {/* 3. Étoiles + avis */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="flex items-center gap-0.5">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <Star key={i} className={cn("h-4 w-4", i < Math.round(current.avgRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-200 fill-gray-200")} />
-                        ))}
-                      </div>
-                      {current.reviewCount > 0 && <span className="text-sm font-semibold text-workon-ink">{current.avgRating.toFixed(1)}</span>}
-                      <span className="text-xs text-workon-muted">{current.reviewCount > 0 ? `(${current.reviewCount} avis)` : "Nouveau"}</span>
-                    </div>
-
-                    {/* 4. Badges + tarif */}
-                    {(current.hourlyRate ?? 0) > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {current.category && (
-                          <span className="inline-flex items-center rounded-full border border-workon-border bg-workon-bg px-2.5 py-1 text-[11px] font-medium text-workon-ink">
-                            {current.category}
-                          </span>
-                        )}
-                        <span className="inline-flex items-center rounded-full bg-workon-primary/10 px-2.5 py-1 text-[11px] font-semibold text-workon-primary">
-                          À partir de {current.hourlyRate} $/h
-                        </span>
-                      </div>
-                    )}
-
-                    {/* 5. Pourquoi choisir */}
-                    <div className="rounded-xl bg-workon-bg border border-workon-border p-3 space-y-1.5">
-                      <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2">
-                        Pourquoi choisir {current.firstName} ?
-                      </p>
-                      {["Identité vérifiée", "Assurances & conformité", "Contrat sécurisé WorkOn"].map((item) => (
-                        <div key={item} className="flex items-center gap-2 text-xs text-workon-ink">
-                          <CheckCircle className="h-3.5 w-3.5 text-workon-primary shrink-0" />
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* 6. Section avis */}
-                    {current.reviewCount > 0 ? (
-                      <div>
-                        <p className="text-[11px] font-semibold text-workon-muted uppercase tracking-wide mb-2">Avis clients</p>
-                        <div className="rounded-xl border border-workon-border bg-workon-bg p-3">
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <div className="flex">
-                              {Array.from({ length: 5 }, (_, i) => (
-                                <Star key={i} className={cn("h-3.5 w-3.5", i < Math.round(current.avgRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-200 fill-gray-200")} />
-                              ))}
-                            </div>
-                            <span className="text-xs font-semibold text-workon-ink">{current.avgRating.toFixed(1)}</span>
-                            <span className="text-xs text-workon-muted">({current.reviewCount} avis)</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <Quote className="h-3.5 w-3.5 text-workon-primary/40 shrink-0 mt-0.5" />
-                            <p className="text-xs text-workon-muted italic leading-relaxed">
-                              {current.reviewCount === 1 ? "1 client a laissé un avis positif." : `${current.reviewCount} clients ont laissé des avis positifs.`}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="rounded-xl border border-dashed border-workon-border bg-workon-bg/50 p-3 text-center">
-                        <p className="text-xs text-workon-muted">Aucun avis pour le moment</p>
-                        <p className="text-[10px] text-workon-muted/60 mt-0.5">Soyez le premier à travailler avec {current.firstName}</p>
-                      </div>
-                    )}
-
-                    {/* 7. Bio */}
-                    {current.bio && (
-                      <p className="text-sm leading-relaxed text-workon-muted line-clamp-2 border-t border-workon-border/50 pt-2">
-                        {current.bio}
-                      </p>
-                    )}
-
-                    {/* 8. Footer légal */}
-                    <div className="flex items-center gap-1.5 pt-1 text-[10px] text-workon-muted border-t border-workon-border">
-                      <ShieldCheck className="h-3 w-3 shrink-0" />
-                      Paiement sécurisé par Stripe · WorkOn n&apos;est pas partie au contrat de service
-                    </div>
-
-                    {/* 9. Drag hint */}
-                    <div className="flex justify-center">
-                      <div className="flex items-center gap-3 rounded-full bg-black/5 px-4 py-1.5 text-[10px] text-workon-muted">
-                        <span className="flex items-center gap-1"><X className="h-3 w-3" /> Gauche</span>
-                        <span className="flex items-center gap-1"><ArrowUp className="h-3 w-3" /> Super</span>
-                        <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> Droite</span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Action buttons */}
-            <div className="mt-5 flex items-center justify-center gap-4">
-              <button
-                onClick={() => handleSwipe("PASS")}
-                disabled={swipeMutation.isPending}
-                className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-workon-border bg-white text-workon-muted shadow-sm transition hover:border-red-300 hover:text-red-500 active:scale-95"
-                aria-label="Passer"
-              >
-                <X className="h-6 w-6" />
-              </button>
-
-              <button
-                onClick={() => handleSwipe("LIKE")}
-                disabled={swipeMutation.isPending}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-workon-primary text-white shadow-lg transition hover:bg-workon-primary/90 active:scale-95"
-                aria-label="J'aime"
-              >
-                <Heart className="h-7 w-7" />
-              </button>
-
-              <button
-                onClick={() => handleSwipe("SUPERLIKE")}
-                disabled={swipeMutation.isPending}
-                className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-workon-accent bg-white text-workon-accent shadow-sm transition hover:bg-workon-accent/10 active:scale-95"
-                aria-label="Super like — Contacter"
-              >
-                <MessageCircle className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="mt-3 flex justify-center gap-8 text-[10px] text-workon-muted">
-              <span>Passer</span>
-              <span>J&apos;aime</span>
-              <span>Contacter</span>
-            </div>
-          </>
-        )}
-      </div>
+        </>
+      )}
 
       {matchCelebration && (
         <MatchCelebrationModal
@@ -543,4 +380,484 @@ export default function SwipePage() {
       )}
     </div>
   );
+}
+
+function CandidateHero({
+  candidate,
+  isHiring,
+}: {
+  candidate: SwipeCandidate;
+  isHiring: boolean;
+}) {
+  return (
+    <div className="relative min-h-[190px] overflow-hidden bg-workon-surface-dark sm:min-h-[220px]">
+      {candidate.pictureUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={candidate.pictureUrl}
+          alt={`${candidate.firstName} ${candidate.lastName}`}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-workon-primary to-workon-forest-deep">
+          <span className="font-heading text-7xl font-bold text-white/35">
+            {getInitials(candidate)}
+          </span>
+        </div>
+      )}
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/[0.78] via-black/[0.24] to-black/[0.18]" />
+
+      <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-3">
+        <TrustPill
+          variant={getTrustVariant(candidate)}
+          label={getTrustLabel(candidate)}
+          className="border-white/20 bg-white/[0.92] text-workon-ink"
+        />
+        <span className="rounded-full border border-white/15 bg-white/[0.12] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white backdrop-blur">
+          {isHiring ? "Profil pro" : "Client potentiel"}
+        </span>
+      </div>
+
+      <div className="absolute inset-x-4 bottom-4">
+        <Link
+          href={`/worker/${candidate.id}`}
+          className="group inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.12] px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-white/[0.18]"
+        >
+          Voir profil
+          <ChevronRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+        </Link>
+        <h2 className="mt-3 font-heading text-3xl font-bold leading-tight text-white">
+          {candidate.firstName} {candidate.lastName}
+        </h2>
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-white/78">
+          <span>{candidate.jobTitle || candidate.category || "Professionnel"}</span>
+          {candidate.city && (
+            <>
+              <span className="text-white/30">·</span>
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {candidate.city}
+              </span>
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function CandidateSummary({ candidate }: { candidate: SwipeCandidate }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          {candidate.category && (
+            <span className="rounded-full bg-workon-primary-subtle px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-workon-primary">
+              {formatCategory(candidate.category)}
+            </span>
+          )}
+          <span className="rounded-full bg-workon-bg px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-workon-stone">
+            {candidate.reviewCount > 0 ? "Avis verifies" : "Nouveau reseau"}
+          </span>
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex items-center gap-0.5">
+            {Array.from({ length: 5 }, (_, index) => (
+              <Star
+                key={index}
+                className={cn(
+                  "h-4 w-4",
+                  index < Math.round(safeRating(candidate.avgRating))
+                    ? "fill-workon-gold text-workon-gold"
+                    : "fill-workon-stone-subtle text-workon-stone-subtle",
+                )}
+              />
+            ))}
+          </div>
+          <span className="text-sm font-bold text-workon-ink">
+            {candidate.reviewCount > 0
+              ? safeRating(candidate.avgRating).toFixed(1)
+              : "Nouveau"}
+          </span>
+          <span className="text-xs font-medium text-workon-muted">
+            {candidate.reviewCount > 0
+              ? `${candidate.reviewCount} avis`
+              : "aucun avis encore"}
+          </span>
+        </div>
+      </div>
+
+      <div className="shrink-0 text-right">
+        <p className="text-[10px] font-bold uppercase tracking-wide text-workon-stone">
+          A partir de
+        </p>
+        <p className="font-heading text-2xl font-bold leading-none text-workon-copper">
+          {formatRate(candidate.hourlyRate)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function CandidateStats({ candidate }: { candidate: SwipeCandidate }) {
+  return (
+    <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-workon-border bg-workon-bg">
+      <StatCell
+        icon={ShieldCheck}
+        label="Trust"
+        value={formatTrustScore(candidate)}
+        emphasis
+      />
+      <StatCell
+        icon={CheckCircle}
+        label="Profil"
+        value={`${Math.round(candidate.completionScore || 0)}%`}
+      />
+      <StatCell
+        icon={Clock3}
+        label="Reponse"
+        value={candidate.trustTier === "BASIC" ? "Standard" : "Priorite"}
+      />
+    </div>
+  );
+}
+
+function WhyMatch({
+  candidate,
+  isHiring,
+}: {
+  candidate: SwipeCandidate;
+  isHiring: boolean;
+}) {
+  const reasons = [
+    candidate.city
+      ? `${candidate.city} dans ton reseau local`
+      : "Position locale a confirmer",
+    candidate.trustTier === "BASIC"
+      ? "Profil admissible WorkOn"
+      : "Identite et reputation renforcees",
+    isHiring
+      ? "Contrat protege avant de demarrer"
+      : "Client compatible avec une mission encadree",
+  ];
+
+  return (
+    <div className="rounded-2xl border border-workon-border bg-white p-4 shadow-soft">
+      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
+        Pourquoi ce match
+      </p>
+      <div className="mt-3 space-y-2">
+        {reasons.map((reason) => (
+          <div
+            key={reason}
+            className="flex items-center gap-2 text-sm font-medium text-workon-ink"
+          >
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-workon-primary-subtle text-workon-primary">
+              <CheckCircle className="h-3.5 w-3.5" />
+            </span>
+            {reason}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ReviewSignal({ candidate }: { candidate: SwipeCandidate }) {
+  if (candidate.reviewCount <= 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-workon-border bg-workon-bg/70 p-4 text-center">
+        <p className="text-sm font-semibold text-workon-ink">
+          Nouveau sur WorkOn.
+        </p>
+        <p className="mt-1 text-xs text-workon-muted">
+          La decision repose surtout sur le profil, la categorie et les preuves
+          de confiance disponibles.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-workon-border bg-workon-bg p-4">
+      <div className="flex items-start gap-3">
+        <Quote className="mt-0.5 h-4 w-4 shrink-0 text-workon-copper" />
+        <div>
+          <p className="text-sm font-semibold text-workon-ink">
+            {candidate.reviewCount} client{candidate.reviewCount > 1 ? "s" : ""} ont deja
+            laisse un signal positif.
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-workon-muted">
+            Moyenne {safeRating(candidate.avgRating).toFixed(1)} / 5 avec un
+            profil complete a {Math.round(candidate.completionScore || 0)}%.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionDock({
+  disabled,
+  onPass,
+  onLike,
+  onSuperLike,
+}: {
+  disabled: boolean;
+  onPass: () => void;
+  onLike: () => void;
+  onSuperLike: () => void;
+}) {
+  return (
+    <div className="z-20">
+      <div className="mx-auto flex max-w-sm items-center justify-center gap-4 rounded-[28px] border border-workon-border bg-white/[0.92] px-4 py-3 shadow-xl shadow-workon-ink/10 backdrop-blur">
+        <ActionButton
+          label="Passer"
+          icon={X}
+          tone="neutral"
+          disabled={disabled}
+          onClick={onPass}
+        />
+        <ActionButton
+          label="Matcher"
+          icon={Heart}
+          tone="primary"
+          disabled={disabled}
+          onClick={onLike}
+          large
+        />
+        <ActionButton
+          label="Priorite"
+          icon={MessageCircle}
+          tone="copper"
+          disabled={disabled}
+          onClick={onSuperLike}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({
+  label,
+  icon: Icon,
+  tone,
+  disabled,
+  onClick,
+  large,
+}: {
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  tone: "neutral" | "primary" | "copper";
+  disabled: boolean;
+  onClick: () => void;
+  large?: boolean;
+}) {
+  const classes =
+    tone === "primary"
+      ? "bg-workon-primary text-white shadow-lg shadow-workon-primary/25"
+      : tone === "copper"
+        ? "border-workon-copper/35 bg-workon-accent-subtle text-workon-copper"
+        : "border-workon-border bg-white text-workon-stone";
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center justify-center gap-1 rounded-2xl border font-bold transition active:scale-95 disabled:opacity-50",
+        large ? "h-16 w-20" : "h-14 w-16",
+        classes,
+      )}
+      aria-label={label}
+    >
+      <Icon className={large ? "h-6 w-6" : "h-5 w-5"} />
+      <span className="text-[10px]">{label}</span>
+    </button>
+  );
+}
+
+function SwipeOverlay({
+  tone,
+  opacity,
+  label,
+}: {
+  tone: "like" | "pass" | "super";
+  opacity: number;
+  label: string;
+}) {
+  const classes =
+    tone === "like"
+      ? "border-workon-primary bg-workon-primary/[0.18] text-workon-primary"
+      : tone === "super"
+        ? "border-workon-copper bg-workon-accent-subtle text-workon-copper"
+        : "border-red-500 bg-red-500/[0.12] text-red-600";
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-[32px]"
+      style={{ opacity }}
+    >
+      <div
+        className={cn(
+          "rotate-[-8deg] rounded-3xl border-4 px-7 py-4 text-3xl font-black uppercase shadow-lg backdrop-blur",
+          classes,
+        )}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function StackPreview({ candidate }: { candidate: SwipeCandidate }) {
+  return (
+    <div className="absolute inset-x-4 top-8 z-0 h-[620px] rounded-[32px] border border-workon-border bg-white/70 shadow-card">
+      <div className="absolute inset-x-5 top-5 flex items-center gap-3 opacity-50">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-workon-primary-subtle font-heading font-bold text-workon-primary">
+          {getInitials(candidate)}
+        </div>
+        <div>
+          <p className="text-sm font-bold text-workon-ink">
+            {candidate.firstName} {candidate.lastName}
+          </p>
+          <p className="text-xs text-workon-muted">Prochain profil</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptySwipeState({
+  hasAnyMatch,
+  matchCount,
+}: {
+  hasAnyMatch: boolean;
+  matchCount: number;
+}) {
+  return (
+    <div className="rounded-[28px] border border-workon-border bg-white p-8 text-center shadow-card">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-workon-primary-subtle text-workon-primary">
+        <Heart className="h-8 w-8" />
+      </div>
+      <h3 className="mt-4 font-heading text-xl font-bold text-workon-ink">
+        Tous les profils sont parcourus.
+      </h3>
+      <p className="mt-2 text-sm leading-relaxed text-workon-muted">
+        Reviens plus tard : la pile se met a jour avec les nouvelles missions,
+        clients et pros admissibles.
+      </p>
+      {hasAnyMatch && (
+        <Link
+          href="/matches"
+          className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-3 text-sm font-bold text-white shadow-md shadow-workon-primary/20"
+        >
+          <Users className="h-4 w-4" />
+          {matchCount > 0 ? `Voir ${matchCount} nouveau match` : "Voir mes matchs"}
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function HeroMetric({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.08] px-3 py-3">
+      <Icon className="mb-2 h-4 w-4 text-workon-gold" />
+      <p className="font-heading text-lg font-bold leading-none text-white">
+        {value}
+      </p>
+      <p className="mt-1 truncate text-[10px] font-bold uppercase tracking-wide text-white/55">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+function StatCell({
+  label,
+  value,
+  icon: Icon,
+  emphasis,
+}: {
+  label: string;
+  value: string;
+  icon: ComponentType<{ className?: string }>;
+  emphasis?: boolean;
+}) {
+  return (
+    <div className="border-r border-workon-border px-2 py-3 text-center last:border-r-0">
+      <Icon className="mx-auto mb-1 h-4 w-4 text-workon-stone" />
+      <p className="text-[9px] font-bold uppercase tracking-wide text-workon-stone">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "mt-1 truncate font-bold leading-tight",
+          emphasis ? "text-base text-workon-primary" : "text-sm text-workon-ink",
+        )}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function getTrustVariant(candidate: SwipeCandidate) {
+  if (candidate.trustTier === "PREMIUM") return "premium";
+  if (candidate.trustTier === "TRUSTED") return "trusted";
+  if (candidate.trustTier === "VERIFIED") return "verified";
+  if (candidate.reviewCount === 0) return "nouveau";
+  return "fiable";
+}
+
+function getTrustLabel(candidate: SwipeCandidate) {
+  if (candidate.trustTier === "PREMIUM") return "Top Performer";
+  if (candidate.trustTier === "TRUSTED") return "De confiance";
+  if (candidate.trustTier === "VERIFIED") return "Identite verifiee";
+  if (candidate.reviewCount === 0) return "Nouveau profil";
+  return "Fiable";
+}
+
+function formatTrustScore(candidate: SwipeCandidate) {
+  if (candidate.trustScore != null && Number.isFinite(candidate.trustScore)) {
+    return `${Math.round(candidate.trustScore)}%`;
+  }
+  if (candidate.trustTier === "PREMIUM") return "Elite";
+  if (candidate.trustTier === "TRUSTED") return "Fort";
+  if (candidate.trustTier === "VERIFIED") return "Verifie";
+  return "Base";
+}
+
+function formatRate(value: number | null) {
+  if (value == null || !Number.isFinite(value) || value <= 0) {
+    return "A confirmer";
+  }
+  return `${Math.round(value)} $/h`;
+}
+
+function safeRating(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.min(5, value)) : 0;
+}
+
+function getInitials(candidate: SwipeCandidate) {
+  return `${candidate.firstName?.[0] ?? ""}${candidate.lastName?.[0] ?? ""}`.toUpperCase();
+}
+
+function formatCategory(value: string) {
+  return value
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
