@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { MarketingHeaderTheme } from "@/components/navigation/marketing-header";
 
 /**
  * UserNav — header auth control.
@@ -12,16 +14,22 @@ import { Button } from "@/components/ui/button";
  * We lean on the shared Button variants (outline, hero, ghost)
  * which handle colors via currentColor and work on either background.
  */
-export function UserNav() {
+export function UserNav({ theme = "light" }: { theme?: MarketingHeaderTheme }) {
   const { isAuthenticated, user, logout } = useAuth();
+  const isDark = theme === "dark";
 
   if (!isAuthenticated) {
     return (
       <div className="flex items-center gap-2 text-sm">
-        <Button variant="ghost" size="sm" asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(isDark && "text-white/75 hover:bg-white/10 hover:text-white")}
+          asChild
+        >
           <Link href="/login">Connexion</Link>
         </Button>
-        <Button variant="hero" size="sm" asChild>
+        <Button variant={isDark ? "inverse" : "premium"} size="sm" asChild>
           <Link href="/register">S&apos;inscrire</Link>
         </Button>
       </div>
@@ -32,7 +40,11 @@ export function UserNav() {
 
   return (
     <div className="flex items-center gap-2 text-sm">
-      <Button variant="outline" size="sm" asChild>
+      <Button
+        variant={isDark ? "inverse" : "outline"}
+        size="sm"
+        asChild
+      >
         <Link href="/home">
           <span className="hidden sm:inline">{firstName}</span>
           <span className="sm:hidden">Compte</span>
@@ -41,6 +53,7 @@ export function UserNav() {
       <Button
         variant="ghost"
         size="sm"
+        className={cn(isDark && "text-white/75 hover:bg-white/10 hover:text-white")}
         onClick={() => {
           logout();
           window.location.href = "/";

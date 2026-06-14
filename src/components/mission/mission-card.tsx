@@ -3,13 +3,27 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  MapPin,
-  Zap,
-  Rocket,
-  Sparkles,
   ArrowRight,
-  Users,
+  Briefcase,
+  Brush,
+  Clock3,
+  CreditCard,
+  Droplets,
+  FileCheck,
+  Leaf,
+  MapPin,
+  PackageCheck,
+  Paintbrush,
+  PlugZap,
+  Rocket,
   ShieldCheck,
+  Snowflake,
+  Sparkles,
+  Truck,
+  Users,
+  Wrench,
+  Zap,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -17,15 +31,6 @@ import {
   type MissionCardSource,
 } from "@/lib/analytics";
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
-
-/**
- * Loose input shape accepted by the shared card. Compatible with both
- * `MissionResponse` (authenticated API) and `PublicMission` (public
- * feed) without forcing either to be converted at the call site.
- */
 export type MissionCardInput = {
   id: string;
   title: string;
@@ -34,94 +39,102 @@ export type MissionCardInput = {
   createdAt: string;
   description?: string;
   status?: string;
-  /** Price as number — `MissionResponse.price` (CAD, before tax). */
   price?: number;
-  /** Pre-formatted range — `PublicMission.priceRange` (e.g. "$80–$120"). */
   priceRange?: string;
-  /** Straight-line distance in km from the viewer (authenticated only). */
   distanceKm?: number | null;
-  /** Active URGENT_9 boost window — public feed flag. */
   isUrgent?: boolean;
-  /** Active TOP_48H boost window — public feed flag. */
   boostedUntil?: string | null;
-  /** Oldest attached photo URL — server-computed. Drives the hero image. */
   firstPhotoUrl?: string | null;
-  /** PENDING-offer count — server-computed. Drives the social-proof line. */
   offersCount?: number;
-  /** Estimated duration in minutes. Null = not specified; UI shows "À préciser". */
   durationMinutes?: number | null;
-  /** Client provides material. Null = not specified. */
   materialProvided?: boolean | null;
 };
 
-/**
- * Card persona. `pro` = worker browsing available work (green CTA
- * "Postuler"). `client` = owner viewing their own request (accent CTA
- * "Recevoir des offres").
- */
 export type MissionCardVariant = "client" | "pro";
 
 interface MissionCardProps {
   mission: MissionCardInput;
   variant?: MissionCardVariant;
-  /** Override destination. Defaults to `/missions/{id}`. */
   href?: string;
-  /** Hide the bottom CTA (e.g. inside a parent link or recap list). */
   showCTA?: boolean;
-  /**
-   * Surface the card is rendered on — used for analytics segmentation.
-   * Defaults to `"other"` when not specified.
-   */
   source?: MissionCardSource;
   className?: string;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Visual lookup tables                                               */
-/* ------------------------------------------------------------------ */
-
 const statusConfig: Record<string, { label: string; color: string }> = {
-  open:        { label: "Ouverte",  color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  assigned:    { label: "Assignée", color: "bg-amber-50 text-amber-700 border-amber-200" },
-  in_progress: { label: "En cours", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  completed:   { label: "Terminée", color: "bg-purple-50 text-purple-700 border-purple-200" },
-  paid:        { label: "Payée",    color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  cancelled:   { label: "Annulée",  color: "bg-gray-50 text-gray-400 border-gray-200" },
+  open: {
+    label: "Ouverte",
+    color: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  },
+  assigned: {
+    label: "Assignee",
+    color: "border-amber-200 bg-amber-50 text-amber-700",
+  },
+  in_progress: {
+    label: "En cours",
+    color: "border-blue-200 bg-blue-50 text-blue-700",
+  },
+  completed: {
+    label: "Terminee",
+    color: "border-violet-200 bg-violet-50 text-violet-700",
+  },
+  paid: {
+    label: "Payee",
+    color: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  },
+  cancelled: {
+    label: "Annulee",
+    color: "border-stone-200 bg-stone-50 text-stone-500",
+  },
 };
 
-const categoryIcons: Record<string, string> = {
-  cleaning: "🧹",
-  snow_removal: "❄️",
-  moving: "📦",
-  handyman: "🔧",
-  gardening: "🌿",
-  painting: "🎨",
-  delivery: "🚚",
-  plumbing: "🚰",
-  electrical: "⚡",
-  other: "⚡",
+const categoryIcons: Record<string, LucideIcon> = {
+  cleaning: Sparkles,
+  menage: Sparkles,
+  snow_removal: Snowflake,
+  deneigement: Snowflake,
+  moving: PackageCheck,
+  handyman: Wrench,
+  reparation: Wrench,
+  gardening: Leaf,
+  paysagement: Leaf,
+  painting: Paintbrush,
+  delivery: Truck,
+  plumbing: Droplets,
+  plomberie: Droplets,
+  electrical: PlugZap,
+  electricite: PlugZap,
+  construction: Briefcase,
+  "construction-legere": Wrench,
+  lavage: Droplets,
+  renovation: Brush,
+  other: Briefcase,
 };
 
-/** Warm gradient lookup per category — placeholder until PR B ships real photos. */
-const categoryGradients: Record<string, string> = {
-  cleaning:     "from-sky-100 to-sky-200",
-  snow_removal: "from-slate-100 to-blue-200",
-  moving:       "from-orange-100 to-amber-200",
-  handyman:     "from-amber-100 to-orange-200",
-  gardening:    "from-emerald-100 to-lime-200",
-  painting:     "from-pink-100 to-rose-200",
-  delivery:     "from-indigo-100 to-sky-200",
-  plumbing:     "from-cyan-100 to-blue-200",
-  electrical:   "from-yellow-100 to-amber-200",
-  other:        "from-stone-100 to-stone-200",
-};
-
-/** Under 6h = "NOUVEAU". */
 const NEW_THRESHOLD_MS = 6 * 60 * 60 * 1000;
 
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
+const categoryLabels: Record<string, string> = {
+  cleaning: "Menage",
+  menage: "Menage",
+  snow_removal: "Deneigement",
+  deneigement: "Deneigement",
+  moving: "Demenagement",
+  handyman: "Reparations",
+  reparation: "Reparation",
+  gardening: "Jardinage",
+  paysagement: "Paysagement",
+  painting: "Peinture",
+  delivery: "Livraison",
+  plumbing: "Plomberie",
+  plomberie: "Plomberie",
+  electrical: "Electricite",
+  electricite: "Electricite",
+  construction: "Construction",
+  "construction-legere": "Construction legere",
+  lavage: "Lavage",
+  renovation: "Renovation",
+  other: "Autres services",
+};
 
 export function MissionCard({
   mission,
@@ -131,10 +144,8 @@ export function MissionCard({
   source = "other",
   className,
 }: MissionCardProps) {
-  // Freeze "now" at first render so the card stays idempotent on re-renders.
   const [now] = useState(() => Date.now());
-
-  const isCancelled = mission.status === "cancelled";
+  const destination = href ?? `/missions/${mission.id}`;
   const createdAt = new Date(mission.createdAt);
   const ageMs = now - createdAt.getTime();
   const isNew = ageMs >= 0 && ageMs < NEW_THRESHOLD_MS;
@@ -142,17 +153,14 @@ export function MissionCard({
     !!mission.boostedUntil &&
     new Date(mission.boostedUntil).getTime() > now;
   const isUrgent = !!mission.isUrgent;
-
+  const isCancelled = mission.status === "cancelled";
   const status = mission.status ? statusConfig[mission.status] : undefined;
-  const icon = categoryIcons[mission.category] ?? "⚡";
-  const gradient = categoryGradients[mission.category] ?? categoryGradients.other;
+  const Icon = categoryIcons[mission.category] ?? categoryIcons.other;
+  const categoryLabel = formatCategoryLabel(mission.category);
   const hasPhoto = !!mission.firstPhotoUrl;
-
-  const priceLabel =
-    mission.priceRange ??
-    (mission.price != null ? `${mission.price}$` : null);
-
-  const destination = href ?? `/missions/${mission.id}`;
+  const priceLabel = formatPriceLabel(mission.priceRange, mission.price);
+  const ctaLabel = variant === "client" ? "Recevoir des offres" : "Postuler";
+  const primaryTone = variant === "client" ? "copper" : "primary";
 
   const handleClick = (viaCTA: boolean) => () => {
     trackMissionCardClick({
@@ -164,27 +172,16 @@ export function MissionCard({
     });
   };
 
-  const ctaLabel = variant === "client" ? "Recevoir des offres" : "Postuler";
-  const ctaStyles =
-    variant === "client"
-      ? "bg-workon-accent text-white hover:bg-workon-accent-hover shadow-[0_4px_12px_rgba(201,102,70,0.35)]"
-      : "bg-workon-primary text-white hover:bg-workon-primary-hover shadow-[0_4px_12px_rgba(19,64,33,0.35)]";
-
-  // Border accent follows the strongest signal: urgent > boosted > variant.
-  const borderAccent = isUrgent
-    ? "border-amber-300 hover:border-amber-400"
-    : isBoosted
-      ? "border-blue-300 hover:border-blue-400"
-      : variant === "client"
-        ? "border-workon-border hover:border-workon-accent/40"
-        : "border-workon-border hover:border-workon-primary/40";
-
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg",
-        borderAccent,
-        isCancelled && "opacity-60",
+        "group overflow-hidden rounded-[24px] border bg-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg",
+        isUrgent
+          ? "border-workon-copper/40"
+          : isBoosted
+            ? "border-workon-gold/40"
+            : "border-workon-border",
+        isCancelled && "opacity-65",
         className,
       )}
       data-testid="mission-card"
@@ -194,54 +191,55 @@ export function MissionCard({
     >
       <Link
         href={destination}
-        className="flex flex-1 flex-col gap-3 p-4"
+        className="block p-4"
         data-testid="mission-card-body"
         onClick={handleClick(false)}
       >
-        {/* Top signals row */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          {isUrgent && (
-            <Badge tone="urgent" icon={<Zap className="h-3 w-3" />}>
-              Urgent
-            </Badge>
-          )}
-          {isNew && !isUrgent && (
-            <Badge tone="new" icon={<Sparkles className="h-3 w-3" />}>
-              Nouveau
-            </Badge>
-          )}
-          {isBoosted && !isUrgent && !isNew && (
-            <Badge tone="boosted" icon={<Rocket className="h-3 w-3" />}>
-              Top
-            </Badge>
-          )}
-          <span
-            className="inline-flex items-center rounded-full bg-workon-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-workon-primary"
-            data-testid="mission-category-chip"
-          >
-            {mission.category}
-          </span>
-          {status && (
-            <span
-              className={cn(
-                "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                status.color,
-              )}
-            >
-              {status.label}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {isUrgent && (
+              <SignalBadge tone="urgent" icon={Zap}>
+                Urgent
+              </SignalBadge>
+            )}
+            {isNew && !isUrgent && (
+              <SignalBadge tone="new" icon={Sparkles}>
+                Nouveau
+              </SignalBadge>
+            )}
+            {isBoosted && !isUrgent && !isNew && (
+              <SignalBadge tone="boosted" icon={Rocket}>
+                Top
+              </SignalBadge>
+            )}
+            <span className="inline-flex items-center gap-1 rounded-full bg-workon-primary-subtle px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-workon-primary">
+              <Icon className="h-3 w-3" />
+              {categoryLabel}
             </span>
-          )}
+            {status && (
+              <span
+                className={cn(
+                  "inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide",
+                  status.color,
+                )}
+              >
+                {status.label}
+              </span>
+            )}
+          </div>
+          <div className="shrink-0 text-right">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-workon-stone">
+              {variant === "pro" ? "Gain" : "Budget"}
+            </p>
+            <p className="font-heading text-xl font-bold leading-none text-workon-copper">
+              {priceLabel}
+            </p>
+          </div>
         </div>
 
-        {/* Hero row: bigger photo + title + location/distance */}
-        <div className="flex items-start gap-3">
+        <div className="mt-4 flex gap-3">
           {hasPhoto ? (
-            <div
-              className="relative flex h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl bg-workon-bg sm:h-28 sm:w-28"
-              data-testid="mission-card-photo"
-            >
-              {/* Plain <img> so any upload/CDN domain works without
-                  patching next.config.ts image remotePatterns. */}
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-workon-bg">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={mission.firstPhotoUrl!}
@@ -251,97 +249,90 @@ export function MissionCard({
               />
             </div>
           ) : (
-            <div
-              className={cn(
-                "flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-4xl sm:h-28 sm:w-28 sm:text-5xl",
-                gradient,
-              )}
-              data-testid="mission-card-photo-fallback"
-              aria-hidden
-            >
-              {icon}
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-workon-border bg-gradient-to-br from-workon-bg-cream to-workon-surface text-workon-primary">
+              <Icon className="h-9 w-9" strokeWidth={1.8} />
             </div>
           )}
 
           <div className="min-w-0 flex-1">
             <h3
               className={cn(
-                "line-clamp-2 text-base font-semibold leading-snug text-workon-ink sm:text-lg",
+                "line-clamp-2 text-base font-bold leading-snug text-workon-ink",
                 isCancelled && "line-through",
               )}
               data-testid="mission-card-title"
             >
               {mission.title}
             </h3>
-            <p className="mt-1 inline-flex items-center gap-1 text-xs text-workon-muted">
-              <MapPin className="h-3 w-3" />
-              {mission.city ?? "Ville non precisee"}
+            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-workon-muted">
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5 text-workon-copper" />
+                {mission.city || "Ville a confirmer"}
+              </span>
               {mission.distanceKm != null && (
-                <span className="text-workon-gray">
-                  • à {mission.distanceKm.toFixed(1)} km
-                </span>
+                <span>a {mission.distanceKm.toFixed(1)} km</span>
               )}
             </p>
-            {/* Description snippet — small, greyed, only if present */}
             {mission.description && (
-              <p className="mt-1.5 line-clamp-2 text-xs text-workon-muted">
+              <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-workon-muted">
                 {mission.description}
               </p>
             )}
           </div>
         </div>
 
-        {/* Stats row — 3 columns: Gain | Temps | Matériel (pro)
-                                     Budget | Offres | Depuis (client)
-            Data-honest: missing fields render as "À préciser" rather
-            than fake defaults. */}
         <div
-          className="grid grid-cols-3 divide-x divide-workon-border/70 rounded-xl border border-workon-border/70 bg-gradient-to-br from-workon-bg to-white"
+          className="mt-4 grid grid-cols-3 overflow-hidden rounded-2xl border border-workon-border bg-workon-bg"
           data-testid="mission-card-stats"
         >
           <Stat
+            icon={CreditCard}
             label={variant === "pro" ? "Gain" : "Budget"}
-            value={priceLabel ?? "—"}
+            value={priceLabel}
             emphasis
           />
           <Stat
+            icon={Clock3}
             label="Temps"
             value={formatDuration(mission.durationMinutes)}
           />
           <Stat
-            label="Matériel"
+            icon={PackageCheck}
+            label="Materiel"
             value={formatMaterial(mission.materialProvided)}
           />
         </div>
 
-        {/* Trust + social proof row */}
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
-          <span className="inline-flex items-center gap-1 text-workon-gray">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span className="inline-flex items-center gap-1.5 font-medium text-workon-stone">
             <ShieldCheck className="h-3.5 w-3.5 text-workon-trust-green" />
-            Paiement sécurisé
+            Paiement securise
           </span>
-          {/* Social proof — hidden at 0 so we never display "0 offre". */}
+          <span className="inline-flex items-center gap-1.5 font-medium text-workon-stone">
+            <FileCheck className="h-3.5 w-3.5 text-workon-primary" />
+            Contrat protege
+          </span>
           {mission.offersCount != null && mission.offersCount > 0 && (
             <span
-              className="inline-flex items-center gap-1.5 font-semibold text-workon-primary"
+              className="inline-flex items-center gap-1.5 font-bold text-workon-primary"
               data-testid="mission-card-social-proof"
             >
               <Users className="h-3.5 w-3.5" />
-              {mission.offersCount} offre{mission.offersCount > 1 ? "s" : ""}{" "}
-              reçue{mission.offersCount > 1 ? "s" : ""}
+              {mission.offersCount} offre{mission.offersCount > 1 ? "s" : ""}
             </span>
           )}
         </div>
       </Link>
 
-      {/* Inline CTA — big, shadowed, full-bleed on mobile */}
       {showCTA && !isCancelled && (
-        <div className="border-t border-workon-border/70 bg-white p-3">
+        <div className="border-t border-workon-border bg-white p-3">
           <Link
             href={destination}
             className={cn(
-              "flex h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition-all active:translate-y-0.5 sm:h-12 sm:text-base",
-              ctaStyles,
+              "flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold text-white shadow-md transition-all active:translate-y-0.5",
+              primaryTone === "primary"
+                ? "bg-workon-primary shadow-workon-primary/20 hover:bg-workon-primary-hover"
+                : "bg-workon-copper shadow-workon-copper/20 hover:bg-workon-copper-hover",
             )}
             data-testid="mission-card-cta"
             onClick={handleClick(true)}
@@ -355,30 +346,27 @@ export function MissionCard({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Internals                                                          */
-/* ------------------------------------------------------------------ */
-
 function Stat({
+  icon: Icon,
   label,
   value,
   emphasis,
 }: {
+  icon: LucideIcon;
   label: string;
   value: string;
   emphasis?: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center px-2 py-2 text-center">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-workon-muted">
+    <div className="border-r border-workon-border px-2 py-3 text-center last:border-r-0">
+      <Icon className="mx-auto mb-1 h-3.5 w-3.5 text-workon-stone" />
+      <p className="text-[9px] font-bold uppercase tracking-wide text-workon-stone">
         {label}
       </p>
       <p
         className={cn(
-          "mt-0.5 font-bold leading-tight",
-          emphasis
-            ? "text-base text-workon-accent sm:text-lg"
-            : "text-sm text-workon-ink",
+          "mt-1 truncate font-bold leading-tight",
+          emphasis ? "text-base text-workon-copper" : "text-sm text-workon-ink",
         )}
       >
         {value}
@@ -387,9 +375,38 @@ function Stat({
   );
 }
 
-/** Human-friendly duration: 45 → "45 min"; 90 → "1h30"; 180 → "3h". */
+function SignalBadge({
+  tone,
+  icon: Icon,
+  children,
+}: {
+  tone: "urgent" | "new" | "boosted";
+  icon: LucideIcon;
+  children: React.ReactNode;
+}) {
+  const styles =
+    tone === "urgent"
+      ? "bg-workon-accent-subtle text-workon-copper"
+      : tone === "new"
+        ? "bg-emerald-100 text-emerald-800"
+        : "bg-workon-gold/15 text-workon-gold";
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide",
+        styles,
+      )}
+      data-testid={`mission-${tone}-badge`}
+    >
+      <Icon className="h-3 w-3" />
+      {children}
+    </span>
+  );
+}
+
 function formatDuration(minutes: number | null | undefined): string {
-  if (minutes == null) return "À préciser";
+  if (minutes == null) return "A preciser";
   if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -397,37 +414,29 @@ function formatDuration(minutes: number | null | undefined): string {
   return `${h}h${m.toString().padStart(2, "0")}`;
 }
 
-/** Material label. `null` = not specified, so we say so honestly. */
 function formatMaterial(value: boolean | null | undefined): string {
-  if (value == null) return "À préciser";
+  if (value == null) return "A preciser";
   return value ? "Fourni" : "Non fourni";
 }
 
-function Badge({
-  tone,
-  icon,
-  children,
-}: {
-  tone: "urgent" | "new" | "boosted";
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  const styles =
-    tone === "urgent"
-      ? "bg-amber-100 text-amber-800"
-      : tone === "new"
-        ? "bg-emerald-100 text-emerald-800"
-        : "bg-blue-100 text-blue-800";
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-        styles,
-      )}
-      data-testid={`mission-${tone}-badge`}
-    >
-      {icon}
-      {children}
-    </span>
-  );
+function formatCategoryLabel(value: string): string {
+  if (!value) return "Autres services";
+  if (categoryLabels[value]) return categoryLabels[value];
+
+  return value
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatPriceLabel(priceRange?: string, price?: number): string {
+  if (priceRange) {
+    const trimmed = priceRange.trim();
+    const dollarPrefix = trimmed.match(/^\$\s*(.+)$/);
+    if (dollarPrefix) return `${dollarPrefix[1]} $`;
+    return trimmed.replace(/\s*\$$/, " $");
+  }
+  if (price != null) return `${price} $`;
+  return "A preciser";
 }

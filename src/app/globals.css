@@ -23,6 +23,20 @@
   --workon-primary-subtle: rgba(19, 64, 33, 0.08);
   --workon-primary-ring: rgba(19, 64, 33, 0.25);
 
+  --workon-forest-deep: #09251A;
+  --workon-forest: #0F3A27;
+  --workon-graphite: #181614;
+  --workon-copper: #B96B43;
+  --workon-copper-hover: #9E5836;
+  --workon-gold: #D49B45;
+  --workon-stone: #7B766E;
+  --workon-stone-subtle: #D8D1C6;
+  --workon-surface: #FFFDF8;
+  --workon-surface-raised: #FFFFFF;
+  --workon-surface-dark: #082219;
+  --workon-surface-dark-soft: #103426;
+  --workon-line: rgba(27, 26, 24, 0.10);
+
   --workon-accent: #C96646;
   --workon-accent-hover: #B5553A;
   --workon-accent-subtle: rgba(201, 102, 70, 0.08);
@@ -77,6 +91,19 @@
   --color-red-accent: var(--red-accent);
   --color-workon-primary: var(--workon-primary);
   --color-workon-primary-hover: var(--workon-primary-hover);
+  --color-workon-forest-deep: var(--workon-forest-deep);
+  --color-workon-forest: var(--workon-forest);
+  --color-workon-graphite: var(--workon-graphite);
+  --color-workon-copper: var(--workon-copper);
+  --color-workon-copper-hover: var(--workon-copper-hover);
+  --color-workon-gold: var(--workon-gold);
+  --color-workon-stone: var(--workon-stone);
+  --color-workon-stone-subtle: var(--workon-stone-subtle);
+  --color-workon-surface: var(--workon-surface);
+  --color-workon-surface-raised: var(--workon-surface-raised);
+  --color-workon-surface-dark: var(--workon-surface-dark);
+  --color-workon-surface-dark-soft: var(--workon-surface-dark-soft);
+  --color-workon-line: var(--workon-line);
   --color-workon-accent: var(--workon-accent);
   --color-workon-accent-hover: var(--workon-accent-hover);
   --color-workon-ink: var(--workon-ink);
@@ -122,6 +149,26 @@ body {
   border: 1px solid var(--workon-border);
 }
 
+/* Premium V1 surfaces */
+.workon-premium-surface {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(249, 248, 245, 0.96)),
+    var(--workon-bg);
+}
+
+.workon-premium-card {
+  background: var(--workon-surface-raised);
+  border: 1px solid var(--workon-line);
+  box-shadow: 0 1px 2px rgba(27, 26, 24, 0.04), 0 14px 34px rgba(27, 26, 24, 0.06);
+}
+
+.workon-dark-panel {
+  background:
+    radial-gradient(circle at top left, rgba(212, 155, 69, 0.16), transparent 32%),
+    linear-gradient(145deg, var(--workon-forest-deep), var(--workon-surface-dark));
+  color: white;
+}
+
 /* Safe area for bottom nav */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -156,7 +203,7 @@ body {
 }
 
 /* Emergent shadows */
-.shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 4px 12px rgba(27,26,24,0.03); }
+.shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 8px 22px rgba(27,26,24,0.05); }
 .shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
 
 /* Heading font — Bricolage Grotesque (loaded via next/font in layout.tsx)
@@ -169,10 +216,6 @@ body {
   font-feature-settings: 'ss01';
   letter-spacing: -0.01em;
 }
-
-/* Emergent shadow tokens */
-.shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 4px 12px rgba(27,26,24,0.03); }
-.shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
 
 /* Focus rings */
 *:focus-visible {
