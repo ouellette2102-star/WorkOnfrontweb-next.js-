@@ -860,6 +860,9 @@ export const api = {
   // Paths: /stripe/connect/onboarding, /stripe/connect/status, /stripe/worker/history.
   getStripeOnboardingLink: () =>
     apiFetch<{ url: string }>("/stripe/connect/onboarding"),
+  // Onboarding EMBARQUÉ : client_secret pour @stripe/connect-js (in-app, sans redirection).
+  getConnectAccountSession: () =>
+    apiFetch<{ clientSecret: string }>("/stripe/connect/account-session"),
   getStripeOnboardingStatus: async () => {
     const raw = await apiFetch<unknown>("/stripe/connect/status");
     return parseResponse(
