@@ -14,10 +14,13 @@ import {
   Bell,
   Briefcase,
   ChevronRight,
+  FileCheck,
   LogOut,
   MapPin,
   Menu,
+  Scale,
   ShieldCheck,
+  WalletCards,
   Users,
   X,
 } from "lucide-react";
@@ -54,6 +57,20 @@ function groupMenuItems(items: NavItem[]) {
   })).filter((group) => group.items.length > 0);
 }
 
+function countActiveContracts(
+  contracts?: Array<{ status?: string | null }>,
+): number {
+  return (contracts ?? []).filter((contract) =>
+    ["PENDING", "ACCEPTED"].includes(contract.status ?? ""),
+  ).length;
+}
+
+function countActiveDisputes(disputes?: Array<{ status?: string | null }>): number {
+  return (disputes ?? []).filter((dispute) =>
+    ["OPEN", "IN_MEDIATION"].includes(dispute.status ?? ""),
+  ).length;
+}
+
 export function TopBar() {
   const { user, logout } = useAuth();
   const { mode, setMode } = useMode();
@@ -68,8 +85,35 @@ export function TopBar() {
     staleTime: 15_000,
   });
 
+  const { data: menuContracts } = useQuery({
+    queryKey: ["menu-contracts"],
+    queryFn: () => api.getMyContracts(),
+    enabled: menuOpen && !!user,
+    retry: false,
+    staleTime: 45_000,
+  });
+
+  const { data: menuDisputes } = useQuery({
+    queryKey: ["menu-disputes"],
+    queryFn: () => api.getMyDisputes(),
+    enabled: menuOpen && !!user,
+    retry: false,
+    staleTime: 45_000,
+  });
+
+  const { data: menuEarnings } = useQuery({
+    queryKey: ["menu-earnings-summary"],
+    queryFn: () => api.getEarningsSummary(),
+    enabled: menuOpen && mode === "pro" && !!user,
+    retry: false,
+    staleTime: 45_000,
+  });
+
   const unread = notifCount?.count ?? 0;
   const currentRoleLabel = mode === "pro" ? "Pro" : "Client";
+  const contractCount = countActiveContracts(menuContracts);
+  const disputeCount = countActiveDisputes(menuDisputes);
+  const pendingMoney = menuEarnings?.totalPending ?? 0;
 
   const menuItems = useMemo(
     () =>
@@ -157,20 +201,58 @@ export function TopBar() {
             onClick={() => setMenuOpen(false)}
           />
           <div className="fixed left-0 right-0 top-16 z-[60] max-h-[76vh] overflow-y-auto border-b border-workon-border bg-workon-surface/95 shadow-[0_24px_70px_rgba(27,26,24,0.18)] backdrop-blur-xl">
-            <div className="border-b border-workon-border px-4 py-4">
+            <div className="workon-dark-panel border-b border-white/10 px-4 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-workon-primary text-sm font-bold text-white shadow-sm">
                   {initials || "WO"}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-workon-ink">
+                  <p className="truncate font-semibold text-white">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-workon-muted">
+                  <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-white/70">
                     <ShieldCheck className="h-3.5 w-3.5 text-workon-trust-green" />
                     Profil {currentRoleLabel} protege
                   </p>
                 </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <Link
+                  href={mode === "pro" ? "/earnings" : "/invoices"}
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-3 text-white transition hover:bg-white/15"
+                >
+                  <WalletCards className="mb-2 h-4 w-4 text-workon-gold" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/50">
+                    Argent
+                  </p>
+                  <p className="mt-1 text-sm font-black">
+                    {mode === "pro" ? `${pendingMoney.toFixed(0)} $` : "Factures"}
+                  </p>
+                </Link>
+                <Link
+                  href="/contracts"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-3 text-white transition hover:bg-white/15"
+                >
+                  <FileCheck className="mb-2 h-4 w-4 text-workon-gold" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/50">
+                    Contrats
+                  </p>
+                  <p className="mt-1 text-sm font-black">{contractCount}</p>
+                </Link>
+                <Link
+                  href="/disputes"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-3 text-white transition hover:bg-white/15"
+                >
+                  <Scale className="mb-2 h-4 w-4 text-workon-gold" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/50">
+                    Litiges
+                  </p>
+                  <p className="mt-1 text-sm font-black">{disputeCount}</p>
+                </Link>
               </div>
             </div>
 
