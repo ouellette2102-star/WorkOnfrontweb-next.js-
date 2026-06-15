@@ -18,15 +18,3 @@ export async function createOnboardingLink(_token?: string): Promise<{ url: stri
 export async function getOnboardingStatus(_token?: string) {
   return api.getStripeOnboardingStatus();
 }
-
-export async function createPaymentIntent(
-  _token: string,
-  missionId: string,
-  amountCents: number,
-) {
-  return api.createPaymentIntent({ missionId, amount: amountCents });
-}
-
-export async function getWorkerPayments(_token?: string): Promise<WorkerPayment[]> {
-  return api.getWorkerPaymentHistory();
-}
