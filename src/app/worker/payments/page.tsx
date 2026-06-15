@@ -5,12 +5,9 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAccessToken } from "@/lib/auth";
 import { RequireWorkerClient } from "@/components/auth/require-worker-client";
 import { Button } from "@/components/ui/button";
-import {
-  getOnboardingStatus,
-  createOnboardingLink,
-  type WorkerPayment,
-} from "@/lib/stripe-api";
+import { getOnboardingStatus, type WorkerPayment } from "@/lib/stripe-api";
 import { api } from "@/lib/api-client";
+import { EmbeddedConnectOnboarding } from "@/components/worker/embedded-connect-onboarding";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { toast } from "sonner";
@@ -30,7 +27,7 @@ function WorkerPaymentsContent() {
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   const [payments, setPayments] = useState<WorkerPayment[]>([]);
   const [isLoadingPayments, setIsLoadingPayments] = useState(true);
-  const [isCreatingLink, setIsCreatingLink] = useState(false);
+  const [showEmbedded, setShowEmbedded] = useState(false);
 
   useEffect(() => {
     const loadStatus = async () => {
@@ -78,30 +75,6 @@ function WorkerPaymentsContent() {
 
     loadPayments();
   }, [authLoading, isAuthenticated, isOnboarded]);
-
-  const handleStartOnboarding = async () => {
-    setIsCreatingLink(true);
-    try {
-      const token = getAccessToken();
-      if (!token) {
-        toast.error("Authentification requise");
-        return;
-      }
-
-      const { url } = await createOnboardingLink(token);
-      // Rediriger vers Stripe
-      window.location.href = url;
-    } catch (error) {
-      console.error("Erreur lors de la création du lien:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Impossible de créer le lien d'onboarding"
-      );
-    } finally {
-      setIsCreatingLink(false);
-    }
-  };
 
   const formatAmount = (cents: number) => {
     return (cents / 100).toFixed(2);
@@ -161,7 +134,7 @@ function WorkerPaymentsContent() {
         </div>
 
         {/* Banner Onboarding */}
-        {!isOnboarded && (
+        {!isOnboarded && !showEmbedded && (
           <div className="mb-8 rounded-3xl border border-workon-primary/30 bg-gradient-to-br from-workon-primary/15 via-workon-primary/5 to-transparent p-8 shadow-sm ">
             <div className="mb-4 text-6xl">💳</div>
             <h2 className="mb-3 text-2xl font-bold text-workon-ink">
@@ -172,14 +145,19 @@ function WorkerPaymentsContent() {
               configure ton compte de paiement. Ça prend quelques minutes — à
               faire une seule fois.
             </p>
-            <Button
-              onClick={handleStartOnboarding}
-              disabled={isCreatingLink}
-              variant="hero"
-              size="hero"
-            >
-              {isCreatingLink ? "Chargement..." : "Configurer mes paiements"}
+            <Button onClick={() => setShowEmbedded(true)} variant="hero" size="hero">
+              Configurer mes paiements
             </Button>
+          </div>
+        )}
+
+        {/* Onboarding EMBARQUÉ — composants Connect dans WorkOn, sans redirection */}
+        {!isOnboarded && showEmbedded && (
+          <div className="mb-8 rounded-3xl border border-workon-border bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-2xl font-bold text-workon-ink">
+              Configure tes paiements
+            </h2>
+            <EmbeddedConnectOnboarding onComplete={() => window.location.reload()} />
           </div>
         )}
 
