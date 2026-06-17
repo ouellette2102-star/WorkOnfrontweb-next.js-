@@ -845,14 +845,8 @@ export const api = {
   getEarningsByMission: (missionId: string) => apiFetch<unknown>(`/earnings/by-mission/${missionId}`),
 
   // Real worker payouts from the Invoice/escrow flow (source of truth).
-  // Replaces getWorkerPaymentHistory() (legacy /stripe/worker/history reads the
-  // dead Clerk-era Payment table and returns nothing for the real journey).
   getWorkerEarningsPayments: () =>
     apiFetch<WorkerPayment[]>("/earnings/payments"),
-
-  // Payments
-  createPaymentIntent: (data: { missionId: string; amount: number }) =>
-    apiFetch<{ clientSecret: string }>("/payments-local/intent", { method: "POST", body: JSON.stringify(data) }),
 
   // Stripe Connect.
   //
@@ -871,9 +865,6 @@ export const api = {
       "GET /stripe/connect/status",
     );
   },
-  getWorkerPaymentHistory: () =>
-    apiFetch<WorkerPayment[]>("/stripe/worker/history"),
-
   // Subscriptions (Phase 1 monetization)
   getSubscription: async (): Promise<Subscription> => {
     const raw = await apiFetch<unknown>("/subscriptions/me");
