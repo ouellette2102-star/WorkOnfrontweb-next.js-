@@ -120,7 +120,11 @@ export async function acceptAllDocuments(
   );
 
   return {
-    success: results.every((result) => result.accepted || result.alreadyAccepted),
+    // documents.length > 0 : un tableau vide ne doit JAMAIS compter comme un succès
+    // ([].every() vaut true), ce qui laissait passer un consentement sans rien enregistrer.
+    success:
+      documents.length > 0 &&
+      results.every((result) => result.accepted || result.alreadyAccepted),
     results,
   };
 }

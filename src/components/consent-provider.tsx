@@ -155,7 +155,12 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
       throw error;
     }
 
-    const documentsToAccept = toLegalDocuments(consentStatus?.missing ?? []);
+    const requestedDocuments = toLegalDocuments(consentStatus?.missing ?? []);
+    // Si la liste des documents manquants est vide (statut non chargé / requireConsent
+    // déclenché sans statut frais), on retombe sur TOUS les documents requis — sinon
+    // acceptAllDocuments recevrait [] et renverrait un faux succès sans rien enregistrer.
+    const documentsToAccept =
+      requestedDocuments.length > 0 ? requestedDocuments : REQUIRED_LEGAL_DOCUMENTS;
     setIsLoading(true);
 
     const result = await acceptAllDocuments(token, documentsToAccept);
