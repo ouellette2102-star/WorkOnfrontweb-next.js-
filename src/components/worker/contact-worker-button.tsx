@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MessageCircle, Loader2, X, Send } from "lucide-react";
-import { api } from "@/lib/api-client";
-import { toast } from "sonner";
+import { MessageCircle, X, Heart, ArrowRight } from "lucide-react";
 
 interface ContactWorkerButtonProps {
   workerId: string;
@@ -13,6 +11,16 @@ interface ContactWorkerButtonProps {
   workerCity?: string;
 }
 
+/**
+ * Mise en relation = SWIPE-FIRST. Il n'y a pas de message direct : l'utilisateur
+ * like le profil dans /swipe (Pros) ; au match mutuel, le backend crée
+ * automatiquement la conversation (swipe.service.ts#ensureConversation) et le
+ * chat apparaît dans /messages.
+ *
+ * Ce modal EXPLIQUE le modèle au lieu d'afficher un faux champ de saisie :
+ * l'ancienne version montrait un textarea + "Envoyer le message" qui ne faisait
+ * que rediriger vers /swipe en jetant le message tapé (UX trompeuse).
+ */
 export function ContactWorkerButton({
   workerId,
   workerFirstName,
@@ -20,15 +28,6 @@ export function ContactWorkerButton({
 }: ContactWorkerButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (open && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [open]);
 
   const handleOpen = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -36,26 +35,14 @@ export function ContactWorkerButton({
     setOpen(true);
   };
 
-  // Contact flow is now swipe-first: the user must match before chatting.
-  // Clicking "Envoyer" redirects to /swipe so the user can like the
-  // worker's card. On mutual LIKE the backend auto-creates a Conversation
-  // (see swipe.service.ts#ensureConversation) and the chat appears in
-  // /messages. This replaces the old POST /messages-local/direct endpoint
-  // that was removed 2026-04-18 (returns 410 Gone).
-  const handleSend = () => {
-    toast.info("Swipe pour matcher d'abord", {
-      description:
-        `Pour contacter ${workerFirstName}, likez son profil dans Pros. Le chat s'ouvre dès le match.`,
-    });
+  const goToSwipe = () => {
     setOpen(false);
-    setMessage("");
     router.push("/swipe");
   };
 
-  // Silence unused — API is no longer called, but workerId stays part of the
-  // component signature for the time being.
+  // workerId reste dans le contrat du composant (réservé à un futur deep-link
+  // vers la carte du pro dans /swipe).
   void workerId;
-  void sending;
 
   return (
     <>
@@ -68,16 +55,16 @@ export function ContactWorkerButton({
         Contacter
       </button>
 
-      {/* Modal */}
+      {/* Modal explicatif (swipe-first) — aucun champ de saisie */}
       {open && (
         <>
           {/* Backdrop */}
           <div
             className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
-            onClick={() => !sending && setOpen(false)}
+            onClick={() => setOpen(false)}
           />
 
-          {/* Form */}
+          {/* Carte */}
           <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md rounded-2xl border border-workon-border bg-white p-5 shadow-xl sm:inset-x-auto sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:w-full">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -91,52 +78,37 @@ export function ContactWorkerButton({
               </div>
               <button
                 type="button"
-                onClick={() => !sending && setOpen(false)}
+                onClick={() => setOpen(false)}
                 className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-workon-bg text-workon-muted"
+                aria-label="Fermer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Message field */}
-            <textarea
-              ref={textareaRef}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Décrivez votre besoin... (ex: J'ai besoin d'un nettoyage de bureau la semaine prochaine)"
-              rows={4}
-              maxLength={500}
-              disabled={sending}
-              className="w-full rounded-xl border border-workon-border bg-workon-bg px-3 py-2.5 text-sm text-workon-ink placeholder:text-workon-muted/60 focus:outline-none focus:ring-2 focus:ring-workon-primary/30 focus:border-workon-primary resize-none disabled:opacity-60"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-            />
-            <p className="mt-1 text-right text-[10px] text-workon-muted">
-              {message.length}/500
-            </p>
+            {/* Explication swipe-first */}
+            <div className="flex flex-col items-center text-center gap-3 py-2">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-workon-accent/10 text-workon-accent">
+                <Heart className="h-6 w-6" />
+              </div>
+              <p className="text-sm font-medium text-workon-ink">
+                Sur WorkOn, la mise en relation se fait par match.
+              </p>
+              <p className="text-sm text-workon-muted">
+                Likez le profil de {workerFirstName} dans <strong>Pros</strong>.
+                Dès qu&apos;il vous like en retour, votre conversation s&apos;ouvre
+                automatiquement dans Messages.
+              </p>
+            </div>
 
-            {/* Send button */}
+            {/* CTA */}
             <button
               type="button"
-              onClick={handleSend}
-              disabled={sending || !message.trim()}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-workon-primary py-3 text-sm font-semibold text-white transition hover:bg-workon-primary/90 disabled:opacity-50"
+              onClick={goToSwipe}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-workon-primary py-3 text-sm font-semibold text-white transition hover:bg-workon-primary/90"
             >
-              {sending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Envoi en cours...
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4" />
-                  Envoyer le message
-                </>
-              )}
+              Voir dans Pros
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </>
