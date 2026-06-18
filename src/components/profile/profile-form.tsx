@@ -59,7 +59,7 @@ export function ProfileForm() {
           city: city.trim(),
         });
         setStatus("success");
-        setStatusMessage("Profil mis à jour ✨");
+        setStatusMessage("Profil mis à jour");
       } catch (updateError) {
         setStatus("error");
         setStatusMessage(

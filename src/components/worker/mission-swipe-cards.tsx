@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { format, formatDistanceToNow, differenceInHours } from "date-fns";
 import { frCA, fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
+import { CheckCircle2, MapPin, Tag, Wallet, Calendar, X, Star, Check } from "lucide-react";
 import type { MissionFeedItem } from "@/types/mission";
 
 type Props = {
@@ -47,7 +48,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
   if (!currentMission) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-workon-border bg-white p-12">
-        <div className="mb-4 text-6xl">✅</div>
+        <CheckCircle2 className="mb-4 h-14 w-14 text-workon-trust-green" />
         <h3 className="mb-2 text-xl font-semibold text-workon-ink">
           Toutes les missions parcourues !
         </h3>
@@ -95,7 +96,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
             {/* Header avec distance */}
             {currentMission.distance !== null && (
               <div className="flex items-center justify-center gap-2 bg-workon-primary px-6 py-3">
-                <span className="text-white">📍</span>
+                <MapPin className="h-5 w-5 text-white" />
                 <p className="text-center text-lg font-bold text-white">
                   {currentMission.distance} km de vous
                 </p>
@@ -136,7 +137,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
               <div className="mb-8 space-y-4">
                 {currentMission.category && (
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">🏷️</span>
+                    <Tag className="h-6 w-6 text-workon-gray" />
                     <div>
                       <p className="text-sm text-workon-gray">Catégorie</p>
                       <p className="font-semibold text-workon-ink">{currentMission.category}</p>
@@ -146,7 +147,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
 
                 {currentMission.city && (
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">📍</span>
+                    <MapPin className="h-6 w-6 text-workon-gray" />
                     <div>
                       <p className="text-sm text-workon-gray">Lieu</p>
                       <p className="font-semibold text-workon-ink">{currentMission.city}</p>
@@ -156,7 +157,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
 
                 {currentMission.hourlyRate && (
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">💰</span>
+                    <Wallet className="h-6 w-6 text-workon-gray" />
                     <div>
                       <p className="text-sm text-workon-gray">Rémunération</p>
                       <p className="text-xl font-bold text-[#2D8B55]">
@@ -168,7 +169,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
 
                 {currentMission.startsAt && (
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">📅</span>
+                    <Calendar className="h-6 w-6 text-workon-gray" />
                     <div>
                       <p className="text-sm text-workon-gray">Date de début</p>
                       <p className="font-semibold text-workon-ink">
@@ -185,19 +186,19 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
                   onClick={handleReject}
                   className="flex-1 rounded-xl border-2 border-workon-border bg-transparent py-6 text-lg font-bold text-workon-gray transition hover:bg-workon-bg hover:text-workon-ink"
                 >
-                  ❌ Passer
+                  <span className="inline-flex items-center justify-center gap-2"><X className="h-5 w-5" />Passer</span>
                 </Button>
                 <Button
                   onClick={handleSave}
-                  className="flex-1 rounded-xl border-2 border-[#D4922A] bg-transparent py-6 text-lg font-bold text-[#D4922A] transition hover:bg-[#D4922A]/10"
+                  className="flex-1 rounded-xl border-2 border-[#2E7DFF] bg-transparent py-6 text-lg font-bold text-[#2E7DFF] transition hover:bg-[#2E7DFF]/10"
                 >
-                  ⭐ Sauvegarder
+                  <span className="inline-flex items-center justify-center gap-2"><Star className="h-5 w-5" />Sauvegarder</span>
                 </Button>
                 <Button
                   onClick={handleReserve}
                   className="flex-1 rounded-xl bg-workon-primary py-6 text-lg font-bold text-white transition hover:bg-workon-primary-hover"
                 >
-                  ✅ Réserver
+                  <span className="inline-flex items-center justify-center gap-2"><Check className="h-5 w-5" />Réserver</span>
                 </Button>
               </div>
             </div>

@@ -50,7 +50,7 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
       {/* Error message */}
       {error && (
         <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-400">
-          ⚠️ {error}
+          {error}
           <button
             onClick={() => setError(null)}
             className="ml-2 text-xs underline hover:no-underline"
@@ -77,7 +77,7 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
         <Button
           onClick={handleSend}
           disabled={!content.trim() || isSending || disabled}
-          className="self-end rounded-2xl bg-workon-primary px-6 py-3 font-semibold text-white transition hover:bg-[#1a5a2e] disabled:opacity-50"
+          className="self-end rounded-2xl bg-workon-primary px-6 py-3 font-semibold text-white transition hover:bg-workon-primary-hover disabled:opacity-50"
         >
           {isSending ? (
             <span className="flex items-center gap-2">

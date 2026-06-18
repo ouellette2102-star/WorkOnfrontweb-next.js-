@@ -69,7 +69,7 @@ export function ReserveMissionButton({
         size="hero"
         className="w-full"
       >
-        {isPending ? "Réservation..." : "✓ Réserver cette mission"}
+        {isPending ? "Réservation..." : "Réserver cette mission"}
       </Button>
       {error && <p className="text-xs text-workon-accent">{error}</p>}
     </div>

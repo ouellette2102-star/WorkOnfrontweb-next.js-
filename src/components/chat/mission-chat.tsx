@@ -8,6 +8,7 @@ import type { Message } from "@/types/mission-chat";
 import { MessageList } from "./message-list";
 import { MessageInput } from "./message-input";
 import { Button } from "@/components/ui/button";
+import { MessageCircle, AlertTriangle, RefreshCw } from "lucide-react";
 
 type MissionChatProps = {
   missionId: string;
@@ -120,7 +121,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
     return (
       <div className="flex h-full items-center justify-center p-6">
         <div className="max-w-md rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-8 text-center">
-          <div className="mb-4 text-5xl">💬</div>
+          <MessageCircle className="mx-auto mb-4 h-12 w-12 text-yellow-400/70" />
           <h3 className="mb-2 text-xl font-bold text-yellow-400">
             Chat non disponible
           </h3>
@@ -133,7 +134,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
             variant="outline"
             className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
           >
-            🔄 Vérifier à nouveau
+            <span className="inline-flex items-center gap-2"><RefreshCw className="h-4 w-4" />Vérifier à nouveau</span>
           </Button>
           {error?.code && (
             <p className="mt-4 text-xs text-white/40">Code: {error.code}</p>
@@ -148,16 +149,16 @@ export function MissionChat({ missionId }: MissionChatProps) {
     return (
       <div className="flex h-full items-center justify-center p-6">
         <div className="max-w-md rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center">
-          <div className="mb-4 text-5xl">⚠️</div>
+          <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-red-400/70" />
           <h3 className="mb-2 text-xl font-bold text-red-400">
             Erreur de chargement
           </h3>
           <p className="mb-6 text-white/70">{error.message}</p>
           <Button
             onClick={loadMessages}
-            className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-500"
+            className="rounded-xl bg-workon-primary px-6 py-3 font-semibold text-white hover:bg-workon-primary-hover"
           >
-            🔄 Réessayer
+            <span className="inline-flex items-center gap-2"><RefreshCw className="h-4 w-4" />Réessayer</span>
           </Button>
           {error.code && (
             <p className="mt-4 text-xs text-white/40">Code: {error.code}</p>
@@ -173,7 +174,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
       {/* Send error banner */}
       {sendError && (
         <div className="border-b border-red-500/20 bg-red-500/10 px-4 py-2 text-center text-sm text-red-400">
-          ⚠️ {sendError}
+          {sendError}
           <button
             onClick={() => setSendError(null)}
             className="ml-2 text-xs underline hover:no-underline"
@@ -187,7 +188,7 @@ export function MissionChat({ missionId }: MissionChatProps) {
       {messages.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-8 text-center">
           <div>
-            <div className="mb-4 text-5xl">💬</div>
+            <MessageCircle className="mx-auto mb-4 h-12 w-12 text-white/30" />
             <p className="text-white/70">
               Aucun message pour le moment.
               <br />

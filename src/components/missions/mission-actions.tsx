@@ -25,8 +25,8 @@ export function MissionActions({
   return (
     <div className="flex gap-2">
       <Link href={`/missions/${mission.id}/chat`} className="flex-1">
-        <Button className="w-full rounded-2xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500">
-          💬 Ouvrir le chat
+        <Button className="w-full rounded-2xl bg-workon-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-workon-primary-hover">
+          Ouvrir le chat
         </Button>
       </Link>
     </div>

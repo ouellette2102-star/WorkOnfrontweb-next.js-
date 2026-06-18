@@ -5,7 +5,7 @@ import { api, type OfferResponse } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Check, X, User } from "lucide-react";
+import { Loader2, Check, X, User, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
@@ -98,7 +98,7 @@ export function OfferList({ missionId, isEmployer }: Props) {
                     {offer.worker?.firstName} {offer.worker?.lastName}
                   </p>
                   {offer.worker?.city && (
-                    <p className="text-xs text-white/40">📍 {offer.worker.city}</p>
+                    <p className="text-xs text-white/40 inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {offer.worker.city}</p>
                   )}
                 </div>
               </div>

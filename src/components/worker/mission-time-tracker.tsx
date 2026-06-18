@@ -68,7 +68,7 @@ export function MissionTimeTracker({ missionId }: Props) {
 
       await checkInToMission(token, missionId);
       setIsCheckedIn(true);
-      toast.success("✅ Arrivée enregistrée");
+      toast.success("Arrivée enregistrée");
       loadTimeLogs();
     } catch (error) {
       console.error("Erreur lors du check-in:", error);
@@ -89,7 +89,7 @@ export function MissionTimeTracker({ missionId }: Props) {
 
       await checkOutFromMission(token, missionId);
       setIsCheckedIn(false);
-      toast.success("✅ Départ enregistré");
+      toast.success("Départ enregistré");
       loadTimeLogs();
     } catch (error) {
       console.error("Erreur lors du check-out:", error);
@@ -114,7 +114,7 @@ export function MissionTimeTracker({ missionId }: Props) {
   return (
     <div className="rounded-lg border border-white/10 bg-neutral-700/30 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-semibold text-white/70">⏱️ Temps de travail</span>
+        <span className="text-sm font-semibold text-white/70">Temps de travail</span>
         <span className="text-lg font-bold text-white">
           {formatDuration(totalDuration)}
         </span>
@@ -127,7 +127,7 @@ export function MissionTimeTracker({ missionId }: Props) {
             disabled={isActionLoading}
             className="flex-1 bg-green-600 text-white hover:bg-green-500"
           >
-            {isActionLoading ? "..." : "▶️ Démarrer"}
+            {isActionLoading ? "..." : "Démarrer"}
           </Button>
         ) : (
           <Button
@@ -135,7 +135,7 @@ export function MissionTimeTracker({ missionId }: Props) {
             disabled={isActionLoading}
             className="flex-1 bg-red-600 text-white hover:bg-red-500"
           >
-            {isActionLoading ? "..." : "⏹️ Arrêter"}
+            {isActionLoading ? "..." : "Arrêter"}
           </Button>
         )}
       </div>

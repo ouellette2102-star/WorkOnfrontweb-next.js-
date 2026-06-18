@@ -6,6 +6,7 @@ import { getAccessToken } from "@/lib/auth";
 import { getOnboardingStatus } from "@/lib/stripe-api";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
+import { Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { safeSessionStorage } from "@/lib/safe-storage";
 import { useAuth } from "@/contexts/auth-context";
@@ -104,8 +105,8 @@ export function StripeConnectGate({
         ×
       </button>
       <div className="flex items-start gap-3 pr-8">
-        <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-lg">
-          💰
+        <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+          <Wallet className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-[15px] text-workon-ink">

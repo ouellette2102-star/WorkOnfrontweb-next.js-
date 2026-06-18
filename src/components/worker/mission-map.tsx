@@ -63,7 +63,7 @@ export function MissionMap({ missions, userLocation, onReserve }: Props) {
 
         L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(map)
-          .bindPopup("<b>📍 Vous êtes ici</b>");
+          .bindPopup("<b>Vous êtes ici</b>");
       }
 
       // Ajouter les marqueurs des missions
@@ -78,7 +78,7 @@ export function MissionMap({ missions, userLocation, onReserve }: Props) {
 
           const missionIcon = L.divIcon({
             className: "mission-marker",
-            html: '<div style="background: #10b981; border: 3px solid white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💼</div>',
+            html: '<div style="background: #F0392B; border: 3px solid white; border-radius: 50%; width: 28px; height: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
           });
