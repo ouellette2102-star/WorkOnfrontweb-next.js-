@@ -75,3 +75,6 @@ startdev.err
 
 # Backend-identity is a separate repo, never commit
 backend-identity/
+
+# committed by Vercel CLI — should not be tracked
+.env.vercel-prod
