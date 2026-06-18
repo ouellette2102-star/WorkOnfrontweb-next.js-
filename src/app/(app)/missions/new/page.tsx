@@ -501,14 +501,14 @@ export default function NewMissionPage() {
                 <>
                   <AlertCircle className="h-4 w-4 text-workon-accent" />
                   <span className="text-sm text-workon-muted">
-                    GPS indisponible — position par defaut (Montreal)
+                    GPS indisponible — position par défaut (Montréal)
                   </span>
                   <button
                     type="button"
                     onClick={detectGPS}
                     className="text-sm text-workon-primary ml-auto hover:underline"
                   >
-                    Reessayer
+                    Réessayer
                   </button>
                 </>
               )}

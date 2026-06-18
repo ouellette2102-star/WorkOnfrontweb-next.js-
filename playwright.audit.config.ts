@@ -3,7 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   testMatch:
-    /(admin-verify-express-visual|notifications-actionurl-visual|proof-notifications-prod)\.spec\.ts/,
+    /(admin-verify-express-visual|notifications-actionurl-visual|proof-notifications-prod|proof-reviewer-queue-prod|proof-fcm-web-push-prod)\.spec\.ts/,
   retries: 0,
   workers: 1,
   reporter: "line",

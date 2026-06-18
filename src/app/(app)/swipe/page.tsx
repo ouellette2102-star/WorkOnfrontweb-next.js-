@@ -52,8 +52,8 @@ export default function SwipePage() {
     user?.role === "employer" ? "Trouver un pro" : "Trouver un client";
   const pageSubtitle =
     user?.role === "employer"
-      ? "Swipez pour decouvrir les meilleurs travailleurs"
-      : "Swipez pour decouvrir des opportunites";
+      ? "Swipez pour découvrir les meilleurs travailleurs"
+      : "Swipez pour découvrir des opportunités";
 
   const {
     data: candidates,

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
@@ -11,8 +10,6 @@ import {
   Clock,
   CheckCircle,
   Percent,
-  ChevronLeft,
-  ChevronRight,
   ExternalLink,
   CreditCard,
   Loader2,
@@ -34,26 +31,7 @@ function formatCADFromDollars(dollars: number): string {
   }).format(dollars);
 }
 
-type EarningsHistoryItem = {
-  id: string;
-  missionTitle: string;
-  amount: number;
-  date: string;
-  status: "paid" | "pending" | "failed";
-};
-
-type EarningsHistoryResponse = {
-  items: EarningsHistoryItem[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-};
-
 export default function EarningsPage() {
-  const [page, setPage] = useState(1);
-  const limit = 10;
-
   const {
     data: summary,
     isLoading: summaryLoading,
@@ -63,17 +41,10 @@ export default function EarningsPage() {
     queryFn: () => api.getEarningsSummary(),
   });
 
-  const {
-    data: historyRaw,
-    isLoading: historyLoading,
-    error: historyError,
-  } = useQuery({
-    queryKey: ["earnings-history", page],
-    queryFn: () => api.getEarningsHistory({ page, limit }),
-  });
-
-  const history = historyRaw as EarningsHistoryResponse | undefined;
-
+  // History list source of truth: real payouts from the Invoice/escrow flow
+  // (GET /earnings/payments). The legacy paginated /earnings/history path was
+  // removed — it sent a `page` param the backend rejects (cursor-based → 400)
+  // and expected a stale response shape, so it never rendered.
   const {
     data: payments,
     isLoading: paymentsLoading,
@@ -83,7 +54,7 @@ export default function EarningsPage() {
   });
 
   const isLoading = summaryLoading;
-  const hasError = summaryError; // history error is handled per-section, not page-wide
+  const hasError = summaryError;
 
   const summaryCards = summary
     ? [
@@ -200,7 +171,7 @@ export default function EarningsPage() {
               </Button>
             </div>
 
-            {/* History */}
+            {/* History — real payouts from /earnings/payments (source of truth) */}
             <div className="rounded-2xl border border-workon-border bg-white shadow-sm">
               <div className="border-b border-workon-border px-6 py-4">
                 <h2 className="text-lg font-semibold text-workon-ink">
@@ -208,21 +179,13 @@ export default function EarningsPage() {
                 </h2>
               </div>
 
-              {historyLoading && (
+              {paymentsLoading && (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-6 w-6 animate-spin text-workon-primary" />
                 </div>
               )}
 
-              {!historyLoading && historyError && (
-                <div className="py-12 text-center">
-                  <Inbox className="mx-auto mb-3 h-8 w-8 text-workon-muted/40" />
-                  <p className="text-workon-muted text-sm">Aucun historique disponible pour le moment</p>
-                  <p className="mt-1 text-xs text-workon-muted/60">Complétez des missions pour voir vos revenus ici</p>
-                </div>
-              )}
-
-              {!historyLoading && !historyError && history?.items && history.items.length === 0 && (
+              {!paymentsLoading && (!payments || payments.length === 0) && (
                 <div className="py-12 text-center">
                   <Inbox className="mx-auto mb-3 h-10 w-10 text-workon-muted/40" />
                   <p className="text-workon-muted">Aucun revenu pour le moment</p>
@@ -232,70 +195,7 @@ export default function EarningsPage() {
                 </div>
               )}
 
-              {/* If history is an array (no pagination wrapper), handle both shapes */}
-              {!historyLoading && history && (
-                <>
-                  {(history.items ?? (Array.isArray(history) ? (history as unknown as EarningsHistoryItem[]) : [])).map(
-                    (item: EarningsHistoryItem) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between border-b border-workon-border/50 px-6 py-4 last:border-b-0"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-medium text-workon-ink">
-                            {item.missionTitle}
-                          </p>
-                          <p className="text-xs text-workon-muted">
-                            {new Date(item.date).toLocaleDateString("fr-CA", {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </div>
-                        <div className="ml-4 flex items-center gap-3">
-                          <StatusBadge status={item.status} />
-                          <span className="whitespace-nowrap font-semibold text-workon-primary">
-                            {formatCADFromDollars(item.amount)}
-                          </span>
-                        </div>
-                      </div>
-                    ),
-                  )}
-
-                  {/* Pagination */}
-                  {history.totalPages > 1 && (
-                    <div className="flex items-center justify-between border-t border-workon-border px-6 py-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page <= 1}
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        className="border-workon-border text-workon-ink"
-                      >
-                        <ChevronLeft className="mr-1 h-4 w-4" />
-                        Précédent
-                      </Button>
-                      <span className="text-sm text-workon-muted">
-                        Page {page} / {history.totalPages}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page >= history.totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                        className="border-workon-border text-workon-ink"
-                      >
-                        Suivant
-                        <ChevronRight className="ml-1 h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Fallback: show payment history if earnings history isn't available */}
-              {!historyLoading && !history && payments && payments.length > 0 && (
+              {!paymentsLoading && payments && payments.length > 0 && (
                 <>
                   {payments.map((p) => (
                     <div

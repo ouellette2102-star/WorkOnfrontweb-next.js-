@@ -2,21 +2,23 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertCircle } from "lucide-react";
 import { getAccessToken } from "@/lib/auth";
 import { getOnboardingStatus } from "@/lib/stripe-api";
+import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { safeSessionStorage } from "@/lib/safe-storage";
 import { useAuth } from "@/contexts/auth-context";
 
 /**
- * StripeConnectGate — reusable banner that surfaces when a worker
- * has NOT completed Stripe Connect onboarding.
+ * StripeConnectGate — payout setup nudge for workers.
  *
- * Worker-only: renders nothing when user.role !== 'worker' so it
- * can be dropped on shared pages (e.g. /profile) without firing
- * status checks for clients.
+ * Décision 🔒 2026-06-14 : on demande le KYC/compte de paiement AU BON
+ * MOMENT — seulement quand le worker a DE L'ARGENT EN ATTENTE
+ * (totalPending > 0). Pas à l'inscription, pas pour « accepter une
+ * mission » (le worker peut accepter + gagner sans onboarding, l'escrow
+ * tient les fonds). Wording orienté « recevoir ton argent », jamais
+ * « Stripe ». Worker-only.
  */
 
 export interface StripeConnectGateProps {
@@ -30,6 +32,7 @@ export function StripeConnectGate({
 }: StripeConnectGateProps) {
   const { user } = useAuth();
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
+  const [pending, setPending] = useState<number | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
   const isWorker = user?.role === "worker" || (user?.role as unknown as string) === "WORKER";
@@ -41,8 +44,17 @@ export function StripeConnectGate({
       try {
         const token = getAccessToken();
         if (!token) return;
-        const status = await getOnboardingStatus(token);
-        if (!cancelled) setOnboarded(!!status.onboarded);
+        const [status, summary] = await Promise.all([
+          getOnboardingStatus(token),
+          api.getEarningsSummary().catch(() => null),
+        ]);
+        if (cancelled) return;
+        setOnboarded(!!status.onboarded);
+        setPending(
+          summary && typeof summary.totalPending === "number"
+            ? summary.totalPending
+            : 0,
+        );
       } catch (err) {
         console.warn("[stripe-connect-gate] status check failed", err);
       }
@@ -65,42 +77,47 @@ export function StripeConnectGate({
   }
 
   if (!isWorker) return null;
-  if (onboarded === null) return null;
+  if (onboarded === null || pending === null) return null;
   if (onboarded) return null;
+  // Le bon moment : on ne demande la config de paiement QUE lorsqu'il y a
+  // de l'argent en attente à recevoir (décision 🔒 2026-06-14).
+  if (!(pending > 0)) return null;
   if (dismissed) return null;
   void minCompletedMissions;
+
+  const amount = pending.toFixed(2);
 
   return (
     <div
       role="region"
       aria-label="Configuration de votre compte de paiement"
       className={cn(
-        "relative rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm",
+        "relative rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm",
         className,
       )}
     >
       <button
         onClick={handleDismiss}
         aria-label="Masquer"
-        className="absolute top-3 right-3 h-7 w-7 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 flex items-center justify-center text-sm"
+        className="absolute top-3 right-3 h-7 w-7 rounded-full bg-emerald-100 text-emerald-700 hover:bg-emerald-200 flex items-center justify-center text-sm"
       >
         ×
       </button>
       <div className="flex items-start gap-3 pr-8">
-        <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center">
-          <AlertCircle className="h-5 w-5 text-amber-600" />
+        <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-lg">
+          💰
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-[15px] text-workon-ink">
-            Configure ton paiement Stripe
+            Tu as {amount} $ qui t&apos;attendent
           </p>
           <p className="mt-1 text-sm text-workon-muted leading-relaxed">
-            Pour accepter une mission payée, tu dois d&apos;abord connecter
-            ton compte Stripe Connect. Ça prend 2 minutes.
+            Configure ton compte de paiement (2 min) pour recevoir cet argent
+            sur ton compte bancaire.
           </p>
           <div className="mt-4">
             <Button asChild size="sm" className="bg-workon-primary hover:bg-workon-primary/90 text-white">
-              <Link href="/worker/payments">Configurer Stripe</Link>
+              <Link href="/worker/payments">Configurer mes paiements</Link>
             </Button>
           </div>
         </div>

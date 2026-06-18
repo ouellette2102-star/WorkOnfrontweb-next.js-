@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRight, ListFilter } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  ListFilter,
+  MapPin,
+  ShieldCheck,
+  SlidersHorizontal,
+} from "lucide-react";
 import {
   getPublicMissions,
   getSectorStats,
@@ -8,21 +15,6 @@ import {
 } from "@/lib/public-api";
 import { MissionsFilterBar } from "./_components/missions-filter-bar";
 import { MissionCard } from "@/components/mission/mission-card";
-
-/**
- * /missions — public, open-mission feed.
- *
- * Server component that reads `category`, `city` and `page` from the
- * URL, queries the existing `GET /public/missions` endpoint, and
- * renders a responsive grid of cards. Filters are driven by the
- * client-side <MissionsFilterBar> which mutates the search params via
- * `useRouter().replace`.
- *
- * Replaces the previous `/missions/mine` redirect. Workers now have a
- * real way to discover open demand on the platform; the existing
- * `/missions/mine` page stays accessible via the header link inside
- * the authenticated shell.
- */
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +25,32 @@ type SearchParams = {
 };
 
 const PAGE_SIZE = 12;
+
+const CATEGORY_LABELS: Record<string, string> = {
+  other: "Autres services",
+  cleaning: "Ménage",
+  menage: "Ménage",
+  reparation: "Réparation",
+  entretien: "Entretien",
+  snow_removal: "Déneigement",
+  paysagement: "Paysagement",
+  construction: "Construction",
+  "construction-legere": "Construction légère",
+  plomberie: "Plomberie",
+  electrical: "Électricité",
+  electricite: "Électricité",
+};
+
+function formatCategoryLabel(value?: string) {
+  if (!value) return "";
+  if (CATEGORY_LABELS[value]) return CATEGORY_LABELS[value];
+
+  return value
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
 
 export default async function MissionsFeedPage({
   searchParams,
@@ -48,21 +66,52 @@ export default async function MissionsFeedPage({
     getPublicMissions({ category, city, page, limit: PAGE_SIZE }).catch(
       () => ({ missions: [] as PublicMission[], total: 0, page }),
     ),
-    getSectorStats().catch(() => [] as { category: string; missionCount: number }[]),
+    getSectorStats().catch(
+      () => [] as { category: string; missionCount: number }[],
+    ),
   ]);
 
   const totalPages = Math.max(Math.ceil(feed.total / PAGE_SIZE), 1);
+  const hasFilters = Boolean(category || city);
+  const topCategory = sectorStats[0]?.category;
+  const categoryLabel = formatCategoryLabel(category);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-12 pt-4">
-      <header className="mb-4">
-        <h1 className="text-2xl font-bold text-workon-ink">Missions ouvertes</h1>
-        <p className="mt-1 text-sm text-workon-muted">
-          {feed.total.toLocaleString("fr-CA")} mission{feed.total > 1 ? "s" : ""}{" "}
-          disponible{feed.total > 1 ? "s" : ""}
-          {city ? ` à ${city}` : ""}
-          {category ? ` en ${category}` : ""}.
+    <div className="mx-auto max-w-5xl space-y-5 px-4 pb-28 pt-4">
+      <header className="workon-dark-panel overflow-hidden rounded-[24px] p-5 shadow-[0_18px_40px_rgba(8,34,25,0.18)]">
+        <p className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white/78">
+          <Briefcase className="h-3.5 w-3.5 text-workon-gold" />
+          Opportunités locales
         </p>
+        <div className="mt-4 flex items-end justify-between gap-4">
+          <div>
+            <h1 className="font-heading text-3xl font-bold leading-tight text-white">
+              Missions ouvertes
+            </h1>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/72">
+              {feed.total.toLocaleString("fr-CA")} mission
+              {feed.total > 1 ? "s" : ""} disponible
+              {feed.total > 1 ? "s" : ""}
+              {city ? ` a ${city}` : ""}
+              {categoryLabel ? ` en ${categoryLabel}` : ""}. Compare le budget, le lieu
+              et les signaux de confiance avant de postuler.
+            </p>
+          </div>
+          <div className="hidden rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-right sm:block">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-white/50">
+              Secteur actif
+            </p>
+            <p className="mt-1 text-sm font-bold text-white">
+              {topCategory ? formatCategoryLabel(topCategory) : "Tous"}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-3 gap-2 text-[11px] text-white/72">
+          <TrustMini icon={ShieldCheck} label="Paiement" value="sécurisé" />
+          <TrustMini icon={SlidersHorizontal} label="Filtres" value="propres" />
+          <TrustMini icon={MapPin} label="Local" value="vérifié" />
+        </div>
       </header>
 
       <Suspense fallback={null}>
@@ -73,18 +122,37 @@ export default async function MissionsFeedPage({
         />
       </Suspense>
 
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-workon-copper">
+            Feed
+          </p>
+          <h2 className="font-heading text-lg font-bold text-workon-ink">
+            {hasFilters ? "Resultats filtres" : "A traiter maintenant"}
+          </h2>
+        </div>
+        {hasFilters && (
+          <Link
+            href="/missions"
+            className="rounded-full border border-workon-border bg-white px-3 py-1.5 text-xs font-bold text-workon-primary shadow-sm hover:bg-workon-bg-cream"
+          >
+            Tout voir
+          </Link>
+        )}
+      </div>
+
       {feed.missions.length === 0 ? (
         <EmptyState category={category} city={city} />
       ) : (
         <>
           <div
-            className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
             data-testid="missions-feed-grid"
           >
-            {feed.missions.map((m) => (
+            {feed.missions.map((mission) => (
               <MissionCard
-                key={m.id}
-                mission={m}
+                key={mission.id}
+                mission={mission}
                 variant="pro"
                 source="public_feed"
               />
@@ -106,41 +174,44 @@ export default async function MissionsFeedPage({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Empty state                                                        */
-/* ------------------------------------------------------------------ */
-
 function EmptyState({ category, city }: { category?: string; city?: string }) {
   const hasFilter = !!(category || city);
   return (
     <div
-      className="mt-6 flex flex-col items-center justify-center rounded-2xl border border-dashed border-workon-border bg-white p-10 text-center"
+      className="rounded-[24px] border border-dashed border-workon-border bg-white p-8 text-center shadow-card"
       data-testid="missions-empty-state"
     >
-      <ListFilter className="mb-3 h-8 w-8 text-workon-muted" />
-      <h2 className="text-sm font-semibold text-workon-ink">
-        Aucune mission pour l&apos;instant
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-workon-bg-cream text-workon-stone">
+        <ListFilter className="h-6 w-6" />
+      </div>
+      <h2 className="font-heading text-xl font-bold text-workon-ink">
+        {hasFilter ? "Aucune mission ne correspond" : "Aucune mission active"}
       </h2>
-      <p className="mt-1 max-w-sm text-xs text-workon-muted">
+      <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-workon-muted">
         {hasFilter
-          ? "Essaie d'élargir ta recherche — retire un filtre ou change de ville."
-          : "Reviens bientôt, de nouvelles missions sont publiées chaque jour."}
+          ? "Élargis la ville ou retire une catégorie pour voir plus d'opportunités."
+          : "Le feed se remplit avec les nouvelles demandes. Reviens bientot ou explore la carte."}
       </p>
-      {hasFilter && (
+      <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        {hasFilter && (
+          <Link
+            href="/missions"
+            className="inline-flex h-11 items-center justify-center rounded-2xl border border-workon-border bg-white px-4 text-sm font-bold text-workon-ink hover:bg-workon-bg-cream"
+          >
+            Reinitialiser
+          </Link>
+        )}
         <Link
-          href="/missions"
-          className="mt-3 rounded-full border border-workon-border bg-workon-bg px-3 py-1 text-xs font-medium text-workon-ink hover:border-workon-primary hover:text-workon-primary"
+          href="/map"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-workon-primary px-4 text-sm font-bold text-white hover:bg-workon-primary-hover"
         >
-          Réinitialiser les filtres
+          Voir la carte
+          <ArrowRight className="h-4 w-4" />
         </Link>
-      )}
+      </div>
     </div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Pagination                                                         */
-/* ------------------------------------------------------------------ */
 
 function Pagination({
   page,
@@ -166,35 +237,35 @@ function Pagination({
 
   return (
     <nav
-      className="mt-6 flex items-center justify-between"
+      className="flex items-center justify-between rounded-2xl border border-workon-border bg-white p-2 shadow-card"
       aria-label="Pagination"
       data-testid="missions-pagination"
     >
-      <span className="text-xs text-workon-muted">
+      <span className="px-2 text-xs font-medium text-workon-muted">
         Page {page} sur {totalPages} · {total} missions
       </span>
       <div className="flex items-center gap-2">
         {page > 1 ? (
           <Link
             href={hrefFor(page - 1)}
-            className="inline-flex items-center gap-1 rounded-full border border-workon-border bg-white px-3 py-1 text-xs font-medium text-workon-ink hover:border-workon-primary hover:text-workon-primary"
+            className="rounded-full border border-workon-border bg-workon-bg px-3 py-1.5 text-xs font-bold text-workon-ink hover:border-workon-primary hover:text-workon-primary"
           >
-            ← Précédent
+            Precedent
           </Link>
         ) : (
-          <span className="inline-flex items-center gap-1 rounded-full border border-workon-border bg-workon-bg px-3 py-1 text-xs font-medium text-workon-muted opacity-50">
-            ← Précédent
+          <span className="rounded-full border border-workon-border bg-workon-bg px-3 py-1.5 text-xs font-bold text-workon-muted opacity-50">
+            Precedent
           </span>
         )}
         {page < totalPages ? (
           <Link
             href={hrefFor(page + 1)}
-            className="inline-flex items-center gap-1 rounded-full border border-workon-primary bg-workon-primary px-3 py-1 text-xs font-medium text-white hover:bg-workon-primary-hover"
+            className="inline-flex items-center gap-1 rounded-full bg-workon-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-workon-primary-hover"
           >
             Suivant <ArrowRight className="h-3 w-3" />
           </Link>
         ) : (
-          <span className="inline-flex items-center gap-1 rounded-full border border-workon-border bg-workon-bg px-3 py-1 text-xs font-medium text-workon-muted opacity-50">
+          <span className="inline-flex items-center gap-1 rounded-full border border-workon-border bg-workon-bg px-3 py-1.5 text-xs font-bold text-workon-muted opacity-50">
             Suivant <ArrowRight className="h-3 w-3" />
           </span>
         )}
@@ -203,3 +274,22 @@ function Pagination({
   );
 }
 
+function TrustMini({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof ShieldCheck;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/8 px-2 py-2">
+      <Icon className="mb-1 h-3.5 w-3.5 text-workon-gold" />
+      <p className="text-[9px] font-bold uppercase tracking-wide text-white/48">
+        {label}
+      </p>
+      <p className="text-[11px] font-semibold text-white">{value}</p>
+    </div>
+  );
+}

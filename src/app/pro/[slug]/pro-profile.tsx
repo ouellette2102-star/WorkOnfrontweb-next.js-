@@ -42,6 +42,15 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const CA_PHONE_REGEX = /^(\+?1?[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
+function getInitials(firstName: string, lastName: string) {
+  return `${firstName.trim()[0] ?? ""}${lastName.trim()[0] ?? ""}`.toUpperCase();
+}
+
+function getMemberSinceYear(memberSince: string) {
+  const year = new Date(memberSince).getFullYear();
+  return Number.isFinite(year) ? String(year) : "Nouveau";
+}
+
 function validatePhone(phone: string): string | null {
   if (!phone.trim()) return "Le numéro de téléphone est requis";
   if (!CA_PHONE_REGEX.test(phone)) return "Format invalide (ex: 514-555-1234)";
@@ -115,7 +124,17 @@ export function ProProfile({ pro }: { pro: ProData }) {
     ? CATEGORY_LABELS[pro.category] || pro.category
     : "Professionnel";
 
-  const portfolioImages = pro.gallery?.filter((m) => m.type === "portfolio") || [];
+  const displayName =
+    pro.fullName.trim() ||
+    [pro.firstName, pro.lastName].filter(Boolean).join(" ").trim() ||
+    "Pro WorkOn";
+  const firstName = pro.firstName.trim() || "ce pro";
+  const initials = getInitials(pro.firstName, pro.lastName);
+  const memberSinceYear = getMemberSinceYear(pro.memberSince);
+  const portfolioImages =
+    pro.gallery?.filter(
+      (m) => m.type === "portfolio" && m.imageUrl.trim().length > 0,
+    ) || [];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -127,20 +146,19 @@ export function ProProfile({ pro }: { pro: ProData }) {
               {pro.pictureUrl ? (
                 <img
                   src={pro.pictureUrl}
-                  alt={pro.fullName}
+                  alt={displayName}
                   className="w-24 h-24 rounded-full object-cover border-2 border-workon-accent"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-workon-primary flex items-center justify-center text-3xl font-bold">
-                  {pro.firstName[0]}
-                  {pro.lastName[0]}
+                  {initials || "?"}
                 </div>
               )}
             </div>
 
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold">{pro.fullName}</h1>
+                <h1 className="text-2xl font-bold">{displayName}</h1>
                 {pro.verified && (
                   <span className="bg-workon-trust-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
                     Vérifié
@@ -177,7 +195,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-workon-accent">
-                {new Date(pro.memberSince).getFullYear()}
+                {memberSinceYear}
               </p>
               <p className="text-gray-400 text-sm">Membre depuis</p>
             </div>
@@ -217,7 +235,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 <div key={img.id} className="relative group">
                   <img
                     src={img.imageUrl}
-                    alt={img.caption || `Réalisation de ${pro.fullName}`}
+                    alt={img.caption || `Réalisation de ${displayName}`}
                     className="w-full h-48 object-cover rounded-lg"
                     loading="lazy"
                   />
@@ -248,7 +266,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 Demande envoyée
               </h3>
               <p className="text-gray-600">
-                Votre demande a été envoyée à {pro.fullName}.
+                Votre demande a été envoyée à {displayName}.
                 <br />
                 Il vous contactera sous 2 heures.
               </p>
@@ -259,7 +277,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 Demander une soumission
               </h2>
               <p className="text-gray-500 mb-6">
-                Décrivez votre besoin et {pro.firstName} vous contactera
+                Décrivez votre besoin et {firstName} vous contactera
                 rapidement.
               </p>
 
@@ -385,7 +403,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
 
                 <p className="text-center text-gray-400 text-xs mt-2">
                   Vos informations sont protégées et ne seront partagées
-                  qu&apos;avec {pro.firstName}. Conforme à la Loi 25.
+                  qu&apos;avec {firstName}. Conforme à la Loi 25.
                 </p>
               </form>
             </>

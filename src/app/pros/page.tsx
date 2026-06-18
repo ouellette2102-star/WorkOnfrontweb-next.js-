@@ -59,7 +59,11 @@ const TIER_BADGE: Record<
 
 function ProCard({ pro }: { pro: ProListItem }) {
   const tier = TIER_BADGE[pro.trustTier];
-  const initials = `${pro.firstName[0] ?? ""}${pro.lastName[0] ?? ""}`.toUpperCase();
+  const initials = `${pro.firstName?.[0] ?? ""}${pro.lastName?.[0] ?? ""}`.toUpperCase();
+  const displayName =
+    pro.fullName?.trim() ||
+    [pro.firstName, pro.lastName].filter(Boolean).join(" ").trim() ||
+    "Pro WorkOn";
   const href = pro.slug ? `/pro/${pro.slug}` : `/pro/${pro.id}`;
 
   return (
@@ -73,7 +77,7 @@ function ProCard({ pro }: { pro: ProListItem }) {
           <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-workon-border">
             <Image
               src={pro.pictureUrl}
-              alt={pro.fullName}
+              alt={displayName}
               fill
               sizes="80px"
               className="object-cover"
@@ -90,7 +94,7 @@ function ProCard({ pro }: { pro: ProListItem }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-semibold text-workon-ink truncate">
-            {pro.fullName}
+            {displayName}
           </h3>
           {tier && (
             <span
@@ -183,6 +187,30 @@ export default async function ProsPage({ searchParams }: ProsPageProps) {
   const items = data?.items ?? [];
   const totalPages = data?.pagination.totalPages ?? 0;
   const total = data?.pagination.total ?? 0;
+  const loadFailed = data === null;
+  const hasFilters = Boolean(
+    sp.city || sp.category || sp.trustTier || sp.search,
+  );
+  const emptyState = loadFailed
+    ? {
+        title: "La liste des pros est temporairement indisponible",
+        body: "Vous pouvez réessayer dans un instant ou publier une mission pour recevoir des réponses.",
+        href: "/missions/new",
+        action: "Publier une mission",
+      }
+    : hasFilters
+      ? {
+          title: "Aucun pro ne correspond à votre recherche",
+          body: "Essayez d'élargir votre recherche ou publiez votre mission pour laisser les pros venir à vous.",
+          href: "/pros",
+          action: "Voir tous les pros",
+        }
+      : {
+          title: "Aucun pro public pour le moment",
+          body: "La vitrine se remplit progressivement. Les travailleurs autonomes peuvent déjà créer leur profil public.",
+          href: "/rejoindre-pro",
+          action: "Rejoindre WorkOn",
+        };
 
   // Common filter chip params (drop page when changing filter)
   const baseParams = {
@@ -271,20 +299,13 @@ export default async function ProsPage({ searchParams }: ProsPageProps) {
         {items.length === 0 ? (
           <div className="rounded-2xl border border-workon-border bg-white p-10 text-center">
             <h2 className="text-lg font-semibold text-workon-ink mb-2">
-              Aucun pro ne correspond à votre recherche
+              {emptyState.title}
             </h2>
             <p className="text-sm text-workon-gray mb-5">
-              Essayez d&apos;élargir votre recherche, ou{" "}
-              <Link
-                href="/missions/new"
-                className="text-workon-primary underline underline-offset-2 hover:text-workon-primary-hover"
-              >
-                publiez votre mission
-              </Link>{" "}
-              et laissez les pros venir à vous.
+              {emptyState.body}
             </p>
             <Button asChild variant="outline" className="rounded-xl">
-              <Link href="/pros">Voir tous les pros</Link>
+              <Link href={emptyState.href}>{emptyState.action}</Link>
             </Button>
           </div>
         ) : (

@@ -109,7 +109,13 @@ export default function EmployerOnboardingPage() {
 
       if (!updated.onboardingCompletedAt) {
         toast.info(
-          "Ajoute ton téléphone et ta ville depuis les paramètres pour activer la publication.",
+          "Ajoute ton téléphone et ta ville dans ton profil pour activer la publication.",
+          {
+            action: {
+              label: "Aller au profil",
+              onClick: () => router.push("/profile"),
+            },
+          },
         );
       } else {
         toast.success("Profil entreprise enregistré");

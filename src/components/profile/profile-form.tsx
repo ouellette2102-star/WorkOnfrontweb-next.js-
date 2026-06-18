@@ -1,13 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useProfile } from "@/hooks/use-profile";
 import { api } from "@/lib/api-client";
 import { SkillSelector } from "@/components/skills/skill-selector";
 import { AvailabilityEditor } from "@/components/availability/availability-editor";
+import { TrustTierBadge } from "@/components/worker/trust-tier-badge";
 
 export function ProfileForm() {
   const { profile, isLoading, error, updateProfile, refetch } = useProfile();
+  const { data: verification } = useQuery({
+    queryKey: ["verification-status", "profile-form-badge"],
+    queryFn: () => api.getVerificationStatus(),
+    staleTime: 60_000,
+    retry: false,
+  });
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -184,6 +193,15 @@ export function ProfileForm() {
         <p className="text-xs text-workon-muted">
           Clique pour changer ta photo (JPEG, PNG, WebP, max 5 Mo)
         </p>
+        {verification?.trustTier ? (
+          <Link
+            href="/profile/verify"
+            className="inline-flex items-center hover:opacity-80 transition-opacity"
+            aria-label={`Statut de vérification : ${verification.trustTier}. Cliquer pour vérifier.`}
+          >
+            <TrustTierBadge tier={verification.trustTier} showBasic />
+          </Link>
+        ) : null}
         {avatarMessage ? (
           <p
             className={`text-xs ${
