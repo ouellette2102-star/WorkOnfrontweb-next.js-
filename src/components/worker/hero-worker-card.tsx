@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Star } from "lucide-react";
+import { Star, MapPin } from "lucide-react";
 import { TrustPill, type TrustPillVariant } from "@/components/ui/trust-pill";
 import type { FeaturedWorker } from "@/lib/public-api";
 import { cn } from "@/lib/utils";
@@ -82,8 +82,8 @@ export function HeroWorkerCard({
               <p className="text-sm text-workon-gray truncate">{worker.sector}</p>
             )}
             {worker.city && (
-              <p className="text-xs text-workon-gray/70 mt-0.5">
-                📍 {worker.city}
+              <p className="text-xs text-workon-gray/70 mt-0.5 inline-flex items-center gap-1">
+                <MapPin className="h-3 w-3" /> {worker.city}
               </p>
             )}
             {worker.bio && (
