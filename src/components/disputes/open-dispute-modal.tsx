@@ -54,7 +54,7 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
             <Input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Ex: Travail non effectue, qualite insuffisante..."
+              placeholder="Ex: Travail non effectué, qualité insuffisante..."
               className="border-workon-border bg-workon-bg text-workon-ink placeholder-workon-muted"
             />
           </div>

@@ -42,7 +42,7 @@ export function MissionPhotos({ missionId, canEdit = false }: MissionPhotosProps
   const uploadMutation = useMutation({
     mutationFn: (file: File) => api.uploadMissionPhoto(missionId, file),
     onSuccess: () => {
-      toast.success("Photo ajoutee !");
+      toast.success("Photo ajoutée !");
       queryClient.invalidateQueries({ queryKey: ["mission-photos", missionId] });
     },
     onError: (err) =>
@@ -52,7 +52,7 @@ export function MissionPhotos({ missionId, canEdit = false }: MissionPhotosProps
   const deleteMutation = useMutation({
     mutationFn: (photoId: string) => api.deleteMissionPhoto(missionId, photoId),
     onSuccess: () => {
-      toast.success("Photo supprimee");
+      toast.success("Photo supprimée");
       queryClient.invalidateQueries({ queryKey: ["mission-photos", missionId] });
     },
     onError: (err) =>
@@ -65,13 +65,13 @@ export function MissionPhotos({ missionId, canEdit = false }: MissionPhotosProps
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error("Seules les images sont acceptees");
+      toast.error("Seules les images sont acceptées");
       return;
     }
 
     // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("La photo ne doit pas depasser 10 Mo");
+      toast.error("La photo ne doit pas dépasser 10 Mo");
       return;
     }
 
