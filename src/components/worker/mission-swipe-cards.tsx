@@ -111,7 +111,7 @@ export function MissionSwipeCards({ missions, onReserve, onReject, onSave }: Pro
                   </span>
                 )}
                 <span className="inline-flex items-center rounded-xl bg-workon-bg px-2.5 py-1 text-xs text-workon-gray">
-                  Publiee {formatDistanceToNow(new Date(currentMission.createdAt), { addSuffix: true, locale: fr })}
+                  Publiée {formatDistanceToNow(new Date(currentMission.createdAt), { addSuffix: true, locale: fr })}
                 </span>
               </div>
 

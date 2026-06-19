@@ -30,10 +30,10 @@ import { fr } from "date-fns/locale";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   PENDING: { label: "En attente", color: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30" },
-  CONFIRMED: { label: "Confirmee", color: "bg-blue-500/20 text-blue-600 border-blue-500/30" },
+  CONFIRMED: { label: "Confirmée", color: "bg-blue-500/20 text-blue-600 border-blue-500/30" },
   IN_PROGRESS: { label: "En cours", color: "bg-purple-500/20 text-purple-600 border-purple-500/30" },
-  COMPLETED: { label: "Terminee", color: "bg-green-500/20 text-green-600 border-green-500/30" },
-  CANCELLED: { label: "Annulee", color: "bg-red-500/20 text-red-400 border-red-500/30" },
+  COMPLETED: { label: "Terminée", color: "bg-green-500/20 text-green-600 border-green-500/30" },
+  CANCELLED: { label: "Annulée", color: "bg-red-500/20 text-red-400 border-red-500/30" },
   NO_SHOW: { label: "Absence", color: "bg-neutral-500/20 text-neutral-500 border-neutral-500/30" },
 };
 

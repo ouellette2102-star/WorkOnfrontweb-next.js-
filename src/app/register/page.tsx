@@ -99,7 +99,7 @@ function RegisterInner() {
     } catch (err) {
       console.warn("[register] active legal versions unavailable", err);
       setConsentStatusError(
-        "Impossible de charger les versions legales actives. Elles seront verifiees avant l'acceptation.",
+        "Impossible de charger les versions légales actives. Elles seront vérifiées avant l'acceptation.",
       );
     }
 

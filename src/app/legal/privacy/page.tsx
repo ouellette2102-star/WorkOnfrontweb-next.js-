@@ -13,9 +13,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialite",
+  title: "Politique de confidentialité",
   description:
-    "Politique de confidentialite de WorkOn. Conforme a la Loi 25 du Quebec. Decouvrez comment nous collectons, utilisons et protegeons vos renseignements personnels.",
+    "Politique de confidentialité de WorkOn. Conforme à la Loi 25 du Québec. Découvrez comment nous collectons, utilisons et protégeons vos renseignements personnels.",
 };
 
 const VERSION = "2.0";

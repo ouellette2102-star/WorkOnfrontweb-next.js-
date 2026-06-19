@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return errorResponse("INVALID_REQUEST", "Corps de requete invalide", 400);
+      return errorResponse("INVALID_REQUEST", "Corps de requête invalide", 400);
     }
 
     // Validate payload
