@@ -22,8 +22,8 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   IN_PROGRESS: { label: "En cours", color: "bg-purple-500/20 text-purple-400" },
   WAITING_USER: { label: "En attente", color: "bg-yellow-500/20 text-yellow-400" },
   WAITING_ADMIN: { label: "En traitement", color: "bg-orange-500/20 text-orange-400" },
-  RESOLVED: { label: "Resolu", color: "bg-green-500/20 text-green-400" },
-  CLOSED: { label: "Ferme", color: "bg-neutral-500/20 text-neutral-400" },
+  RESOLVED: { label: "Résolu", color: "bg-green-500/20 text-green-400" },
+  CLOSED: { label: "Fermé", color: "bg-neutral-500/20 text-neutral-400" },
 };
 
 export default function SupportPage() {
@@ -60,7 +60,7 @@ export default function SupportPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
-      toast.success("Message envoye");
+      toast.success("Message envoyé");
       setReplyContent("");
       // Refresh ticket detail
       if (selectedTicket) {
@@ -74,7 +74,7 @@ export default function SupportPage() {
     mutationFn: (id: string) => api.closeTicket(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
-      toast.success("Ticket ferme");
+      toast.success("Ticket fermé");
       setSelectedTicket(null);
     },
     onError: () => toast.error("Erreur lors de la fermeture"),
@@ -216,7 +216,7 @@ export default function SupportPage() {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Decrivez votre probleme en detail..."
+                  placeholder="Décrivez votre problème en détail..."
                   rows={4}
                   className="w-full rounded-xl border border-workon-border bg-white shadow-sm p-3 text-workon-ink placeholder-workon-muted/50 focus:border-red-500 focus:outline-none"
                 />
@@ -228,7 +228,7 @@ export default function SupportPage() {
                   className="flex-1 bg-workon-primary hover:bg-workon-primary/90"
                 >
                   {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Creer le ticket
+                  Créer le ticket
                 </Button>
                 <Button variant="outline" onClick={() => setShowCreate(false)}>
                   Annuler
@@ -248,7 +248,7 @@ export default function SupportPage() {
         <div className="rounded-xl border border-workon-border bg-white shadow-sm p-12 text-center">
           <HelpCircle className="mx-auto mb-4 h-12 w-12 text-workon-muted/60" />
           <h3 className="mb-2 text-lg font-semibold text-workon-ink">Aucun ticket</h3>
-          <p className="text-workon-muted">Vous n&apos;avez pas encore cree de ticket de support.</p>
+          <p className="text-workon-muted">Vous n&apos;avez pas encore créé de ticket de support.</p>
         </div>
       ) : (
         <div className="space-y-3">
