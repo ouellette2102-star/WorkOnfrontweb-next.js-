@@ -94,7 +94,7 @@ describe("ConsentProvider", () => {
 
     const modal = await screen.findByTestId("consent-modal");
     expect(modal).toHaveTextContent("TERMS,PRIVACY");
-    expect(modal).toHaveTextContent("Impossible de verifier le consentement");
+    expect(modal).toHaveTextContent("Impossible de vérifier le consentement");
   });
 
   it("accepts active documents and closes only after status confirms completion", async () => {

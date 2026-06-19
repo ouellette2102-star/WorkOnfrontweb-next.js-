@@ -93,11 +93,11 @@ export default async function EmployerDashboardPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-workon-muted">Ville</p>
-              <p className="mt-0.5 text-sm text-workon-ink">{profile.city || "Non renseignee"}</p>
+              <p className="mt-0.5 text-sm text-workon-ink">{profile.city || "Non renseignée"}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-workon-muted">Telephone</p>
-              <p className="mt-0.5 text-sm text-workon-ink">{profile.phone || "Non renseigne"}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-workon-muted">Téléphone</p>
+              <p className="mt-0.5 text-sm text-workon-ink">{profile.phone || "Non renseigné"}</p>
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-workon-muted">Email</p>

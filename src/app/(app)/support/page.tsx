@@ -195,12 +195,12 @@ export default function SupportPage() {
                 <Input
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  placeholder="Resume du probleme..."
+                  placeholder="Résumé du problème..."
                   className="border-workon-border bg-white text-workon-ink placeholder-workon-muted/50"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-workon-muted">Categorie</label>
+                <label className="mb-1 block text-sm text-workon-muted">Catégorie</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}

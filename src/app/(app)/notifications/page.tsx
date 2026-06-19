@@ -270,24 +270,24 @@ const bucketMeta: Record<
   { eyebrow: string; title: string; description: string }
 > = {
   priority: {
-    eyebrow: "A traiter",
-    title: "Priorite immediate",
-    description: "Elements non lus ou sensibles qui peuvent bloquer une mission.",
+    eyebrow: "À traiter",
+    title: "Priorité immédiate",
+    description: "Éléments non lus ou sensibles qui peuvent bloquer une mission.",
   },
   money: {
     eyebrow: "Confiance",
     title: "Contrats et paiements",
-    description: "Factures, depot, litige, verification et mouvements d'argent.",
+    description: "Factures, dépôt, litige, vérification et mouvements d'argent.",
   },
   operations: {
-    eyebrow: "Execution",
+    eyebrow: "Exécution",
     title: "Missions, messages et matchs",
-    description: "Activite qui fait avancer le travail terrain.",
+    description: "Activité qui fait avancer le travail terrain.",
   },
   history: {
     eyebrow: "Historique",
-    title: "Mises a jour",
-    description: "Informations conservees pour suivi et reference.",
+    title: "Mises à jour",
+    description: "Informations conservées pour suivi et référence.",
   },
 };
 
@@ -330,7 +330,7 @@ function getActionLabel(n: Notification): string {
   if (type.includes("contract")) return "Voir le contrat";
   if (type.includes("message")) return "Ouvrir le fil";
   if (type.includes("offer")) return "Voir l'offre";
-  if (type.includes("booking")) return "Voir reservation";
+  if (type.includes("booking")) return "Voir réservation";
   if (type.includes("mission")) return "Voir mission";
   if (type.includes("lead")) return "Voir le lead";
   if (type.includes("swipe")) return "Voir le match";
@@ -418,8 +418,8 @@ export default function NotificationsPage() {
                 Notifications
               </h1>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/70">
-                Les signaux sont regroupes par importance pour savoir quoi faire
-                maintenant, quoi proteger et quoi suivre.
+                Les signaux sont regroupés par importance pour savoir quoi faire
+                maintenant, quoi protéger et quoi suivre.
               </p>
             </div>
 
@@ -442,7 +442,7 @@ export default function NotificationsPage() {
 
           <div className="grid grid-cols-3 gap-2">
             <SignalMetric label="Non lues" value={unreadCount} />
-            <SignalMetric label="Priorite" value={actionRequiredCount} />
+            <SignalMetric label="Priorité" value={actionRequiredCount} />
             <SignalMetric label="Argent" value={moneyCount} />
           </div>
         </div>
@@ -452,14 +452,14 @@ export default function NotificationsPage() {
         <NotificationState
           icon={Loader2}
           title="Chargement des signaux"
-          text="On recupere les actions, messages et paiements recents."
+          text="On récupère les actions, messages et paiements récents."
           spinning
         />
       ) : isError ? (
         <NotificationState
           icon={TriangleAlert}
           title="Impossible de charger les notifications"
-          text="Verifiez votre connexion et reessayez."
+          text="Vérifiez votre connexion et réessayez."
           tone="danger"
         >
           <button
@@ -473,14 +473,14 @@ export default function NotificationsPage() {
             ) : (
               <RefreshCcw className="h-4 w-4" />
             )}
-            Reessayer
+            Réessayer
           </button>
         </NotificationState>
       ) : safeNotifications.length === 0 ? (
         <NotificationState
           icon={BellOff}
           title="Aucune notification pour le moment"
-          text="Les prochains messages, offres, contrats et paiements apparaitront ici."
+          text="Les prochains messages, offres, contrats et paiements apparaîtront ici."
         />
       ) : (
         <div className="mt-4 space-y-5">
@@ -650,7 +650,7 @@ function NotificationCard({
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full border border-workon-border bg-white px-2.5 py-1 text-[10px] font-bold text-workon-stone">
               <ShieldCheck className="h-3 w-3 text-workon-trust-green" />
-              Trace conservee
+              Trace conservée
             </span>
             <span className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-workon-primary opacity-80 transition group-hover:opacity-100">
               {actionLabel}
