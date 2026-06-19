@@ -199,7 +199,7 @@ export async function POST(
     try {
       body = await request.json();
     } catch {
-      return errorResponse("INVALID_REQUEST", "Corps de requete invalide", 400);
+      return errorResponse("INVALID_REQUEST", "Corps de requête invalide", 400);
     }
 
     if (!body.content?.trim()) {

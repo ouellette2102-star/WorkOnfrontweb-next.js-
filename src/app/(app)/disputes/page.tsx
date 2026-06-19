@@ -323,7 +323,7 @@ function EvidenceForm({
     mutationFn: () =>
       api.addDisputeTextEvidence(disputeId, { type: "TEXT", content }),
     onSuccess: () => {
-      toast.success("Preuve ajoutee avec succes !");
+      toast.success("Preuve ajoutée avec succès !");
       setContent("");
       onSuccess();
     },
@@ -335,7 +335,7 @@ function EvidenceForm({
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Decrivez votre preuve : captures d'ecran, temoignages, details..."
+        placeholder="Décrivez votre preuve : captures d'écran, témoignages, détails..."
         rows={3}
         className="w-full rounded-xl border border-workon-border bg-workon-bg p-3 text-sm text-workon-ink placeholder-workon-muted/50 focus:border-workon-primary focus:outline-none focus:ring-1 focus:ring-workon-primary"
       />

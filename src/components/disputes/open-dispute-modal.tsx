@@ -22,7 +22,7 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
   const createMutation = useMutation({
     mutationFn: () => api.createDispute({ localMissionId, reason, description }),
     onSuccess: () => {
-      toast.success("Litige ouvert avec succes");
+      toast.success("Litige ouvert avec succès");
       setReason("");
       setDescription("");
       onSuccess?.();

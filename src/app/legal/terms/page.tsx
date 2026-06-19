@@ -18,7 +18,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Conditions d'utilisation",
   description:
-    "Conditions generales d'utilisation de WorkOn, plateforme de mise en relation pour travailleurs autonomes au Quebec.",
+    "Conditions générales d'utilisation de WorkOn, plateforme de mise en relation pour travailleurs autonomes au Québec.",
 };
 
 const VERSION = "2.0";

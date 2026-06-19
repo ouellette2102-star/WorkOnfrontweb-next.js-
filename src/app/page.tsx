@@ -166,7 +166,7 @@ function SystemSection() {
     {
       num: "04",
       title: "Opportunités livrées",
-      desc: "Chaque demande qualifiée est livrée directement sur votre téléphone. Vous recevez le nom, le numero et le besoin exact du client.",
+      desc: "Chaque demande qualifiée est livrée directement sur votre téléphone. Vous recevez le nom, le numéro et le besoin exact du client.",
       accent: "border-workon-trust-green/20 bg-workon-trust-green/5 text-workon-trust-green",
     },
   ];
