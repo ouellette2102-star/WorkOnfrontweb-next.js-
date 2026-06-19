@@ -33,7 +33,7 @@ type EnrichedConversation = ConversationItem & {
 
 const FILTERS: Array<{ value: InboxFilter; label: string }> = [
   { value: "all", label: "Tout" },
-  { value: "priority", label: "Priorite" },
+  { value: "priority", label: "Priorité" },
   { value: "mission", label: "Missions" },
   { value: "direct", label: "Matchs" },
 ];
@@ -61,7 +61,7 @@ function enrichConversation(conv: ConversationItem): EnrichedConversation {
     isDirect,
     isPriority,
     lastMessageDate,
-    statusLabel: isPriority ? "A traiter" : isDirect ? "Match actif" : "Mission",
+    statusLabel: isPriority ? "À traiter" : isDirect ? "Match actif" : "Mission",
     statusClassName: isPriority
       ? "border-workon-copper/30 bg-workon-copper/10 text-workon-copper"
       : isDirect
@@ -110,14 +110,14 @@ export default function MessagesPage() {
             <div className="min-w-0">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
                 <MessageCircle className="h-3.5 w-3.5 text-workon-gold" />
-                Inbox operationnelle
+                Inbox opérationnelle
               </div>
               <h1 className="font-[family-name:var(--font-cabinet)] text-3xl font-black tracking-tight text-white">
                 Messages
               </h1>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/70">
                 Suis les conversations qui font avancer les missions, les matchs
-                et les prochaines decisions.
+                et les prochaines décisions.
               </p>
             </div>
 
@@ -132,7 +132,7 @@ export default function MessagesPage() {
 
           <div className="grid grid-cols-3 gap-2">
             <InboxMetric label="Non lus" value={unreadCount} />
-            <InboxMetric label="Priorite" value={priorityCount} />
+            <InboxMetric label="Priorité" value={priorityCount} />
             <InboxMetric label="Missions" value={missionCount} />
           </div>
         </div>
@@ -162,14 +162,14 @@ export default function MessagesPage() {
         <StatePanel
           icon={Loader2}
           title="Chargement de l'inbox"
-          text="On recupere les conversations et les priorites."
+          text="On récupère les conversations et les priorités."
           spinning
         />
       ) : isError ? (
         <StatePanel
           icon={MessageCircle}
           title="Impossible de charger les conversations"
-          text="Verifie ta connexion et reessaie dans quelques instants."
+          text="Vérifie ta connexion et réessaie dans quelques instants."
           tone="danger"
         />
       ) : enriched.length === 0 ? (
@@ -178,14 +178,14 @@ export default function MessagesPage() {
         <div className="mt-4 space-y-4">
           {priorityCount > 0 && filter === "all" && (
             <InboxSection
-              title="A traiter maintenant"
+              title="À traiter maintenant"
               eyebrow={`${priorityCount} conversation${priorityCount > 1 ? "s" : ""}`}
               conversations={enriched.filter((conv) => conv.isPriority)}
             />
           )}
 
           <InboxSection
-            title={filter === "all" ? "Toutes les conversations" : "Resultats filtres"}
+            title={filter === "all" ? "Toutes les conversations" : "Résultats filtrés"}
             eyebrow={`${filtered.length} fil${filtered.length > 1 ? "s" : ""} actif${filtered.length > 1 ? "s" : ""}`}
             conversations={filtered}
           />
@@ -220,7 +220,7 @@ function InboxSection({
       <section className="workon-premium-card rounded-[24px] p-6 text-center">
         <Search className="mx-auto h-6 w-6 text-workon-muted" />
         <p className="mt-2 text-sm font-semibold text-workon-ink">
-          Aucun resultat dans ce filtre
+          Aucun résultat dans ce filtre
         </p>
       </section>
     );
@@ -313,7 +313,7 @@ function ConversationCard({ conversation: conv }: { conversation: EnrichedConver
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-workon-trust-green/20 bg-workon-trust-green/10 px-2.5 py-1 text-[10px] font-bold text-workon-trust-green">
               <ShieldCheck className="h-3 w-3" />
-              Contexte conserve
+              Contexte conservé
             </span>
             <span className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-workon-primary opacity-80 transition group-hover:opacity-100">
               Ouvrir
@@ -336,8 +336,8 @@ function EmptyInbox({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }
         Aucune conversation active
       </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-workon-gray">
-        Les messages apparaitront quand un match, une mission ou une reservation
-        necessite une decision.
+        Les messages apparaîtront quand un match, une mission ou une réservation
+        nécessite une décision.
       </p>
       <Link
         href={ctaHref}

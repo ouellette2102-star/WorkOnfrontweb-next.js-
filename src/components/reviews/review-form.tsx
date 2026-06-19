@@ -29,7 +29,7 @@ export function ReviewForm({
     e.preventDefault();
 
     if (rating === 0) {
-      setError("Veuillez selectionner une note");
+      setError("Veuillez sélectionner une note");
       return;
     }
 
@@ -68,7 +68,7 @@ export function ReviewForm({
       <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-6 text-center">
         <div className="mb-3 text-4xl">🎉</div>
         <h3 className="mb-2 text-xl font-bold text-green-400">Merci pour votre avis !</h3>
-        <p className="text-white/70">Votre feedback aide la communaute WorkOn.</p>
+        <p className="text-white/70">Votre feedback aide la communauté WorkOn.</p>
       </div>
     );
   }
@@ -105,7 +105,7 @@ export function ReviewForm({
       {/* Selected rating text */}
       {rating > 0 && (
         <p className="text-sm text-white/60">
-          {rating === 1 && "Tres insatisfait"}
+          {rating === 1 && "Très insatisfait"}
           {rating === 2 && "Insatisfait"}
           {rating === 3 && "Correct"}
           {rating === 4 && "Satisfait"}
@@ -123,7 +123,7 @@ export function ReviewForm({
           onChange={(e) => {
             if (e.target.value.length <= 500) setComment(e.target.value);
           }}
-          placeholder="Partagez votre experience..."
+          placeholder="Partagez votre expérience..."
           maxLength={500}
           rows={3}
           className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-white/40 focus:border-red-500 focus:outline-none"
