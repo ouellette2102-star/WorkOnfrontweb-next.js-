@@ -28,17 +28,17 @@ const PAGE_SIZE = 12;
 
 const CATEGORY_LABELS: Record<string, string> = {
   other: "Autres services",
-  cleaning: "Menage",
-  menage: "Menage",
-  reparation: "Reparation",
+  cleaning: "Ménage",
+  menage: "Ménage",
+  reparation: "Réparation",
   entretien: "Entretien",
-  snow_removal: "Deneigement",
+  snow_removal: "Déneigement",
   paysagement: "Paysagement",
   construction: "Construction",
-  "construction-legere": "Construction legere",
+  "construction-legere": "Construction légère",
   plomberie: "Plomberie",
-  electrical: "Electricite",
-  electricite: "Electricite",
+  electrical: "Électricité",
+  electricite: "Électricité",
 };
 
 function formatCategoryLabel(value?: string) {
@@ -81,7 +81,7 @@ export default async function MissionsFeedPage({
       <header className="workon-dark-panel overflow-hidden rounded-[24px] p-5 shadow-[0_18px_40px_rgba(8,34,25,0.18)]">
         <p className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white/78">
           <Briefcase className="h-3.5 w-3.5 text-workon-gold" />
-          Opportunites locales
+          Opportunités locales
         </p>
         <div className="mt-4 flex items-end justify-between gap-4">
           <div>
@@ -92,7 +92,7 @@ export default async function MissionsFeedPage({
               {feed.total.toLocaleString("fr-CA")} mission
               {feed.total > 1 ? "s" : ""} disponible
               {feed.total > 1 ? "s" : ""}
-              {city ? ` a ${city}` : ""}
+              {city ? ` à ${city}` : ""}
               {categoryLabel ? ` en ${categoryLabel}` : ""}. Compare le budget, le lieu
               et les signaux de confiance avant de postuler.
             </p>
@@ -108,9 +108,9 @@ export default async function MissionsFeedPage({
         </div>
 
         <div className="mt-5 grid grid-cols-3 gap-2 text-[11px] text-white/72">
-          <TrustMini icon={ShieldCheck} label="Paiement" value="securise" />
+          <TrustMini icon={ShieldCheck} label="Paiement" value="sécurisé" />
           <TrustMini icon={SlidersHorizontal} label="Filtres" value="propres" />
-          <TrustMini icon={MapPin} label="Local" value="verifie" />
+          <TrustMini icon={MapPin} label="Local" value="vérifié" />
         </div>
       </header>
 
@@ -128,7 +128,7 @@ export default async function MissionsFeedPage({
             Feed
           </p>
           <h2 className="font-heading text-lg font-bold text-workon-ink">
-            {hasFilters ? "Resultats filtres" : "A traiter maintenant"}
+            {hasFilters ? "Résultats filtrés" : "À traiter maintenant"}
           </h2>
         </div>
         {hasFilters && (
@@ -189,8 +189,8 @@ function EmptyState({ category, city }: { category?: string; city?: string }) {
       </h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-workon-muted">
         {hasFilter
-          ? "Elargis la ville ou retire une categorie pour voir plus d'opportunites."
-          : "Le feed se remplit avec les nouvelles demandes. Reviens bientot ou explore la carte."}
+          ? "Élargis la ville ou retire une catégorie pour voir plus d'opportunités."
+          : "Le feed se remplit avec les nouvelles demandes. Reviens bientôt ou explore la carte."}
       </p>
       <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
         {hasFilter && (
@@ -198,7 +198,7 @@ function EmptyState({ category, city }: { category?: string; city?: string }) {
             href="/missions"
             className="inline-flex h-11 items-center justify-center rounded-2xl border border-workon-border bg-white px-4 text-sm font-bold text-workon-ink hover:bg-workon-bg-cream"
           >
-            Reinitialiser
+            Réinitialiser
           </Link>
         )}
         <Link
@@ -250,11 +250,11 @@ function Pagination({
             href={hrefFor(page - 1)}
             className="rounded-full border border-workon-border bg-workon-bg px-3 py-1.5 text-xs font-bold text-workon-ink hover:border-workon-primary hover:text-workon-primary"
           >
-            Precedent
+            Précédent
           </Link>
         ) : (
           <span className="rounded-full border border-workon-border bg-workon-bg px-3 py-1.5 text-xs font-bold text-workon-muted opacity-50">
-            Precedent
+            Précédent
           </span>
         )}
         {page < totalPages ? (
