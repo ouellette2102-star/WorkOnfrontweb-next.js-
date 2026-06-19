@@ -67,7 +67,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
     color: "border-emerald-200 bg-emerald-50 text-emerald-700",
   },
   assigned: {
-    label: "Assignee",
+    label: "Assignée",
     color: "border-amber-200 bg-amber-50 text-amber-700",
   },
   in_progress: {
@@ -75,15 +75,15 @@ const statusConfig: Record<string, { label: string; color: string }> = {
     color: "border-blue-200 bg-blue-50 text-blue-700",
   },
   completed: {
-    label: "Terminee",
+    label: "Terminée",
     color: "border-violet-200 bg-violet-50 text-violet-700",
   },
   paid: {
-    label: "Payee",
+    label: "Payée",
     color: "border-emerald-200 bg-emerald-50 text-emerald-700",
   },
   cancelled: {
-    label: "Annulee",
+    label: "Annulée",
     color: "border-stone-200 bg-stone-50 text-stone-500",
   },
 };
@@ -114,25 +114,25 @@ const categoryIcons: Record<string, LucideIcon> = {
 const NEW_THRESHOLD_MS = 6 * 60 * 60 * 1000;
 
 const categoryLabels: Record<string, string> = {
-  cleaning: "Menage",
-  menage: "Menage",
-  snow_removal: "Deneigement",
-  deneigement: "Deneigement",
-  moving: "Demenagement",
-  handyman: "Reparations",
-  reparation: "Reparation",
+  cleaning: "Ménage",
+  menage: "Ménage",
+  snow_removal: "Déneigement",
+  deneigement: "Déneigement",
+  moving: "Déménagement",
+  handyman: "Réparations",
+  reparation: "Réparation",
   gardening: "Jardinage",
   paysagement: "Paysagement",
   painting: "Peinture",
   delivery: "Livraison",
   plumbing: "Plomberie",
   plomberie: "Plomberie",
-  electrical: "Electricite",
-  electricite: "Electricite",
+  electrical: "Électricité",
+  electricite: "Électricité",
   construction: "Construction",
-  "construction-legere": "Construction legere",
+  "construction-legere": "Construction légère",
   lavage: "Lavage",
-  renovation: "Renovation",
+  renovation: "Rénovation",
   other: "Autres services",
 };
 
@@ -267,10 +267,10 @@ export function MissionCard({
             <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-workon-muted">
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5 text-workon-copper" />
-                {mission.city || "Ville a confirmer"}
+                {mission.city || "Ville à confirmer"}
               </span>
               {mission.distanceKm != null && (
-                <span>a {mission.distanceKm.toFixed(1)} km</span>
+                <span>à {mission.distanceKm.toFixed(1)} km</span>
               )}
             </p>
             {mission.description && (
@@ -298,7 +298,7 @@ export function MissionCard({
           />
           <Stat
             icon={PackageCheck}
-            label="Materiel"
+            label="Matériel"
             value={formatMaterial(mission.materialProvided)}
           />
         </div>
@@ -306,11 +306,11 @@ export function MissionCard({
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
           <span className="inline-flex items-center gap-1.5 font-medium text-workon-stone">
             <ShieldCheck className="h-3.5 w-3.5 text-workon-trust-green" />
-            Paiement securise
+            Paiement sécurisé
           </span>
           <span className="inline-flex items-center gap-1.5 font-medium text-workon-stone">
             <FileCheck className="h-3.5 w-3.5 text-workon-primary" />
-            Contrat protege
+            Contrat protégé
           </span>
           {mission.offersCount != null && mission.offersCount > 0 && (
             <span
@@ -406,7 +406,7 @@ function SignalBadge({
 }
 
 function formatDuration(minutes: number | null | undefined): string {
-  if (minutes == null) return "A preciser";
+  if (minutes == null) return "À préciser";
   if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -415,7 +415,7 @@ function formatDuration(minutes: number | null | undefined): string {
 }
 
 function formatMaterial(value: boolean | null | undefined): string {
-  if (value == null) return "A preciser";
+  if (value == null) return "À préciser";
   return value ? "Fourni" : "Non fourni";
 }
 
@@ -438,5 +438,5 @@ function formatPriceLabel(priceRange?: string, price?: number): string {
     return trimmed.replace(/\s*\$$/, " $");
   }
   if (price != null) return `${price} $`;
-  return "A preciser";
+  return "À préciser";
 }
