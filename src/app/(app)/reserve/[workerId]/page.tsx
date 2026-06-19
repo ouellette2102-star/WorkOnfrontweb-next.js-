@@ -60,13 +60,13 @@ export default function ReservePage() {
 
   async function handleDirectRequest() {
     if (!title.trim()) {
-      toast.error("Decris ton besoin avant d'envoyer.");
+      toast.error("Décris ton besoin avant d'envoyer.");
       return;
     }
 
     setSendingDirect(true);
     toast.info("Matchez d'abord dans Pros pour ouvrir le chat", {
-      description: `Swipez sur ${worker?.firstName || "ce pro"} pour demarrer une conversation.`,
+      description: `Swipez sur ${worker?.firstName || "ce pro"} pour démarrer une conversation.`,
     });
     router.push("/swipe");
     setSendingDirect(false);
@@ -74,11 +74,11 @@ export default function ReservePage() {
 
   async function handleBooking() {
     if (!scheduledDate) {
-      toast.error("Veuillez selectionner une date.");
+      toast.error("Veuillez sélectionner une date.");
       return;
     }
     if (!title.trim()) {
-      toast.error("Veuillez entrer un titre pour la reservation.");
+      toast.error("Veuillez entrer un titre pour la réservation.");
       return;
     }
 
@@ -101,18 +101,18 @@ export default function ReservePage() {
         const checkout = await api.createBookingCheckout(booking.id);
         window.location.href = checkout.checkoutUrl;
       } else {
-        toast.success("Reservation envoyee avec succes.");
+        toast.success("Réservation envoyée avec succès.");
         router.push("/bookings");
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("not available") || msg.includes("disponible")) {
-        toast.error("Ce professionnel n'a pas encore configure ses disponibilites. Envoyez-lui une demande directe.");
+        toast.error("Ce professionnel n'a pas encore configuré ses disponibilités. Envoyez-lui une demande directe.");
       } else if (msg.includes("Consent") || msg.includes("consent")) {
         toast.error("Vous devez accepter les conditions d'utilisation avant de payer.");
         router.push("/onboarding");
       } else {
-        toast.error(msg || "Erreur lors de la reservation.");
+        toast.error(msg || "Erreur lors de la réservation.");
       }
     } finally {
       setLoading(false);
@@ -131,9 +131,9 @@ export default function ReservePage() {
     return (
       <div className="min-h-screen bg-workon-bg px-4 py-12">
         <div className="mx-auto max-w-md rounded-[28px] border border-workon-border bg-white p-8 text-center shadow-sm">
-          <p className="font-semibold text-workon-ink">Professionnel non trouve.</p>
+          <p className="font-semibold text-workon-ink">Professionnel non trouvé.</p>
           <Button asChild variant="outline" className="mt-5">
-            <Link href="/home">Retour a WorkOn</Link>
+            <Link href="/home">Retour à WorkOn</Link>
           </Button>
         </div>
       </div>
@@ -151,7 +151,7 @@ export default function ReservePage() {
             Passer en mode Client
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-workon-muted">
-            La reservation se fait en mode Client. Tu peux revenir au mode Pro ensuite.
+            La réservation se fait en mode Client. Tu peux revenir au mode Pro ensuite.
           </p>
           <Button type="button" variant="premium" className="mt-6 w-full" onClick={() => setMode("client")}>
             Passer en Mode Client
@@ -188,13 +188,13 @@ export default function ReservePage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
-                    Reservation protegee
+                    Réservation protégée
                   </p>
                   <h1 className="mt-1 font-heading text-2xl font-bold text-workon-ink">
-                    Definis la mission avant de payer.
+                    Définis la mission avant de payer.
                   </h1>
                   <p className="mt-2 text-sm leading-relaxed text-workon-muted">
-                    WorkOn garde le contexte, les conditions et le paiement ensemble pour eviter les zones grises.
+                    WorkOn garde le contexte, les conditions et le paiement ensemble pour éviter les zones grises.
                   </p>
                 </div>
                 <div className="hidden rounded-2xl bg-workon-primary-subtle p-3 text-workon-primary sm:block">
@@ -203,18 +203,18 @@ export default function ReservePage() {
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                <StepCard number="1" title="Mission" text="Titre, date, duree et details." />
+                <StepCard number="1" title="Mission" text="Titre, date, durée et détails." />
                 <StepCard number="2" title="Contrat" text="Conditions visibles avant confirmation." />
-                <StepCard number="3" title="Paiement" text="Depot Stripe si montant indique." />
+                <StepCard number="3" title="Paiement" text="Dépôt Stripe si montant indiqué." />
               </div>
             </section>
 
             <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
               <SectionTitle
                 icon={Clock}
-                eyebrow="Disponibilites"
-                title="Choisir un creneau"
-                text="Les choix rapides pre-remplissent la date et l'heure; tu peux les modifier."
+                eyebrow="Disponibilités"
+                title="Choisir un créneau"
+                text="Les choix rapides pré-remplissent la date et l'heure; tu peux les modifier."
               />
 
               {slots.length > 0 ? (
@@ -245,10 +245,10 @@ export default function ReservePage() {
               ) : (
                 <div className="mt-4 rounded-2xl border border-dashed border-workon-border bg-workon-bg-cream p-4">
                   <p className="text-sm font-semibold text-workon-ink">
-                    Aucun creneau publie pour le moment.
+                    Aucun créneau publié pour le moment.
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-workon-muted">
-                    Tu peux proposer une date ou envoyer une demande directe apres avoir decrit ton besoin.
+                    Tu peux proposer une date ou envoyer une demande directe après avoir décrit ton besoin.
                   </p>
                 </div>
               )}
@@ -257,21 +257,21 @@ export default function ReservePage() {
             <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
               <SectionTitle
                 icon={CalendarDays}
-                eyebrow="Details"
-                title="Mission a reserver"
-                text="Ces informations deviennent la base de la demande et du recapitulatif."
+                eyebrow="Détails"
+                title="Mission à réserver"
+                text="Ces informations deviennent la base de la demande et du récapitulatif."
               />
 
                 <div className="mt-5 grid gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="reservation-title" className="text-workon-ink">
-                      Titre de la reservation *
+                      Titre de la réservation *
                     </Label>
                     <Input
                       id="reservation-title"
                       value={title}
                       onChange={(event) => setTitle(event.target.value)}
-                      placeholder="Ex: Nettoyage residentiel"
+                      placeholder="Ex: Nettoyage résidentiel"
                     className="h-11 scroll-mb-[180px] rounded-2xl bg-white"
                   />
                 </div>
@@ -279,7 +279,7 @@ export default function ReservePage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="reservation-date" className="text-workon-ink">
-                      Date souhaitee *
+                      Date souhaitée *
                     </Label>
                     <Input
                       id="reservation-date"
@@ -307,7 +307,7 @@ export default function ReservePage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="reservation-duration" className="text-workon-ink">
-                      Duree (minutes) *
+                      Durée (minutes) *
                     </Label>
                     <Input
                       id="reservation-duration"
@@ -321,7 +321,7 @@ export default function ReservePage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="reservation-price" className="text-workon-ink">
-                      Prix propose ($CAD) *
+                      Prix proposé ($CAD) *
                     </Label>
                     <Input
                       id="reservation-price"
@@ -341,7 +341,7 @@ export default function ReservePage() {
                   </Label>
                   <Textarea
                     id="reservation-description"
-                    placeholder="Adresse, contraintes, materiel, acces, photos disponibles, attentes..."
+                    placeholder="Adresse, contraintes, matériel, accès, photos disponibles, attentes..."
                     rows={4}
                     value={description}
                     onChange={(event) => setDescription(event.target.value)}
@@ -366,10 +366,10 @@ export default function ReservePage() {
                 Protections visibles
               </p>
               <div className="mt-4 space-y-3">
-                <TrustLine icon={BadgeCheck} text="Identite du profil visible avant action." />
+                <TrustLine icon={BadgeCheck} text="Identité du profil visible avant action." />
                 <TrustLine icon={FileText} text="Termes de contrat lisibles avant confirmation." />
-                <TrustLine icon={WalletCards} text="Depot Stripe seulement si un prix est indique." />
-                <TrustLine icon={ShieldCheck} text="Historique de reservation conserve dans WorkOn." />
+                <TrustLine icon={WalletCards} text="Dépôt Stripe seulement si un prix est indiqué." />
+                <TrustLine icon={ShieldCheck} text="Historique de réservation conservé dans WorkOn." />
               </div>
             </section>
 
@@ -390,7 +390,7 @@ export default function ReservePage() {
                 ) : (
                   <>
                     <CalendarDays className="h-4 w-4" />
-                    {priceNumber > 0 ? "Payer le depot" : "Envoyer la reservation"}
+                    {priceNumber > 0 ? "Payer le dépôt" : "Envoyer la réservation"}
                   </>
                 )}
               </Button>
@@ -422,7 +422,7 @@ export default function ReservePage() {
               </Button>
 
               <p className="mt-4 text-center text-xs leading-relaxed text-workon-muted">
-                Aucuns frais ne sont factures avant confirmation et redirection Stripe.
+                Aucuns frais ne sont facturés avant confirmation et redirection Stripe.
               </p>
             </section>
           </aside>
@@ -454,7 +454,7 @@ function ReservationHero({ worker, fullName }: { worker: WorkerProfile; fullName
         <div className="p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-white/15 bg-white/[0.10] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white/70">
-              Pro selectionne
+              Pro sélectionné
             </span>
             <span className="rounded-full border border-white/15 bg-white/[0.10] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white/70">
               Contrat WorkOn
@@ -482,7 +482,7 @@ function ReservationHero({ worker, fullName }: { worker: WorkerProfile; fullName
             <HeroFact
               icon={WalletCards}
               label="Tarif"
-              value={hourlyRate > 0 ? `${hourlyRate} $/h` : "A fixer"}
+              value={hourlyRate > 0 ? `${hourlyRate} $/h` : "À fixer"}
             />
             <HeroFact icon={ShieldCheck} label="Protection" value="Stripe" />
           </div>
