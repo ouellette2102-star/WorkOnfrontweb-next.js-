@@ -133,7 +133,7 @@ export default function ChatThreadPage() {
               Impossible de charger la conversation
             </p>
             <p className="mt-1 text-xs text-workon-muted">
-              Verifiez votre connexion et reessayez.
+              Vérifiez votre connexion et réessayez.
             </p>
             <button
               type="button"
@@ -144,7 +144,7 @@ export default function ChatThreadPage() {
               {isFetching ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : null}
-              Reessayer
+              Réessayer
             </button>
           </div>
         ) : messages.length === 0 ? (
