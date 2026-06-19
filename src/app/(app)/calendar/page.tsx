@@ -112,14 +112,14 @@ export default function CalendarPage() {
             className="flex items-center gap-1.5 rounded-full bg-workon-primary/10 px-3 py-1.5 text-xs font-medium text-workon-primary transition hover:bg-workon-primary/20"
           >
             <Pencil className="h-3.5 w-3.5" />
-            Disponibilites
+            Disponibilités
           </Link>
           <Link
             href="/bookings"
             className="flex items-center gap-1.5 rounded-full bg-workon-primary/10 px-3 py-1.5 text-xs font-medium text-workon-primary transition hover:bg-workon-primary/20"
           >
             <CalendarDays className="h-3.5 w-3.5" />
-            Reservations
+            Réservations
           </Link>
         </div>
       </div>
@@ -129,7 +129,7 @@ export default function CalendarPage() {
         <button
           onClick={() => setWeekOffset((o) => o - 1)}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-white border border-workon-border text-workon-muted hover:text-workon-ink transition"
-          aria-label="Semaine precedente"
+          aria-label="Semaine précédente"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -215,7 +215,7 @@ function DayDetail({
       {isEmpty ? (
         <div className="rounded-2xl border border-workon-border bg-white p-8 text-center shadow-sm">
           <CalendarDays className="mx-auto mb-3 h-10 w-10 text-workon-muted/30" />
-          <p className="text-sm text-workon-muted">Aucune activite</p>
+          <p className="text-sm text-workon-muted">Aucune activité</p>
         </div>
       ) : (
         <div className="space-y-3">

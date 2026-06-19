@@ -162,7 +162,7 @@ export async function GET(
       const messages: Message[] = Array.isArray(data) ? data : data?.data ?? [];
       return successResponse(messages);
     } catch {
-      return errorResponse("PARSE_ERROR", "Reponse serveur invalide", 502);
+      return errorResponse("PARSE_ERROR", "Réponse serveur invalide", 502);
     }
   } catch (error) {
     console.error("[CHAT_PROXY_ERROR]", error);
@@ -272,7 +272,7 @@ export async function POST(
         source: "backend" as const,
       });
     } catch {
-      return errorResponse("PARSE_ERROR", "Reponse serveur invalide", 502);
+      return errorResponse("PARSE_ERROR", "Réponse serveur invalide", 502);
     }
   } catch (error) {
     console.error("[CHAT_PROXY_ERROR]", error);

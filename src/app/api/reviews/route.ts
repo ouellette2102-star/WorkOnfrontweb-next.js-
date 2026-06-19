@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (typeof body.rating !== "number" || body.rating < 1 || body.rating > 5) {
-      return errorResponse("INVALID_RATING", "Rating doit etre entre 1 et 5", 400);
+      return errorResponse("INVALID_RATING", "Rating doit être entre 1 et 5", 400);
     }
 
     // Create abort controller for timeout
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
       const data = await response.json();
       return successResponse(data);
     } catch {
-      return errorResponse("PARSE_ERROR", "Reponse serveur invalide", 502);
+      return errorResponse("PARSE_ERROR", "Réponse serveur invalide", 502);
     }
   } catch (error) {
     console.error("[REVIEW_PROXY_ERROR]", error);
