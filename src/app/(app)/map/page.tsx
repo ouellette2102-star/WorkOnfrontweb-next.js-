@@ -128,7 +128,7 @@ export default function MapPage() {
   const openCount = missions.filter((mission) => mission.status === "open").length;
   const activeCategoryLabel = category
     ? formatCategoryLabel(category)
-    : "Toutes categories";
+    : "Toutes catégories";
 
   return (
     <div className="mx-auto max-w-6xl space-y-5 px-4 py-5 pb-28">
@@ -137,13 +137,13 @@ export default function MapPage() {
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">
               <Target className="h-3.5 w-3.5 text-workon-gold" />
-              Carte opportunites
+              Carte opportunités
             </p>
             <h1 className="mt-2 font-heading text-2xl font-bold leading-tight text-white">
               Missions proches, preuves visibles.
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-white/70">
-              Priorise les missions autour de toi selon le rayon, la categorie
+              Priorise les missions autour de toi selon le rayon, la catégorie
               et le potentiel terrain.
             </p>
           </div>
@@ -280,7 +280,7 @@ export default function MapPage() {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
-              {view === "map" ? "A proximite" : "Resultats"}
+              {view === "map" ? "À proximité" : "Résultats"}
             </p>
             <h2 className="font-heading text-xl font-bold text-workon-ink">
               {missions.length} mission{missions.length > 1 ? "s" : ""} dans ce rayon
@@ -309,7 +309,7 @@ export default function MapPage() {
             <p className="mt-1 text-sm text-workon-stone">
               {error instanceof Error
                 ? error.message
-                : "Reessaie dans un instant."}
+                : "Réessaie dans un instant."}
             </p>
             <Button
               type="button"
@@ -317,7 +317,7 @@ export default function MapPage() {
               className="mt-4"
               onClick={() => refetch()}
             >
-              Reessayer
+              Réessayer
             </Button>
           </div>
         ) : missions.length === 0 ? (
@@ -329,7 +329,7 @@ export default function MapPage() {
               Rien dans ce rayon.
             </h3>
             <p className="mt-1 text-sm text-workon-muted">
-              Elargis le rayon ou reviens plus tard pour de nouvelles missions.
+              Élargis le rayon ou reviens plus tard pour de nouvelles missions.
             </p>
           </div>
         ) : (
@@ -447,7 +447,7 @@ function MapPreviewCard({ mission }: { mission: MissionMapItem }) {
               </p>
               <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-workon-muted">
                 <ShieldCheck className="h-3.5 w-3.5 text-workon-trust-green" />
-                Paiement securise · contrat protege
+                Paiement sécurisé · contrat protégé
               </p>
             </div>
             <p className="shrink-0 font-heading text-lg font-bold text-workon-copper">
@@ -470,7 +470,7 @@ function MapPreviewCard({ mission }: { mission: MissionMapItem }) {
 }
 
 function formatMoney(value: number | null | undefined): string {
-  if (value == null || !Number.isFinite(value)) return "A confirmer";
+  if (value == null || !Number.isFinite(value)) return "À confirmer";
   return `${Math.round(value).toLocaleString("fr-CA")} $`;
 }
 
