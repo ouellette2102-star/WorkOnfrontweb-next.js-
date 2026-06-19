@@ -1156,7 +1156,7 @@ export default function MissionDetailPage() {
                 Budget
               </p>
               <p className="mt-1 text-xl font-black text-white">
-                {mission.price > 0 ? `${mission.price} $` : "A confirmer"}
+                {mission.price > 0 ? `${mission.price} $` : "À confirmer"}
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
@@ -1177,7 +1177,7 @@ export default function MissionDetailPage() {
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
               <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
-                Publiee
+                Publiée
               </p>
               <p className="mt-1 truncate text-sm font-black text-white">
                 {formatDistanceToNow(new Date(mission.createdAt), {
@@ -1204,20 +1204,20 @@ export default function MissionDetailPage() {
       <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
         <SectionHeading
           eyebrow="Mission"
-          title="Details operationnels"
-          text="Les informations essentielles pour evaluer, accepter ou suivre la mission."
+          title="Détails opérationnels"
+          text="Les informations essentielles pour évaluer, accepter ou suivre la mission."
         />
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <DetailMetric icon={Tag} label="Categorie" value={mission.category} />
+          <DetailMetric icon={Tag} label="Catégorie" value={mission.category} />
           <DetailMetric
             icon={DollarSign}
             label="Budget"
-            value={mission.price > 0 ? `${mission.price} $ CAD` : "Prix a confirmer"}
+            value={mission.price > 0 ? `${mission.price} $ CAD` : "Prix à confirmer"}
           />
           <DetailMetric icon={MapPin} label="Lieu" value={mission.city} />
           <DetailMetric
             icon={Clock3}
-            label="Mise a jour"
+            label="Mise à jour"
             value={formatDistanceToNow(new Date(mission.updatedAt), {
               addSuffix: true,
               locale: fr,
@@ -1241,7 +1241,7 @@ export default function MissionDetailPage() {
         <SectionHeading
           eyebrow="Progression"
           title="Statut de la mission"
-          text="Suivi clair du cycle publication, assignation, execution, paiement."
+          text="Suivi clair du cycle publication, assignation, exécution, paiement."
         />
         <div className="mt-5">
           <MissionTimeline
@@ -1258,7 +1258,7 @@ export default function MissionDetailPage() {
         <SectionHeading
           eyebrow="Preuves"
           title="Photos et contexte"
-          text="Les visuels reduisent les malentendus avant, pendant et apres la mission."
+          text="Les visuels réduisent les malentendus avant, pendant et après la mission."
         />
         <div className="mt-5">
           <MissionPhotos missionId={id} canEdit={isOwner || isAssigned} />
@@ -1270,7 +1270,7 @@ export default function MissionDetailPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <SectionHeading
             eyebrow="Action"
-            title="Prochaine decision"
+            title="Prochaine décision"
             text="Les gestes critiques restent visibles avec le contexte de confiance."
           />
           <span
@@ -1568,12 +1568,12 @@ export default function MissionDetailPage() {
           <div className="space-y-3">
             <TrustSignal
               icon={ShieldCheck}
-              title="Contrat protege"
-              text="Statut, preuves et conditions restent rattaches a la mission."
+              title="Contrat protégé"
+              text="Statut, preuves et conditions restent rattachés à la mission."
             />
             <TrustSignal
               icon={WalletCards}
-              title="Paiement securise"
+              title="Paiement sécurisé"
               text="Paiement, revenus et commission restent lisibles dans le dossier."
             />
             <TrustSignal
