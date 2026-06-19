@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     // Backend returned 409 = already reviewed
     if (response.status === 409) {
-      return errorResponse("ALREADY_REVIEWED", "Vous avez deja laisse un avis pour cette mission", 409);
+      return errorResponse("ALREADY_REVIEWED", "Vous avez déjà laissé un avis pour cette mission", 409);
     }
 
     // Other backend errors

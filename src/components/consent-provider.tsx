@@ -107,8 +107,8 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
       // the user must open WorkOn in a real browser instead.
       setStatusError(
         safeLocalStorage.isAvailable()
-          ? "Session expiree: reconnecte-toi pour accepter les conditions."
-          : "Ton navigateur bloque le stockage local. Ouvre WorkOn directement dans Safari ou Chrome (pas dans l'app Facebook/Instagram/Messenger ni un apercu d'email).",
+          ? "Session expirée: reconnecte-toi pour accepter les conditions."
+          : "Ton navigateur bloque le stockage local. Ouvre WorkOn directement dans Safari ou Chrome (pas dans l'app Facebook/Instagram/Messenger ni un aperçu d'email).",
       );
       setIsLoading(false);
       setShowModal(true);
@@ -140,7 +140,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
       const fallback = incompleteConsentStatus();
       setConsentStatus(fallback);
       setStatusError(
-        "Impossible de verifier le consentement. WorkOn bloque les actions critiques jusqu'a confirmation.",
+        "Impossible de vérifier le consentement. WorkOn bloque les actions critiques jusqu'à confirmation.",
       );
       setShowModal(true);
       return null;
@@ -170,7 +170,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
       }
       if (!token) {
         const error = new Error(
-          "Session expiree. Reconnecte-toi pour accepter les conditions.",
+          "Session expirée. Reconnecte-toi pour accepter les conditions.",
         );
         rejectPendingActions(pendingActionsRef, error);
         throw error;
@@ -188,7 +188,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
       const confirmedStatus = await checkConsentStatus();
       if (!confirmedStatus?.isComplete) {
         const error = new Error(
-          "Consentement envoye, mais le statut n'est pas encore confirme.",
+          "Consentement envoyé, mais le statut n'est pas encore confirmé.",
         );
         rejectPendingActions(pendingActionsRef, error);
         throw error;

@@ -78,7 +78,7 @@ export function EmployerDashboardClient() {
               {totalMissions}
             </p>
           )}
-          <p className="mt-1 text-sm text-workon-muted">Missions creees</p>
+          <p className="mt-1 text-sm text-workon-muted">Missions créées</p>
         </div>
 
         <div className="rounded-2xl border border-workon-border bg-white p-5 shadow-sm">
@@ -120,7 +120,7 @@ export function EmployerDashboardClient() {
               {completedMissions}
             </p>
           )}
-          <p className="mt-1 text-sm text-workon-muted">Completees</p>
+          <p className="mt-1 text-sm text-workon-muted">Complétées</p>
         </div>
       </div>
 
@@ -162,7 +162,7 @@ export function EmployerDashboardClient() {
                 Aucune mission active
               </p>
               <p className="mt-1 text-xs text-workon-muted">
-                Publiez votre premiere mission pour trouver un pro.
+                Publiez votre première mission pour trouver un pro.
               </p>
               <Button
                 asChild
@@ -170,7 +170,7 @@ export function EmployerDashboardClient() {
                 className="mt-4 bg-workon-primary text-white hover:bg-workon-primary/90"
               >
                 <Link href="/missions/new">
-                  Creer une mission
+                  Créer une mission
                   <ArrowRight className="ml-1 h-3.5 w-3.5" />
                 </Link>
               </Button>
@@ -183,7 +183,7 @@ export function EmployerDashboardClient() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-workon-ink">
               <Users className="h-5 w-5 text-workon-primary" />
-              Matches recents
+              Matches récents
             </h2>
             <Link
               href="/matches"
@@ -239,7 +239,7 @@ export function EmployerDashboardClient() {
                 className="mt-4 bg-workon-primary text-white hover:bg-workon-primary/90"
               >
                 <Link href="/pros">
-                  Decouvrir des pros
+                  Découvrir des pros
                   <ArrowRight className="ml-1 h-3.5 w-3.5" />
                 </Link>
               </Button>
@@ -265,7 +265,7 @@ export function EmployerDashboardClient() {
               <p className="text-2xl font-bold text-workon-ink">
                 {stats.completedContracts}
               </p>
-              <p className="text-xs text-workon-muted">Contrats completes</p>
+              <p className="text-xs text-workon-muted">Contrats complétés</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-workon-ink">

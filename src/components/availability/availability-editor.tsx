@@ -123,7 +123,7 @@ export function AvailabilityEditor() {
     for (let i = 0; i < 7; i++) {
       const day = days[i];
       if (day.enabled && day.endTime <= day.startTime) {
-        toast.error(`${DAY_NAMES[i]} : l'heure de fin doit etre apres l'heure de debut`);
+        toast.error(`${DAY_NAMES[i]} : l'heure de fin doit être après l'heure de début`);
         return;
       }
     }
