@@ -85,10 +85,18 @@ export async function getActiveVersions(): Promise<{
   };
 }
 
-/** Vérifier le statut de consentement de l'utilisateur. */
+/**
+ * Vérifier le statut de consentement de l'utilisateur.
+ *
+ * `cache: "no-store"` is critical: this is re-fetched right after a successful
+ * `POST /compliance/accept` to decide whether to close the consent modal. The
+ * backend serves a default ETag, so without this the browser can answer the
+ * re-fetch from its HTTP cache (304) with a stale `isComplete: false`, leaving
+ * the modal open forever even though consent was recorded.
+ */
 export async function getConsentStatus(_token?: string): Promise<ConsentStatus> {
   void _token;
-  return apiFetch<ConsentStatus>("/compliance/status");
+  return apiFetch<ConsentStatus>("/compliance/status", { cache: "no-store" });
 }
 
 /** Accepter un document légal. */
