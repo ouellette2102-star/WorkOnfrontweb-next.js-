@@ -53,8 +53,8 @@ export default function SwipePage() {
   const isHiring = targetRole === "worker";
   const pageTitle = isHiring ? "Trouver un pro" : "Trouver un client";
   const pageSubtitle = isHiring
-    ? "Des profils qualifies avec preuves de confiance."
-    : "Des opportunites pertinentes pour remplir ton horaire.";
+    ? "Des profils qualifiés avec preuves de confiance."
+    : "Des opportunités pertinentes pour remplir ton horaire.";
 
   const {
     data: candidates,
@@ -193,7 +193,7 @@ export default function SwipePage() {
             Erreur de chargement.
           </p>
           <p className="mt-1 text-sm text-workon-stone">
-            Reessaie plus tard ou verifie ta connexion.
+            Réessaie plus tard ou vérifie ta connexion.
           </p>
         </div>
       </div>
@@ -342,8 +342,8 @@ export default function SwipePage() {
 
                   <div className="flex items-start gap-2 border-t border-workon-border pt-3 text-[11px] font-medium leading-relaxed text-workon-stone">
                     <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-workon-trust-green" />
-                    Paiement securise, contrat protege et messagerie deverrouillee
-                    apres match.
+                    Paiement sécurisé, contrat protégé et messagerie déverrouillée
+                    après match.
                   </div>
 
                   <div className="flex justify-center">
@@ -354,7 +354,7 @@ export default function SwipePage() {
                       </span>
                       <span className="flex items-center gap-1 px-2">
                         <ArrowUp className="h-3 w-3" />
-                        Priorite
+                        Priorité
                       </span>
                       <span className="flex items-center gap-1 px-2">
                         <Heart className="h-3 w-3" />
@@ -458,7 +458,7 @@ function CandidateSummary({ candidate }: { candidate: SwipeCandidate }) {
             </span>
           )}
           <span className="rounded-full bg-workon-bg px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-workon-stone">
-            {candidate.reviewCount > 0 ? "Avis verifies" : "Nouveau reseau"}
+            {candidate.reviewCount > 0 ? "Avis vérifiés" : "Nouveau réseau"}
           </span>
         </div>
         <div className="mt-3 flex items-center gap-2">
@@ -490,7 +490,7 @@ function CandidateSummary({ candidate }: { candidate: SwipeCandidate }) {
 
       <div className="shrink-0 text-right">
         <p className="text-[10px] font-bold uppercase tracking-wide text-workon-stone">
-          A partir de
+          À partir de
         </p>
         <p className="font-heading text-2xl font-bold leading-none text-workon-copper">
           {formatRate(candidate.hourlyRate)}
@@ -516,8 +516,8 @@ function CandidateStats({ candidate }: { candidate: SwipeCandidate }) {
       />
       <StatCell
         icon={Clock3}
-        label="Reponse"
-        value={candidate.trustTier === "BASIC" ? "Standard" : "Priorite"}
+        label="Réponse"
+        value={candidate.trustTier === "BASIC" ? "Standard" : "Priorité"}
       />
     </div>
   );
@@ -532,14 +532,14 @@ function WhyMatch({
 }) {
   const reasons = [
     candidate.city
-      ? `${candidate.city} dans ton reseau local`
-      : "Position locale a confirmer",
+      ? `${candidate.city} dans ton réseau local`
+      : "Position locale à confirmer",
     candidate.trustTier === "BASIC"
       ? "Profil admissible WorkOn"
-      : "Identite et reputation renforcees",
+      : "Identité et réputation renforcées",
     isHiring
-      ? "Contrat protege avant de demarrer"
-      : "Client compatible avec une mission encadree",
+      ? "Contrat protégé avant de démarrer"
+      : "Client compatible avec une mission encadrée",
   ];
 
   return (
@@ -572,7 +572,7 @@ function ReviewSignal({ candidate }: { candidate: SwipeCandidate }) {
           Nouveau sur WorkOn.
         </p>
         <p className="mt-1 text-xs text-workon-muted">
-          La decision repose surtout sur le profil, la categorie et les preuves
+          La décision repose surtout sur le profil, la catégorie et les preuves
           de confiance disponibles.
         </p>
       </div>
@@ -585,12 +585,12 @@ function ReviewSignal({ candidate }: { candidate: SwipeCandidate }) {
         <Quote className="mt-0.5 h-4 w-4 shrink-0 text-workon-copper" />
         <div>
           <p className="text-sm font-semibold text-workon-ink">
-            {candidate.reviewCount} client{candidate.reviewCount > 1 ? "s" : ""} ont deja
-            laisse un signal positif.
+            {candidate.reviewCount} client{candidate.reviewCount > 1 ? "s" : ""} ont déjà
+            laissé un signal positif.
           </p>
           <p className="mt-1 text-xs leading-relaxed text-workon-muted">
             Moyenne {safeRating(candidate.avgRating).toFixed(1)} / 5 avec un
-            profil complete a {Math.round(candidate.completionScore || 0)}%.
+            profil complété à {Math.round(candidate.completionScore || 0)}%.
           </p>
         </div>
       </div>
@@ -824,7 +824,7 @@ function getTrustVariant(candidate: SwipeCandidate) {
 function getTrustLabel(candidate: SwipeCandidate) {
   if (candidate.trustTier === "PREMIUM") return "Top Performer";
   if (candidate.trustTier === "TRUSTED") return "De confiance";
-  if (candidate.trustTier === "VERIFIED") return "Identite verifiee";
+  if (candidate.trustTier === "VERIFIED") return "Identité vérifiée";
   if (candidate.reviewCount === 0) return "Nouveau profil";
   return "Fiable";
 }
@@ -833,15 +833,15 @@ function formatTrustScore(candidate: SwipeCandidate) {
   if (candidate.trustScore != null && Number.isFinite(candidate.trustScore)) {
     return `${Math.round(candidate.trustScore)}%`;
   }
-  if (candidate.trustTier === "PREMIUM") return "Elite";
+  if (candidate.trustTier === "PREMIUM") return "Élite";
   if (candidate.trustTier === "TRUSTED") return "Fort";
-  if (candidate.trustTier === "VERIFIED") return "Verifie";
+  if (candidate.trustTier === "VERIFIED") return "Vérifié";
   return "Base";
 }
 
 function formatRate(value: number | null) {
   if (value == null || !Number.isFinite(value) || value <= 0) {
-    return "A confirmer";
+    return "À confirmer";
   }
   return `${Math.round(value)} $/h`;
 }
