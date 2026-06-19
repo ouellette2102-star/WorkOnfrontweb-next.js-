@@ -143,7 +143,7 @@ function RegisterInner() {
       setConsentMissing(
         status.missing.length > 0 ? status.missing : [...REQUIRED_LEGAL_DOCUMENTS],
       );
-      throw new Error("Consentement envoye, mais le statut n'est pas encore confirme.");
+      throw new Error("Consentement envoyé, mais le statut n'est pas encore confirmé.");
     }
 
     setConsentOpen(false);

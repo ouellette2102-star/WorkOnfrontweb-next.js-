@@ -171,7 +171,7 @@ export default function ConversationThreadPage() {
         </div>
         {sendMessage.isError && (
           <p className="mt-2 text-center text-xs text-red-600">
-            Message non envoye. Reessayez dans un instant.
+            Message non envoyé. Réessayez dans un instant.
           </p>
         )}
       </div>
