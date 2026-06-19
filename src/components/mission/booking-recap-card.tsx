@@ -50,7 +50,7 @@ export function BookingRecapCard({
         day: "numeric",
         month: "long",
       })
-    : "Date a confirmer";
+    : "Date à confirmer";
 
   return (
     <div className="workon-premium-card overflow-hidden rounded-[28px]">
@@ -61,7 +61,7 @@ export function BookingRecapCard({
               Contrat et paiement
             </p>
             <p className="mt-1 font-heading text-xl font-bold text-workon-ink">
-              {base > 0 ? "Depot protege" : "Cadre pret"}
+              {base > 0 ? "Dépôt protégé" : "Cadre prêt"}
             </p>
           </div>
           <div className="rounded-2xl bg-workon-primary-subtle p-2 text-workon-primary">
@@ -94,7 +94,7 @@ export function BookingRecapCard({
                 muted
               />
               <div className="my-2 border-t border-workon-border" />
-              <Line label="Total estime" value={formatCAD(totalClient)} bold />
+              <Line label="Total estimé" value={formatCAD(totalClient)} bold />
             </div>
           </div>
 
@@ -102,7 +102,7 @@ export function BookingRecapCard({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-bold text-workon-primary">
-                  Depot maintenant ({DEPOSIT_PCT}%)
+                  Dépôt maintenant ({DEPOSIT_PCT}%)
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-workon-muted">
                   Retenu par Stripe pendant la confirmation de la mission.
@@ -114,11 +114,11 @@ export function BookingRecapCard({
             </div>
             <div className="mt-3 border-t border-workon-primary/20 pt-3 text-xs text-workon-muted">
               <div className="flex items-center justify-between gap-3">
-                <span>Solde a la completion</span>
+                <span>Solde à la complétion</span>
                 <span className="font-bold text-workon-ink">{formatCAD(balanceDue)}</span>
               </div>
               <div className="mt-1 flex items-center justify-between gap-3">
-                <span>Net pro estime</span>
+                <span>Net pro estimé</span>
                 <span className="font-bold text-workon-ink">{formatCAD(workerReceives)}</span>
               </div>
             </div>
@@ -130,9 +130,9 @@ export function BookingRecapCard({
             <div className="flex items-start gap-3">
               <WalletCards className="mt-0.5 h-5 w-5 shrink-0 text-workon-primary" />
               <div>
-                <p className="font-bold text-workon-ink">Aucun depot calcule pour le moment.</p>
+                <p className="font-bold text-workon-ink">Aucun dépôt calculé pour le moment.</p>
                 <p className="mt-1 text-sm leading-relaxed text-workon-muted">
-                  Entre un prix pour afficher le depot, les taxes et le total estime avant de confirmer.
+                  Entre un prix pour afficher le dépôt, les taxes et le total estimé avant de confirmer.
                 </p>
               </div>
             </div>
@@ -143,7 +143,7 @@ export function BookingRecapCard({
       <div className="mx-5 mb-4 flex items-start gap-2 rounded-2xl border border-workon-border bg-workon-bg-cream p-3">
         <Lock className="mt-0.5 h-4 w-4 shrink-0 text-workon-primary" />
         <p className="text-xs leading-relaxed text-workon-ink">
-          <strong>Paiement protege.</strong> Le depot est traite par Stripe. Les details de mission et les termes restent visibles dans WorkOn.
+          <strong>Paiement protégé.</strong> Le dépôt est traité par Stripe. Les détails de mission et les termes restent visibles dans WorkOn.
         </p>
       </div>
 
@@ -162,13 +162,13 @@ export function BookingRecapCard({
         {contractOpen && (
           <div className="rounded-2xl border border-workon-border bg-workon-bg-cream p-3 text-xs leading-relaxed text-workon-muted">
             <p>
-              <strong className="text-workon-ink">Annulation :</strong> gratuite avant le delai de 24h, sauf condition differente convenue entre les parties.
+              <strong className="text-workon-ink">Annulation :</strong> gratuite avant le délai de 24h, sauf condition différente convenue entre les parties.
             </p>
             <p className="mt-2">
-              <strong className="text-workon-ink">Commission :</strong> WorkOn preleve {PLATFORM_FEE_PCT}% pour la plateforme marketplace et paiement.
+              <strong className="text-workon-ink">Commission :</strong> WorkOn prélève {PLATFORM_FEE_PCT}% pour la plateforme marketplace et paiement.
             </p>
             <p className="mt-2">
-              <strong className="text-workon-ink">Statut du pro :</strong> travailleur autonome independant. WorkOn ne joue pas le role employeur et ne devient pas partie au contrat de service.
+              <strong className="text-workon-ink">Statut du pro :</strong> travailleur autonome indépendant. WorkOn ne joue pas le rôle employeur et ne devient pas partie au contrat de service.
             </p>
           </div>
         )}
@@ -176,7 +176,7 @@ export function BookingRecapCard({
 
       <div className="flex items-center gap-2 border-t border-workon-border bg-white px-5 py-4 text-[11px] font-semibold text-workon-muted">
         <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-workon-primary" />
-        En confirmant, tu autorises la creation de la reservation et la redirection Stripe si un depot est requis.
+        En confirmant, tu autorises la création de la réservation et la redirection Stripe si un dépôt est requis.
       </div>
     </div>
   );
