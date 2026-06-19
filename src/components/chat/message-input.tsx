@@ -66,7 +66,7 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
           onChange={(e) => setContent(e.target.value)}
           onKeyPress={handleKeyPress}
           disabled={isSending || disabled}
-          placeholder="Ecris ton message... (Entree pour envoyer)"
+          placeholder="Écris ton message... (Entrée pour envoyer)"
           className={`flex-1 resize-none rounded-2xl border px-4 py-3 text-workon-ink placeholder:text-workon-muted focus:outline-none disabled:opacity-50 ${
             error
               ? "border-red-500/30 bg-red-500/5 focus:border-workon-primary"
