@@ -11,10 +11,10 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 const TIER_CONFIG: Record<string, { label: string; color: string; description: string }> = {
-  BASIC: { label: "Basique", color: "text-neutral-400 border-neutral-500/30 bg-neutral-500/10", description: "Compte non verifie" },
-  VERIFIED: { label: "Verifie", color: "text-blue-400 border-blue-500/30 bg-blue-500/10", description: "Telephone verifie" },
-  TRUSTED: { label: "Fiable", color: "text-green-400 border-green-500/30 bg-green-500/10", description: "Identite confirmee" },
-  PREMIUM: { label: "Premium", color: "text-yellow-400 border-yellow-500/30 bg-yellow-500/10", description: "Verification complete" },
+  BASIC: { label: "Basique", color: "text-neutral-400 border-neutral-500/30 bg-neutral-500/10", description: "Compte non vérifié" },
+  VERIFIED: { label: "Vérifié", color: "text-blue-400 border-blue-500/30 bg-blue-500/10", description: "Téléphone vérifié" },
+  TRUSTED: { label: "Fiable", color: "text-green-400 border-green-500/30 bg-green-500/10", description: "Identité confirmée" },
+  PREMIUM: { label: "Premium", color: "text-yellow-400 border-yellow-500/30 bg-yellow-500/10", description: "Vérification complète" },
 };
 
 const TIERS_ORDER = ["BASIC", "VERIFIED", "TRUSTED", "PREMIUM"];
@@ -117,8 +117,8 @@ export default function VerifyPage() {
         Retour
       </Link>
 
-      <h1 className="mb-2 text-2xl font-bold text-workon-ink">Verification d&apos;identite</h1>
-      <p className="mb-6 text-workon-muted">Augmentez votre niveau de confiance pour debloquer plus de fonctionnalites.</p>
+      <h1 className="mb-2 text-2xl font-bold text-workon-ink">Vérification d&apos;identité</h1>
+      <p className="mb-6 text-workon-muted">Augmentez votre niveau de confiance pour débloquer plus de fonctionnalités.</p>
 
       {/* Current tier */}
       <div className={`mb-6 rounded-xl border p-4 ${tierConfig.color}`}>
@@ -162,13 +162,13 @@ export default function VerifyPage() {
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-workon-ink">Verification du telephone</h3>
-                <p className="text-sm text-workon-muted">Confirmez votre numero par SMS</p>
+                <h3 className="font-semibold text-workon-ink">Vérification du téléphone</h3>
+                <p className="text-sm text-workon-muted">Confirmez votre numéro par SMS</p>
               </div>
             </div>
             {phoneVerified && (
               <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
-                Verifie
+                Vérifié
               </span>
             )}
           </div>
@@ -189,7 +189,7 @@ export default function VerifyPage() {
               <Input
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
-                placeholder="Code a 6 chiffres"
+                placeholder="Code à 6 chiffres"
                 maxLength={6}
                 className="flex-1 border-workon-border bg-white text-center text-lg tracking-widest text-workon-ink placeholder-workon-muted/50"
               />
@@ -216,13 +216,13 @@ export default function VerifyPage() {
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-workon-ink">Verification d&apos;identite</h3>
-                <p className="text-sm text-workon-muted">Soumettez une piece d&apos;identite officielle</p>
+                <h3 className="font-semibold text-workon-ink">Vérification d&apos;identité</h3>
+                <p className="text-sm text-workon-muted">Soumettez une pièce d&apos;identité officielle</p>
               </div>
             </div>
             {idVerified && (
               <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
-                Verifie
+                Vérifié
               </span>
             )}
             {idPending && !idVerified && (

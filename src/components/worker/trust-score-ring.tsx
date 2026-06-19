@@ -13,7 +13,7 @@ interface TrustScoreRingProps {
 
 const TIER_LABELS: Record<string, string> = {
   BASIC: "Basique",
-  VERIFIED: "Verifie",
+  VERIFIED: "Vérifié",
   TRUSTED: "Fiable",
   PREMIUM: "Premium",
 };
