@@ -12,6 +12,7 @@ const RAW_BASE = (
   "https://workon-backend-production-8908.up.railway.app"
 ).replace(/\/api\/v1$/, "");
 const API_BASE = `${RAW_BASE}/api/v1`;
+const BROWSER_API_PROXY_BASE = "/api/workon";
 
 // ─── DTOs ──────────────────────────────────────────────────────────────────
 
@@ -137,10 +138,18 @@ async function publicFetch<T>(
   path: string,
   revalidate: number | false = 60,
 ): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    next: revalidate === false ? { revalidate: 0 } : { revalidate },
+  const isBrowser = typeof window !== "undefined";
+  const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
     headers: { "Content-Type": "application/json" },
-  });
+  };
+
+  if (isBrowser) {
+    if (revalidate === false) fetchOptions.cache = "no-store";
+  } else {
+    fetchOptions.next = revalidate === false ? { revalidate: 0 } : { revalidate };
+  }
+
+  const res = await fetch(`${isBrowser ? BROWSER_API_PROXY_BASE : API_BASE}${path}`, fetchOptions);
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
   return res.json() as Promise<T>;
 }
