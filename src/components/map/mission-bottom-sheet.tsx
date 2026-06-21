@@ -48,14 +48,14 @@ export function MissionBottomSheet({
           <div className="mb-3 pr-12">
             <p className="inline-flex items-center gap-1.5 rounded-full bg-workon-primary-subtle px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-workon-primary">
               <MapPin className="h-3.5 w-3.5" />
-              Opportunite selectionnee
+              Opportunité sélectionnée
             </p>
             <h2 className="mt-2 font-heading text-xl font-bold leading-tight text-workon-ink">
-              Verifie le potentiel avant de postuler.
+              Vérifie le potentiel avant de postuler.
             </h2>
             <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-workon-stone">
               <ShieldCheck className="h-3.5 w-3.5 text-workon-trust-green" />
-              Paiement securise, contrat protege, suivi WorkOn.
+              Paiement sécurisé, contrat protégé, suivi WorkOn.
             </p>
           </div>
 

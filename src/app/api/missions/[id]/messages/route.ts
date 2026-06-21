@@ -126,7 +126,7 @@ export async function GET(
       clearTimeout(timeoutId);
 
       if (networkError instanceof Error && networkError.name === "AbortError") {
-        return errorResponse("TIMEOUT", "Le serveur n'a pas repondu a temps", 504);
+        return errorResponse("TIMEOUT", "Le serveur n'a pas répondu à temps", 504);
       }
 
       console.error("[CHAT_PROXY] Backend unreachable:", networkError);
@@ -162,7 +162,7 @@ export async function GET(
       const messages: Message[] = Array.isArray(data) ? data : data?.data ?? [];
       return successResponse(messages);
     } catch {
-      return errorResponse("PARSE_ERROR", "Reponse serveur invalide", 502);
+      return errorResponse("PARSE_ERROR", "Réponse serveur invalide", 502);
     }
   } catch (error) {
     console.error("[CHAT_PROXY_ERROR]", error);
@@ -199,11 +199,11 @@ export async function POST(
     try {
       body = await request.json();
     } catch {
-      return errorResponse("INVALID_REQUEST", "Corps de requete invalide", 400);
+      return errorResponse("INVALID_REQUEST", "Corps de requête invalide", 400);
     }
 
     if (!body.content?.trim()) {
-      return errorResponse("INVALID_CONTENT", "Le message ne peut pas etre vide", 400);
+      return errorResponse("INVALID_CONTENT", "Le message ne peut pas être vide", 400);
     }
 
     // Check API URL
@@ -233,7 +233,7 @@ export async function POST(
       clearTimeout(timeoutId);
 
       if (networkError instanceof Error && networkError.name === "AbortError") {
-        return errorResponse("TIMEOUT", "Le serveur n'a pas repondu a temps", 504);
+        return errorResponse("TIMEOUT", "Le serveur n'a pas répondu à temps", 504);
       }
 
       console.error("[CHAT_PROXY] Backend unreachable:", networkError);
@@ -272,7 +272,7 @@ export async function POST(
         source: "backend" as const,
       });
     } catch {
-      return errorResponse("PARSE_ERROR", "Reponse serveur invalide", 502);
+      return errorResponse("PARSE_ERROR", "Réponse serveur invalide", 502);
     }
   } catch (error) {
     console.error("[CHAT_PROXY_ERROR]", error);

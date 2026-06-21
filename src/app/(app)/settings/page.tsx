@@ -373,7 +373,7 @@ export default function SettingsPage() {
       api.setQuietHours(data),
     onSuccess: (_, variables) => {
       queryClient.setQueryData(["quiet-hours"], variables);
-      toast.success("Heures calmes mises a jour");
+      toast.success("Heures calmes mises à jour");
     },
     onError: () => toast.error("Erreur lors de la mise à jour"),
   });
@@ -460,12 +460,12 @@ export default function SettingsPage() {
                 icon={ShieldCheck}
                 label="Confiance"
                 value={trustTier}
-                detail={`${Math.round(score)}% du profil complete.`}
+                detail={`${Math.round(score)}% du profil complété.`}
                 tone={trustTier === "BASIC" ? "gold" : "green"}
               />
               <HubMetric
                 icon={CreditCard}
-                label={isWorker ? "A recevoir" : "Plan"}
+                label={isWorker ? "À recevoir" : "Plan"}
                 value={isWorker ? formatMoney(pendingMoney) : plan}
                 detail={isWorker ? "Revenus en attente." : "Abonnement et quota."}
                 tone={isWorker && pendingMoney > 0 ? "copper" : "green"}
@@ -474,7 +474,7 @@ export default function SettingsPage() {
                 icon={FileCheck}
                 label="Contrats"
                 value={String(activeContractCount)}
-                detail="Dossiers actifs a suivre."
+                detail="Dossiers actifs à suivre."
                 tone={activeContractCount > 0 ? "blue" : "stone"}
               />
               <HubMetric
@@ -495,11 +495,11 @@ export default function SettingsPage() {
               {isWorker
                 ? pendingMoney > 0
                   ? "Recevoir les revenus en attente"
-                  : "Rendre le profil plus reservable"
+                  : "Rendre le profil plus réservable"
                 : "Publier et suivre les demandes"}
             </h2>
             <p className="mt-2 hidden text-sm leading-relaxed text-white/68 min-[420px]:line-clamp-2 min-[420px]:block">
-              WorkOn doit garder les actions critiques dans le systeme:
+              WorkOn doit garder les actions critiques dans le système:
               messages, contrats, paiements, preuves et support.
             </p>
             <div className="mt-3 grid gap-2 min-[420px]:mt-4">
@@ -515,7 +515,7 @@ export default function SettingsPage() {
                   )}
                   {isWorker && pendingMoney > 0
                     ? "Configurer mes paiements"
-                    : "Ameliorer mon profil"}
+                    : "Améliorer mon profil"}
                 </span>
                 <ChevronRight className="h-4 w-4" />
               </Link>
@@ -525,7 +525,7 @@ export default function SettingsPage() {
                   className="rounded-2xl border border-white/10 bg-white/10 p-2.5 text-sm font-bold text-white transition hover:bg-white/15 min-[420px]:p-3"
                 >
                   <Lock className="mb-1.5 h-4 w-4 text-workon-gold min-[420px]:mb-2" />
-                  Donnees
+                  Données
                 </Link>
                 <Link
                   href="/settings/subscription"
@@ -544,7 +544,7 @@ export default function SettingsPage() {
         <SectionHeading
           icon={SlidersHorizontal}
           eyebrow="Raccourcis"
-          title="Operations du compte"
+          title="Opérations du compte"
           text="Chaque tuile donne accès à un flux existant. Rien n'est masqué: argent, contrat, litige, profil, confidentialité et notifications restent visibles."
         />
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -553,7 +553,7 @@ export default function SettingsPage() {
             icon={User}
             title="Profil public"
             value={`${Math.round(score)}% complet`}
-            detail="Photo, ville, metier, bio, portfolio et informations legales."
+            detail="Photo, ville, métier, bio, portfolio et informations légales."
             tone={score >= 80 ? "green" : "gold"}
           />
           <AccountRoute
@@ -561,7 +561,7 @@ export default function SettingsPage() {
             icon={isWorker ? WalletCards : CreditCard}
             title={isWorker ? "Revenus" : "Factures"}
             value={isWorker ? formatMoney(pendingMoney) : "Historique"}
-            detail={isWorker ? "Gains, versements et argent en attente." : "Recus, paiements et documents de mission."}
+            detail={isWorker ? "Gains, versements et argent en attente." : "Reçus, paiements et documents de mission."}
             tone={isWorker && pendingMoney > 0 ? "copper" : "green"}
           />
           <AccountRoute
@@ -569,7 +569,7 @@ export default function SettingsPage() {
             icon={Briefcase}
             title="Abonnement et quota"
             value={quotaLabel}
-            detail="Missions publiees, plan actif et portail de facturation."
+            detail="Missions publiées, plan actif et portail de facturation."
             tone={plan === "FREE" ? "stone" : "green"}
           />
           <AccountRoute
@@ -577,7 +577,7 @@ export default function SettingsPage() {
             icon={FileCheck}
             title="Contrats"
             value={`${activeContractCount} actif${activeContractCount > 1 ? "s" : ""}`}
-            detail="Conditions, acceptations, mission liee et historique."
+            detail="Conditions, acceptations, mission liée et historique."
             tone={activeContractCount > 0 ? "blue" : "stone"}
           />
           <AccountRoute
@@ -585,7 +585,7 @@ export default function SettingsPage() {
             icon={Scale}
             title="Litiges"
             value={disputeCount > 0 ? `${disputeCount} ouvert${disputeCount > 1 ? "s" : ""}` : "Clair"}
-            detail="Preuves, mediation et suivi si une mission bloque."
+            detail="Preuves, médiation et suivi si une mission bloque."
             tone={disputeCount > 0 ? "red" : "green"}
           />
           <AccountRoute
@@ -593,7 +593,7 @@ export default function SettingsPage() {
             icon={Briefcase}
             title={mode === "pro" ? "Affectations" : "Publications"}
             value={`${missionCount} actif${missionCount > 1 ? "s" : ""}`}
-            detail="Missions ouvertes, assignees ou en cours."
+            detail="Missions ouvertes, assignées ou en cours."
             tone={missionCount > 0 ? "blue" : "stone"}
           />
         </div>
@@ -604,7 +604,7 @@ export default function SettingsPage() {
           icon={Bell}
           eyebrow="Signaux"
           title="Préférences de notifications"
-          text="Choisis les canaux selon le risque: missions, messages et paiements doivent rester faciles a suivre."
+          text="Choisis les canaux selon le risque: missions, messages et paiements doivent rester faciles à suivre."
         />
 
         <div className="overflow-hidden rounded-[28px] border border-workon-border bg-white shadow-sm">
@@ -626,7 +626,7 @@ export default function SettingsPage() {
           {isLoading ? (
             <div className="flex items-center justify-center py-12" role="status">
               <Loader2 className="h-6 w-6 animate-spin text-workon-primary" />
-              <span className="sr-only">Chargement des preferences.</span>
+              <span className="sr-only">Chargement des préférences.</span>
             </div>
           ) : (
             NOTIFICATION_TYPES.map(({ type, label, detail }, i) => {
@@ -714,7 +714,7 @@ export default function SettingsPage() {
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="text-xs font-bold uppercase tracking-[0.12em] text-workon-stone">
-                  Debut
+                  Début
                 </span>
                 <select
                   value={qh.startHour}
@@ -791,11 +791,11 @@ export default function SettingsPage() {
             <div className="rounded-2xl border border-workon-border bg-workon-bg/50 p-4">
               <div className="flex items-center gap-2 text-sm font-black text-workon-ink">
                 <Clock3 className="h-4 w-4 text-workon-copper" />
-                Preuves conservees
+                Preuves conservées
               </div>
               <p className="mt-2 text-xs leading-relaxed text-workon-gray">
                 Messages, contrats, factures, avis et litiges doivent rester
-                dans WorkOn pour soutenir les decisions et le support.
+                dans WorkOn pour soutenir les décisions et le support.
               </p>
             </div>
           </div>

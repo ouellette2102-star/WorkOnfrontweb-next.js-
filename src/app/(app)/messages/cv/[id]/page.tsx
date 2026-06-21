@@ -128,7 +128,7 @@ export default function ConversationThreadPage() {
               Impossible de charger la discussion
             </p>
             <p className="mt-1 text-xs text-workon-muted">
-              Verifiez votre connexion et reessayez.
+              Vérifiez votre connexion et réessayez.
             </p>
             <button
               type="button"
@@ -139,7 +139,7 @@ export default function ConversationThreadPage() {
               {isFetching ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : null}
-              Reessayer
+              Réessayer
             </button>
           </div>
         ) : messages.length === 0 ? (
@@ -185,7 +185,7 @@ export default function ConversationThreadPage() {
         </div>
         {sendMessage.isError && (
           <p className="mt-2 text-center text-xs text-red-600">
-            Message non envoye. Reessayez dans un instant.
+            Message non envoyé. Réessayez dans un instant.
           </p>
         )}
       </div>

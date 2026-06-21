@@ -6,15 +6,15 @@ import { api } from "@/lib/api-client";
 import Link from "next/link";
 
 const FIELD_LABELS: Record<string, string> = {
-  firstName: "Prenom",
+  firstName: "Prénom",
   lastName: "Nom",
   email: "Email",
-  phone: "Telephone",
+  phone: "Téléphone",
   city: "Ville",
   bio: "Bio / Description",
   pictureUrl: "Photo de profil",
-  category: "Categorie",
-  skills: "Competences",
+  category: "Catégorie",
+  skills: "Compétences",
   location: "Localisation GPS",
 };
 
@@ -84,7 +84,7 @@ export function ProfileCompletionCard() {
         href="/profile"
         className="inline-block text-sm font-semibold text-[#D4922A] hover:underline"
       >
-        Completer mon profil
+        Compléter mon profil
       </Link>
     </div>
   );

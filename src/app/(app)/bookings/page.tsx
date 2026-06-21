@@ -14,10 +14,10 @@ type FilterTab = "all" | "upcoming" | "completed";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   PENDING: { label: "En attente", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", icon: <Clock className="h-4 w-4" /> },
-  CONFIRMED: { label: "Confirmee", color: "bg-blue-500/20 text-blue-400 border-blue-500/30", icon: <CheckCircle className="h-4 w-4" /> },
+  CONFIRMED: { label: "Confirmée", color: "bg-blue-500/20 text-blue-400 border-blue-500/30", icon: <CheckCircle className="h-4 w-4" /> },
   IN_PROGRESS: { label: "En cours", color: "bg-purple-500/20 text-purple-400 border-purple-500/30", icon: <Loader2 className="h-4 w-4 animate-spin" /> },
-  COMPLETED: { label: "Terminee", color: "bg-green-500/20 text-green-400 border-green-500/30", icon: <CheckCircle className="h-4 w-4" /> },
-  CANCELLED: { label: "Annulee", color: "bg-red-500/20 text-red-400 border-red-500/30", icon: <XCircle className="h-4 w-4" /> },
+  COMPLETED: { label: "Terminée", color: "bg-green-500/20 text-green-400 border-green-500/30", icon: <CheckCircle className="h-4 w-4" /> },
+  CANCELLED: { label: "Annulée", color: "bg-red-500/20 text-red-400 border-red-500/30", icon: <XCircle className="h-4 w-4" /> },
   NO_SHOW: { label: "Absence", color: "bg-neutral-500/20 text-neutral-400 border-neutral-500/30", icon: <AlertCircle className="h-4 w-4" /> },
 };
 
@@ -39,7 +39,7 @@ export default function BookingsPage() {
     mutationFn: (id: string) => api.confirmBooking(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
-      toast.success("Reservation confirmee");
+      toast.success("Réservation confirmée");
     },
     onError: () => toast.error("Erreur lors de la confirmation"),
   });
@@ -70,7 +70,7 @@ export default function BookingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
-      <h1 className="mb-6 text-2xl font-bold text-workon-ink">Mes reservations</h1>
+      <h1 className="mb-6 text-2xl font-bold text-workon-ink">Mes réservations</h1>
 
       {/* Filter tabs */}
       <div className="mb-6 flex gap-2 rounded-xl bg-workon-bg p-1">
@@ -97,11 +97,11 @@ export default function BookingsPage() {
       ) : !bookings || bookings.length === 0 ? (
         <div className="rounded-xl border border-workon-border bg-white p-12 text-center shadow-sm">
           <Calendar className="mx-auto mb-4 h-12 w-12 text-workon-muted/40" />
-          <h3 className="mb-2 text-lg font-semibold text-workon-ink">Aucune reservation</h3>
+          <h3 className="mb-2 text-lg font-semibold text-workon-ink">Aucune réservation</h3>
           <p className="text-workon-muted">
             {isWorker
-              ? "Vous n'avez pas encore de reservations de clients."
-              : "Vous n'avez pas encore effectue de reservations."}
+              ? "Vous n'avez pas encore de réservations de clients."
+              : "Vous n'avez pas encore effectué de réservations."}
           </p>
         </div>
       ) : (

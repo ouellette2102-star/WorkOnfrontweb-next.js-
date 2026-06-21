@@ -454,7 +454,7 @@ function PayMissionButton({ missionId, price }: { missionId: string; price: numb
         return (
           <div className="space-y-3">
             <div className="rounded-2xl border border-workon-primary/15 bg-workon-primary-subtle p-3 text-xs leading-relaxed text-workon-ink">
-              <strong>Paiement protege.</strong> Le total est calcule avant Stripe; la trace reste liee au dossier de mission.
+              <strong>Paiement protégé.</strong> Le total est calculé avant Stripe; la trace reste liée au dossier de mission.
             </div>
             <Button
               onClick={handlePay}
@@ -696,7 +696,7 @@ function SectionHeading({
 }
 
 function formatMissionMoney(price: number) {
-  if (price <= 0) return "A confirmer";
+  if (price <= 0) return "À confirmer";
   return new Intl.NumberFormat("fr-CA", {
     style: "currency",
     currency: "CAD",
@@ -721,63 +721,63 @@ function getDecisionCopy({
 }) {
   if (isOwner && mission.status === "completed") {
     return {
-      title: "Paiement a liberer",
-      text: "Le travail est marque termine. Verifie le dossier, puis paie pour fermer proprement la mission.",
+      title: "Paiement à libérer",
+      text: "Le travail est marqué terminé. Vérifie le dossier, puis paie pour fermer proprement la mission.",
       label: "Action client",
     };
   }
 
   if (isWorker && mission.status === "open" && !isOwner && !idVerified) {
     return {
-      title: "Verifier ton identite avant de postuler",
-      text: "La verification protege les clients et augmente la confiance avant toute offre ou acceptation.",
-      label: "Pre-requis",
+      title: "Vérifier ton identité avant de postuler",
+      text: "La vérification protège les clients et augmente la confiance avant toute offre ou acceptation.",
+      label: "Pré-requis",
     };
   }
 
   if (isWorker && mission.status === "open" && !isOwner && idVerified && !connectOnboarded) {
     return {
       title: "Configurer Stripe avant de t'engager",
-      text: "Le paiement doit pouvoir etre verse sans friction quand la mission sera terminee.",
-      label: "Pre-requis",
+      text: "Le paiement doit pouvoir être versé sans friction quand la mission sera terminée.",
+      label: "Pré-requis",
     };
   }
 
   if (isWorker && mission.status === "open" && !isOwner) {
     return {
       title: "Accepter ou envoyer une offre",
-      text: "Le prix, la ville, les preuves et la protection sont visibles avant de prendre une decision.",
-      label: "Decision pro",
+      text: "Le prix, la ville, les preuves et la protection sont visibles avant de prendre une décision.",
+      label: "Décision pro",
     };
   }
 
   if (isAssigned && mission.status === "assigned") {
     return {
-      title: "Demarrer quand tu es pret",
-      text: "Le passage en cours cree une trace claire pour le client, le paiement et les preuves.",
-      label: "Execution",
+      title: "Démarrer quand tu es prêt",
+      text: "Le passage en cours crée une trace claire pour le client, le paiement et les preuves.",
+      label: "Exécution",
     };
   }
 
   if (isAssigned && mission.status === "in_progress") {
     return {
       title: "Terminer avec des preuves",
-      text: "Photos, messages et suivi reduisent les litiges avant la liberation du paiement.",
-      label: "Qualite",
+      text: "Photos, messages et suivi réduisent les litiges avant la libération du paiement.",
+      label: "Qualité",
     };
   }
 
   if (isOwner && ["open", "assigned", "in_progress"].includes(mission.status)) {
     return {
-      title: "Garder la mission sous controle",
-      text: "Offres, messages, statut, boosts et preuves restent connectes au meme dossier.",
+      title: "Garder la mission sous contrôle",
+      text: "Offres, messages, statut, boosts et preuves restent connectés au même dossier.",
       label: "Pilotage client",
     };
   }
 
   return {
     title: "Dossier mission actif",
-    text: "Le contexte, les decisions, les paiements et les preuves restent accessibles au meme endroit.",
+    text: "Le contexte, les décisions, les paiements et les preuves restent accessibles au même endroit.",
     label: "Suivi",
   };
 }
@@ -824,18 +824,18 @@ function MissionDecisionPanel({
         <div className="mt-5 grid grid-cols-3 gap-2">
           <DecisionSignal
             icon={ShieldCheck}
-            label="Identite"
-            value={isWorker ? (idVerified ? "verifiee" : "a verifier") : "client suivi"}
+            label="Identité"
+            value={isWorker ? (idVerified ? "vérifiée" : "à vérifier") : "client suivi"}
           />
           <DecisionSignal
             icon={FileCheck}
             label="Contrat"
-            value={mission.status === "open" ? "pret" : "en trace"}
+            value={mission.status === "open" ? "prêt" : "en trace"}
           />
           <DecisionSignal
             icon={WalletCards}
             label="Paiement"
-            value={mission.price > 0 ? "montant visible" : "a cadrer"}
+            value={mission.price > 0 ? "montant visible" : "à cadrer"}
           />
         </div>
       </div>
@@ -1156,7 +1156,7 @@ export default function MissionDetailPage() {
                 Budget
               </p>
               <p className="mt-1 text-xl font-black text-white">
-                {mission.price > 0 ? `${mission.price} $` : "A confirmer"}
+                {mission.price > 0 ? `${mission.price} $` : "À confirmer"}
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
@@ -1177,7 +1177,7 @@ export default function MissionDetailPage() {
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
               <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
-                Publiee
+                Publiée
               </p>
               <p className="mt-1 truncate text-sm font-black text-white">
                 {formatDistanceToNow(new Date(mission.createdAt), {
@@ -1204,20 +1204,20 @@ export default function MissionDetailPage() {
       <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
         <SectionHeading
           eyebrow="Mission"
-          title="Details operationnels"
-          text="Les informations essentielles pour evaluer, accepter ou suivre la mission."
+          title="Détails opérationnels"
+          text="Les informations essentielles pour évaluer, accepter ou suivre la mission."
         />
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <DetailMetric icon={Tag} label="Categorie" value={mission.category} />
+          <DetailMetric icon={Tag} label="Catégorie" value={mission.category} />
           <DetailMetric
             icon={DollarSign}
             label="Budget"
-            value={mission.price > 0 ? `${mission.price} $ CAD` : "Prix a confirmer"}
+            value={mission.price > 0 ? `${mission.price} $ CAD` : "Prix à confirmer"}
           />
           <DetailMetric icon={MapPin} label="Lieu" value={mission.city} />
           <DetailMetric
             icon={Clock3}
-            label="Mise a jour"
+            label="Mise à jour"
             value={formatDistanceToNow(new Date(mission.updatedAt), {
               addSuffix: true,
               locale: fr,
@@ -1241,7 +1241,7 @@ export default function MissionDetailPage() {
         <SectionHeading
           eyebrow="Progression"
           title="Statut de la mission"
-          text="Suivi clair du cycle publication, assignation, execution, paiement."
+          text="Suivi clair du cycle publication, assignation, exécution, paiement."
         />
         <div className="mt-5">
           <MissionTimeline
@@ -1258,7 +1258,7 @@ export default function MissionDetailPage() {
         <SectionHeading
           eyebrow="Preuves"
           title="Photos et contexte"
-          text="Les visuels reduisent les malentendus avant, pendant et apres la mission."
+          text="Les visuels réduisent les malentendus avant, pendant et après la mission."
         />
         <div className="mt-5">
           <MissionPhotos missionId={id} canEdit={isOwner || isAssigned} />
@@ -1270,7 +1270,7 @@ export default function MissionDetailPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <SectionHeading
             eyebrow="Action"
-            title="Prochaine decision"
+            title="Prochaine décision"
             text="Les gestes critiques restent visibles avec le contexte de confiance."
           />
           <span
@@ -1568,12 +1568,12 @@ export default function MissionDetailPage() {
           <div className="space-y-3">
             <TrustSignal
               icon={ShieldCheck}
-              title="Contrat protege"
-              text="Statut, preuves et conditions restent rattaches a la mission."
+              title="Contrat protégé"
+              text="Statut, preuves et conditions restent rattachés à la mission."
             />
             <TrustSignal
               icon={WalletCards}
-              title="Paiement securise"
+              title="Paiement sécurisé"
               text="Paiement, revenus et commission restent lisibles dans le dossier."
             />
             <TrustSignal

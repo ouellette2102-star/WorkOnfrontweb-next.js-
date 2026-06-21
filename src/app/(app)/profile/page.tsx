@@ -446,13 +446,13 @@ export default function ProfilePage() {
                 icon={ShieldCheck}
                 label="Profil"
                 value={`${Math.round(profileScore)}%`}
-                detail="Signal de confiance et completude."
+                detail="Signal de confiance et complétude."
                 tone={profileScore >= 80 ? "green" : "gold"}
               />
               <AccountMetric
                 icon={WalletCards}
-                label={isWorker ? "A recevoir" : "Paiement"}
-                value={isWorker ? formatMoney(pendingMoney) : "Protege"}
+                label={isWorker ? "À recevoir" : "Paiement"}
+                value={isWorker ? formatMoney(pendingMoney) : "Protégé"}
                 detail={isWorker ? "Fonds en attente de versement." : "Paiements et factures suivis."}
                 tone={isWorker && pendingMoney > 0 ? "copper" : "green"}
               />
@@ -460,7 +460,7 @@ export default function ProfilePage() {
                 icon={FileCheck}
                 label="Contrats"
                 value={String(contractCount)}
-                detail="Dossiers actifs a surveiller."
+                detail="Dossiers actifs à surveiller."
                 tone={contractCount > 0 ? "blue" : "stone"}
               />
               <AccountMetric
@@ -478,7 +478,7 @@ export default function ProfilePage() {
               Quoi faire maintenant
             </p>
             <h2 className="mt-1.5 font-heading text-xl font-black text-white min-[420px]:mt-2 min-[420px]:text-2xl">
-              Tableau de controle
+              Tableau de contrôle
             </h2>
             <p className="mt-2 hidden text-sm leading-relaxed text-white/68 min-[420px]:line-clamp-2 min-[420px]:block">
               Les éléments critiques du compte sont regroupés ici pour protéger
@@ -528,7 +528,7 @@ export default function ProfilePage() {
         <TrustSignal
           icon={CreditCard}
           label="Paiements"
-          value={bankVerified ? "Compte pret" : isWorker ? "A configurer au bon moment" : "Factures suivies"}
+          value={bankVerified ? "Compte prêt" : isWorker ? "À configurer au bon moment" : "Factures suivies"}
           tone={bankVerified ? "green" : "stone"}
           href={isWorker ? "/worker/payments" : "/invoices"}
         />
@@ -542,7 +542,7 @@ export default function ProfilePage() {
         <TrustSignal
           icon={Scale}
           label="Litiges"
-          value={disputeCount > 0 ? `${disputeCount} a traiter` : "Aucun signal critique"}
+          value={disputeCount > 0 ? `${disputeCount} à traiter` : "Aucun signal critique"}
           tone={disputeCount > 0 ? "red" : "green"}
           href="/disputes"
         />
@@ -550,7 +550,7 @@ export default function ProfilePage() {
 
       <section className="space-y-4">
         <SectionHeading
-          eyebrow="Operations"
+          eyebrow="Opérations"
           title="Centre de compte"
           text="Chaque tuile mène à une partie active de l'entreprise WorkOn: argent, contrats, missions, réputation et support."
         />
@@ -568,7 +568,7 @@ export default function ProfilePage() {
             icon={ClipboardList}
             label={mode === "pro" ? "Affectations" : "Publications"}
             value={`${missionCount} actif${missionCount > 1 ? "s" : ""}`}
-            detail="Missions ouvertes, assignees ou en cours."
+            detail="Missions ouvertes, assignées ou en cours."
             tone={missionCount > 0 ? "blue" : "stone"}
           />
           <OperationTile
@@ -584,15 +584,15 @@ export default function ProfilePage() {
             icon={Scale}
             label="Litiges"
             value={disputeCount > 0 ? `${disputeCount} ouvert${disputeCount > 1 ? "s" : ""}` : "Clair"}
-            detail="Protection, arbitrage et preuves si un probleme survient."
+            detail="Protection, arbitrage et preuves si un problème survient."
             tone={disputeCount > 0 ? "red" : "green"}
           />
           <OperationTile
             href={isClient ? "/swipe" : "/calendar"}
             icon={Calendar}
-            label={isClient ? "Reservation" : "Disponibilites"}
+            label={isClient ? "Réservation" : "Disponibilités"}
             value={isClient ? "Planifier" : "Calendrier"}
-            detail={isClient ? "Trouver et reserver un pro avec contrat." : "Horaires, disponibilites et blocages."}
+            detail={isClient ? "Trouver et réserver un pro avec contrat." : "Horaires, disponibilités et blocages."}
             tone="gold"
           />
           <OperationTile
@@ -610,13 +610,13 @@ export default function ProfilePage() {
         {[
           {
             icon: Star,
-            title: "Reputation visible",
-            text: "Photo, avis, missions completees et badges rendent le profil plus vendeur.",
+            title: "Réputation visible",
+            text: "Photo, avis, missions complétées et badges rendent le profil plus vendeur.",
           },
           {
             icon: FileCheck,
             title: "Trace contractuelle",
-            text: "Contrats, messages, photos et litiges restent relies au dossier de mission.",
+            text: "Contrats, messages, photos et litiges restent reliés au dossier de mission.",
           },
           {
             icon: ShieldCheck,
@@ -648,7 +648,7 @@ export default function ProfilePage() {
         <SectionHeading
           eyebrow="Configuration"
           title="Profil public et informations"
-          text="Les formulaires restent disponibles ici pour modifier les details visibles, le portfolio, les informations legales et la fiche travailleur."
+          text="Les formulaires restent disponibles ici pour modifier les détails visibles, le portfolio, les informations légales et la fiche travailleur."
         />
 
         <div className="rounded-[28px] border border-workon-border bg-white p-5 shadow-sm md:p-7">

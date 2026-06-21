@@ -16,17 +16,17 @@ const WORKER_STEPS = [
   {
     icon: Search,
     title: "Explorez",
-    description: "Parcourez les missions disponibles pres de chez vous et trouvez celles qui correspondent a vos competences.",
+    description: "Parcourez les missions disponibles près de chez vous et trouvez celles qui correspondent à vos compétences.",
   },
   {
     icon: Send,
     title: "Proposez",
-    description: "Envoyez votre offre avec un prix competitif et un message personnalise pour vous demarquer.",
+    description: "Envoyez votre offre avec un prix compétitif et un message personnalisé pour vous démarquer.",
   },
   {
     icon: Briefcase,
     title: "Travaillez",
-    description: "Completez la mission, recevez votre paiement securise et construisez votre reputation.",
+    description: "Complétez la mission, recevez votre paiement sécurisé et construisez votre réputation.",
   },
 ];
 
@@ -34,17 +34,17 @@ const EMPLOYER_STEPS = [
   {
     icon: FileText,
     title: "Publiez",
-    description: "Creez une mission avec une description claire, un budget et votre localisation.",
+    description: "Créez une mission avec une description claire, un budget et votre localisation.",
   },
   {
     icon: Users,
     title: "Recevez des offres",
-    description: "Les travailleurs qualifies vous enverront leurs propositions. Comparez les profils et avis.",
+    description: "Les travailleurs qualifiés vous enverront leurs propositions. Comparez les profils et avis.",
   },
   {
     icon: CheckCircle,
     title: "Choisissez",
-    description: "Selectionnez le meilleur candidat, suivez la mission et payez en toute securite.",
+    description: "Sélectionnez le meilleur candidat, suivez la mission et payez en toute sécurité.",
   },
 ];
 
@@ -83,9 +83,9 @@ export function FirstMissionWizard() {
 
       <div className="mb-4 text-center">
         <h2 className="mb-1 text-lg font-bold text-gray-900">
-          {isWorker ? "Commencez a travailler" : "Trouvez votre travailleur"}
+          {isWorker ? "Commencez à travailler" : "Trouvez votre travailleur"}
         </h2>
-        <p className="text-sm text-gray-500">3 etapes simples pour commencer</p>
+        <p className="text-sm text-gray-500">3 étapes simples pour commencer</p>
       </div>
 
       {/* Step indicators */}
@@ -119,7 +119,7 @@ export function FirstMissionWizard() {
             onClick={() => setCurrentStep(currentStep - 1)}
             className="text-sm text-gray-400 hover:text-gray-900"
           >
-            Precedent
+            Précédent
           </button>
         ) : (
           <div />
@@ -135,7 +135,7 @@ export function FirstMissionWizard() {
         ) : (
           <Link href={isWorker ? "/missions/mine" : "/missions/new"}>
             <Button onClick={handleDismiss} className="bg-red-600 hover:bg-red-500">
-              {isWorker ? "Voir les missions" : "Creer une mission"}
+              {isWorker ? "Voir les missions" : "Créer une mission"}
             </Button>
           </Link>
         )}

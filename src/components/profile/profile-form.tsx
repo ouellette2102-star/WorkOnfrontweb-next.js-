@@ -135,7 +135,7 @@ export function ProfileForm() {
       setAvatarPreview(dataUri);
       await api.updateAvatar(dataUri);
       await refetch();
-      setAvatarMessage("Photo mise a jour !");
+      setAvatarMessage("Photo mise à jour !");
       setAvatarMessageType("success");
     } catch (uploadError) {
       setAvatarMessage(
@@ -266,10 +266,10 @@ export function ProfileForm() {
 
       {/* Skill selector section */}
       <div className="mt-8 border-t border-workon-border pt-8">
-        <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Competences</p>
-        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Tes competences</h3>
+        <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Compétences</p>
+        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Tes compétences</h3>
         <p className="mt-1 text-sm text-workon-muted">
-          Selectionne les competences que tu offres pour apparaitre dans les recherches.
+          Sélectionne les compétences que tu offres pour apparaître dans les recherches.
         </p>
         <div className="mt-4">
           <SkillSelector />
@@ -279,7 +279,7 @@ export function ProfileForm() {
       {/* Availability section */}
       <div className="mt-8 border-t border-workon-border pt-8">
         <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Horaire</p>
-        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Disponibilites</h3>
+        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Disponibilités</h3>
         <p className="mt-1 text-sm text-workon-muted">
           Configure tes plages horaires pour chaque jour de la semaine.
         </p>

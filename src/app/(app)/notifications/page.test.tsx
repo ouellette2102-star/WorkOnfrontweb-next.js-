@@ -49,7 +49,7 @@ describe("NotificationsPage", () => {
       await screen.findByText("Impossible de charger les notifications"),
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /Reessayer/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Réessayer/i }));
 
     await waitFor(() => {
       expect(api.getNotifications).toHaveBeenCalledTimes(2);

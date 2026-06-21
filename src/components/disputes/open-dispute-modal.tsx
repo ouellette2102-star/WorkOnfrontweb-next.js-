@@ -22,7 +22,7 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
   const createMutation = useMutation({
     mutationFn: () => api.createDispute({ localMissionId, reason, description }),
     onSuccess: () => {
-      toast.success("Litige ouvert avec succes");
+      toast.success("Litige ouvert avec succès");
       setReason("");
       setDescription("");
       onSuccess?.();
@@ -54,7 +54,7 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
             <Input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Ex: Travail non effectue, qualite insuffisante..."
+              placeholder="Ex: Travail non effectué, qualité insuffisante..."
               className="border-workon-border bg-workon-bg text-workon-ink placeholder-workon-muted"
             />
           </div>
@@ -65,7 +65,7 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Decrivez le probleme en detail..."
+              placeholder="Décrivez le problème en détail..."
               rows={4}
               className="w-full rounded-xl border border-workon-border bg-workon-bg p-3 text-workon-ink placeholder-workon-muted focus:border-workon-primary focus:outline-none"
             />

@@ -99,7 +99,7 @@ function RegisterInner() {
     } catch (err) {
       console.warn("[register] active legal versions unavailable", err);
       setConsentStatusError(
-        "Impossible de charger les versions legales actives. Elles seront verifiees avant l'acceptation.",
+        "Impossible de charger les versions légales actives. Elles seront vérifiées avant l'acceptation.",
       );
     }
 
@@ -126,7 +126,7 @@ function RegisterInner() {
   async function handleRegisterConsentAccept() {
     const token = getAccessToken();
     if (!token) {
-      throw new Error("Session locale incomplete. Reconnecte-toi pour continuer.");
+      throw new Error("Session locale incomplète. Reconnecte-toi pour continuer.");
     }
 
     const documents = consentMissing.filter(isLegalDocumentType);
@@ -143,7 +143,7 @@ function RegisterInner() {
       setConsentMissing(
         status.missing.length > 0 ? status.missing : [...REQUIRED_LEGAL_DOCUMENTS],
       );
-      throw new Error("Consentement envoye, mais le statut n'est pas encore confirme.");
+      throw new Error("Consentement envoyé, mais le statut n'est pas encore confirmé.");
     }
 
     setConsentOpen(false);

@@ -138,7 +138,7 @@ export function SkillSelector() {
       {selectedSkills.length > 0 && (
         <div>
           <label className="text-sm text-workon-muted">
-            Competences selectionnees ({selectedSkills.length})
+            Compétences sélectionnées ({selectedSkills.length})
           </label>
           <div className="mt-2 flex flex-wrap gap-2">
             {selectedSkills.map((skill) => (

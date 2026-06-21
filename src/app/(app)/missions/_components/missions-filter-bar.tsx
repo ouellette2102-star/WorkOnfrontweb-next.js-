@@ -14,21 +14,21 @@ import { cn } from "@/lib/utils";
 
 const CATEGORY_LABELS: Record<string, string> = {
   other: "Autres services",
-  cleaning: "Menage",
-  menage: "Menage",
-  reparation: "Reparation",
+  cleaning: "Ménage",
+  menage: "Ménage",
+  reparation: "Réparation",
   entretien: "Entretien",
-  snow_removal: "Deneigement",
+  snow_removal: "Déneigement",
   paysagement: "Paysagement",
   construction: "Construction",
-  "construction-legere": "Construction legere",
+  "construction-legere": "Construction légère",
   plomberie: "Plomberie",
-  electrical: "Electricite",
-  electricite: "Electricite",
+  electrical: "Électricité",
+  electricite: "Électricité",
 };
 
 function formatCategoryLabel(value: string) {
-  if (!value) return "Toutes categories";
+  if (!value) return "Toutes catégories";
   if (CATEGORY_LABELS[value]) return CATEGORY_LABELS[value];
 
   return value

@@ -163,7 +163,7 @@ function ConsentModalBody({
             />
             <span>
               J&apos;ai ouvert les documents requis, je comprends les conditions
-              d&apos;utilisation et la politique de confidentialite, et je les
+              d&apos;utilisation et la politique de confidentialité, et je les
               accepte explicitement.
             </span>
           </label>

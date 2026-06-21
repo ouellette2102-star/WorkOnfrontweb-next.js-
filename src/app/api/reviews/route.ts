@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return errorResponse("INVALID_REQUEST", "Corps de requete invalide", 400);
+      return errorResponse("INVALID_REQUEST", "Corps de requête invalide", 400);
     }
 
     // Validate payload
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (typeof body.rating !== "number" || body.rating < 1 || body.rating > 5) {
-      return errorResponse("INVALID_RATING", "Rating doit etre entre 1 et 5", 400);
+      return errorResponse("INVALID_RATING", "Rating doit être entre 1 et 5", 400);
     }
 
     // Create abort controller for timeout
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       clearTimeout(timeoutId);
 
       if (networkError instanceof Error && networkError.name === "AbortError") {
-        return errorResponse("BACKEND_TIMEOUT", "Le serveur n'a pas repondu a temps", 504);
+        return errorResponse("BACKEND_TIMEOUT", "Le serveur n'a pas répondu à temps", 504);
       }
 
       console.error("[REVIEW_PROXY] Backend unreachable:", networkError);
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     // Backend returned 409 = already reviewed
     if (response.status === 409) {
-      return errorResponse("ALREADY_REVIEWED", "Vous avez deja laisse un avis pour cette mission", 409);
+      return errorResponse("ALREADY_REVIEWED", "Vous avez déjà laissé un avis pour cette mission", 409);
     }
 
     // Other backend errors
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
       const data = await response.json();
       return successResponse(data);
     } catch {
-      return errorResponse("PARSE_ERROR", "Reponse serveur invalide", 502);
+      return errorResponse("PARSE_ERROR", "Réponse serveur invalide", 502);
     }
   } catch (error) {
     console.error("[REVIEW_PROXY_ERROR]", error);

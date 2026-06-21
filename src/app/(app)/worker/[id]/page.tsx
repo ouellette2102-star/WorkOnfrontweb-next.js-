@@ -50,12 +50,12 @@ export default function WorkerProfilePage() {
     return (
       <div className="min-h-screen bg-workon-bg px-4 py-12">
         <div className="mx-auto max-w-md rounded-[28px] border border-workon-border bg-white p-8 text-center shadow-sm">
-          <p className="font-semibold text-workon-ink">Professionnel non trouve</p>
+          <p className="font-semibold text-workon-ink">Professionnel non trouvé</p>
           <p className="mt-2 text-sm text-workon-muted">
-            Ce profil est indisponible ou le lien a change.
+            Ce profil est indisponible ou le lien a changé.
           </p>
           <Button asChild variant="outline" className="mt-5">
-            <Link href="/home">Retour a WorkOn</Link>
+            <Link href="/home">Retour à WorkOn</Link>
           </Button>
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function WorkerProfilePage() {
                         onClick={() => router.push(`/reserve/${worker.id}`)}
                       >
                         <CalendarDays className="h-4 w-4" />
-                        Reserver
+                        Réserver
                       </Button>
                       <ContactWorkerButton
                         workerId={worker.id}
@@ -143,7 +143,7 @@ export default function WorkerProfilePage() {
                       />
                     </div>
                     <p className="text-xs leading-relaxed text-white/58">
-                      Paiement securise, contrat protege et historique conserve dans WorkOn.
+                      Paiement sécurisé, contrat protégé et historique conservé dans WorkOn.
                     </p>
                   </div>
                 </div>
@@ -169,7 +169,7 @@ export default function WorkerProfilePage() {
                       Tarif indicatif
                     </p>
                     <p className="mt-1 font-heading text-2xl font-bold">
-                      {hourlyRate > 0 ? `A partir de ${hourlyRate} $/h` : "Sur demande"}
+                      {hourlyRate > 0 ? `À partir de ${hourlyRate} $/h` : "Sur demande"}
                     </p>
                   </div>
                 </div>
@@ -179,23 +179,23 @@ export default function WorkerProfilePage() {
             <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <TrustSignal
                 icon={BadgeCheck}
-                title="Identite verifiee"
-                text="Profil rattache a un compte WorkOn suivi."
+                title="Identité vérifiée"
+                text="Profil rattaché à un compte WorkOn suivi."
               />
               <TrustSignal
                 icon={WalletCards}
-                title="Paiement securise"
-                text="Depot et suivi de paiement via Stripe."
+                title="Paiement sécurisé"
+                text="Dépôt et suivi de paiement via Stripe."
               />
               <TrustSignal
                 icon={FileCheck2}
-                title="Contrat protege"
-                text="Conditions et preuves conservees."
+                title="Contrat protégé"
+                text="Conditions et preuves conservées."
               />
               <TrustSignal
                 icon={ShieldCheck}
                 title="Historique visible"
-                text={`${completedMissions} mission${completedMissions > 1 ? "s" : ""} completee${completedMissions > 1 ? "s" : ""}.`}
+                text={`${completedMissions} mission${completedMissions > 1 ? "s" : ""} complétée${completedMissions > 1 ? "s" : ""}.`}
               />
             </section>
 
@@ -216,8 +216,8 @@ export default function WorkerProfilePage() {
 
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <MiniStat label="Note client" value={reviewCount > 0 ? `${rating.toFixed(1)} / 5` : "Nouveau"} />
-                <MiniStat label="Avis" value={reviewCount > 0 ? String(reviewCount) : "A venir"} />
-                <MiniStat label="Missions completees" value={completedMissions > 0 ? String(completedMissions) : "0"} />
+                <MiniStat label="Avis" value={reviewCount > 0 ? String(reviewCount) : "À venir"} />
+                <MiniStat label="Missions complétées" value={completedMissions > 0 ? String(completedMissions) : "0"} />
               </div>
 
               <div className="mt-5 flex flex-wrap gap-2">
@@ -240,7 +240,7 @@ export default function WorkerProfilePage() {
             </section>
 
             {worker.bio && worker.bio.trim().length > 0 && (
-              <InfoCard title="A propos">
+              <InfoCard title="À propos">
                 <p className="whitespace-pre-line text-sm leading-relaxed text-workon-ink">
                   {worker.bio}
                 </p>
@@ -249,7 +249,7 @@ export default function WorkerProfilePage() {
 
             {(worker.skills ?? []).length > 0 && (
               <InfoCard
-                title="Competences"
+                title="Compétences"
                 eyebrow="Savoir-faire"
                 icon={<Sparkles className="h-5 w-5" />}
               >
@@ -267,7 +267,7 @@ export default function WorkerProfilePage() {
             )}
 
             <InfoCard
-              title="Disponibilites"
+              title="Disponibilités"
               eyebrow="Planification"
               icon={<Clock className="h-5 w-5" />}
             >
@@ -284,13 +284,13 @@ export default function WorkerProfilePage() {
                 </div>
               ) : (
                 <p className="text-sm text-workon-muted">
-                  Les disponibilites ne sont pas encore publiees. La demande peut quand meme etre envoyee.
+                  Les disponibilités ne sont pas encore publiées. La demande peut quand même être envoyée.
                 </p>
               )}
             </InfoCard>
 
             <InfoCard
-              title="Realisations"
+              title="Réalisations"
               eyebrow="Portfolio"
               icon={<ImageIcon className="h-5 w-5" />}
             >
@@ -304,7 +304,7 @@ export default function WorkerProfilePage() {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={url}
-                        alt={`Realisation ${index + 1}`}
+                        alt={`Réalisation ${index + 1}`}
                         className="h-full w-full object-cover transition duration-300 hover:scale-105"
                         loading="lazy"
                       />
@@ -313,9 +313,9 @@ export default function WorkerProfilePage() {
                 </div>
               ) : (
                 <div className="rounded-2xl border border-dashed border-workon-border bg-workon-bg-cream p-5 text-center">
-                  <p className="text-sm font-semibold text-workon-ink">Portfolio a venir</p>
+                  <p className="text-sm font-semibold text-workon-ink">Portfolio à venir</p>
                   <p className="mt-1 text-xs text-workon-muted">
-                    Les prochaines realisations pourront renforcer la preuve sociale.
+                    Les prochaines réalisations pourront renforcer la preuve sociale.
                   </p>
                 </div>
               )}
@@ -327,10 +327,10 @@ export default function WorkerProfilePage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
-                    Action recommandee
+                    Action recommandée
                   </p>
                   <h2 className="mt-1 font-heading text-xl font-bold text-workon-ink">
-                    Reserver avec un cadre clair.
+                    Réserver avec un cadre clair.
                   </h2>
                 </div>
                 <span className="rounded-2xl bg-workon-primary-subtle p-2 text-workon-primary">
@@ -346,7 +346,7 @@ export default function WorkerProfilePage() {
                   className="h-12 w-full rounded-2xl px-4"
                   onClick={() => router.push(`/reserve/${worker.id}`)}
                 >
-                  Reserver ce pro
+                  Réserver ce pro
                   <ChevronRight className="h-4 w-4" />
                 </Button>
                 <ContactWorkerButton
@@ -367,21 +367,21 @@ export default function WorkerProfilePage() {
                   </span>
                 </div>
                 <p className="mt-2 text-xs leading-relaxed text-workon-muted">
-                  Le montant final peut etre fixe dans la reservation selon la portee de la mission.
+                  Le montant final peut être fixé dans la réservation selon la portée de la mission.
                 </p>
               </div>
             </section>
 
             <section className="rounded-[28px] border border-workon-border bg-white p-5 shadow-sm">
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
-                Resume confiance
+                Résumé confiance
               </p>
               <div className="mt-4 space-y-3">
                 {[
-                  "Identite et profil suivis",
-                  "Contrat de service encadre",
-                  "Depot Stripe si paiement requis",
-                  "Historique mission conserve",
+                  "Identité et profil suivis",
+                  "Contrat de service encadré",
+                  "Dépôt Stripe si paiement requis",
+                  "Historique mission conservé",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2 text-sm font-semibold text-workon-ink">
                     <CheckCircle2 className="h-4 w-4 text-workon-primary" />
@@ -484,7 +484,7 @@ function deriveTrustVariant(worker: WorkerProfile): TrustPillVariant {
 function deriveTrustLabel(worker: WorkerProfile): string {
   if (worker.trustTier === "PREMIUM") return "Top Performer";
   if (worker.trustTier === "TRUSTED") return "De confiance";
-  if (worker.trustTier === "VERIFIED") return "Identite verifiee";
+  if (worker.trustTier === "VERIFIED") return "Identité vérifiée";
   if ((worker.reviewCount ?? 0) === 0) return "Nouveau profil";
   return "Fiable";
 }

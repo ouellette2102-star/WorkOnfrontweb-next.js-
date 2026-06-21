@@ -143,7 +143,7 @@ export default function HomePage() {
         <section className="space-y-3">
           <SectionHeader
             eyebrow="En cours"
-            title={isPro ? "Missions a piloter" : "Missions a suivre"}
+            title={isPro ? "Missions à piloter" : "Missions à suivre"}
             href="/missions/mine"
             action="Voir tout"
           />
@@ -208,7 +208,7 @@ function PrimaryActionCard({
           ? "/missions"
           : "/missions/new";
   const cta = quotaExceeded
-    ? "Debloquer le plan"
+    ? "Débloquer le plan"
     : pendingLeads > 0
       ? "Traiter les demandes"
       : topMission
@@ -219,21 +219,21 @@ function PrimaryActionCard({
   const title = quotaExceeded
     ? "Ton plan limite la prochaine action"
     : pendingLeads > 0
-      ? `${pendingLeads} demande${pendingLeads > 1 ? "s" : ""} a traiter`
+      ? `${pendingLeads} demande${pendingLeads > 1 ? "s" : ""} à traiter`
       : topMission
         ? topMission.title
         : isPro
-          ? "Trouve une mission rentable pres de toi"
-          : "Confie une mission a un pro verifie";
+          ? "Trouve une mission rentable près de toi"
+          : "Confie une mission à un pro vérifié";
   const body = quotaExceeded
-    ? "Passe au plan adapte pour continuer sans friction."
+    ? "Passe au plan adapté pour continuer sans friction."
     : pendingLeads > 0
-      ? "Accepte, refuse ou qualifie les opportunites pendant qu'elles sont chaudes."
+      ? "Accepte, refuse ou qualifie les opportunités pendant qu'elles sont chaudes."
       : topMission
         ? `${topMission.category} · ${topMission.city} · ${topMission.price}$`
         : isPro
-          ? `${openMissionCount} opportunite${openMissionCount > 1 ? "s" : ""} ouverte${openMissionCount > 1 ? "s" : ""} sur WorkOn.`
-          : "Publie le besoin, protege le contrat, paie seulement avec confiance.";
+          ? `${openMissionCount} opportunité${openMissionCount > 1 ? "s" : ""} ouverte${openMissionCount > 1 ? "s" : ""} sur WorkOn.`
+          : "Publie le besoin, protège le contrat, paie seulement avec confiance.";
 
   return (
     <section className="workon-dark-panel overflow-hidden rounded-[24px] p-5 shadow-[0_18px_40px_rgba(8,34,25,0.24)]">
@@ -241,7 +241,7 @@ function PrimaryActionCard({
         <div className="min-w-0">
           <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white/78">
             <Sparkles className="h-3.5 w-3.5 text-workon-gold" />
-            A faire maintenant
+            À faire maintenant
           </p>
           <h2 className="font-heading text-2xl font-bold leading-tight text-white">
             {title}
@@ -254,9 +254,9 @@ function PrimaryActionCard({
       </div>
 
       <div className="mt-5 grid grid-cols-3 gap-2 text-[11px] text-white/72">
-        <TrustMini icon={ShieldCheck} label="Identite" value="verifiee" />
-        <TrustMini icon={CreditCard} label="Paiement" value="securise" />
-        <TrustMini icon={FileCheck} label="Contrat" value="protege" />
+        <TrustMini icon={ShieldCheck} label="Identité" value="vérifiée" />
+        <TrustMini icon={CreditCard} label="Paiement" value="sécurisé" />
+        <TrustMini icon={FileCheck} label="Contrat" value="protégé" />
       </div>
 
       <Button asChild variant="inverse" className="mt-5 h-12 w-full rounded-2xl">
@@ -348,7 +348,7 @@ function ToDoSection({
       href: "/leads/mine",
       icon: Inbox,
       title: `${pendingLeads} lead${pendingLeads > 1 ? "s" : ""} en attente`,
-      detail: "Reponds vite pour maximiser tes chances.",
+      detail: "Réponds vite pour maximiser tes chances.",
       tone: "primary" as const,
     });
   }
@@ -358,7 +358,7 @@ function ToDoSection({
       href: "/settings/subscription",
       icon: CreditCard,
       title: "Limite gratuite atteinte",
-      detail: "Choisis le plan qui garde ton activite en mouvement.",
+      detail: "Choisis le plan qui garde ton activité en mouvement.",
       tone: "copper" as const,
     });
   }
@@ -370,7 +370,7 @@ function ToDoSection({
       title: mode === "pro" ? "Cherche une mission active" : "Publie ton besoin",
       detail:
         mode === "pro"
-          ? "Les opportunites proches de toi sont centralisees dans Missions."
+          ? "Les opportunités proches de toi sont centralisées dans Missions."
           : "WorkOn structure la demande, le contrat et le paiement.",
       tone: "neutral" as const,
     });
@@ -378,7 +378,7 @@ function ToDoSection({
 
   return (
     <section className="space-y-3">
-      <SectionHeader eyebrow="Priorite" title="Actions rapides" />
+      <SectionHeader eyebrow="Priorité" title="Actions rapides" />
       <div className="space-y-2">
         {items.map((item) => (
           <ActionRow key={item.id} {...item} />
@@ -468,8 +468,8 @@ function EmptyActionCard({
       <p className="font-semibold text-workon-ink">{copy.welcomeBanner}</p>
       <p className="mt-1 text-sm text-workon-muted">
         {mode === "pro"
-          ? "Commence par les missions ouvertes ou complete ton profil pour inspirer confiance."
-          : "Decris le besoin, compare les pros et garde le paiement protege."}
+          ? "Commence par les missions ouvertes ou complète ton profil pour inspirer confiance."
+          : "Décris le besoin, compare les pros et garde le paiement protégé."}
       </p>
       <Button asChild variant="outline" size="sm" className="mt-4 rounded-xl">
         <Link href={mode === "pro" ? "/missions" : "/pros"}>
