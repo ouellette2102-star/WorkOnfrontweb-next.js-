@@ -60,7 +60,7 @@ function HeroSection({ stats }: { stats: PublicStats | null }) {
 
           <p className="mt-8 text-lg md:text-xl text-workon-gray max-w-2xl leading-relaxed">
             WorkOn capte les intentions d&apos;achat dans votre secteur et les transforme
-            en opportunités concrètes &mdash; livrées directement a vous.
+            en opportunités concrètes &mdash; livrées directement à vous.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-4">
@@ -100,7 +100,7 @@ function ProblemSection() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 3.75 18 6m0 0 2.25 2.25M18 6l2.25-2.25M18 6l-2.25 2.25m1.5 13.5a10.5 10.5 0 1 1-8.25-17.325" />
         </svg>
       ),
-      title: "Dépendance au bouche-a-oreille",
+      title: "Dépendance au bouche-à-oreille",
       desc: "Quand les recommandations ralentissent, votre chiffre d'affaires ralentit avec. Pas de système, pas de prévisibilité.",
     },
     {
@@ -214,7 +214,7 @@ function DifferentiationSection() {
     },
     {
       label: "Un annuaire en ligne",
-      desc: "Votre profil n'est pas noye dans une liste de 500 concurrents.",
+      desc: "Votre profil n'est pas noyé dans une liste de 500 concurrents.",
     },
     {
       label: "Un réseau social",
@@ -291,7 +291,7 @@ function UseCasesSection() {
     },
     {
       sector: "Entretien paysager",
-      desc: "Le printemps génère un pic de demande massif. Votre page professionnelle est prete avant la premiere tonte.",
+      desc: "Le printemps génère un pic de demande massif. Votre page professionnelle est prête avant la première tonte.",
       demand: "Pic saisonnier",
       icon: "🌿",
       borderColor: "border-workon-trust-green/20 hover:border-workon-trust-green/30",
