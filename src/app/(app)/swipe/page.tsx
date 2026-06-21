@@ -746,7 +746,7 @@ function EmptySwipeState({
         Tous les profils sont parcourus.
       </h3>
       <p className="mt-2 text-sm leading-relaxed text-workon-muted">
-        Reviens plus tard : la pile se met a jour avec les nouvelles missions,
+        Reviens plus tard : la pile se met à jour avec les nouvelles missions,
         clients et pros admissibles.
       </p>
       {hasAnyMatch && (
