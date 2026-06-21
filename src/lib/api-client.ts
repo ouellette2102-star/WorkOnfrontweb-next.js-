@@ -13,13 +13,17 @@ import {
 } from "./api-schemas";
 import type { MissionCategory } from "./mission-categories";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+const BACKEND_API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+const BROWSER_API_PROXY_URL = "/api/workon";
 
 type FetchOptions = RequestInit & { skipAuth?: boolean };
 
 export async function apiFetch<T>(path: string, options: FetchOptions = {}): Promise<T> {
   const { skipAuth, ...fetchOptions } = options;
   const headers = new Headers(fetchOptions.headers);
+  const apiBaseUrl =
+    typeof window === "undefined" ? BACKEND_API_URL : BROWSER_API_PROXY_URL;
 
   if (!skipAuth) {
     const token = getAccessToken();
@@ -32,14 +36,14 @@ export async function apiFetch<T>(path: string, options: FetchOptions = {}): Pro
     headers.set("Content-Type", "application/json");
   }
 
-  let res = await fetch(`${API_URL}${path}`, { ...fetchOptions, headers });
+  let res = await fetch(`${apiBaseUrl}${path}`, { ...fetchOptions, headers });
 
   // Auto-refresh on 401
   if (res.status === 401 && !skipAuth) {
     const newToken = await refreshToken();
     if (newToken) {
       headers.set("Authorization", `Bearer ${newToken}`);
-      res = await fetch(`${API_URL}${path}`, { ...fetchOptions, headers });
+      res = await fetch(`${apiBaseUrl}${path}`, { ...fetchOptions, headers });
     }
   }
 

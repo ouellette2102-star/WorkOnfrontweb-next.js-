@@ -1,12 +1,16 @@
 // @vitest-environment node
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./auth", () => ({
   getAccessToken: vi.fn(() => "test-access-token"),
   refreshToken: vi.fn(),
 }));
 
-const { api } = await import("./api-client");
+const { api, apiFetch } = await import("./api-client");
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("api.getNearbyMissions", () => {
   beforeEach(() => {
@@ -36,6 +40,32 @@ describe("api.getNearbyMissions", () => {
     expect(url.searchParams.get("radius")).toBe("25");
     expect(url.searchParams.has("radiusKm")).toBe(false);
     expect(url.searchParams.get("category")).toBe("cleaning");
+  });
+});
+
+describe("apiFetch transport", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("uses the same-origin WorkOn proxy in the browser to avoid preview CORS", async () => {
+    vi.stubGlobal("window", {});
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    await expect(apiFetch("/users/me?source=test")).resolves.toEqual({ ok: true });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(url).toBe("/api/workon/users/me?source=test");
+    expect(new Headers(init?.headers).get("Authorization")).toBe(
+      "Bearer test-access-token",
+    );
   });
 });
 
