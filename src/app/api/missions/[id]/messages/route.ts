@@ -203,7 +203,7 @@ export async function POST(
     }
 
     if (!body.content?.trim()) {
-      return errorResponse("INVALID_CONTENT", "Le message ne peut pas etre vide", 400);
+      return errorResponse("INVALID_CONTENT", "Le message ne peut pas être vide", 400);
     }
 
     // Check API URL

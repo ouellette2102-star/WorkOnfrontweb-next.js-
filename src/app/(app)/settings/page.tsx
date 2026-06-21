@@ -460,7 +460,7 @@ export default function SettingsPage() {
                 icon={ShieldCheck}
                 label="Confiance"
                 value={trustTier}
-                detail={`${Math.round(score)}% du profil complete.`}
+                detail={`${Math.round(score)}% du profil complété.`}
                 tone={trustTier === "BASIC" ? "gold" : "green"}
               />
               <HubMetric

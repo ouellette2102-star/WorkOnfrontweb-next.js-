@@ -126,7 +126,7 @@ function RegisterInner() {
   async function handleRegisterConsentAccept() {
     const token = getAccessToken();
     if (!token) {
-      throw new Error("Session locale incomplete. Reconnecte-toi pour continuer.");
+      throw new Error("Session locale incomplète. Reconnecte-toi pour continuer.");
     }
 
     const documents = consentMissing.filter(isLegalDocumentType);

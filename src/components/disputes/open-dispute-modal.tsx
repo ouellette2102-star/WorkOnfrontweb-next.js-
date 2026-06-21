@@ -65,7 +65,7 @@ export function OpenDisputeModal({ localMissionId, isOpen, onClose, onSuccess }:
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Decrivez le probleme en detail..."
+              placeholder="Décrivez le problème en détail..."
               rows={4}
               className="w-full rounded-xl border border-workon-border bg-workon-bg p-3 text-workon-ink placeholder-workon-muted focus:border-workon-primary focus:outline-none"
             />
