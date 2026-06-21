@@ -76,6 +76,12 @@ export function BookingRecapCard({
         </p>
       </div>
 
+      <div className="grid grid-cols-3 gap-2 border-b border-workon-border bg-workon-bg-cream px-5 py-4">
+        <RecapTrustSignal icon={ShieldCheck} label="Profil" value="visible" />
+        <RecapTrustSignal icon={FileText} label="Contrat" value="trace" />
+        <RecapTrustSignal icon={WalletCards} label="Paiement" value={base > 0 ? "cadre" : "a definir"} />
+      </div>
+
       {base > 0 ? (
         <>
           <div className="px-5 py-4">
@@ -208,6 +214,26 @@ function Line({
       <span className={bold ? "shrink-0 font-bold tabular-nums text-workon-ink" : muted ? "shrink-0 tabular-nums text-workon-muted" : "shrink-0 tabular-nums text-workon-ink"}>
         {value}
       </span>
+    </div>
+  );
+}
+
+function RecapTrustSignal({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof ShieldCheck;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-workon-border bg-white/80 p-3">
+      <Icon className="mb-2 h-4 w-4 text-workon-copper" />
+      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-workon-stone">
+        {label}
+      </p>
+      <p className="mt-1 truncate text-xs font-black text-workon-ink">{value}</p>
     </div>
   );
 }
