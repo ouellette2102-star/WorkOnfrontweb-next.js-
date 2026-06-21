@@ -1134,10 +1134,12 @@ export const api = {
 
   // Identity Verification
   startPhoneVerification: () =>
-    apiFetch<{ sent: boolean; expiresInSeconds: number; devOtp?: string }>(
-      "/identity/verify/phone",
-      { method: "POST" },
-    ),
+    apiFetch<{
+      sent: boolean;
+      expiresInSeconds: number;
+      devOtp?: string;
+      reason?: string;
+    }>("/identity/verify/phone", { method: "POST" }),
   confirmPhoneOtp: (code: string) =>
     apiFetch<{ verified: true; trustTier: string }>(
       "/identity/verify/phone/confirm",
