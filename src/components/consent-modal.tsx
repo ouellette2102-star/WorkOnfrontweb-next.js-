@@ -79,7 +79,7 @@ function ConsentModalBody({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="sm:max-w-lg bg-white border-workon-border text-workon-ink [&>button]:hidden"
+        className="sm:max-w-lg max-h-[90dvh] overflow-y-auto bg-white border-workon-border text-workon-ink [&>button]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
