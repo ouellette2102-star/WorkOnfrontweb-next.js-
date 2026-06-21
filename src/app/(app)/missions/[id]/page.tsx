@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type OfferResponse, type BoostType } from "@/lib/api-client";
+import { api, type OfferResponse, type BoostType, type MissionResponse } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import {
   MapPin,
@@ -452,19 +452,24 @@ function PayMissionButton({ missionId, price }: { missionId: string; price: numb
             ? `${price.toFixed(2)} $`
             : "prix à confirmer";
         return (
-          <Button
-            onClick={handlePay}
-            disabled={loading || previewLoading || price <= 0}
-            className="w-full bg-workon-primary hover:bg-workon-primary-hover text-white rounded-2xl py-3"
-            data-testid="mission-pay-button"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <DollarSign className="h-4 w-4 mr-2" />
-            )}
-            Payer la mission ({totalLabel})
-          </Button>
+          <div className="space-y-3">
+            <div className="rounded-2xl border border-workon-primary/15 bg-workon-primary-subtle p-3 text-xs leading-relaxed text-workon-ink">
+              <strong>Paiement protege.</strong> Le total est calcule avant Stripe; la trace reste liee au dossier de mission.
+            </div>
+            <Button
+              onClick={handlePay}
+              disabled={loading || previewLoading || price <= 0}
+              className="h-12 w-full rounded-2xl bg-workon-primary font-black text-white shadow-[0_12px_28px_rgba(19,64,33,0.22)] hover:bg-workon-primary-hover"
+              data-testid="mission-pay-button"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <DollarSign className="h-4 w-4 mr-2" />
+              )}
+              Payer la mission ({totalLabel})
+            </Button>
+          </div>
         );
       }}
     </PriceBreakdownCard>
@@ -686,6 +691,197 @@ function SectionHeading({
         {title}
       </h2>
       {text && <p className="mt-1 text-xs leading-relaxed text-workon-muted">{text}</p>}
+    </div>
+  );
+}
+
+function formatMissionMoney(price: number) {
+  if (price <= 0) return "A confirmer";
+  return new Intl.NumberFormat("fr-CA", {
+    style: "currency",
+    currency: "CAD",
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
+function getDecisionCopy({
+  mission,
+  isWorker,
+  isOwner,
+  isAssigned,
+  idVerified,
+  connectOnboarded,
+}: {
+  mission: MissionResponse;
+  isWorker: boolean;
+  isOwner: boolean;
+  isAssigned: boolean;
+  idVerified: boolean;
+  connectOnboarded: boolean;
+}) {
+  if (isOwner && mission.status === "completed") {
+    return {
+      title: "Paiement a liberer",
+      text: "Le travail est marque termine. Verifie le dossier, puis paie pour fermer proprement la mission.",
+      label: "Action client",
+    };
+  }
+
+  if (isWorker && mission.status === "open" && !isOwner && !idVerified) {
+    return {
+      title: "Verifier ton identite avant de postuler",
+      text: "La verification protege les clients et augmente la confiance avant toute offre ou acceptation.",
+      label: "Pre-requis",
+    };
+  }
+
+  if (isWorker && mission.status === "open" && !isOwner && idVerified && !connectOnboarded) {
+    return {
+      title: "Configurer Stripe avant de t'engager",
+      text: "Le paiement doit pouvoir etre verse sans friction quand la mission sera terminee.",
+      label: "Pre-requis",
+    };
+  }
+
+  if (isWorker && mission.status === "open" && !isOwner) {
+    return {
+      title: "Accepter ou envoyer une offre",
+      text: "Le prix, la ville, les preuves et la protection sont visibles avant de prendre une decision.",
+      label: "Decision pro",
+    };
+  }
+
+  if (isAssigned && mission.status === "assigned") {
+    return {
+      title: "Demarrer quand tu es pret",
+      text: "Le passage en cours cree une trace claire pour le client, le paiement et les preuves.",
+      label: "Execution",
+    };
+  }
+
+  if (isAssigned && mission.status === "in_progress") {
+    return {
+      title: "Terminer avec des preuves",
+      text: "Photos, messages et suivi reduisent les litiges avant la liberation du paiement.",
+      label: "Qualite",
+    };
+  }
+
+  if (isOwner && ["open", "assigned", "in_progress"].includes(mission.status)) {
+    return {
+      title: "Garder la mission sous controle",
+      text: "Offres, messages, statut, boosts et preuves restent connectes au meme dossier.",
+      label: "Pilotage client",
+    };
+  }
+
+  return {
+    title: "Dossier mission actif",
+    text: "Le contexte, les decisions, les paiements et les preuves restent accessibles au meme endroit.",
+    label: "Suivi",
+  };
+}
+
+function MissionDecisionPanel({
+  mission,
+  statusLabel,
+  isWorker,
+  isOwner,
+  isAssigned,
+  idVerified,
+  connectOnboarded,
+}: {
+  mission: MissionResponse;
+  statusLabel: string;
+  isWorker: boolean;
+  isOwner: boolean;
+  isAssigned: boolean;
+  idVerified: boolean;
+  connectOnboarded: boolean;
+}) {
+  const decision = getDecisionCopy({
+    mission,
+    isWorker,
+    isOwner,
+    isAssigned,
+    idVerified,
+    connectOnboarded,
+  });
+
+  return (
+    <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="workon-premium-card rounded-[28px] p-5 sm:p-6">
+        <p className="text-[11px] font-black uppercase tracking-[0.16em] text-workon-copper">
+          {decision.label}
+        </p>
+        <h2 className="mt-2 font-heading text-2xl font-black leading-tight text-workon-ink">
+          {decision.title}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-workon-muted">
+          {decision.text}
+        </p>
+
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <DecisionSignal
+            icon={ShieldCheck}
+            label="Identite"
+            value={isWorker ? (idVerified ? "verifiee" : "a verifier") : "client suivi"}
+          />
+          <DecisionSignal
+            icon={FileCheck}
+            label="Contrat"
+            value={mission.status === "open" ? "pret" : "en trace"}
+          />
+          <DecisionSignal
+            icon={WalletCards}
+            label="Paiement"
+            value={mission.price > 0 ? "montant visible" : "a cadrer"}
+          />
+        </div>
+      </div>
+
+      <div className="workon-dark-panel rounded-[28px] p-5 text-white shadow-[0_20px_52px_rgba(19,64,33,0.20)]">
+        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/50">
+          Valeur et statut
+        </p>
+        <p className="mt-2 font-heading text-3xl font-black">
+          {formatMissionMoney(mission.price)}
+        </p>
+        <div className="mt-4 grid gap-2">
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/50">
+              Statut
+            </p>
+            <p className="mt-1 text-sm font-black">{statusLabel}</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/50">
+              Protection
+            </p>
+            <p className="mt-1 text-sm font-black">Contrat + paiement WorkOn</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DecisionSignal({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="min-w-0 rounded-2xl border border-workon-line bg-white/75 p-2.5">
+      <Icon className="mb-2 h-4 w-4 text-workon-copper" />
+      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-workon-stone">
+        {label}
+      </p>
+      <p className="mt-1 truncate text-[11px] font-black text-workon-ink">{value}</p>
     </div>
   );
 }
@@ -993,6 +1189,16 @@ export default function MissionDetailPage() {
           </div>
         </div>
       </section>
+
+      <MissionDecisionPanel
+        mission={mission}
+        statusLabel={statusLabel}
+        isWorker={isWorker}
+        isOwner={isOwner}
+        isAssigned={isAssigned}
+        idVerified={idVerified}
+        connectOnboarded={connectOnboarded}
+      />
 
       {/* Details card */}
       <section className="workon-premium-card rounded-[28px] p-5 sm:p-6">
