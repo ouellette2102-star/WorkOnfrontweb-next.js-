@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { getAccessToken } from "@/lib/auth";
+import { getAccessToken, refreshToken } from "@/lib/auth";
+import { safeLocalStorage } from "@/lib/safe-storage";
 import { ConsentModal } from "./consent-modal";
 import {
   acceptAllDocuments,
@@ -100,8 +101,14 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
     if (!token) {
       const fallback = incompleteConsentStatus();
       setConsentStatus(fallback);
+      // Distinguish a blocked-storage browser (in-app WebView / private mode)
+      // from a plain expired session. In the first case localStorage silently
+      // returns null for everything, so "reconnecte-toi" would loop forever —
+      // the user must open WorkOn in a real browser instead.
       setStatusError(
-        "Session locale incomplete: reconnecte-toi ou accepte les documents avant de continuer.",
+        safeLocalStorage.isAvailable()
+          ? "Session expiree: reconnecte-toi pour accepter les conditions."
+          : "Ton navigateur bloque le stockage local. Ouvre WorkOn directement dans Safari ou Chrome (pas dans l'app Facebook/Instagram/Messenger ni un apercu d'email).",
       );
       setIsLoading(false);
       setShowModal(true);
@@ -148,33 +155,51 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
   }, [checkConsentStatus]);
 
   const handleAccept = useCallback(async () => {
-    const token = getAccessToken();
-    if (!token) {
-      const error = new Error("Non authentifie");
-      rejectPendingActions(pendingActionsRef, error);
-      throw error;
-    }
-
-    const documentsToAccept = toLegalDocuments(consentStatus?.missing ?? []);
     setIsLoading(true);
+    try {
+      // The access token lives in localStorage and is short-lived (15 min).
+      // On iOS Safari (ITP) / in-app WebViews it can be missing by the time
+      // the user clicks accept — typically after reading the legal docs in a
+      // new tab while the token expires. DON'T dead-end here: attempt a
+      // cookie-based refresh first. If that also fails, refreshToken() emits
+      // `workon:session-expired`, which AuthProvider turns into a redirect to
+      // /login — a recovery path instead of a permanently stuck modal.
+      let token = getAccessToken();
+      if (!token) {
+        token = await refreshToken();
+      }
+      if (!token) {
+        const error = new Error(
+          "Session expiree. Reconnecte-toi pour accepter les conditions.",
+        );
+        rejectPendingActions(pendingActionsRef, error);
+        throw error;
+      }
 
-    const result = await acceptAllDocuments(token, documentsToAccept);
-    if (!result.success) {
-      const error = new Error("Impossible d'enregistrer votre consentement");
-      rejectPendingActions(pendingActionsRef, error);
-      throw error;
+      const documentsToAccept = toLegalDocuments(consentStatus?.missing ?? []);
+
+      const result = await acceptAllDocuments(token, documentsToAccept);
+      if (!result.success) {
+        const error = new Error("Impossible d'enregistrer votre consentement");
+        rejectPendingActions(pendingActionsRef, error);
+        throw error;
+      }
+
+      const confirmedStatus = await checkConsentStatus();
+      if (!confirmedStatus?.isComplete) {
+        const error = new Error(
+          "Consentement envoye, mais le statut n'est pas encore confirme.",
+        );
+        rejectPendingActions(pendingActionsRef, error);
+        throw error;
+      }
+
+      resolvePendingActions(pendingActionsRef);
+    } finally {
+      // Never leave the modal's button stuck on a permanent spinner, even if
+      // a network/auth step threw above.
+      setIsLoading(false);
     }
-
-    const confirmedStatus = await checkConsentStatus();
-    if (!confirmedStatus?.isComplete) {
-      const error = new Error(
-        "Consentement envoye, mais le statut n'est pas encore confirme.",
-      );
-      rejectPendingActions(pendingActionsRef, error);
-      throw error;
-    }
-
-    resolvePendingActions(pendingActionsRef);
   }, [checkConsentStatus, consentStatus?.missing]);
 
   const requireConsent = useCallback((): Promise<void> => {
