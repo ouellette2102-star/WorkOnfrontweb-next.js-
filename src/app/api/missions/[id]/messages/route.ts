@@ -126,7 +126,7 @@ export async function GET(
       clearTimeout(timeoutId);
 
       if (networkError instanceof Error && networkError.name === "AbortError") {
-        return errorResponse("TIMEOUT", "Le serveur n'a pas repondu a temps", 504);
+        return errorResponse("TIMEOUT", "Le serveur n'a pas répondu à temps", 504);
       }
 
       console.error("[CHAT_PROXY] Backend unreachable:", networkError);
@@ -233,7 +233,7 @@ export async function POST(
       clearTimeout(timeoutId);
 
       if (networkError instanceof Error && networkError.name === "AbortError") {
-        return errorResponse("TIMEOUT", "Le serveur n'a pas repondu a temps", 504);
+        return errorResponse("TIMEOUT", "Le serveur n'a pas répondu à temps", 504);
       }
 
       console.error("[CHAT_PROXY] Backend unreachable:", networkError);
