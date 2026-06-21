@@ -76,6 +76,30 @@ function radiusLabel(radius: number | "unlimited") {
   return radius === "unlimited" ? "Illimité" : `${radius} km`;
 }
 
+function missionDistanceRank(mission: MissionFeedItem) {
+  return mission.distance === null ? Number.POSITIVE_INFINITY : mission.distance;
+}
+
+function missionFreshnessRank(mission: MissionFeedItem) {
+  const timestamp = new Date(mission.createdAt).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function sortMissionOpportunities(missions: MissionFeedItem[]) {
+  return [...missions].sort((a, b) => {
+    const aHasBudget = a.priceCents > 0 ? 1 : 0;
+    const bHasBudget = b.priceCents > 0 ? 1 : 0;
+
+    if (aHasBudget !== bHasBudget) return bHasBudget - aHasBudget;
+    if (a.priceCents !== b.priceCents) return b.priceCents - a.priceCents;
+
+    const distanceDelta = missionDistanceRank(a) - missionDistanceRank(b);
+    if (distanceDelta !== 0) return distanceDelta;
+
+    return missionFreshnessRank(b) - missionFreshnessRank(a);
+  });
+}
+
 export default function WorkerMissionsPage() {
   return (
     <RequireWorkerClient>
@@ -145,7 +169,7 @@ function WorkerMissionsContent() {
         radius: maxDistance === "unlimited" ? undefined : Number(maxDistance),
         category: category || undefined,
       });
-      setMissions(raw.map(missionResponseToFeedItem));
+      setMissions(sortMissionOpportunities(raw.map(missionResponseToFeedItem)));
     } catch (err) {
       setError(
         err instanceof Error
