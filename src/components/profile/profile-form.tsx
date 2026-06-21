@@ -279,7 +279,7 @@ export function ProfileForm() {
       {/* Availability section */}
       <div className="mt-8 border-t border-workon-border pt-8">
         <p className="text-sm uppercase tracking-[0.4em] text-workon-muted">Horaire</p>
-        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Disponibilites</h3>
+        <h3 className="mt-2 text-lg font-semibold text-workon-ink">Disponibilités</h3>
         <p className="mt-1 text-sm text-workon-muted">
           Configure tes plages horaires pour chaque jour de la semaine.
         </p>
