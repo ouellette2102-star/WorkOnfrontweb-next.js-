@@ -135,7 +135,7 @@ export function ProfileForm() {
       setAvatarPreview(dataUri);
       await api.updateAvatar(dataUri);
       await refetch();
-      setAvatarMessage("Photo mise a jour !");
+      setAvatarMessage("Photo mise à jour !");
       setAvatarMessageType("success");
     } catch (uploadError) {
       setAvatarMessage(

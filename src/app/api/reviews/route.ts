@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       clearTimeout(timeoutId);
 
       if (networkError instanceof Error && networkError.name === "AbortError") {
-        return errorResponse("BACKEND_TIMEOUT", "Le serveur n'a pas repondu a temps", 504);
+        return errorResponse("BACKEND_TIMEOUT", "Le serveur n'a pas répondu à temps", 504);
       }
 
       console.error("[REVIEW_PROXY] Backend unreachable:", networkError);
