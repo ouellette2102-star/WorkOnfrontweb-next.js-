@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { useConversationSocket } from "@/hooks/use-conversation-socket";
 import { Send, Loader2, ArrowLeft, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -26,6 +27,19 @@ export default function ConversationThreadPage() {
   const [message, setMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Realtime: refresh instantly when the gateway pushes a message for this
+  // thread. The HTTP polling below stays as a fallback (slower when the
+  // socket is live, snappier when it isn't).
+  const { isConnected } = useConversationSocket({
+    conversationId,
+    enabled: !!conversationId,
+    onNewMessage: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversation-messages", conversationId],
+      });
+    },
+  });
+
   const {
     data,
     isError,
@@ -35,7 +49,7 @@ export default function ConversationThreadPage() {
   } = useQuery({
     queryKey: ["conversation-messages", conversationId],
     queryFn: () => api.getConversationMessages(conversationId),
-    refetchInterval: 3_000,
+    refetchInterval: isConnected ? 15_000 : 3_000,
     enabled: !!conversationId,
   });
 
