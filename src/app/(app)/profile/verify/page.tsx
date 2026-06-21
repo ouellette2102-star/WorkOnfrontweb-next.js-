@@ -44,13 +44,20 @@ export default function VerifyPage() {
   const phoneMutation = useMutation({
     mutationFn: () => api.startPhoneVerification(),
     onSuccess: (res) => {
-      setShowOtpInput(true);
-      // Twilio not configured in prod — surface the devOtp in non-prod so
-      // testers can actually complete the flow. Backend strips it in prod.
       if (res.devOtp) {
+        // Dev only — the backend strips this in prod.
+        setShowOtpInput(true);
         toast.success(`Code DEV: ${res.devOtp}`, { duration: 15_000 });
-      } else {
+      } else if (res.sent) {
+        setShowOtpInput(true);
         toast.success("Code de vérification envoyé par SMS");
+      } else {
+        // Honest: no SMS actually went out (provider not configured or the
+        // send failed). Don't show the code input for a code never sent.
+        toast.error(
+          res.reason ??
+            "La vérification par SMS n'est pas disponible pour le moment.",
+        );
       }
     },
     onError: (err) => {
