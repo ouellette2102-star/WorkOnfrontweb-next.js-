@@ -197,6 +197,49 @@ export const getPublicMissions = (params?: {
 export const getSectorStats = () =>
   publicFetch<SectorStat[]>("/public/sectors/stats", 300);
 
+// ─── Public mission creation (POST, browser-only) ──────────────────────────
+
+export interface CreatePublicMissionInput {
+  title: string;
+  description: string;
+  category: string;
+  city: string;
+  budget: number;
+  clientName: string;
+  clientPhone: string;
+  clientEmail?: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  source?: string;
+}
+
+export interface CreatePublicMissionResult {
+  id: string;
+  title: string;
+  city: string;
+}
+
+export async function createPublicMission(
+  input: CreatePublicMissionInput,
+): Promise<CreatePublicMissionResult> {
+  const res = await fetch(`${BROWSER_API_PROXY_BASE}/public/missions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source: "landing_public", ...input }),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const msg =
+      (body as { message?: string | string[] }).message;
+    throw new Error(
+      Array.isArray(msg) ? msg[0] : (msg ?? `Erreur ${res.status}`),
+    );
+  }
+  return res.json() as Promise<CreatePublicMissionResult>;
+}
+
 // ─── Browsable pros list (Sprint 2 — QA report C3) ─────────────
 
 export interface ProListItem {
