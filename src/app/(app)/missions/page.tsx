@@ -155,6 +155,7 @@ export default async function MissionsFeedPage({
                 mission={mission}
                 variant="pro"
                 source="public_feed"
+                showSaveButton
               />
             ))}
           </div>

@@ -39,6 +39,7 @@ import {
   AlertTriangle,
   FileText,
   Calendar,
+  Heart,
   type LucideIcon,
 } from "lucide-react";
 
@@ -164,6 +165,13 @@ export const HAMBURGER_ITEMS: NavItem[] = [
     href: "/contracts",
     icon: FileCheck,
     intent: "All: contracts where the user is employer or worker",
+  },
+  {
+    id: "saved",
+    label: "Mes favoris",
+    href: "/saved",
+    icon: Heart,
+    intent: "All: missions the user saved locally (favourites)",
   },
   {
     id: "reviews",

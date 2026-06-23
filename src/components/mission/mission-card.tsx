@@ -30,6 +30,7 @@ import {
   trackMissionCardClick,
   type MissionCardSource,
 } from "@/lib/analytics";
+import { SaveMissionButton } from "@/components/mission/save-mission-button";
 
 export type MissionCardInput = {
   id: string;
@@ -58,6 +59,8 @@ interface MissionCardProps {
   href?: string;
   showCTA?: boolean;
   source?: MissionCardSource;
+  /** Show a heart toggle to save/unsave the mission (default off). */
+  showSaveButton?: boolean;
   className?: string;
 }
 
@@ -142,6 +145,7 @@ export function MissionCard({
   href,
   showCTA = true,
   source = "other",
+  showSaveButton = false,
   className,
 }: MissionCardProps) {
   const [now] = useState(() => Date.now());
@@ -175,7 +179,7 @@ export function MissionCard({
   return (
     <article
       className={cn(
-        "group overflow-hidden rounded-[24px] border bg-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg",
+        "group relative overflow-hidden rounded-[24px] border bg-white shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg",
         isUrgent
           ? "border-workon-copper/40"
           : isBoosted
@@ -189,6 +193,12 @@ export function MissionCard({
       data-urgent={isUrgent ? "true" : undefined}
       data-boosted={isBoosted ? "true" : undefined}
     >
+      {showSaveButton && (
+        <SaveMissionButton
+          mission={mission}
+          className="absolute right-2.5 top-2.5 z-10"
+        />
+      )}
       <Link
         href={destination}
         className="block p-4"
