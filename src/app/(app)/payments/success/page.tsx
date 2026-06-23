@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, ArrowRight, AlertTriangle, RefreshCw, XCircle } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { trackEvent } from "@/lib/analytics";
 
 type Status = "loading" | "confirmed" | "pending" | "failed" | "no-session";
 
@@ -20,6 +21,7 @@ function SuccessContent() {
   const [status, setStatus] = useState<Status>("loading");
   const cancelledRef = useRef(false);
   const retryKeyRef = useRef(0);
+  const trackedRef = useRef(false);
 
   const poll = useCallback(async () => {
     if (!sessionId) {
@@ -71,6 +73,20 @@ function SuccessContent() {
       cancelledRef.current = true;
     };
   }, [poll]);
+
+  // Fire the F4 funnel event once, only on a real terminal outcome from the
+  // poll above (PAID → succeeded, FAILED/CANCELLED → failed). Never on the
+  // loading/pending/no-session states, so the count stays honest.
+  useEffect(() => {
+    if (trackedRef.current) return;
+    if (status === "confirmed") {
+      trackedRef.current = true;
+      trackEvent("payment_succeeded", { source: invoiceId ? "invoice" : "subscription" });
+    } else if (status === "failed") {
+      trackedRef.current = true;
+      trackEvent("payment_failed", { source: invoiceId ? "invoice" : "subscription" });
+    }
+  }, [status, invoiceId]);
 
   const handleRetry = () => {
     poll();
