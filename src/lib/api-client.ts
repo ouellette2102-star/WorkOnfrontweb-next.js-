@@ -979,7 +979,16 @@ export const api = {
   getNotificationPreferences: () =>
     apiFetch<NotificationPreference[]>("/notifications/preferences"),
   updateNotificationPreference: (type: NotificationType, data: { email: boolean; push: boolean; sms: boolean }) =>
-    apiFetch<NotificationPreference>(`/notifications/preferences/${type}`, { method: "PUT", body: JSON.stringify(data) }),
+    // Backend DTO expects the `*Enabled` field names (UpdateNotificationPreferenceDto);
+    // sending {email, push, sms} was rejected with 400 "property should not exist".
+    apiFetch<NotificationPreference>(`/notifications/preferences/${type}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        emailEnabled: data.email,
+        pushEnabled: data.push,
+        smsEnabled: data.sms,
+      }),
+    }),
   setQuietHours: (data: { enabled: boolean; startHour: number; endHour: number }) =>
     apiFetch<QuietHoursResponse>("/notifications/preferences/quiet-hours", { method: "PUT", body: JSON.stringify(data) }),
 
