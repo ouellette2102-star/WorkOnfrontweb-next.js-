@@ -108,3 +108,27 @@ jobs:
         run: npm ci --legacy-peer-deps --ignore-scripts
       - name: vitest src/lib/nav.test.ts
         run: npx vitest run src/lib/nav.test.ts
+
+  # E2E (F1) — BLOCKING. Boots the app (npm run dev via playwright.config
+  # webServer) and proves the /publier-besoin public funnel end-to-end:
+  # form fill -> POST payload contract -> "Demande recue" confirmation. The
+  # POST is mocked in-test, so no backend or seed data is touched. Guards
+  # flow F1 of the Launch Readiness contract against regressions.
+  e2e:
+    name: E2E (F1 publier-besoin)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+      - name: Run F1 E2E
+        run: npx playwright test e2e/publier-besoin.spec.ts --project=chromium
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
