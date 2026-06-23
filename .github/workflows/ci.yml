@@ -117,6 +117,9 @@ jobs:
   e2e:
     name: E2E (F1 publier-besoin)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -125,8 +128,6 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts
-      - name: Install Playwright (chromium)
-        run: npx playwright install --with-deps chromium
       - name: Run F1 E2E
         run: npx playwright test e2e/publier-besoin.spec.ts --project=chromium
         env:
