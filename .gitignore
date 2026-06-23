@@ -78,3 +78,7 @@ backend-identity/
 
 # committed by Vercel CLI — should not be tracked
 .env.vercel-prod
+
+# Playwright artifacts
+/test-results/
+/playwright-report/

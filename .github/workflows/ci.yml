@@ -132,3 +132,25 @@ jobs:
         run: npx playwright test e2e/publier-besoin.spec.ts --project=chromium
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
+  # E2E (F2) — BLOCKING. Proves the /register onboarding funnel with a
+  # fully mocked network: credentials -> role -> profile -> hydrated success.
+  # No real account, backend call, or production data is created.
+  e2e-register:
+    name: E2E (F2 inscription)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+      - name: Run F2 E2E
+        run: npx playwright test e2e/register-funnel.spec.ts --project=chromium
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
