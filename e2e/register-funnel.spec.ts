@@ -17,6 +17,9 @@ import { test, expect } from "@playwright/test";
 test("inscription worker : 3 étapes → écran « profil prêt »", async ({
   page,
 }) => {
+  // Le serveur dev en CI compile /register à froid.
+  test.setTimeout(120_000);
+
   let registerPayload: Record<string, unknown> | null = null;
 
   // 1. Register proxy → user + tokens factices (storeAuth les pose en
@@ -72,12 +75,16 @@ test("inscription worker : 3 étapes → écran « profil prêt »", async ({
     } catch {}
   });
 
-  await page.goto("/register");
+  await page.goto("/register", { waitUntil: "domcontentloaded", timeout: 90_000 });
+  await page.waitForLoadState("load", { timeout: 90_000 });
 
   // ── Étape 1 — credentials ──────────────────────────────
   await page.getByPlaceholder("votre@email.com").fill("alex.e2e@workon.test");
   await page.getByPlaceholder("Minimum 8 caractères").fill("Test1234!");
   await page.getByRole("button", { name: /^Continuer$/ }).click();
+  await expect(
+    page.getByRole("heading", { name: /Choisissez votre type de compte/ }),
+  ).toBeVisible({ timeout: 15_000 });
 
   // ── Étape 2 — rôle worker ──────────────────────────────
   await page.getByRole("button", { name: /Trouver des missions/ }).click();
