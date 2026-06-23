@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { MissionPhotos } from "@/components/mission/mission-photos";
 import { MissionTimeline } from "@/components/mission/mission-timeline";
 import { PriceBreakdownCard } from "@/components/mission/price-breakdown-card";
+import { ShareMissionButton } from "@/components/mission/share-mission-button";
 import { BoostCheckoutModal } from "@/components/boosts/boost-checkout-modal";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -1054,14 +1055,17 @@ export default function MissionDetailPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-5 pb-10 space-y-5">
-      {/* Back */}
-      <Link
-        href="/missions/mine"
-        className="inline-flex items-center gap-2 rounded-full border border-workon-border bg-white px-3 py-2 text-sm font-bold text-workon-stone shadow-sm transition hover:border-workon-primary/30 hover:text-workon-ink"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Retour
-      </Link>
+      {/* Back + share */}
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          href="/missions/mine"
+          className="inline-flex items-center gap-2 rounded-full border border-workon-border bg-white px-3 py-2 text-sm font-bold text-workon-stone shadow-sm transition hover:border-workon-primary/30 hover:text-workon-ink"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Link>
+        <ShareMissionButton mission={{ id: mission.id, title: mission.title }} />
+      </div>
 
       {/* Mission-just-created celebration banner */}
       {showCreatedBanner && isOwner && (
