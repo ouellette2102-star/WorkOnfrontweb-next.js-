@@ -174,7 +174,7 @@ export default function PublierBesoinPage() {
               </h1>
               <p className="mt-2 text-sm text-workon-muted">
                 Votre besoin{" "}
-                <strong className="text-workon-ink">"{submittedTitle}"</strong>{" "}
+                <strong className="text-workon-ink">«&nbsp;{submittedTitle}&nbsp;»</strong>{" "}
                 est maintenant visible par les professionnels de WorkOn. Un pro
                 vous contactera bientôt.
               </p>
