@@ -68,7 +68,9 @@ export function trackMissionCardClick(payload: MissionCardClickPayload): void {
  */
 export type AnalyticsEvent =
   | "account_registered" // F2 — a new account is created (props: role)
-  | "mission_created"; // F3 — an employer publishes a mission (props: category)
+  | "mission_created" // F3 — an employer publishes a mission (props: category)
+  | "payment_succeeded" // F4 — Stripe checkout confirmed PAID (props: source)
+  | "payment_failed"; // F4 — checkout reached a FAILED/CANCELLED terminal state
 
 /**
  * Record a product event. Fire-and-forget — never throws, never rejects.
