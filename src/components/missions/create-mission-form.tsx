@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MISSION_CATEGORY_OPTIONS, isMissionCategory } from "@/lib/mission-categories";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * CreateMissionForm — wires straight to `api.createMission` → POST
@@ -136,6 +137,8 @@ export function CreateMissionForm() {
           durationMinutes: durationNum,
           materialProvided: materialBool,
         });
+
+        trackEvent("mission_created", { category });
 
         setSuccess(true);
         setTimeout(() => {

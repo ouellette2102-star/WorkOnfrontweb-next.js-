@@ -8,6 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/auth-context";
 import { getAccessToken } from "@/lib/auth";
+import { trackEvent } from "@/lib/analytics";
 import {
   acceptAllDocuments,
   getActiveVersions,
@@ -177,6 +178,8 @@ function RegisterInner() {
         phone: data.phone,
         city: data.city,
       });
+
+      trackEvent("account_registered", { role });
 
       await openRegisterConsentGate();
     } catch (err) {

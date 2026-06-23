@@ -60,3 +60,43 @@ export function trackMissionCardClick(payload: MissionCardClickPayload): void {
     // Analytics failures must never surface to users.
   }
 }
+
+/**
+ * Critical-funnel product events. Keep this list curated — one entry per
+ * meaningful step of F1–F4 so we can build a funnel in Sentry by filtering
+ * on the `event` tag.
+ */
+export type AnalyticsEvent =
+  | "account_registered" // F2 — a new account is created (props: role)
+  | "mission_created"; // F3 — an employer publishes a mission (props: category)
+
+/**
+ * Record a product event. Fire-and-forget — never throws, never rejects.
+ *
+ * Routed through Sentry like {@link trackMissionCardClick} — no extra SDK at
+ * boot. `props` must stay low-cardinality (role, category, …): they become
+ * Sentry tags, which are meant for filtering, not free-form data. `undefined`
+ * values are dropped so callers can pass optional fields inline.
+ */
+export function trackEvent(
+  event: AnalyticsEvent,
+  props?: Record<string, string | number | boolean | undefined>,
+): void {
+  try {
+    const tags: Record<string, string> = { event };
+    if (props) {
+      for (const [key, value] of Object.entries(props)) {
+        if (value !== undefined) tags[key] = String(value);
+      }
+    }
+    Sentry.addBreadcrumb({
+      category: "product",
+      level: "info",
+      message: event,
+      data: props ?? {},
+    });
+    Sentry.captureMessage(event, { level: "info", tags });
+  } catch {
+    // Analytics failures must never surface to users.
+  }
+}
