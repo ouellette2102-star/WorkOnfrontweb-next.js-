@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Bricolage_Grotesque } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { MaintenanceGate } from "@/components/remote-config/maintenance-gate";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -75,7 +76,9 @@ export default function RootLayout({
         className={`${manrope.variable} ${bricolage.variable} antialiased bg-background text-foreground`}
       >
         <Toaster position="top-right" richColors closeButton theme="light" />
-        <Providers>{children}</Providers>
+        <Providers>
+          <MaintenanceGate>{children}</MaintenanceGate>
+        </Providers>
         <CookieConsent />
       </body>
     </html>
