@@ -37,10 +37,12 @@ function shouldReregister(): boolean {
  * user via POST /devices. The record (id + lastSeenAt) lets the backend
  * target push notifications and track active sessions.
  *
- * pushToken stays empty until Firebase Web SDK is wired in — registering
- * the device row first is the prerequisite for that future step (the
- * row's id becomes the FCM token target). Refreshes once per day to
- * keep lastSeenAt fresh without spamming the endpoint.
+ * A best-effort FCM push token is obtained via `requestFcmToken()`
+ * (Firebase Web SDK, see firebase-client.ts) and included when available.
+ * It is null — and the device row is still created — when Firebase isn't
+ * configured (NEXT_PUBLIC_FIREBASE_* / VAPID unset in Vercel), the browser
+ * lacks web-push support, or the user declines the permission prompt.
+ * Refreshes once per day to keep lastSeenAt fresh without spamming the endpoint.
  */
 export function useDeviceRegistration() {
   const { isAuthenticated, isLoading } = useAuth();
