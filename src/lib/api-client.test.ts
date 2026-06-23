@@ -162,3 +162,44 @@ describe("api.createMission", () => {
   });
 });
 
+describe("api.updateNotificationPreference", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("maps settings toggles to the backend *Enabled DTO fields", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          type: "MESSAGE",
+          emailEnabled: true,
+          pushEnabled: false,
+          smsEnabled: false,
+        }),
+        {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        },
+      ),
+    );
+
+    await api.updateNotificationPreference("MESSAGE", {
+      email: true,
+      push: false,
+      sms: false,
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(new URL(String(url)).pathname).toBe(
+      "/api/v1/notifications/preferences/MESSAGE",
+    );
+    expect(init?.method).toBe("PUT");
+    expect(JSON.parse(String(init?.body))).toEqual({
+      emailEnabled: true,
+      pushEnabled: false,
+      smsEnabled: false,
+    });
+  });
+});
+
