@@ -79,7 +79,7 @@ export function MarketingHeader({
         >
           {items.map((item) => (
             <Link
-              key={item.href}
+              key={`${item.href}-${item.label}`}
               href={item.href}
               className={cn(
                 "transition-colors",
