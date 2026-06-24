@@ -276,8 +276,9 @@ export default function ProfilePage() {
   const { user, isLoading } = useAuth();
   const { mode } = useMode();
 
-  const isWorker = user?.role === "worker";
-  const isClient = user?.role === "residential_client" || user?.role === "employer";
+  // Acting-as: the Pro/Client mode selects the view, not the locked role.
+  const isWorker = mode === "pro";
+  const isClient = mode === "client";
 
   const { data: verification } = useQuery({
     queryKey: ["verification-status", "profile-hub"],

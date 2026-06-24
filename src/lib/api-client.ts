@@ -1363,12 +1363,14 @@ export const api = {
   // legacy `ProfileResponse` shape that the consuming hook expects, so
   // no caller code has to change.
   //
-  // Known limitation: PATCH `/users/me` does NOT accept the `role`
-  // field (validation rejects it: "property role should not exist").
-  // Role updates therefore silently no-op here. This matches the
-  // pre-fix behavior (the old `/profile/me` 404 also dropped role
-  // updates) and is documented so the next PR that adds role updates
-  // can target the correct backend endpoint when it ships.
+  // Note on roles: the backend `role` (set at signup) is immutable here —
+  // PATCH `/users/me` silently ignores a `role` field. That is BY DESIGN
+  // under the dual-capability model: a single account can both hire and
+  // work, so the Pro/Client experience is chosen at runtime via the
+  // `mode-context` "acting-as" toggle (localStorage), NOT by mutating the
+  // role. Backend mission actions now authorize on ownership/capability,
+  // not a locked role (see missions-local.service), so the locked role no
+  // longer blocks acting as a client.
   fetchProfile: async () => {
     const raw = await apiFetch<unknown>("/users/me");
     const u = parseResponse(userMeSchema, raw, "GET /users/me");
