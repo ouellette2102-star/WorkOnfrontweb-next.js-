@@ -1,124 +1,119 @@
 import Link from "next/link";
-import { Star } from "lucide-react";
-import { TrustPill, type TrustPillVariant } from "@/components/ui/trust-pill";
+import { Star, MapPin, CheckCircle2, ArrowRight } from "lucide-react";
+import { TrustTierBadge } from "@/components/worker/trust-tier-badge";
 import type { FeaturedWorker } from "@/lib/public-api";
 import { cn } from "@/lib/utils";
 
 /**
- * HeroWorkerCard — large photo-first worker card matching the target
- * mockups ("hero worker cards with photos + trust pills + big red
- * Réserver CTA"). Designed for use on the landing hero and on
- * employer discovery surfaces.
+ * HeroWorkerCard — carte pro orientée conversion (RedPhone).
  *
- * This is the promotional / conversion-oriented card. The dashboard
- * card in @/components/worker/worker-card.tsx stays the compact
- * card for authenticated surfaces.
+ * Met en avant les signaux de réassurance déjà présents dans le modèle
+ * WorkOn : niveau de confiance (Trust Tier), note + nombre d'avis,
+ * disponibilité, expérience (missions réalisées), compétences et tarif.
+ * Toute la carte est cliquable vers le profil public `/p/[slug]` pour
+ * maximiser le taux de clic.
  */
 
 export interface HeroWorkerCardProps {
   worker: FeaturedWorker;
-  /** Optional override for the trust pill variant. Otherwise derived
-   *  from worker.trustTier. */
-  trustVariant?: TrustPillVariant;
   className?: string;
 }
 
-function deriveTrustVariant(worker: FeaturedWorker): TrustPillVariant {
-  const tier = worker.trustTier;
-  if (tier === "PREMIUM") return "premium";
-  if (tier === "TRUSTED") return "trusted";
-  if (tier === "VERIFIED") return "verified";
-  if ((worker.ratingCount ?? 0) === 0) return "nouveau";
-  return "fiable";
-}
-
-export function HeroWorkerCard({
-  worker,
-  trustVariant,
-  className,
-}: HeroWorkerCardProps) {
+export function HeroWorkerCard({ worker, className }: HeroWorkerCardProps) {
   const initials =
     `${worker.firstName?.[0] ?? ""}${worker.lastName?.[0] ?? ""}`.toUpperCase();
-  const variant = trustVariant ?? deriveTrustVariant(worker);
   const hasReviews = (worker.ratingCount ?? 0) > 0;
+  const isAvailable = (worker.availabilityPreview?.length ?? 0) > 0;
+  const role = worker.jobTitle || worker.sector;
+  const skills = worker.skills?.slice(0, 2) ?? [];
 
   return (
-    <div
+    <Link
+      href={`/p/${worker.slug}`}
       className={cn(
-        "group relative overflow-hidden rounded-3xl bg-white border border-workon-border shadow-card transition-all hover:-translate-y-1 hover:shadow-soft hover:border-workon-primary/30",
+        "group flex flex-col rounded-2xl border border-[#E6EAF0] bg-white p-5 shadow-[0_1px_2px_rgba(14,27,42,0.04),0_10px_28px_-14px_rgba(14,27,42,0.12)] transition-all hover:-translate-y-1 hover:border-[#F0392B]/40 hover:shadow-[0_20px_44px_-18px_rgba(14,27,42,0.22)]",
         className,
       )}
     >
-      {/* Photo / avatar */}
-      <div className="relative h-56 bg-gradient-to-br from-workon-primary/10 via-workon-primary/5 to-transparent">
-        {worker.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={worker.photoUrl}
-            alt={`${worker.firstName} ${worker.lastName[0] ?? ""}.`}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <span className="text-5xl font-bold text-workon-primary/70">
+      {/* Identité */}
+      <div className="flex items-start gap-3.5">
+        <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-2xl">
+          {worker.photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={worker.photoUrl}
+              alt={`${worker.firstName} ${worker.lastName?.[0] ?? ""}.`}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#13273D] to-[#0B1B2E] text-lg font-bold text-white">
               {initials}
-            </span>
-          </div>
-        )}
-        {/* Trust pill floating on photo */}
-        <div className="absolute top-3 left-3">
-          <TrustPill variant={variant} />
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="font-bold text-[17px] text-workon-ink truncate">
-              {worker.firstName} {worker.lastName[0]}.
-            </p>
-            {worker.sector && (
-              <p className="text-sm text-workon-gray truncate">{worker.sector}</p>
-            )}
-            {worker.city && (
-              <p className="text-xs text-workon-gray/70 mt-0.5">
-                📍 {worker.city}
-              </p>
-            )}
-            {worker.bio && (
-              <p className="text-xs text-workon-gray/80 mt-2 line-clamp-2 leading-snug">
-                {worker.bio}
-              </p>
-            )}
-          </div>
-          {hasReviews && (
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-              <span className="text-sm font-bold text-workon-ink">
-                {worker.ratingAvg.toFixed(1)}
-              </span>
-              <span className="text-xs text-workon-gray">
-                ({worker.ratingCount})
-              </span>
             </div>
           )}
         </div>
-
-        <div className="mt-4 flex items-center justify-between gap-2">
-          <span className="text-xs text-workon-gray">
-            {worker.completedMissions} mission
-            {worker.completedMissions !== 1 ? "s" : ""} complétée
-            {worker.completedMissions !== 1 ? "s" : ""}
-          </span>
-          <Link
-            href={`/p/${worker.slug}`}
-            className="inline-flex items-center justify-center rounded-xl bg-workon-primary hover:bg-workon-primary-hover text-white text-sm font-semibold h-10 px-5 shadow-md shadow-workon-primary/25 transition-all group-hover:shadow-lg group-hover:shadow-workon-primary/35"
-          >
-            Réserver
-          </Link>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[16px] font-bold text-[#0E1B2A]">
+            {worker.firstName} {worker.lastName?.[0]}.
+          </p>
+          {role && <p className="truncate text-[13px] text-[#5A6B7E]">{role}</p>}
+          {worker.city && (
+            <p className="mt-0.5 inline-flex items-center gap-1 text-[12px] text-[#8A98A8]">
+              <MapPin className="h-3 w-3" /> {worker.city}
+            </p>
+          )}
         </div>
+        <TrustTierBadge tier={worker.trustTier} compact />
       </div>
-    </div>
+
+      {/* Réassurance : note + disponibilité */}
+      <div className="mt-4 flex items-center gap-2">
+        {hasReviews ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#F6F8FB] px-2.5 py-1 text-[12px] font-medium text-[#0E1B2A]">
+            <Star className="h-3.5 w-3.5 fill-[#F6C84C] text-[#F6C84C]" />
+            {worker.ratingAvg.toFixed(1)}
+            <span className="text-[#8A98A8]">({worker.ratingCount})</span>
+          </span>
+        ) : (
+          <span className="rounded-full bg-[#EAF1FF] px-2.5 py-1 text-[12px] font-medium text-[#1E6FE0]">
+            Nouveau pro
+          </span>
+        )}
+        {isAvailable && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#34D27B]/[0.12] px-2.5 py-1 text-[12px] font-medium text-[#1E9E5A]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#34D27B]" /> Disponible
+          </span>
+        )}
+      </div>
+
+      {/* Compétences */}
+      {skills.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {skills.map((s) => (
+            <span
+              key={s.id}
+              className="rounded-md border border-[#E6EAF0] bg-[#F6F8FB] px-2 py-0.5 text-[11.5px] text-[#5A6B7E]"
+            >
+              {s.labelFr}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Expérience + tarif */}
+      <div className="mt-4 flex items-center justify-between border-t border-[#EEF1F6] pt-4 text-[13px]">
+        <span className="inline-flex items-center gap-1.5 text-[#5A6B7E]">
+          <CheckCircle2 className="h-4 w-4 text-[#2BA968]" />
+          {worker.completedMissions} mission{worker.completedMissions !== 1 ? "s" : ""} réalisée{worker.completedMissions !== 1 ? "s" : ""}
+        </span>
+        {worker.hourlyRate != null && (
+          <span className="font-semibold text-[#0E1B2A]">dès {worker.hourlyRate} $/h</span>
+        )}
+      </div>
+
+      {/* CTA */}
+      <span className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#F0392B] py-3 text-[14px] font-medium text-white transition-colors group-hover:bg-[#D62E22]">
+        Voir le profil <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </Link>
   );
 }

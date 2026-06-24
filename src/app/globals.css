@@ -4,50 +4,51 @@
   /* ============================================================
    * WorkOn brand palette — Convergence (Emergent → Next.js)
    * ============================================================
-   * Light organic theme inspired by the Emergent design guidelines:
-   *   Background: #F9F8F5 (oatmeal)
-   *   Text:       #1B1A18 (rich black)
-   *   Primary:    #134021 (forest green — trust/nature)
-   *   Accent:     #C96646 (rich terracotta — urgency/action)
-   *   Gray:       #706E6A (warm gray)
-   *   Cream:      #EAE6DF (warm border)
+   * Identité RedPhone (2026-06-17) :
+   *   Background: #F7F8FB (clair froid)
+   *   Text/Ink:  #0E1B2A (marine profond)
+   *   Primary:   #F0392B (rouge RedPhone — action/CTA)
+   *   Accent:    #F0392B (rouge — le pin, les accents)
+   *   Dark/navy: #0B1B2E (panneaux sombres) + halo bleu #2E7DFF (confiance)
+   *   Gray:      #5A6B7E (gris froid)  ·  Border: #E5E9F0
+   *   Vert #22C55E = succès/vérifié UNIQUEMENT.
    *
    * Font stack: system-ui sans-serif (Cabinet Grotesk/Manrope
    * served via next/font in layout.tsx).
    */
-  --background: #F9F8F5;
-  --foreground: #1B1A18;
+  --background: #F7F8FB;
+  --foreground: #0E1B2A;
 
-  --workon-primary: #134021;
-  --workon-primary-hover: #0F3319;
-  --workon-primary-subtle: rgba(19, 64, 33, 0.08);
-  --workon-primary-ring: rgba(19, 64, 33, 0.25);
+  --workon-primary: #F0392B;
+  --workon-primary-hover: #D62E22;
+  --workon-primary-subtle: rgba(240, 57, 43, 0.08);
+  --workon-primary-ring: rgba(240, 57, 43, 0.22);
 
-  --workon-forest-deep: #09251A;
-  --workon-forest: #0F3A27;
-  --workon-graphite: #181614;
-  --workon-copper: #B96B43;
-  --workon-copper-hover: #9E5836;
-  --workon-gold: #D49B45;
-  --workon-stone: #7B766E;
-  --workon-stone-subtle: #D8D1C6;
-  --workon-surface: #FFFDF8;
+  --workon-forest-deep: #0A1726;
+  --workon-forest: #122B45;
+  --workon-graphite: #0E1B2A;
+  --workon-copper: #D62E22;
+  --workon-copper-hover: #B5241A;
+  --workon-gold: #2E7DFF;
+  --workon-stone: #5A6B7E;
+  --workon-stone-subtle: #CBD4E0;
+  --workon-surface: #FFFFFF;
   --workon-surface-raised: #FFFFFF;
-  --workon-surface-dark: #082219;
-  --workon-surface-dark-soft: #103426;
-  --workon-line: rgba(27, 26, 24, 0.10);
+  --workon-surface-dark: #0B1B2E;
+  --workon-surface-dark-soft: #14304A;
+  --workon-line: rgba(14, 27, 42, 0.10);
 
-  --workon-accent: #C96646;
-  --workon-accent-hover: #B5553A;
-  --workon-accent-subtle: rgba(201, 102, 70, 0.08);
-  --workon-accent-ring: rgba(201, 102, 70, 0.25);
+  --workon-accent: #F0392B;
+  --workon-accent-hover: #D62E22;
+  --workon-accent-subtle: rgba(240, 57, 43, 0.08);
+  --workon-accent-ring: rgba(240, 57, 43, 0.22);
 
-  --workon-ink: #1B1A18;
-  --workon-bg: #F9F8F5;
-  --workon-bg-cream: #F0EDE8;
-  --workon-border: #EAE6DF;
-  --workon-gray: #706E6A;
-  --workon-muted: #9C9A96;
+  --workon-ink: #0E1B2A;
+  --workon-bg: #F7F8FB;
+  --workon-bg-cream: #EEF1F6;
+  --workon-border: #E5E9F0;
+  --workon-gray: #5A6B7E;
+  --workon-muted: #8A98A8;
   --workon-trust-green: #22C55E;
 
   /* Semantic status colors */
@@ -132,12 +133,12 @@ body {
   overscroll-behavior: none;
 }
 
-/* Organic gradient (hero sections) — green brand */
+/* Hero gradient — RedPhone red wash */
 .bg-fire-gradient {
   background: linear-gradient(
     180deg,
-    rgba(19, 64, 33, 0.08) 0%,
-    rgba(19, 64, 33, 0.03) 40%,
+    rgba(240, 57, 43, 0.08) 0%,
+    rgba(240, 57, 43, 0.03) 40%,
     transparent 100%
   );
 }
@@ -164,7 +165,7 @@ body {
 
 .workon-dark-panel {
   background:
-    radial-gradient(circle at top left, rgba(212, 155, 69, 0.16), transparent 32%),
+    radial-gradient(circle at top right, rgba(46, 125, 255, 0.20), transparent 42%),
     linear-gradient(145deg, var(--workon-forest-deep), var(--workon-surface-dark));
   color: white;
 }
@@ -205,61 +206,6 @@ body {
 /* Emergent shadows */
 .shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 8px 22px rgba(27,26,24,0.05); }
 .shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
-
-/* Premium Leaflet layer used by /map. Leaflet markers are injected
- * outside React, so the pin styling lives globally. */
-.workon-leaflet .leaflet-tile {
-  filter: saturate(0.78) contrast(0.98) sepia(0.08);
-}
-
-.workon-leaflet .leaflet-control-attribution {
-  border-top-left-radius: 10px;
-  background: rgba(255, 253, 248, 0.82);
-  color: var(--workon-stone);
-  font-size: 9px;
-}
-
-.mission-pin-shell {
-  background: transparent;
-  border: 0;
-}
-
-.mission-pin-marker {
-  position: relative;
-  display: inline-flex;
-  min-width: 52px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.96);
-  border-radius: 999px 999px 999px 10px;
-  background: var(--workon-primary);
-  box-shadow: 0 12px 24px rgba(9, 37, 26, 0.26);
-  color: white;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 850;
-  letter-spacing: 0;
-  transform: rotate(-3deg);
-}
-
-.mission-pin-marker::after {
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid rgba(255, 255, 255, 0.96);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.96);
-  background: inherit;
-  content: "";
-  transform: translateX(-50%) rotate(45deg);
-}
-
-.mission-pin-marker.is-priority {
-  background: var(--workon-copper);
-  box-shadow: 0 12px 24px rgba(185, 107, 67, 0.30);
-}
 
 /* Heading font — Bricolage Grotesque (loaded via next/font in layout.tsx)
  * with Manrope and the system stack as fallbacks. Bricolage is a free
