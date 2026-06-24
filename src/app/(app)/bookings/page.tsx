@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import { api, type BookingResponse } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Loader2, Calendar, Clock, CheckCircle, XCircle, AlertCircle, User } from "lucide-react";
@@ -23,9 +24,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 
 export default function BookingsPage() {
   const { user } = useAuth();
+  const { mode } = useMode();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
-  const isWorker = user?.role === "worker";
+  // Acting-as: the Pro/Client mode selects the view, not the locked role.
+  const isWorker = mode === "pro";
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["bookings", isWorker, activeTab],
