@@ -119,34 +119,47 @@ test("acceptation facture : /invoices/[id]/review → POST accept → toast", as
     }),
   );
 
-  // F4 — endpoints facture (proxy /api/workon/payments/...).
-  // Ordre : le générique d'abord, les spécifiques après (précédence Playwright).
-  await page.route(`**/api/workon/payments/invoice/${INVOICE_ID}`, (route) =>
-    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(INVOICE) }),
-  );
-  await page.route(`**/api/workon/payments/invoice/${INVOICE_ID}/review-state`, (route) =>
-    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(REVIEW_STATE) }),
-  );
-  await page.route(`**/api/workon/payments/invoice/${INVOICE_ID}/accept`, async (route) => {
-    if (route.request().method() !== "POST") return route.fallback();
-    acceptCalled = true;
-    await route.fulfill({
+  // F4 — endpoints facture (proxy /api/workon/payments/invoice/**). UN SEUL
+  // handler keyé sur le suffixe d'URL → zéro ambiguïté de précédence de glob
+  // (les 3 routes séparées se chevauchaient et laissaient passer review-state).
+  await page.route("**/api/workon/payments/invoice/**", async (route) => {
+    const url = route.request().url();
+    if (url.includes("/review-state")) {
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(REVIEW_STATE),
+      });
+    }
+    if (url.includes("/accept")) {
+      if (route.request().method() !== "POST") return route.fallback();
+      acceptCalled = true;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ...REVIEW_STATE,
+          clientAcceptedAt: "2026-06-23T18:00:00.000Z",
+          canAccept: false,
+        }),
+      });
+    }
+    return route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({
-        ...REVIEW_STATE,
-        clientAcceptedAt: "2026-06-23T18:00:00.000Z",
-        canAccept: false,
-      }),
+      body: JSON.stringify(INVOICE),
     });
   });
 
   await page.goto(`/invoices/${INVOICE_ID}/review`);
 
   // Les deux gates (serveur + client) doivent passer pour rendre la page.
-  await expect(page.getByText("État d'acceptation bilatérale")).toBeVisible({
-    timeout: 15_000,
-  });
+  // Assertions SANS apostrophe (le rendu utilise &apos; ; éviter tout
+  // mismatch droite/courbe). h1 « Revue de facture » = état succès atteint.
+  await expect(
+    page.getByRole("heading", { name: /Revue de facture/ }),
+  ).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/acceptation bilat/)).toBeVisible();
   await expect(page.getByText(/WO-2026-0042/)).toBeVisible();
 
   const acceptBtn = page.getByRole("button", { name: /Accepter la facture/ });
