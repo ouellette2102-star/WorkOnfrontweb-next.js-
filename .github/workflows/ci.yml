@@ -154,3 +154,27 @@ jobs:
         run: npx playwright test e2e/register-funnel.spec.ts --project=chromium
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
+  # E2E (F3/F4) — BLOCKING. Gated (app) routes via mocked auth (cookie +
+  # hydrated user + refresh + consent): mission creation (F3) and bilateral
+  # invoice acceptance / escrow (F4). Network fully mocked — no backend,
+  # Stripe, or seed data. F3's spec landed (#284) but was unguarded; F4 is
+  # new. Guards flows F3 + F4 of the Launch Readiness contract.
+  e2e-gated:
+    name: E2E (F3 mission + F4 facture)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+      - name: Run F3 + F4 E2E
+        run: npx playwright test e2e/mission-create.spec.ts e2e/invoice-review.spec.ts --project=chromium
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
