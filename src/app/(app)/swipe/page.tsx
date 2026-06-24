@@ -31,14 +31,14 @@ import { toast } from "sonner";
 import { MatchCelebrationModal } from "@/components/match-celebration-modal";
 import { TrustPill } from "@/components/ui/trust-pill";
 import { api, type SwipeCandidate } from "@/lib/api-client";
-import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import { cn } from "@/lib/utils";
 
 const SWIPE_THRESHOLD = 100;
 const VELOCITY_THRESHOLD = 500;
 
 export default function SwipePage() {
-  const { user } = useAuth();
+  const { mode } = useMode();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [exitDirection, setExitDirection] = useState<
     "left" | "right" | "up" | null
@@ -49,7 +49,10 @@ export default function SwipePage() {
     matchId: string;
   } | null>(null);
 
-  const targetRole = user?.role === "employer" ? "worker" : "employer";
+  // Acting-as: the Pro/Client mode drives discovery — client mode finds
+  // workers, pro mode finds clients. (Was gated on the locked role, which
+  // showed the worker-recruiting view to client accounts.)
+  const targetRole = mode === "client" ? "worker" : "employer";
   const isHiring = targetRole === "worker";
   const pageTitle = isHiring ? "Trouver un pro" : "Trouver un client";
   const pageSubtitle = isHiring
