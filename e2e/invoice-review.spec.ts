@@ -63,6 +63,15 @@ test("acceptation facture : /invoices/[id]/review → POST accept → toast", as
 
   let acceptCalled = false;
 
+  // DIAGNOSTIC (temporaire) : voir si les requêtes facture sont mockées (200)
+  // ou tapent le backend (401), et ce que la page rend réellement.
+  page.on("response", (r) => {
+    const u = r.url();
+    if (u.includes("/payments/invoice") || u.includes("/api/auth/")) {
+      console.log("[E2E-RESP]", r.status(), u);
+    }
+  });
+
   const jwt = (obj: unknown) =>
     Buffer.from(JSON.stringify(obj)).toString("base64url");
   const fakeJwt = `${jwt({ alg: "HS256", typ: "JWT" })}.${jwt({
@@ -152,6 +161,13 @@ test("acceptation facture : /invoices/[id]/review → POST accept → toast", as
   });
 
   await page.goto(`/invoices/${INVOICE_ID}/review`);
+
+  // DIAGNOSTIC (temporaire) : dump du contenu rendu pour diagnostiquer.
+  await page.waitForTimeout(2500);
+  console.log(
+    "[E2E-BODY]",
+    (await page.locator("body").innerText()).replace(/\s+/g, " ").slice(0, 400),
+  );
 
   // Les deux gates (serveur + client) doivent passer pour rendre la page.
   // Assertions SANS apostrophe (le rendu utilise &apos; ; éviter tout
