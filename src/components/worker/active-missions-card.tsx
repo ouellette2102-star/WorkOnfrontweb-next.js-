@@ -10,6 +10,7 @@ import { frCA } from "date-fns/locale";
 import Link from "next/link";
 import { MissionTimeTracker } from "@/components/worker/mission-time-tracker";
 import { toast } from "sonner";
+import { Inbox, Wallet, Calendar } from "lucide-react";
 
 export function ActiveMissionsCard() {
   const { isLoading: authLoading } = useAuth();
@@ -46,13 +47,13 @@ export function ActiveMissionsCard() {
       case MissionStatus.RESERVED:
         return (
           <span className="rounded-full bg-[#D4922A]/10 px-3 py-1 text-xs font-semibold text-[#D4922A]">
-            📌 Réservée
+            Réservée
           </span>
         );
       case MissionStatus.IN_PROGRESS:
         return (
           <span className="rounded-full bg-workon-primary/10 px-3 py-1 text-xs font-semibold text-workon-primary">
-            🔄 En cours
+            En cours
           </span>
         );
       default:
@@ -87,7 +88,7 @@ export function ActiveMissionsCard() {
           </h2>
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <span className="mb-4 text-6xl">📭</span>
+          <Inbox className="mb-4 h-12 w-12 text-workon-gray/40" />
           <p className="mb-2 text-lg font-semibold text-workon-ink">
             Aucune mission active
           </p>
@@ -129,7 +130,7 @@ export function ActiveMissionsCard() {
                     {mission.title}
                   </h3>
                   {mission.city && (
-                    <p className="text-sm text-workon-gray">📍 {mission.city}</p>
+                    <p className="text-sm text-workon-gray">{mission.city}</p>
                   )}
                 </div>
                 {getStatusBadge(mission.status)}
@@ -139,7 +140,7 @@ export function ActiveMissionsCard() {
               <div className="mb-4 grid gap-3 md:grid-cols-2">
                 {mission.hourlyRate && (
                   <div className="flex items-center gap-2">
-                    <span className="text-workon-gray">💰</span>
+                    <Wallet className="h-4 w-4 text-workon-gray" />
                     <span className="font-semibold text-[#2D8B55]">
                       {mission.hourlyRate.toFixed(2)} $ / heure
                     </span>
@@ -148,7 +149,7 @@ export function ActiveMissionsCard() {
 
                 {mission.startsAt && (
                   <div className="flex items-center gap-2">
-                    <span className="text-workon-gray">📅</span>
+                    <Calendar className="h-4 w-4 text-workon-gray" />
                     <span className="text-sm text-workon-ink">
                       {format(new Date(mission.startsAt), "PPP", { locale: frCA })}
                     </span>
@@ -176,13 +177,13 @@ export function ActiveMissionsCard() {
 
                 {mission.status === MissionStatus.RESERVED && (
                   <Button className="bg-workon-primary text-white hover:bg-workon-primary-hover">
-                    ▶️ Démarrer la mission
+                    Démarrer la mission
                   </Button>
                 )}
 
                 {mission.status === MissionStatus.IN_PROGRESS && (
                   <Button className="bg-workon-accent text-white hover:bg-workon-accent-hover">
-                    ⏹️ Terminer la mission
+                    Terminer la mission
                   </Button>
                 )}
               </div>

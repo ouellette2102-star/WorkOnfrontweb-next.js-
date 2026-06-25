@@ -372,7 +372,7 @@ export default function PublierBesoinPage() {
                         : "bg-white text-workon-ink border-workon-border hover:border-workon-primary"
                     }`}
                   >
-                    <span aria-hidden="true">{opt.icon}</span>
+                    <opt.icon className="h-4 w-4" aria-hidden="true" />
                     {opt.label}
                   </button>
                 ))}

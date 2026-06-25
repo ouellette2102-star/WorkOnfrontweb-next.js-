@@ -45,7 +45,7 @@ export function ProfileRolesCard() {
     try {
       await updateRole(selectedRole);
       setStatus("success");
-      setStatusMessage("Rôle principal mis à jour ✨");
+      setStatusMessage("Rôle principal mis à jour");
     } catch (err) {
       setStatus("error");
       setStatusMessage(
@@ -134,8 +134,8 @@ export function ProfileRolesCard() {
         <div className="mt-8 rounded-2xl border border-workon-border bg-workon-bg/60 p-4 text-sm text-workon-muted">
           <p className="font-semibold text-workon-ink">Accès actifs :</p>
           <ul className="mt-2 space-y-1">
-            <li>• Pro : {profile.isWorker ? "✅ actif" : "—"}</li>
-            <li>• Client : {profile.isEmployer || profile.isClientResidential ? "✅ actif" : "—"}</li>
+            <li>• Pro : {profile.isWorker ? "actif" : "—"}</li>
+            <li>• Client : {profile.isEmployer || profile.isClientResidential ? "actif" : "—"}</li>
           </ul>
         </div>
       ) : null}

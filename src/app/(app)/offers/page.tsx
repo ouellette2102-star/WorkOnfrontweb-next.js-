@@ -68,8 +68,8 @@ export default function MyOffersPage() {
                         {offer.mission?.title ?? "Mission"}
                       </h3>
                       <div className="mt-1 flex flex-wrap gap-2 text-xs text-workon-muted">
-                        {offer.mission?.category && <span>🏷️ {offer.mission.category}</span>}
-                        {offer.mission?.city && <span>📍 {offer.mission.city}</span>}
+                        {offer.mission?.category && <span>{offer.mission.category}</span>}
+                        {offer.mission?.city && <span>{offer.mission.city}</span>}
                         <span>
                           {formatDistanceToNow(new Date(offer.createdAt), {
                             addSuffix: true,

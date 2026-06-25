@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
 import { normalizeBackendError } from "@/lib/backend-error";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
@@ -48,8 +48,8 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-sm rounded-3xl border border-workon-border bg-white p-8 shadow-sm space-y-6">
         {sent ? (
           <div className="text-center space-y-4">
-            <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-workon-trust-green/15 border border-workon-trust-green/25 text-2xl">
-              ✉️
+            <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-workon-trust-green/15 border border-workon-trust-green/25 text-workon-trust-green">
+              <Mail className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-bold text-workon-ink">Email envoyé</h1>
             <p className="text-workon-muted text-sm">
