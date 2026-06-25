@@ -153,7 +153,7 @@ jobs:
   # new. F5 = role gating of /admin (worker blocked, admin allowed). Guards
   # flows F3 + F4 + F5 of the Launch Readiness contract.
   e2e-gated:
-    name: E2E (F3/F4/F5 gated)
+    name: E2E (F3/F4/F5 + map gated)
     runs-on: ubuntu-latest
     timeout-minutes: 12
     container:
@@ -166,5 +166,5 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts
-      - name: Run F3 + F4 + F5 E2E
-        run: npx playwright test e2e/mission-create.spec.ts e2e/invoice-review.spec.ts e2e/admin-role-gate.spec.ts --project=chromium
+      - name: Run F3 + F4 + F5 + map E2E
+        run: npx playwright test e2e/mission-create.spec.ts e2e/invoice-review.spec.ts e2e/admin-role-gate.spec.ts e2e/map.spec.ts --project=chromium
