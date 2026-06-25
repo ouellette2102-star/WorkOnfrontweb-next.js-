@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { auditA11y } from "./fixtures/a11y";
 
 /**
  * F4 — Acceptation bilatérale de facture (escrow) : preuve happy-path,
@@ -176,6 +177,8 @@ test("acceptation facture : /invoices/[id]/review → POST accept → toast", as
   ).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText(/acceptation bilat/)).toBeVisible();
   await expect(page.getByText(/WO-2026-0042/).first()).toBeVisible();
+
+  await auditA11y(page, "F4 invoice-review");
 
   const acceptBtn = page.getByRole("button", { name: /Accepter la facture/ });
   await expect(acceptBtn).toBeVisible();
