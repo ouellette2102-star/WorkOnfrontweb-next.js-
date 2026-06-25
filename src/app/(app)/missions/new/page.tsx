@@ -429,7 +429,7 @@ export default function NewMissionPage() {
                       : "bg-white text-workon-ink border-workon-border hover:border-workon-primary"
                   }`}
                 >
-                  <span aria-hidden="true">{option.icon}</span>
+                  <option.icon className="h-4 w-4" aria-hidden="true" />
                   {option.label}
                 </button>
               ))}

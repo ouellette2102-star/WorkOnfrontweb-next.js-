@@ -105,7 +105,7 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
       <h3 className="mb-3 text-sm font-semibold text-white">
-        ⏱️ Suivi du temps
+        Suivi du temps
       </h3>
 
       {/* Messages */}
@@ -128,7 +128,7 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
             disabled={isLoading}
             className="flex-1 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-50"
           >
-            {isLoading ? "..." : "📍 Enregistrer mon arrivée"}
+            {isLoading ? "..." : "Enregistrer mon arrivée"}
           </Button>
         )}
         {canCheckOut && (
@@ -137,7 +137,7 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
             disabled={isLoading}
             className="flex-1 rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-500 disabled:opacity-50"
           >
-            {isLoading ? "..." : "🚪 Enregistrer mon départ"}
+            {isLoading ? "..." : "Enregistrer mon départ"}
           </Button>
         )}
       </div>
@@ -152,7 +152,7 @@ export function MissionTimeTracking({ mission }: MissionTimeTrackingProps) {
               className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-1 text-xs"
             >
               <span className="text-white/70">
-                {log.type === MissionTimeLogType.CHECK_IN ? "📍 Arrivée" : "🚪 Départ"}
+                {log.type === MissionTimeLogType.CHECK_IN ? "Arrivée" : "Départ"}
               </span>
               <span className="text-white/50">
                 {formatDistanceToNow(new Date(log.createdAt), {

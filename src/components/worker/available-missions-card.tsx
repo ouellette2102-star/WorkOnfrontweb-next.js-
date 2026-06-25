@@ -11,6 +11,7 @@ const MONTREAL_FALLBACK = { latitude: 45.5017, longitude: -73.5673 };
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
+import { Search } from "lucide-react";
 
 export function AvailableMissionsCard() {
   const { isLoading: authLoading } = useAuth();
@@ -135,7 +136,7 @@ export function AvailableMissionsCard() {
           </Link>
         </div>
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <span className="mb-2 text-4xl">🔍</span>
+          <Search className="mb-2 h-10 w-10 text-workon-gray/40" />
           <p className="text-workon-gray">Aucune mission disponible pour le moment</p>
         </div>
       </div>
@@ -167,13 +168,13 @@ export function AvailableMissionsCard() {
             <div className="flex-1">
               <h4 className="mb-1 font-semibold text-workon-ink">{mission.title}</h4>
               <div className="flex flex-wrap gap-3 text-sm text-workon-gray">
-                {mission.city && <span>📍 {mission.city}</span>}
+                {mission.city && <span>{mission.city}</span>}
                 {mission.hourlyRate && (
                   <span className="font-semibold text-[#2D8B55]">
-                    💰 {mission.hourlyRate.toFixed(2)} $/h
+                    {mission.hourlyRate.toFixed(2)} $/h
                   </span>
                 )}
-                {mission.category && <span>🏷️ {mission.category}</span>}
+                {mission.category && <span>{mission.category}</span>}
               </div>
             </div>
 

@@ -157,7 +157,7 @@ export function CreateMissionForm() {
   if (success) {
     return (
       <div className="rounded-3xl border border-workon-trust-green/25 bg-workon-trust-green/10 p-8 text-center shadow-card">
-        <div className="mb-4 text-4xl">✅</div>
+        <div className="mb-4 text-4xl text-workon-trust-green">✓</div>
         <h3 className="mb-2 text-xl font-semibold text-workon-ink">
           Mission créée avec succès !
         </h3>
@@ -215,7 +215,7 @@ export function CreateMissionForm() {
           <option value="">Sélectionne une catégorie</option>
           {MISSION_CATEGORY_OPTIONS.map((cat) => (
             <option key={cat.value} value={cat.value}>
-              {cat.icon} {cat.label}
+              {cat.label}
             </option>
           ))}
         </select>

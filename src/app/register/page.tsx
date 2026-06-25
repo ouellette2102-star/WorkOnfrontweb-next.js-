@@ -455,7 +455,7 @@ function RegisterInner() {
                 {user.firstName} {user.lastName}
               </p>
               <p className="text-sm text-workon-muted capitalize">{user.role}</p>
-              {user.city && <p className="text-sm text-workon-muted">📍 {user.city}</p>}
+              {user.city && <p className="text-sm text-workon-muted">{user.city}</p>}
             </div>
 
             <Button

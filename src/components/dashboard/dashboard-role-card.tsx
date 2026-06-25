@@ -35,9 +35,9 @@ export function DashboardRoleCard() {
             </span>
           </p>
           <ul className="mt-4 space-y-1 text-sm text-workon-muted">
-            <li>• Accès Worker : {profile.isWorker ? "✅" : "—"}</li>
-            <li>• Accès Employer : {profile.isEmployer ? "✅" : "—"}</li>
-            <li>• Accès Client résidentiel : {profile.isClientResidential ? "✅" : "—"}</li>
+            <li>• Accès Worker : {profile.isWorker ? "Oui" : "—"}</li>
+            <li>• Accès Employer : {profile.isEmployer ? "Oui" : "—"}</li>
+            <li>• Accès Client résidentiel : {profile.isClientResidential ? "Oui" : "—"}</li>
           </ul>
         </>
       ) : null}

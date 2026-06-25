@@ -27,6 +27,7 @@ import {
   LogOut,
   Zap,
   Rocket,
+  PartyPopper,
   ShieldCheck,
   WalletCards,
   type LucideIcon,
@@ -1076,8 +1077,8 @@ export default function MissionDetailPage() {
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 flex-1">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-workon-trust-green/15 flex items-center justify-center text-xl">
-                🎉
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-workon-trust-green/15 flex items-center justify-center text-workon-trust-green">
+                <PartyPopper className="h-5 w-5" />
               </div>
               <div>
                 <h2 className="font-semibold text-workon-ink">
@@ -1109,7 +1110,7 @@ export default function MissionDetailPage() {
                   .catch(() => toast.error("Impossible de copier le lien"));
               }}
             >
-              📋 Copier le lien
+              Copier le lien
             </Button>
             <Button
               size="sm"

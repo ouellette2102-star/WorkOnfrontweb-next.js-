@@ -149,7 +149,7 @@ export function MissionPhotos({ mission }: MissionPhotosProps) {
               disabled={isUploading}
               className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
             >
-              {isUploading ? "Upload en cours..." : "📷 Téléverser une photo"}
+              {isUploading ? "Upload en cours..." : "Téléverser une photo"}
             </Button>
           </>
         )}
