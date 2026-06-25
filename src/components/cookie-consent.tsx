@@ -13,7 +13,7 @@
  * - absent     : pas encore de choix → afficher la bannière
  */
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { safeLocalStorage } from "@/lib/safe-storage";
 
@@ -33,16 +33,37 @@ export function CookieConsent() {
   );
   const [visibleOverride, setVisibleOverride] = useState<boolean | null>(null);
   const visible = visibleOverride ?? !hasStoredConsent;
+  const bannerRef = useRef<HTMLDivElement>(null);
 
   const handleChoice = (value: ConsentValue) => {
     safeLocalStorage.setItem(STORAGE_KEY, value);
     setVisibleOverride(false);
   };
 
+  // La bannière est `fixed bottom-0` → réserver sa hauteur en bas de page
+  // pour ne JAMAIS masquer le contenu en dessous (corrige l'obstruction du
+  // CTA « Publier » au 1er chargement). Réinitialisé dès le choix fait.
+  useEffect(() => {
+    if (!visible) return;
+    const el = bannerRef.current;
+    if (!el) return;
+    const apply = () => {
+      document.body.style.paddingBottom = `${el.offsetHeight}px`;
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      document.body.style.paddingBottom = "";
+    };
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
     <div
+      ref={bannerRef}
       role="dialog"
       aria-label="Consentement aux cookies"
       className="fixed bottom-0 inset-x-0 z-[9999] p-4 sm:p-6"
