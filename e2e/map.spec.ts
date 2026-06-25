@@ -1,4 +1,5 @@
 import { test, expect } from "./fixtures/console";
+import { auditA11y } from "./fixtures/a11y";
 import type { Page, BrowserContext } from "@playwright/test";
 
 /**
@@ -115,6 +116,8 @@ test("carte : /map monte et affiche les pins missions sans erreur console", asyn
   await expect(page.locator(".leaflet-marker-icon")).toHaveCount(MISSIONS.length, {
     timeout: 15_000,
   });
+
+  await auditA11y(page, "/map");
 
   // Filet : aucune vraie erreur console (bruit tuiles/réseau/env filtré côté fixture).
   expect(consoleErrors).toEqual([]);

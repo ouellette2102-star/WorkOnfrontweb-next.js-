@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { auditA11y } from "./fixtures/a11y";
 
 /**
  * F2 — Inscription : preuve happy-path bout-en-bout, RÉSEAU MOCKÉ.
@@ -102,6 +103,8 @@ test("inscription worker : 3 étapes → écran « profil prêt »", async ({
     page.getByRole("heading", { name: /Votre profil est prêt/ }),
   ).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText(/Alex Tremblay/)).toBeVisible();
+
+  await auditA11y(page, "F2 inscription/succès");
 
   // Contrat de payload — aligné sur RegisterDto backend.
   expect(registerPayload).toMatchObject({

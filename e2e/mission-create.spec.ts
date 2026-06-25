@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { auditA11y } from "./fixtures/a11y";
 
 /**
  * F3 — Création de mission : preuve happy-path bout-en-bout, RÉSEAU MOCKÉ.
@@ -164,6 +165,8 @@ test("création mission : formulaire rempli → écran de succès", async ({
     "Ex: Réparation de plomberie salle de bain",
   );
   await expect(title).toBeVisible({ timeout: 15_000 });
+
+  await auditA11y(page, "F3 mission-create/formulaire");
 
   await title.fill("Peinture du salon");
   await page

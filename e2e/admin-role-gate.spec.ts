@@ -1,4 +1,5 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
+import { auditA11y } from "./fixtures/a11y";
 
 /**
  * F5 — Auth / session / rôles : contrôle d'accès par rôle sur route gated
@@ -112,4 +113,6 @@ test("rôles : un admin accède au tableau de bord /admin", async ({
     timeout: 15_000,
   });
   await expect(page.getByText(/Accès refusé/)).toHaveCount(0);
+
+  await auditA11y(page, "F5 admin/dashboard");
 });
