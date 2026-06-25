@@ -7,8 +7,8 @@
    * Identité RedPhone (2026-06-17) :
    *   Background: #F7F8FB (clair froid)
    *   Text/Ink:  #0E1B2A (marine profond)
-   *   Primary:   #F0392B (rouge RedPhone — action/CTA)
-   *   Accent:    #F0392B (rouge — le pin, les accents)
+   *   Primary:   #C42417 (rouge RedPhone — action/CTA)
+   *   Accent:    #C42417 (rouge — le pin, les accents)
    *   Dark/navy: #0B1B2E (panneaux sombres) + halo bleu #2E7DFF (confiance)
    *   Gray:      #5A6B7E (gris froid)  ·  Border: #E5E9F0
    *   Vert #22C55E = succès/vérifié UNIQUEMENT.
@@ -19,10 +19,10 @@
   --background: #F7F8FB;
   --foreground: #0E1B2A;
 
-  --workon-primary: #F0392B;
-  --workon-primary-hover: #D62E22;
-  --workon-primary-subtle: rgba(240, 57, 43, 0.08);
-  --workon-primary-ring: rgba(240, 57, 43, 0.22);
+  --workon-primary: #C42417;
+  --workon-primary-hover: #A81E12;
+  --workon-primary-subtle: rgba(196, 36, 23, 0.08);
+  --workon-primary-ring: rgba(196, 36, 23, 0.22);
 
   --workon-forest-deep: #0A1726;
   --workon-forest: #122B45;
@@ -38,17 +38,17 @@
   --workon-surface-dark-soft: #14304A;
   --workon-line: rgba(14, 27, 42, 0.10);
 
-  --workon-accent: #F0392B;
-  --workon-accent-hover: #D62E22;
-  --workon-accent-subtle: rgba(240, 57, 43, 0.08);
-  --workon-accent-ring: rgba(240, 57, 43, 0.22);
+  --workon-accent: #C42417;
+  --workon-accent-hover: #A81E12;
+  --workon-accent-subtle: rgba(196, 36, 23, 0.08);
+  --workon-accent-ring: rgba(196, 36, 23, 0.22);
 
   --workon-ink: #0E1B2A;
   --workon-bg: #F7F8FB;
   --workon-bg-cream: #EEF1F6;
   --workon-border: #E5E9F0;
   --workon-gray: #5A6B7E;
-  --workon-muted: #8A98A8;
+  --workon-muted: #5F6B7A;
   --workon-trust-green: #22C55E;
 
   /* Semantic status colors */
@@ -137,8 +137,8 @@ body {
 .bg-fire-gradient {
   background: linear-gradient(
     180deg,
-    rgba(240, 57, 43, 0.08) 0%,
-    rgba(240, 57, 43, 0.03) 40%,
+    rgba(196, 36, 23, 0.08) 0%,
+    rgba(196, 36, 23, 0.03) 40%,
     transparent 100%
   );
 }
