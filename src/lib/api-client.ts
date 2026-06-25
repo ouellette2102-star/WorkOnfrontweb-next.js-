@@ -685,6 +685,9 @@ export const api = {
   getMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}`),
 
   acceptMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/accept`, { method: "POST" }),
+  /** Client reserves a specific worker for their own open mission (open -> assigned + PENDING contract). */
+  reserveWorker: (missionId: string, workerId: string) =>
+    apiFetch<MissionResponse>(`/missions-local/${missionId}/reserve`, { method: "POST", body: JSON.stringify({ workerId }) }),
   startMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/start`, { method: "POST" }),
   completeMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/complete`, { method: "POST" }),
   cancelMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/cancel`, { method: "POST" }),
