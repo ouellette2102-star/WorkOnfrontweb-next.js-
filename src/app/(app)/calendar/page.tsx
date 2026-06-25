@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import { api, type AvailabilitySlot, type BookingResponse } from "@/lib/api-client";
 import {
   Loader2,
@@ -44,7 +45,9 @@ function jsDayToSlotDay(jsDay: number): number {
 
 export default function CalendarPage() {
   const { user } = useAuth();
-  const isWorker = user?.role === "worker";
+  const { mode } = useMode();
+  // Acting-as: the Pro/Client mode selects the view, not the locked role.
+  const isWorker = mode === "pro";
   const [weekOffset, setWeekOffset] = useState(0);
 
   const baseDate = useMemo(() => {

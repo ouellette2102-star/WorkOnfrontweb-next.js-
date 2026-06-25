@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api, type MissionResponse } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { useMode } from "@/contexts/mode-context";
 import { MissionCard } from "@/components/mission/mission-card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Briefcase, ClipboardList } from "lucide-react";
@@ -40,9 +41,12 @@ const emptyMessages: Record<Tab, string> = {
 
 export default function MyMissionsPage() {
   const { user } = useAuth();
+  const { mode } = useMode();
   const [tab, setTab] = useState<Tab>("active");
 
-  const isEmployer = user?.role === "employer";
+  // Acting-as: the Pro/Client mode selects the view, not the locked role —
+  // client mode shows missions you posted, pro mode shows your assignments.
+  const isEmployer = mode === "client";
 
   // Employer: missions they created. Worker: missions assigned to them.
   const {
