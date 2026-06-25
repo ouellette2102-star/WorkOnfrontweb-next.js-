@@ -116,7 +116,6 @@ test("carte : /map monte et affiche les pins missions sans erreur console", asyn
     timeout: 15_000,
   });
 
-  // Filet : aucune vraie erreur console (le bruit tuiles est filtré côté fixture).
-  console.log("[E2E-ERRS]", JSON.stringify(consoleErrors));
+  // Filet : aucune vraie erreur console (bruit tuiles/réseau/env filtré côté fixture).
   expect(consoleErrors).toEqual([]);
 });

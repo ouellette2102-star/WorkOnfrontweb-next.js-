@@ -23,7 +23,14 @@ const IGNORE = [
   /ERR_/,
   /\[device-registration\]/i,
   /Backend WorkOn indisponible/i,
+  // Artefacts d'env / réseau du contexte mocké (pas des défauts de la page) :
+  /Permissions policy violation/i, // géoloc bloquée par la policy navigateur en CI
+  /Failed to load resource/i, // appels best-effort non mockés → 5xx réseau
 ];
+
+// NB: la fixture garde sa valeur — les vrais crashs app (ex. F4
+// « Cannot read properties of undefined ») arrivent en `pageerror` avec un
+// message spécifique, jamais filtré.
 
 export const test = base.extend<{ consoleErrors: string[] }>({
   consoleErrors: async ({ page }, use) => {
