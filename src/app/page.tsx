@@ -46,10 +46,10 @@ export const revalidate = 300; // ISR — 5 min
 
 function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[#1B3147] bg-[#0B1B2E]/[0.85] backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-[#1B3147] bg-workon-surface-dark/[0.85] backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-5 h-16 flex items-center justify-between">
         <Link href="/" className="text-white">
-          <WorkOnWordmark size="md" pinClassName="text-[#F0392B]" />
+          <WorkOnWordmark size="md" pinClassName="text-workon-primary" />
         </Link>
         <nav className="hidden md:flex items-center gap-7 text-[14px] text-[#9DB0C6]">
           <Link href="/pros" className="transition-colors hover:text-white">Trouver un pro</Link>
@@ -58,14 +58,14 @@ function SiteHeader() {
           <Link href="/login" className="text-white transition-opacity hover:opacity-80">Connexion</Link>
           <Link
             href="/register"
-            className="rounded-[10px] bg-[#F0392B] px-4 py-2 font-medium text-white transition-colors hover:bg-[#D62E22]"
+            className="rounded-[10px] bg-workon-primary px-4 py-2 font-medium text-white transition-colors hover:bg-workon-primary-hover"
           >
             S&apos;inscrire
           </Link>
         </nav>
         <Link
           href="/register"
-          className="md:hidden rounded-[10px] bg-[#F0392B] px-4 py-2 text-sm font-medium text-white"
+          className="md:hidden rounded-[10px] bg-workon-primary px-4 py-2 text-sm font-medium text-white"
         >
           S&apos;inscrire
         </Link>
@@ -78,7 +78,7 @@ function SiteHeader() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[#0B1B2E]">
+    <section className="relative overflow-hidden bg-workon-surface-dark">
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -91,14 +91,14 @@ function Hero() {
           {/* Copy */}
           <div className="flex-1 min-w-0">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#24405C] bg-[#0E2236] px-4 py-1.5 text-[11.5px] font-medium uppercase tracking-[0.14em] text-white">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#F0392B]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-workon-primary" />
               Une ligne directe vers le travail instantané
             </span>
 
             <h1 className="mt-7 font-heading text-[2.9rem] leading-[1.02] tracking-[-0.035em] font-bold text-white md:text-[3.7rem]">
               Le travail
               <br />
-              vient <span className="text-[#F0392B]">à toi.</span>
+              vient <span className="text-workon-primary">à toi.</span>
             </h1>
 
             <p className="mt-6 max-w-md text-[18px] leading-relaxed text-[#A8BACD]">
@@ -110,7 +110,7 @@ function Hero() {
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F0392B] px-7 py-4 text-[15px] font-medium text-white shadow-[0_14px_30px_-12px_rgba(240,57,43,0.55)] transition-all hover:bg-[#D62E22] hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-workon-primary px-7 py-4 text-[15px] font-medium text-white shadow-[0_14px_30px_-12px_rgba(240,57,43,0.55)] transition-all hover:bg-workon-primary-hover hover:-translate-y-0.5"
               >
                 Créer mon profil gratuit <ArrowRight className="h-[18px] w-[18px]" />
               </Link>
@@ -127,12 +127,12 @@ function Hero() {
                 {["bg-[#1E6FE0]", "bg-[#13273D]", "bg-[#243B54]"].map((bg, i) => (
                   <span
                     key={i}
-                    className={`-ml-2.5 first:ml-0 flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#0B1B2E] ${bg} text-xs font-medium text-white`}
+                    className={`-ml-2.5 first:ml-0 flex h-9 w-9 items-center justify-center rounded-full border-2 border-workon-surface-dark ${bg} text-xs font-medium text-white`}
                   >
                     {["M", "G", "F"][i]}
                   </span>
                 ))}
-                <span className="-ml-2.5 flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#0B1B2E] bg-[#F0392B] text-[13px] font-medium text-white">
+                <span className="-ml-2.5 flex h-9 w-9 items-center justify-center rounded-full border-2 border-workon-surface-dark bg-workon-primary text-[13px] font-medium text-white">
                   +
                 </span>
               </div>
@@ -157,11 +157,11 @@ function Hero() {
               </span>
             </div>
 
-            <div className="w-[252px] rounded-[36px] border border-[#2E5680] bg-[#0A1726] p-2.5 shadow-[0_36px_70px_-24px_rgba(0,0,0,0.75)]">
-              <div className="overflow-hidden rounded-[28px] border border-[#16304A] bg-[#0B1B2E]">
+            <div className="w-[252px] rounded-[36px] border border-[#2E5680] bg-workon-forest-deep p-2.5 shadow-[0_36px_70px_-24px_rgba(0,0,0,0.75)]">
+              <div className="overflow-hidden rounded-[28px] border border-[#16304A] bg-workon-surface-dark">
                 <div className="flex items-center justify-between px-4 pt-3.5 pb-2.5">
                   <span className="inline-flex items-center gap-1.5 text-[12px] text-[#9DB0C6]">
-                    <MapPin className="h-3.5 w-3.5 text-[#F0392B]" /> Laval, QC
+                    <MapPin className="h-3.5 w-3.5 text-workon-primary" /> Laval, QC
                   </span>
                   <span className="inline-flex items-center gap-2.5 text-[#9DB0C6]">
                     <Bell className="h-[15px] w-[15px]" />
@@ -178,8 +178,8 @@ function Hero() {
                 <div className="mx-3 mb-2.5 rounded-2xl border border-[#24405C] bg-[#13273D] p-3.5">
                   <div className="mb-1.5 flex items-center justify-between">
                     <span className="inline-flex items-center gap-2 text-[13px] font-medium text-white">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#F0392B]/[0.15]">
-                        <Sparkles className="h-3.5 w-3.5 text-[#F0392B]" />
+                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-workon-primary/[0.15]">
+                        <Sparkles className="h-3.5 w-3.5 text-workon-primary" />
                       </span>
                       Ménage résidentiel
                     </span>
@@ -189,7 +189,7 @@ function Hero() {
                     Grand ménage 3½ · samedi am · client vérifié
                   </p>
                   <div className="flex gap-2">
-                    <span className="flex-1 rounded-[9px] bg-[#F0392B] py-2 text-center text-[12px] font-medium text-white">
+                    <span className="flex-1 rounded-[9px] bg-workon-primary py-2 text-center text-[12px] font-medium text-white">
                       Accepter
                     </span>
                     <span className="rounded-[9px] border border-[#2E5680] bg-white/[0.05] px-4 py-2 text-center text-[12px] text-[#cfe3ff]">
@@ -201,7 +201,7 @@ function Hero() {
                 <div className="mx-3 mb-3 rounded-2xl border border-[#1B3147] bg-[#0E2236] p-3.5">
                   <div className="flex items-center justify-between">
                     <span className="inline-flex items-center gap-2 text-[13px] font-medium text-white">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#2E7DFF]/[0.16]">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-workon-gold/[0.16]">
                         <UtensilsCrossed className="h-3.5 w-3.5 text-[#7FB0FF]" />
                       </span>
                       Aide-cuisine
@@ -214,9 +214,9 @@ function Hero() {
                 </div>
 
                 <div className="flex items-center justify-around border-t border-[#16304A] px-3 pt-2.5 pb-3.5 text-[#6E8299]">
-                  <span className="flex flex-col items-center gap-0.5 text-[9px] text-[#F0392B]"><HomeIcon className="h-[18px] w-[18px]" />Accueil</span>
+                  <span className="flex flex-col items-center gap-0.5 text-[9px] text-workon-primary"><HomeIcon className="h-[18px] w-[18px]" />Accueil</span>
                   <span className="flex flex-col items-center gap-0.5 text-[9px]"><Users className="h-[18px] w-[18px]" />Pros</span>
-                  <span className="-mt-4 flex h-[40px] w-[40px] items-center justify-center rounded-full border-4 border-[#0B1B2E] bg-[#F0392B] shadow-[0_8px_18px_-6px_rgba(240,57,43,0.7)]">
+                  <span className="-mt-4 flex h-[40px] w-[40px] items-center justify-center rounded-full border-4 border-workon-surface-dark bg-workon-primary shadow-[0_8px_18px_-6px_rgba(240,57,43,0.7)]">
                     <Briefcase className="h-[18px] w-[18px] text-white" />
                   </span>
                   <span className="flex flex-col items-center gap-0.5 text-[9px]"><MapIcon className="h-[18px] w-[18px]" />Carte</span>
@@ -229,7 +229,7 @@ function Hero() {
       </div>
 
       {/* Barre de confiance — sobre, uniforme */}
-      <div className="relative border-t border-[#16304A] bg-[#0A1726]">
+      <div className="relative border-t border-[#16304A] bg-workon-forest-deep">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-9 gap-y-3 px-5 py-5 text-[13px] text-[#9DB0C6]">
           <span className="inline-flex items-center gap-2"><ShieldCheck className="h-[17px] w-[17px] text-[#7E93AB]" /> Conçu au Québec</span>
           <span className="hidden h-4 w-px bg-[#1B3147] sm:block" />
@@ -256,21 +256,21 @@ function ProblemSection() {
     <section className="bg-[#F6F8FB]">
       <div className="mx-auto max-w-6xl px-5 py-24">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#F0392B]">Le vrai problème</p>
-          <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-[#0E1B2A] md:text-[2.6rem]">
+          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-workon-primary">Le vrai problème</p>
+          <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-workon-ink md:text-[2.6rem]">
             Tu es bon dans ton métier.
             <br />
-            <span className="text-[#5A6B7E]">Te vendre, c&apos;est une autre paire de manches.</span>
+            <span className="text-workon-gray">Te vendre, c&apos;est une autre paire de manches.</span>
           </h2>
         </div>
         <div className="grid gap-10 md:grid-cols-3 md:gap-12">
           {problems.map((p) => (
             <div key={p.title}>
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0E1B2A]/[0.06] text-[#0E1B2A]">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-workon-ink/[0.06] text-workon-ink">
                 <p.icon className="h-6 w-6" strokeWidth={1.75} />
               </div>
-              <h3 className="mb-2.5 text-[19px] font-bold text-[#0E1B2A]">{p.title}</h3>
-              <p className="text-[16px] leading-relaxed text-[#5A6B7E]">{p.desc}</p>
+              <h3 className="mb-2.5 text-[19px] font-bold text-workon-ink">{p.title}</h3>
+              <p className="text-[16px] leading-relaxed text-workon-gray">{p.desc}</p>
             </div>
           ))}
         </div>
@@ -289,7 +289,7 @@ function HowItWorks() {
     { num: "04", icon: Wallet, title: "Reçois ton paiement", desc: "L'argent est retenu en sécurité (escrow) dès le départ, puis libéré à la fin. Tu gardes 100 %." },
   ];
   return (
-    <section id="fonctionnement" className="scroll-mt-16 bg-[#0B1B2E]">
+    <section id="fonctionnement" className="scroll-mt-16 bg-workon-surface-dark">
       <div className="mx-auto max-w-6xl px-5 py-24">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7FB0FF]">Comment ça marche</p>
@@ -303,7 +303,7 @@ function HowItWorks() {
           {steps.map((s) => (
             <div key={s.num} className="rounded-2xl border border-[#1B3147] bg-[#0E2236] p-6">
               <div className="mb-5 flex items-center justify-between">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F0392B]/[0.12] text-[#F0392B]">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-workon-primary/[0.12] text-workon-primary">
                   <s.icon className="h-5 w-5" strokeWidth={1.75} />
                 </span>
                 <span className="text-[13px] font-bold tracking-widest text-[#3C597A]">{s.num}</span>
@@ -330,30 +330,30 @@ function Differentiation() {
     <section className="bg-[#F6F8FB]">
       <div className="mx-auto max-w-6xl px-5 py-24">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#F0392B]">Ce qui nous distingue</p>
-          <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-[#0E1B2A] md:text-[2.6rem]">
+          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-workon-primary">Ce qui nous distingue</p>
+          <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-workon-ink md:text-[2.6rem]">
             Ni agence. Ni répertoire.
             <br />
-            <span className="text-[#5A6B7E]">Le travail sur demande, pour vrai.</span>
+            <span className="text-workon-gray">Le travail sur demande, pour vrai.</span>
           </h2>
         </div>
         <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
           <div className="space-y-4">
             {notItems.map((item) => (
               <div key={item.label} className="flex items-start gap-4 rounded-xl border border-[#E6EAF0] bg-white p-5">
-                <span className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#F0F2F7] text-[#8A98A8]">
+                <span className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#F0F2F7] text-workon-muted">
                   <item.icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
                 </span>
                 <div>
-                  <p className="font-bold text-[#0E1B2A]">{item.label}</p>
-                  <p className="mt-1 text-[14px] leading-relaxed text-[#5A6B7E]">{item.desc}</p>
+                  <p className="font-bold text-workon-ink">{item.label}</p>
+                  <p className="mt-1 text-[14px] leading-relaxed text-workon-gray">{item.desc}</p>
                 </div>
               </div>
             ))}
           </div>
           <div className="flex items-center">
-            <div className="w-full rounded-2xl bg-[#0B1B2E] p-8 md:p-10">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F0392B]">
+            <div className="w-full rounded-2xl bg-workon-surface-dark p-8 md:p-10">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-workon-primary">
                 <Phone className="h-7 w-7 text-white" />
               </div>
               <h3 className="mb-4 text-[24px] font-bold text-white">Ce que WorkOn est</h3>
@@ -383,7 +383,7 @@ function Sectors() {
     { sector: "Entretien & petits travaux", icon: Leaf, tag: "Toute l'année", desc: "Pelouse, lavage, déneigement l'hiver, homme à tout faire — chaque saison amène ses contrats." },
   ];
   return (
-    <section className="bg-[#0B1B2E]">
+    <section className="bg-workon-surface-dark">
       <div className="mx-auto max-w-6xl px-5 py-24">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7FB0FF]">Secteurs actifs au Québec</p>
@@ -397,17 +397,17 @@ function Sectors() {
           {cases.map((c) => (
             <div
               key={c.sector}
-              className="group relative overflow-hidden rounded-2xl border border-[#23415F] bg-gradient-to-b from-[#11273F] to-[#0C1D31] p-7 transition-all hover:-translate-y-1 hover:border-[#2E7DFF]/50"
+              className="group relative overflow-hidden rounded-2xl border border-[#23415F] bg-gradient-to-b from-[#11273F] to-[#0C1D31] p-7 transition-all hover:-translate-y-1 hover:border-workon-gold/50"
             >
               <div
                 className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 style={{ background: "radial-gradient(circle, rgba(240,57,43,0.18), transparent 70%)" }}
               />
               <div className="relative mb-6 flex items-center justify-between">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F0392B]/[0.12] text-[#F0392B]">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-workon-primary/[0.12] text-workon-primary">
                   <c.icon className="h-5 w-5" strokeWidth={1.75} />
                 </span>
-                <span className="rounded-full border border-[#2E5680] bg-[#0B1B2E] px-3 py-1 text-[11px] font-medium text-[#7FB0FF]">{c.tag}</span>
+                <span className="rounded-full border border-[#2E5680] bg-workon-surface-dark px-3 py-1 text-[11px] font-medium text-[#7FB0FF]">{c.tag}</span>
               </div>
               <h3 className="relative mb-2.5 text-[19px] font-bold text-white">{c.sector}</h3>
               <p className="relative text-[14px] leading-relaxed text-[#9DB0C6]">{c.desc}</p>
@@ -428,12 +428,12 @@ function WorkersSection({ workers }: { workers: FeaturedWorker[] }) {
       <div className="mx-auto max-w-6xl px-5 py-24">
         <div className="mb-12 flex items-end justify-between gap-6">
           <div>
-            <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#F0392B]">Profils en vedette</p>
-            <h2 className="font-heading text-[2rem] font-bold tracking-[-0.02em] text-[#0E1B2A] md:text-[2.4rem]">
+            <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-workon-primary">Profils en vedette</p>
+            <h2 className="font-heading text-[2rem] font-bold tracking-[-0.02em] text-workon-ink md:text-[2.4rem]">
               Des pros vérifiés, prêts à travailler
             </h2>
           </div>
-          <Link href="/pros" className="hidden text-[14px] font-semibold text-[#F0392B] transition-opacity hover:opacity-80 md:inline-flex">
+          <Link href="/pros" className="hidden text-[14px] font-semibold text-workon-primary transition-opacity hover:opacity-80 md:inline-flex">
             Voir tous les profils →
           </Link>
         </div>
@@ -462,7 +462,7 @@ function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: 
   kpis.push({ value: "Loi 25", label: "tes données protégées" });
 
   return (
-    <section className="bg-[#0B1B2E]">
+    <section className="bg-workon-surface-dark">
       <div className="mx-auto max-w-6xl px-5 py-24">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7FB0FF]">Confiance</p>
@@ -477,7 +477,7 @@ function TrustSection({ stats, reviews }: { stats: PublicStats | null; reviews: 
         <div className="mb-14 grid grid-cols-2 gap-4 md:grid-cols-4">
           {kpis.map((f) => (
             <div key={f.label} className="rounded-2xl border border-[#1B3147] bg-[#0E2236] p-7 text-center">
-              <p className="font-heading text-[2rem] font-bold tracking-tight text-[#F0392B] md:text-[2.4rem]">{f.value}</p>
+              <p className="font-heading text-[2rem] font-bold tracking-tight text-workon-primary md:text-[2.4rem]">{f.value}</p>
               <p className="mt-2 text-[13.5px] font-medium leading-snug text-[#9DB0C6]">{f.label}</p>
             </div>
           ))}
@@ -521,21 +521,21 @@ function Pricing() {
     <section id="tarifs" className="scroll-mt-16 bg-[#F6F8FB]">
       <div className="mx-auto max-w-6xl px-5 py-24">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#F0392B]">Tarification</p>
-          <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-[#0E1B2A] md:text-[2.6rem]">
+          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-workon-primary">Tarification</p>
+          <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-workon-ink md:text-[2.6rem]">
             Gratuit pour toi.
             <br />
-            <span className="text-[#5A6B7E]">Tu gardes 100 % de ce que tu charges.</span>
+            <span className="text-workon-gray">Tu gardes 100 % de ce que tu charges.</span>
           </h2>
         </div>
         <div className="mx-auto max-w-lg">
-          <div className="rounded-2xl border-2 border-[#0B1B2E]/10 bg-white p-8 md:p-10">
+          <div className="rounded-2xl border-2 border-workon-surface-dark/10 bg-white p-8 md:p-10">
             <div className="text-center">
               <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#2BA968]">Inscription gratuite</p>
               <div className="mb-2 flex items-end justify-center">
-                <span className="font-heading text-[4rem] font-bold leading-none tracking-tight text-[#0E1B2A]">0&nbsp;$</span>
+                <span className="font-heading text-[4rem] font-bold leading-none tracking-tight text-workon-ink">0&nbsp;$</span>
               </div>
-              <p className="text-[17px] text-[#5A6B7E]">Les frais de service (15 %) sont ajoutés à la facture du client — jamais déduits de ta paie.</p>
+              <p className="text-[17px] text-workon-gray">Les frais de service (15 %) sont ajoutés à la facture du client — jamais déduits de ta paie.</p>
             </div>
             <div className="mt-8 space-y-3.5">
               {perks.map((item) => (
@@ -543,17 +543,17 @@ function Pricing() {
                   <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#34D27B]/[0.12]">
                     <Check className="h-3 w-3 text-[#2BA968]" />
                   </span>
-                  <span className="text-[15px] text-[#0E1B2A]">{item}</span>
+                  <span className="text-[15px] text-workon-ink">{item}</span>
                 </div>
               ))}
             </div>
             <Link
               href="/register"
-              className="mt-8 flex w-full items-center justify-center rounded-xl bg-[#F0392B] py-4 text-[15px] font-medium text-white transition-colors hover:bg-[#D62E22]"
+              className="mt-8 flex w-full items-center justify-center rounded-xl bg-workon-primary py-4 text-[15px] font-medium text-white transition-colors hover:bg-workon-primary-hover"
             >
               Créer mon profil gratuitement
             </Link>
-            <p className="mt-3 text-center text-[12px] text-[#8A98A8]">Aucune carte de crédit requise</p>
+            <p className="mt-3 text-center text-[12px] text-workon-muted">Aucune carte de crédit requise</p>
           </div>
         </div>
       </div>
@@ -565,7 +565,7 @@ function Pricing() {
 
 function EmployerCTA() {
   return (
-    <section className="bg-[#0B1B2E]">
+    <section className="bg-workon-surface-dark">
       <div className="mx-auto max-w-6xl px-5 pt-4 pb-12">
         <div className="flex flex-col items-center justify-between gap-8 rounded-3xl border border-[#1B3147] bg-[#0E2236] p-10 md:flex-row md:p-14">
           <div className="max-w-lg">
@@ -578,7 +578,7 @@ function EmployerCTA() {
           </div>
           <Link
             href="/pricing"
-            className="inline-flex flex-shrink-0 items-center gap-2 rounded-xl bg-[#F0392B] px-9 py-4 text-[15px] font-medium text-white transition-colors hover:bg-[#D62E22]"
+            className="inline-flex flex-shrink-0 items-center gap-2 rounded-xl bg-workon-primary px-9 py-4 text-[15px] font-medium text-white transition-colors hover:bg-workon-primary-hover"
           >
             Publier un besoin <ArrowRight className="h-[18px] w-[18px]" />
           </Link>
@@ -590,19 +590,19 @@ function EmployerCTA() {
 
 function FinalCTA() {
   return (
-    <section className="bg-[#0B1B2E]">
+    <section className="bg-workon-surface-dark">
       <div className="mx-auto max-w-6xl px-5 pb-24">
         <div
-          className="relative overflow-hidden rounded-3xl border border-[#2E5680] bg-[#0A1726] px-6 py-16 text-center"
+          className="relative overflow-hidden rounded-3xl border border-[#2E5680] bg-workon-forest-deep px-6 py-16 text-center"
           style={{ background: "radial-gradient(560px 280px at 50% 0%, rgba(46,125,255,0.14), #0A1726 72%)" }}
         >
-          <span className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F0392B] shadow-[0_16px_36px_-12px_rgba(240,57,43,0.55)]">
+          <span className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-workon-primary shadow-[0_16px_36px_-12px_rgba(240,57,43,0.55)]">
             <Phone className="h-8 w-8 text-white" />
           </span>
           <h2 className="mx-auto max-w-2xl font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-white md:text-[2.8rem]">
             Ton prochain contrat
             <br />
-            est à <span className="text-[#F0392B]">un clic.</span>
+            est à <span className="text-workon-primary">un clic.</span>
           </h2>
           <p className="mx-auto mt-6 max-w-md text-[18px] leading-relaxed text-[#A8BACD]">
             Inscription gratuite, aucun engagement. Tu paies seulement quand une demande
@@ -610,7 +610,7 @@ function FinalCTA() {
           </p>
           <Link
             href="/register"
-            className="mt-9 inline-flex items-center justify-center gap-2 rounded-xl bg-[#F0392B] px-10 py-5 text-[17px] font-medium text-white shadow-[0_18px_40px_-14px_rgba(240,57,43,0.55)] transition-all hover:bg-[#D62E22] hover:-translate-y-0.5"
+            className="mt-9 inline-flex items-center justify-center gap-2 rounded-xl bg-workon-primary px-10 py-5 text-[17px] font-medium text-white shadow-[0_18px_40px_-14px_rgba(240,57,43,0.55)] transition-all hover:bg-workon-primary-hover hover:-translate-y-0.5"
           >
             Créer mon profil professionnel <ArrowRight className="h-5 w-5" />
           </Link>
@@ -627,11 +627,11 @@ function FinalCTA() {
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-[#16304A] bg-[#0A1726]">
+    <footer className="border-t border-[#16304A] bg-workon-forest-deep">
       <div className="mx-auto max-w-6xl px-5 py-12">
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
           <Link href="/" className="text-white">
-            <WorkOnWordmark size="md" pinClassName="text-[#F0392B]" />
+            <WorkOnWordmark size="md" pinClassName="text-workon-primary" />
           </Link>
           <nav className="flex flex-wrap items-center justify-center gap-6 text-[14px] font-medium text-[#9DB0C6]">
             <Link href="/faq" className="transition-colors hover:text-white">FAQ</Link>
@@ -665,7 +665,7 @@ export default async function HomePage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#0B1B2E] text-white">
+    <main className="min-h-screen bg-workon-surface-dark text-white">
       <SiteHeader />
       <Hero />
       <ProblemSection />
