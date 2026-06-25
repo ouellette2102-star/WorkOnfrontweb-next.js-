@@ -265,7 +265,7 @@ export async function GET(req: NextRequest) {
                   fontWeight: 500,
                 }}
               >
-                📍 {params.city}
+                {params.city}
               </div>
             )}
           </div>
@@ -346,7 +346,7 @@ export async function GET(req: NextRequest) {
           >
             <div>Réserver sur workon.ca</div>
             <div style={{ color: ACCENT_RED, fontWeight: 700 }}>
-              ⚡ Pro vérifié WorkOn
+              Pro vérifié WorkOn
             </div>
           </div>
         </div>

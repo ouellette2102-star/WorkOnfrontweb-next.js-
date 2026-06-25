@@ -8,6 +8,7 @@ import { StripeConnectGate } from "@/components/worker/stripe-connect-gate";
 import { TrustScoreRing } from "@/components/worker/trust-score-ring";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Search, Wallet, Bell, MessageCircle } from "lucide-react";
 
 export default async function WorkerDashboardPage() {
   const profile = await requireWorker();
@@ -21,7 +22,7 @@ export default async function WorkerDashboardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="mb-2 font-heading font-bold text-2xl text-workon-ink">
-            Salut {firstName} 👋
+            Salut {firstName}
           </h1>
           <p className="text-sm text-workon-gray">
             {profile.city ? `Tu es à ${profile.city}` : "Prêt à trouver des missions près de chez toi"}
@@ -43,7 +44,7 @@ export default async function WorkerDashboardPage() {
         <div className="mb-8 grid gap-4 md:grid-cols-4">
           <Link href="/worker/missions">
             <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
-              <div className="mb-3 text-3xl">🔍</div>
+              <Search className="mb-3 h-7 w-7 text-workon-primary" />
               <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Missions disponibles
               </h3>
@@ -55,7 +56,7 @@ export default async function WorkerDashboardPage() {
 
           <Link href="/worker/payments">
             <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
-              <div className="mb-3 text-3xl">💰</div>
+              <Wallet className="mb-3 h-7 w-7 text-workon-primary" />
               <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Paiements
               </h3>
@@ -67,7 +68,7 @@ export default async function WorkerDashboardPage() {
 
           <Link href="/notifications">
             <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
-              <div className="mb-3 text-3xl">🔔</div>
+              <Bell className="mb-3 h-7 w-7 text-workon-primary" />
               <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Notifications
               </h3>
@@ -79,7 +80,7 @@ export default async function WorkerDashboardPage() {
 
           <Link href="/messages">
             <div className="group cursor-pointer bg-white border border-workon-border rounded-2xl px-4 py-3.5 transition hover:shadow-soft">
-              <div className="mb-3 text-3xl">💬</div>
+              <MessageCircle className="mb-3 h-7 w-7 text-workon-primary" />
               <h3 className="mb-1 text-base font-semibold text-workon-ink">
                 Messages
               </h3>

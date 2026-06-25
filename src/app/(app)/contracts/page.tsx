@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api, type ContractResponse } from "@/lib/api-client";
 import Link from "next/link";
+import { FileText } from "lucide-react";
 
 const statusConfig: Record<
   ContractResponse["status"],
@@ -46,7 +47,7 @@ export default function ContractsPage() {
 
         {contracts && contracts.length === 0 && (
           <div className="rounded-3xl border border-workon-border bg-white p-12 text-center shadow-sm">
-            <div className="mb-4 text-6xl">📄</div>
+            <FileText className="mx-auto mb-4 h-14 w-14 text-workon-gray/40" />
             <h3 className="mb-2 text-xl font-semibold text-workon-ink">
               Aucun contrat
             </h3>

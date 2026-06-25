@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Clock, Wallet, CreditCard, Banknote, BarChart3 } from "lucide-react";
 
 export default function WorkerPaymentsPage() {
   return (
@@ -85,19 +86,19 @@ function WorkerPaymentsContent() {
       case "SUCCEEDED":
         return (
           <span className="rounded-full bg-workon-trust-green/15 border border-workon-trust-green/25 px-3 py-1 text-xs font-semibold text-workon-trust-green">
-            ✅ Payé
+            Payé
           </span>
         );
       case "PENDING":
         return (
           <span className="rounded-full bg-yellow-500/15 border border-yellow-500/25 px-3 py-1 text-xs font-semibold text-yellow-300">
-            ⏳ En attente
+            En attente
           </span>
         );
       case "FAILED":
         return (
           <span className="rounded-full bg-workon-accent/15 border border-workon-accent/25 px-3 py-1 text-xs font-semibold text-workon-accent">
-            ❌ Échoué
+            Échoué
           </span>
         );
       default:
@@ -126,7 +127,7 @@ function WorkerPaymentsContent() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="mb-2 text-4xl font-bold text-workon-ink">
-            💰 Mes Paiements
+            Mes Paiements
           </h1>
           <p className="text-lg text-workon-muted">
             Gérez vos paiements et votre compte Stripe
@@ -136,7 +137,7 @@ function WorkerPaymentsContent() {
         {/* Banner Onboarding */}
         {!isOnboarded && !showEmbedded && (
           <div className="mb-8 rounded-3xl border border-workon-primary/30 bg-gradient-to-br from-workon-primary/15 via-workon-primary/5 to-transparent p-8 shadow-sm ">
-            <div className="mb-4 text-6xl">💳</div>
+            <CreditCard className="mb-4 h-12 w-12 text-workon-primary" />
             <h2 className="mb-3 text-2xl font-bold text-workon-ink">
               Configure tes paiements
             </h2>
@@ -166,7 +167,7 @@ function WorkerPaymentsContent() {
           <div className="mb-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-3xl border border-workon-trust-green/20 bg-gradient-to-br from-workon-trust-green/10 via-workon-trust-green/5 to-transparent p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-3xl">💵</span>
+                <Banknote className="h-7 w-7 text-workon-trust-green" />
                 <span className="text-3xl font-bold text-workon-trust-green">
                   {formatAmount(totalEarned)} $
                 </span>
@@ -177,7 +178,7 @@ function WorkerPaymentsContent() {
 
             <div className="rounded-3xl border border-workon-border bg-white p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-3xl">📊</span>
+                <BarChart3 className="h-7 w-7 text-workon-ink" />
                 <span className="text-3xl font-bold text-workon-ink">
                   {payments.filter((p) => p.status === "SUCCEEDED").length}
                 </span>
@@ -190,7 +191,7 @@ function WorkerPaymentsContent() {
 
             <div className="rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent p-6  shadow-sm">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-3xl">⏳</span>
+                <Clock className="h-7 w-7 text-yellow-500" />
                 <span className="text-3xl font-bold text-yellow-600">
                   {payments.filter((p) => p.status === "PENDING").length}
                 </span>
@@ -219,7 +220,7 @@ function WorkerPaymentsContent() {
               </div>
             ) : payments.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <span className="mb-4 text-6xl">💸</span>
+                <Wallet className="mb-4 h-12 w-12 text-workon-gray/40" />
                 <p className="mb-2 text-lg font-semibold text-workon-ink">
                   Aucun paiement encore
                 </p>
@@ -240,11 +241,10 @@ function WorkerPaymentsContent() {
                       </h4>
                       <div className="flex flex-wrap gap-3 text-sm text-workon-muted">
                         {payment.missionCategory && (
-                          <span>🏷️ {payment.missionCategory}</span>
+                          <span>{payment.missionCategory}</span>
                         )}
                         {payment.completedAt && (
                           <span>
-                            📅{" "}
                             {format(new Date(payment.completedAt), "PP", {
                               locale: frCA,
                             })}

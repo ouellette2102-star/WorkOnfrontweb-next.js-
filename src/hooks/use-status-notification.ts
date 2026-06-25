@@ -95,7 +95,7 @@ function showToast(info: StatusChangeInfo) {
       : undefined,
   };
 
-  const toastTitle = `${info.icon} ${info.title}`;
+  const toastTitle = info.title;
 
   switch (info.variant) {
     case "success":

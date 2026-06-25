@@ -151,7 +151,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 {categoryLabel}
               </p>
               {pro.city && (
-                <p className="text-gray-400 mt-1">📍 {pro.city}</p>
+                <p className="text-gray-400 mt-1">{pro.city}</p>
               )}
               {pro.serviceRadiusKm && (
                 <p className="text-gray-500 text-sm">

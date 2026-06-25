@@ -5,6 +5,7 @@ import { MarketingHeader } from "@/components/navigation/marketing-header";
 import { HeroWorkerCard } from "@/components/worker/hero-worker-card";
 import { WhyChooseBlock } from "@/components/marketing/why-choose-block";
 import { getFeaturedWorkers, getSectorStats, type SectorStat } from "@/lib/public-api";
+import { Banknote, CalendarDays, ShieldCheck, Star } from "lucide-react";
 
 /**
  * Worker recruitment landing — `/rejoindre-pro`.
@@ -74,7 +75,7 @@ export default async function RejoindreProPage() {
       <section className="mx-auto max-w-6xl px-4 pt-14 pb-10 border-b border-workon-border">
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-workon-accent/30 bg-workon-accent/10 px-3 py-1 text-xs text-workon-accent mb-5">
-            ⚡ Inscription gratuite — payé dès ce soir
+            Inscription gratuite — payé dès ce soir
           </div>
           <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight tracking-tight">
             Trouve des missions.<br />
@@ -101,10 +102,10 @@ export default async function RejoindreProPage() {
         title="Du travail, vraiment simple."
         theme="light"
         items={[
-          { icon: "💸", title: "Payé rapidement", desc: "Virement dès la fin de mission. Pas d'attente de 30 jours." },
-          { icon: "📅", title: "Flexibilité totale", desc: "Tu choisis tes missions, tes horaires, ta ville." },
-          { icon: "🔒", title: "Zéro risque", desc: "Paiement sécurisé via Stripe. Tu es protégé avant de commencer." },
-          { icon: "⭐", title: "Bâtis ta réputation", desc: "Accumule des avis, monte en tier, accède aux meilleures missions." },
+          { icon: <Banknote className="h-6 w-6 text-workon-accent" />, title: "Payé rapidement", desc: "Virement dès la fin de mission. Pas d'attente de 30 jours." },
+          { icon: <CalendarDays className="h-6 w-6 text-workon-accent" />, title: "Flexibilité totale", desc: "Tu choisis tes missions, tes horaires, ta ville." },
+          { icon: <ShieldCheck className="h-6 w-6 text-workon-accent" />, title: "Zéro risque", desc: "Paiement sécurisé via Stripe. Tu es protégé avant de commencer." },
+          { icon: <Star className="h-6 w-6 text-workon-accent" />, title: "Bâtis ta réputation", desc: "Accumule des avis, monte en tier, accède aux meilleures missions." },
         ]}
       />
 

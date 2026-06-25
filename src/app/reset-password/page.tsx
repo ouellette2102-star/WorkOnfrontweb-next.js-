@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WorkOnWordmark } from "@/components/brand/workon-wordmark";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { normalizeBackendError } from "@/lib/backend-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
@@ -85,10 +85,10 @@ function ResetPasswordInner() {
         {done ? (
           <div className="text-center space-y-4">
             <div
-              className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-workon-trust-green/15 border border-workon-trust-green/25 text-2xl"
+              className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-workon-trust-green/15 border border-workon-trust-green/25 text-workon-trust-green"
               aria-hidden
             >
-              ✅
+              <Check className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-bold text-workon-ink">
               Mot de passe mis à jour

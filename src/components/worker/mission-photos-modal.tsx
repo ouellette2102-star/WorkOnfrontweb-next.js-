@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getAccessToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Camera } from "lucide-react";
 import type { MissionPhoto } from "@/types/mission-photo";
 
 type Props = {
@@ -70,7 +70,7 @@ export function MissionPhotosModal({ missionId, onClose }: Props) {
           </div>
         ) : photos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <span className="mb-4 text-6xl">📸</span>
+            <Camera className="mb-4 h-12 w-12 text-workon-gray/40" />
             <p className="text-lg font-semibold text-workon-ink">Aucune photo</p>
             <p className="text-workon-gray">Aucune photo n&apos;a été uploadée pour cette mission</p>
           </div>
