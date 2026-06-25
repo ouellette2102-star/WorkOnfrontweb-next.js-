@@ -50,7 +50,7 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
       {/* Error message */}
       {error && (
         <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-400">
-          ⚠️ {error}
+          {error}
           <button
             onClick={() => setError(null)}
             className="ml-2 text-xs underline hover:no-underline"
