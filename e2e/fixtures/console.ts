@@ -12,7 +12,18 @@ import { test as base, expect } from "@playwright/test";
  * `IGNORE` filtre le bruit réseau attendu (tuiles carto, favicon) pour ne
  * garder que les vraies erreurs applicatives.
  */
-const IGNORE = [/cartocdn/i, /openstreetmap/i, /\btile\b/i, /favicon/i, /ERR_/];
+// Bruit attendu : tuiles externes + appels best-effort du shell (app) qui
+// échouent quand leur backend n'est pas mocké (device-registration, etc.) —
+// jamais lié à la page testée.
+const IGNORE = [
+  /cartocdn/i,
+  /openstreetmap/i,
+  /\btile\b/i,
+  /favicon/i,
+  /ERR_/,
+  /\[device-registration\]/i,
+  /Backend WorkOn indisponible/i,
+];
 
 export const test = base.extend<{ consoleErrors: string[] }>({
   consoleErrors: async ({ page }, use) => {
