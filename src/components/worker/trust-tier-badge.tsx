@@ -29,7 +29,7 @@ const TIER_CONFIG: Record<
   VERIFIED: {
     icon: CheckCircle2,
     label: "Vérifié",
-    className: "bg-[#2E7DFF] text-white",
+    className: "bg-workon-gold text-white",
   },
   TRUSTED: {
     icon: ShieldCheck,
@@ -39,7 +39,7 @@ const TIER_CONFIG: Record<
   PREMIUM: {
     icon: Crown,
     label: "Top Performer",
-    className: "bg-[#0E1B2A] text-white",
+    className: "bg-workon-ink text-white",
   },
 };
 
