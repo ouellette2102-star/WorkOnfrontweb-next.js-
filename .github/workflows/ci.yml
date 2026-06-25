@@ -168,3 +168,23 @@ jobs:
         run: npm ci --legacy-peer-deps --ignore-scripts
       - name: Run F3 + F4 + F5 + map E2E
         run: npx playwright test e2e/mission-create.spec.ts e2e/invoice-review.spec.ts e2e/admin-role-gate.spec.ts e2e/map.spec.ts --project=chromium
+
+  # A11y (axe) — BLOCKING. Vérification WCAG runtime sur une page P0 publique.
+  # Échoue sur les violations `critical`, logue toutes les violations pour
+  # l'audit. Complète le filet statique eslint-plugin-jsx-a11y (warn).
+  a11y:
+    name: A11y (axe /publier-besoin)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+      - name: Run a11y E2E
+        run: npx playwright test e2e/a11y.spec.ts --project=chromium
