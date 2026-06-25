@@ -207,6 +207,20 @@ body {
 .shadow-card { box-shadow: 0 1px 3px rgba(27,26,24,0.04), 0 8px 22px rgba(27,26,24,0.05); }
 .shadow-soft { box-shadow: 0 2px 8px rgba(27,26,24,0.06); }
 
+/* Premium Leaflet layer used by /map. Leaflet markers are injected
+ * outside React, so the pin styling lives globally. Restauré après la
+ * refonte RedPhone qui l'avait retiré par mégarde (régression /map). */
+.workon-leaflet .leaflet-tile {
+  filter: saturate(0.78) contrast(0.98) sepia(0.08);
+}
+
+.workon-leaflet .leaflet-control-attribution {
+  border-top-left-radius: 10px;
+  background: rgba(255, 253, 248, 0.82);
+  color: var(--workon-stone);
+  font-size: 9px;
+}
+
 /* Heading font — Bricolage Grotesque (loaded via next/font in layout.tsx)
  * with Manrope and the system stack as fallbacks. Bricolage is a free
  * open-source display grotesque that fills the role the unloadable
