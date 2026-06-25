@@ -47,6 +47,7 @@ export function WorkOnWordmark({
   const { text, pin } = SIZE_CLASSES[size];
   return (
     <span
+      role="img"
       aria-label="WorkOn"
       className={cn(
         "inline-flex items-baseline font-bold tracking-tight leading-none whitespace-nowrap",
