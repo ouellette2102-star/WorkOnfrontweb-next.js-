@@ -19,7 +19,9 @@ const eslintConfig = defineConfig([
   // problèmes (boutons-icône sans aria-label, labels manquants, div cliquables)
   // dans `npm run lint` sans bloquer le CI. À durcir en error au fil des fixes.
   {
-    plugins: { "jsx-a11y": jsxA11y },
+    // Le plugin jsx-a11y est déjà enregistré par eslint-config-next → on
+    // surcharge seulement les sévérités (recommandé → warn), sans le
+    // ré-enregistrer (« Cannot redefine plugin »).
     rules: Object.fromEntries(
       Object.entries(jsxA11y.flatConfigs.recommended.rules).map(([rule, val]) => [
         rule,
