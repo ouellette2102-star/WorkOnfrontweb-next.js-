@@ -68,7 +68,7 @@ WorkOn est lançable quand **un vrai utilisateur (employeur ou worker) peut trav
 | F2 | Onboarding + découverte worker | register → role → details → `/swipe`·`/map`·`/missions` | 🟡 → **inscription E2E ✅ (#283, mockée, en CI)** ; découverte (`/map` stable, `/pros` browser-vérifié) — reste swipe |
 | F3 | Cycle de mission | création → feed → détail → proposition/contrat → invoice | 🟡 → **création mission E2E ✅ (#284, mockée, tous les gates réels)** ; reste feed/détail/contrat/invoice |
 | F4 | Paiement bout-en-bout | checkout → escrow → acceptation bilatérale → earnings | 🟡 (code en main, preuve à refaire) |
-| F5 | Auth/session/rôles | login, cookies httpOnly, gating admin/employer/worker | 🟡 **gating UI prouvé** (E2E worker→refusé / admin→dashboard) ; autorisation **backend NON prouvée** (mock client) + login réel à smoke |
+| F5 | Auth/session/rôles | login, cookies httpOnly, gating admin/employer/worker | 🟡 **gating UI prouvé** (E2E worker→refusé / admin→dashboard) + **autorisation backend prouvée** : test d'intégration réel nightly (`e2e/admin-authz-prod.spec.ts`) — endpoints `/admin/*` rejettent sans token / token bidon (401). Reste : séparation worker-vs-admin sur token valide (exigerait un token worker seedé) |
 
 ---
 
@@ -76,7 +76,7 @@ WorkOn est lançable quand **un vrai utilisateur (employeur ou worker) peut trav
 
 - **Perf** : pas de page P0 qui bloque > 3 s sur 4G mobile ; pas de crash JS console sur le parcours critique.
 - **UX** : navigation cohérente, zéro dead-end, zéro bouton non câblé sur une page P0.
-- **Sécurité** : aucun secret en clair (✅ vérifié) · CI audit npm **informatif, NON bloquant** (`audit:release` se termine par `|| true` → toujours vert) · gating de rôle **UI** testé (E2E), autorisation **backend non prouvée**.
+- **Sécurité** : aucun secret en clair (✅ vérifié) · CI audit npm **BLOQUANT** (`audit:release` sans `|| true` depuis #308 → rouge sur high/critical) · gating de rôle **UI** testé (E2E) **et** autorisation **backend prouvée** (nightly `admin-authz-prod` : `/admin/*` → 401 sans token).
 - **Observabilité** : Sentry actif (✅), ≥ 1 event analytics par étape F1–F4 (☐).
 - **Données** : zéro métrique seed présentée comme réelle ; instrumentation prête à mesurer de vrais users.
 
@@ -106,7 +106,7 @@ WorkOn est lançable quand **un vrai utilisateur (employeur ou worker) peut trav
 | Lucide icons / tokens | mêmes branches | 🟡 main migre déjà (#271 utilise Lucide) | **MINE ciblé** | `a9902aa0` |
 | **Publier-besoin (capture publique sans auth)** | chantier/publier-besoin (**PR #271 OUVERTE**) | ❌ ouvert | ✅ **REVIEW & LAND** | seule PR ouverte, funnel réel |
 | FCM Web Push (P0) | `public/firebase-messaging-sw.js` | ✅ fichier **en main** | **VERIFY câblage** (registration/permission/réception) | existe ; ne pas reconstruire |
-| Suite E2E proofs (7 specs) | harvestés en main | ⚠️ présents mais **dans AUCUN job CI** (BASE_URL prod manuel) | **NE PAS compter comme filet anti-régression** tant que non câblés CI | `e2e/*proof*` |
+| ~~Suite E2E proofs (14 specs prod one-shot)~~ | harvestés en main | ✅ **SUPPRIMÉS** — validations one-shot de PRs mergées (comptes throwaway morts, URLs preview mortes, configs absentes, plusieurs destructeurs) | Remplacés par **1 nightly prod-smoke réel + non-destructeur** (`admin-authz-prod` + `smoke`) | `nightly-prod-smoke.yml` |
 | ~38 branches squash-merged | — | ✅ | **DELETE** | ahead=1, behind 60-95 |
 
 ---
