@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/console";
 
 /**
  * T4 — Le bandeau de consentement (`fixed bottom-0 z-9999`) ne doit PAS
@@ -11,6 +11,7 @@ import { test, expect } from "@playwright/test";
  */
 test("consent : le bandeau ne recouvre pas le CTA de /publier-besoin", async ({
   page,
+  consoleErrors,
 }) => {
   await page.goto("/publier-besoin");
 
@@ -36,4 +37,6 @@ test("consent : le bandeau ne recouvre pas le CTA de /publier-besoin", async ({
   const form = await page.locator("form").boundingBox();
   expect(form).not.toBeNull();
   expect(form!.y + form!.height).toBeLessThanOrEqual(band!.y + 1);
+
+  expect(consoleErrors).toEqual([]);
 });
