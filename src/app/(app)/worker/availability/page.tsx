@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { api, type AvailabilitySlot } from "@/lib/api-client";
+import { parseDateOnlyFromApi } from "@/lib/date-only";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -87,11 +88,10 @@ function toSlotInput(slot: AvailabilitySlot): SlotInput {
 function formatBlockedDate(slot: CalendarSlot) {
   if (!slot.specificDate) return "Date bloquee";
   const rawDate = slot.specificDate;
-  const value = rawDate.includes("T") ? rawDate : `${rawDate}T00:00:00`;
 
   try {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return rawDate.slice(0, 10);
+    const date = parseDateOnlyFromApi(rawDate);
+    if (!date) return rawDate.slice(0, 10);
 
     return new Intl.DateTimeFormat("fr-CA", {
       weekday: "long",

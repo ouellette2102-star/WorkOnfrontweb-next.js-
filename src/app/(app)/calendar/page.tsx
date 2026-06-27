@@ -34,6 +34,7 @@ import {
 import { fr } from "date-fns/locale";
 import { useMode } from "@/contexts/mode-context";
 import { api, type AvailabilitySlot, type BookingResponse } from "@/lib/api-client";
+import { parseDateOnlyFromApi } from "@/lib/date-only";
 import { cn } from "@/lib/utils";
 
 type CalendarSlot = AvailabilitySlot & { specificDate?: string | null };
@@ -124,11 +125,8 @@ function splitSlots(slots: AvailabilitySlot[]) {
 
 function slotMatchesDay(slot: CalendarSlot, date: Date) {
   if (slot.specificDate) {
-    try {
-      return isSameDay(new Date(slot.specificDate), date);
-    } catch {
-      return false;
-    }
+    const slotDate = parseDateOnlyFromApi(slot.specificDate);
+    return slotDate ? isSameDay(slotDate, date) : false;
   }
 
   return slot.dayOfWeek === jsDayToSlotDay(getDay(date));
