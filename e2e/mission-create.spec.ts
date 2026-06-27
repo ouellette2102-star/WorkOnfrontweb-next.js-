@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/console";
 import { auditA11y } from "./fixtures/a11y";
 
 /**
@@ -32,6 +32,7 @@ const USER = {
 test("création mission : formulaire rempli → écran de succès", async ({
   page,
   context,
+  consoleErrors,
 }) => {
   let missionPayload: Record<string, unknown> | null = null;
 
@@ -192,4 +193,6 @@ test("création mission : formulaire rempli → écran de succès", async ({
     latitude: 45.5017,
     longitude: -73.5673,
   });
+
+  expect(consoleErrors).toEqual([]);
 });
