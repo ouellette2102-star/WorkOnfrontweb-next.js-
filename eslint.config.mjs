@@ -26,20 +26,34 @@ const eslintConfig = defineConfig([
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
-  // Filet a11y statique. eslint-config-next/core-web-vitals enregistre DÉJÀ le
-  // plugin jsx-a11y + 6 règles (cf. NEXT_JSX_A11Y_RULES). Ici on AJOUTE le
-  // RESTE du recommended en WARN, en laissant intactes ces 6 (sinon on perd
+  // Filet a11y statique BLOQUANT. eslint-config-next/core-web-vitals enregistre
+  // DÉJÀ le plugin jsx-a11y + 6 règles (cf. NEXT_JSX_A11Y_RULES). Ici on AJOUTE
+  // le RESTE du recommended en ERROR, en laissant intactes ces 6 (sinon on perd
   // leurs options, ex. alt-text/next-Image). Le plugin n'est pas ré-enregistré
-  // (« Cannot redefine plugin »). Non bloquant (warn) — filet informatif ;
-  // à durcir en error au fil des fixes.
+  // (« Cannot redefine plugin »).
+  //
+  // La dette existante (~96 violations) est gelée dans eslint-suppressions.json
+  // (généré via `eslint . --suppress-all`) : `eslint .` reste vert sur l'existant
+  // mais ROUGE sur toute NOUVELLE violation (ratchet « zéro régression a11y »).
+  // Le compteur ne peut que descendre — corriger une violation puis
+  // `eslint . --prune-suppressions` rétrécit le baseline.
+  //
+  // On RESPECTE les severités du recommended : les 3 règles qu'il met à `off`
+  // (dépréciée `label-has-for`, opt-in bruyantes `control-has-associated-label`
+  // / `anchor-ambiguous-text`) restent OFF — l'ancienne config les forçait en
+  // warn par erreur (d'où ~85 faux positifs label).
   {
     rules: Object.fromEntries(
       Object.entries(jsxA11y.flatConfigs.recommended.rules)
         .filter(([rule]) => !NEXT_JSX_A11Y_RULES.has(rule))
-        .map(([rule, val]) => [
-          rule,
-          Array.isArray(val) ? ["warn", ...val.slice(1)] : "warn",
-        ]),
+        .map(([rule, val]) => {
+          const sev = Array.isArray(val) ? val[0] : val;
+          if (sev === "off" || sev === 0) return [rule, "off"];
+          return [
+            rule,
+            Array.isArray(val) ? ["error", ...val.slice(1)] : "error",
+          ];
+        }),
     ),
   },
   // Override default ignores of eslint-config-next.
