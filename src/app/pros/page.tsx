@@ -63,10 +63,8 @@ function ProCard({ pro }: { pro: ProListItem }) {
   const href = pro.slug ? `/pro/${pro.slug}` : `/pro/${pro.id}`;
 
   return (
-    <Link
-      href={href}
-      className="group rounded-2xl border border-workon-border bg-white p-5 hover:border-workon-accent/40 hover:shadow-card transition-all flex gap-4"
-    >
+    <div className="group rounded-2xl border border-workon-border bg-white p-5 hover:border-workon-accent/40 hover:shadow-card transition-all">
+      <Link href={href} className="flex gap-4">
       {/* Photo or initials */}
       <div className="flex-shrink-0">
         {pro.pictureUrl ? (
@@ -127,7 +125,16 @@ function ProCard({ pro }: { pro: ProListItem }) {
           )}
         </div>
       </div>
-    </Link>
+      </Link>
+      <div className="mt-4 flex justify-end">
+        <Link
+          href={`/reserve/${pro.id}`}
+          className="inline-flex items-center gap-1.5 rounded-full bg-workon-primary px-4 py-2 text-sm font-semibold text-white hover:bg-workon-primary-hover transition-colors"
+        >
+          Réserver
+        </Link>
+      </div>
+    </div>
   );
 }
 

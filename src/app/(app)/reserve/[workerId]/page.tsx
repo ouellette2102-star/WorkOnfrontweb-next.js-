@@ -22,6 +22,7 @@ import { toast } from "sonner";
 
 import { useMode } from "@/contexts/mode-context";
 import { api, type WorkerProfile } from "@/lib/api-client";
+import type { MissionCategory } from "@/lib/mission-categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -85,32 +86,55 @@ export default function ReservePage() {
     const numPrice = Number(price) || 0;
     setLoading(true);
     try {
-      const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString();
-      const booking = await api.createBooking({
-        workerId,
+      // Fold the requested schedule into the description — a direct mission has
+      // no separate scheduledAt field, so we keep the info visible to the pro.
+      const dateLabel = new Date(
+        `${scheduledDate}T${scheduledTime}:00`,
+      ).toLocaleString("fr-CA");
+      const fullDescription = [
+        description.trim(),
+        `Créneau souhaité : ${dateLabel} (durée ~${duration} min).`,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      // 1. Create the mission owned by the client (employer side of the deal).
+      const mission = await api.createMission({
         title: title.trim(),
-        description: description || undefined,
-        scheduledAt,
-        duration,
+        description: fullDescription,
+        category: (worker?.category || worker?.jobTitle || "autre") as MissionCategory,
         price: numPrice,
-        priceType: "fixed",
+        city: worker?.city || "Montréal",
+        // A direct reservation isn't geo-discovered; default coords keep the
+        // payload valid (the real address lives in the description).
+        latitude: 45.5017,
+        longitude: -73.5673,
+        durationMinutes: duration,
       });
 
+      // 2. Reserve THIS pro for the mission (open -> assigned + PENDING contract).
+      await api.reserveWorker(mission.id, workerId);
+
+      // 3. Pay upfront if a price was set; otherwise the pro is engaged and waits.
       if (numPrice > 0) {
         toast.loading("Redirection vers Stripe...");
-        const checkout = await api.createBookingCheckout(booking.id);
+        const checkout = await api.createCheckoutSession(mission.id);
         window.location.href = checkout.checkoutUrl;
       } else {
-        toast.success("Réservation envoyée avec succès.");
-        router.push("/bookings");
+        toast.success("Pro réservé — la mission est dans vos missions.");
+        router.push(`/missions/${mission.id}`);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes("not available") || msg.includes("disponible")) {
-        toast.error("Ce professionnel n'a pas encore configuré ses disponibilités. Envoyez-lui une demande directe.");
-      } else if (msg.includes("Consent") || msg.includes("consent")) {
-        toast.error("Vous devez accepter les conditions d'utilisation avant de payer.");
+      if (msg.includes("Consent") || msg.includes("consent") || msg.includes("CGU")) {
+        toast.error("Vous devez accepter les conditions d'utilisation avant de réserver.");
         router.push("/onboarding");
+      } else if (
+        msg.includes("already") ||
+        msg.includes("assigned") ||
+        msg.includes("disponible")
+      ) {
+        toast.error("Ce pro n'est plus disponible pour cette mission.");
       } else {
         toast.error(msg || "Erreur lors de la réservation.");
       }
