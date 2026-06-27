@@ -39,11 +39,6 @@
       "count": 1
     }
   },
-  "src/app/(app)/support/page.tsx": {
-    "jsx-a11y/label-has-associated-control": {
-      "count": 3
-    }
-  },
   "src/app/(app)/worker/availability/page.tsx": {
     "jsx-a11y/label-has-associated-control": {
       "count": 4
