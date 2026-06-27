@@ -1,4 +1,5 @@
-import { test, expect, type Page, type BrowserContext } from "@playwright/test";
+import { test, expect } from "./fixtures/console";
+import type { Page, BrowserContext } from "@playwright/test";
 import { auditA11y } from "./fixtures/a11y";
 
 /**
@@ -90,6 +91,7 @@ async function setupAuth(
 test("rôles : un worker est bloqué sur /admin (accès refusé)", async ({
   page,
   context,
+  consoleErrors,
 }) => {
   test.setTimeout(120_000);
   await setupAuth(page, context, makeUser("worker"));
@@ -99,11 +101,14 @@ test("rôles : un worker est bloqué sur /admin (accès refusé)", async ({
   await expect(page.getByText(/réservée aux administrateurs/)).toBeVisible();
   // Et surtout : pas de contenu admin.
   await expect(page.getByText(/Tableau de bord admin/)).toHaveCount(0);
+
+  expect(consoleErrors).toEqual([]);
 });
 
 test("rôles : un admin accède au tableau de bord /admin", async ({
   page,
   context,
+  consoleErrors,
 }) => {
   test.setTimeout(120_000);
   await setupAuth(page, context, makeUser("admin"));
@@ -115,4 +120,6 @@ test("rôles : un admin accède au tableau de bord /admin", async ({
   await expect(page.getByText(/Accès refusé/)).toHaveCount(0);
 
   await auditA11y(page, "F5 admin/dashboard", ["color-contrast"]);
+
+  expect(consoleErrors).toEqual([]);
 });
