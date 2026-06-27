@@ -19,11 +19,6 @@
       "count": 4
     }
   },
-  "src/app/(app)/matches/page.tsx": {
-    "jsx-a11y/label-has-associated-control": {
-      "count": 3
-    }
-  },
   "src/app/(app)/missions/[id]/page.tsx": {
     "jsx-a11y/label-has-associated-control": {
       "count": 6
