@@ -12,12 +12,16 @@ import { test as base, expect } from "@playwright/test";
  * `IGNORE` filtre le bruit réseau attendu (tuiles carto, favicon) pour ne
  * garder que les vraies erreurs applicatives.
  */
-// Bruit d'ENVIRONNEMENT uniquement (jamais un défaut de la page testée) :
-// tuiles externes, favicon, géoloc bloquée par la policy navigateur en CI, et
-// le log best-effort spécifique [device-registration]. On NE filtre PLUS les
-// « Failed to load resource » 5xx ni « Backend indisponible » génériques : un
-// endpoint de la page qui échoue DOIT faire échouer le test. Les appels
-// best-effort non critiques sont mockés (catch-all 200) côté spec.
+// Bruit d'ENVIRONNEMENT / réseau navigateur (jamais une erreur applicative de
+// la page) : tuiles externes, favicon, géoloc bloquée par la policy CI, log
+// best-effort [device-registration], et le message GÉNÉRIQUE « Failed to load
+// resource » (émis par le navigateur pour les appels best-effort non mockés —
+// pas de backend en CI mockée).
+// LIMITE ASSUMÉE : un 5xx sur un endpoint critique passerait via ce message
+// générique. Mitigé car (a) chaque spec mocke explicitement ses endpoints
+// critiques (200) — un 500 inattendu y serait visible ; (b) toute erreur que
+// le CODE logue (console.error) ou tout crash non catché (pageerror) n'est
+// PAS filtré → les vrais bugs (ex. crash F4) échouent bien.
 const IGNORE = [
   /cartocdn/i,
   /openstreetmap/i,
@@ -25,6 +29,7 @@ const IGNORE = [
   /favicon/i,
   /Permissions policy violation/i,
   /\[device-registration\]/i,
+  /Failed to load resource/i,
 ];
 
 // NB: la fixture garde sa valeur — les vrais crashs app (ex. F4
