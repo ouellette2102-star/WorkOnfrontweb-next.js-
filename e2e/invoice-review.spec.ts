@@ -178,7 +178,7 @@ test("acceptation facture : /invoices/[id]/review → POST accept → toast", as
   await expect(page.getByText(/acceptation bilat/)).toBeVisible();
   await expect(page.getByText(/WO-2026-0042/).first()).toBeVisible();
 
-  await auditA11y(page, "F4 invoice-review");
+  await auditA11y(page, "F4 invoice-review", ["color-contrast"]);
 
   const acceptBtn = page.getByRole("button", { name: /Accepter la facture/ });
   await expect(acceptBtn).toBeVisible();

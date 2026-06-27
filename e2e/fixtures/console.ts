@@ -12,20 +12,19 @@ import { test as base, expect } from "@playwright/test";
  * `IGNORE` filtre le bruit réseau attendu (tuiles carto, favicon) pour ne
  * garder que les vraies erreurs applicatives.
  */
-// Bruit attendu : tuiles externes + appels best-effort du shell (app) qui
-// échouent quand leur backend n'est pas mocké (device-registration, etc.) —
-// jamais lié à la page testée.
+// Bruit d'ENVIRONNEMENT uniquement (jamais un défaut de la page testée) :
+// tuiles externes, favicon, géoloc bloquée par la policy navigateur en CI, et
+// le log best-effort spécifique [device-registration]. On NE filtre PLUS les
+// « Failed to load resource » 5xx ni « Backend indisponible » génériques : un
+// endpoint de la page qui échoue DOIT faire échouer le test. Les appels
+// best-effort non critiques sont mockés (catch-all 200) côté spec.
 const IGNORE = [
   /cartocdn/i,
   /openstreetmap/i,
   /\btile\b/i,
   /favicon/i,
-  /ERR_/,
+  /Permissions policy violation/i,
   /\[device-registration\]/i,
-  /Backend WorkOn indisponible/i,
-  // Artefacts d'env / réseau du contexte mocké (pas des défauts de la page) :
-  /Permissions policy violation/i, // géoloc bloquée par la policy navigateur en CI
-  /Failed to load resource/i, // appels best-effort non mockés → 5xx réseau
 ];
 
 // NB: la fixture garde sa valeur — les vrais crashs app (ex. F4

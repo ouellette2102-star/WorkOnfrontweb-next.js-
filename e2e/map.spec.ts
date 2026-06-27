@@ -63,6 +63,14 @@ async function setupAuth(page: Page, context: BrowserContext) {
       localStorage.setItem("cookie-consent", "accepted");
     } catch {}
   }, USER);
+
+  // Catch-all : tout endpoint /api/workon non mocké explicitement → 200 {}
+  // (enregistré EN PREMIER → les mocks spécifiques ci-dessous, enregistrés
+  // après, gagnent). Évite les 5xx des appels best-effort du shell SANS
+  // filtrer aveuglément « Failed to load resource » dans la fixture console.
+  await page.route("**/api/workon/**", (r) =>
+    r.fulfill({ status: 200, contentType: "application/json", body: "{}" }),
+  );
   await page.route("**/api/auth/me", (r) =>
     r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(USER) }),
   );

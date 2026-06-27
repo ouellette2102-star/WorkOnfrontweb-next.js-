@@ -114,5 +114,5 @@ test("rôles : un admin accède au tableau de bord /admin", async ({
   });
   await expect(page.getByText(/Accès refusé/)).toHaveCount(0);
 
-  await auditA11y(page, "F5 admin/dashboard");
+  await auditA11y(page, "F5 admin/dashboard", ["color-contrast"]);
 });

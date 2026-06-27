@@ -1,18 +1,20 @@
-import { test, expect } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
+import { test } from "@playwright/test";
+import { auditA11y } from "./fixtures/a11y";
 
 /**
- * T3 — Gate a11y runtime (axe-core) sur une page P0 publique.
+ * T3 — Gate a11y runtime (axe-core) sur la page P0 publique /publier-besoin.
  *
- * Transforme l'audit a11y subjectif en garde CI objective : contraste,
- * labels, rôles, IDs dupliqués (WCAG 2.0 A/AA + 2.1 AA). Échoue sur les
- * violations `critical` (vrais bloquants), logue toutes les violations
- * pour l'audit (serious/moderate à traiter ensuite, côté goût/priorité).
+ * Garde RÉELLE : `auditA11y` SANS baseline échoue sur toute violation
+ * `critical` OU `serious`. La page est à 0 violation (corrigée #301/#302) ;
+ * reverter un fix de contraste/aria réintroduirait une violation `serious`
+ * et ferait échouer la CI — c'est ce qui rend les fixes réellement gardés.
  *
- * Complète le filet STATIQUE eslint-plugin-jsx-a11y (warn) et la grille
- * HUMAINE design:accessibility-review.
+ * Complète le filet statique eslint-plugin-jsx-a11y et la grille humaine
+ * design:accessibility-review.
  */
-test("a11y : /publier-besoin sans violation axe critique", async ({ page }) => {
+test("a11y : /publier-besoin sans violation axe (critical/serious)", async ({
+  page,
+}) => {
   // Pré-accepter le consentement → axe analyse le contenu, pas le bandeau.
   await page.addInitScript(() => {
     try {
@@ -22,20 +24,5 @@ test("a11y : /publier-besoin sans violation axe critique", async ({ page }) => {
   await page.goto("/publier-besoin");
   await page.getByRole("heading").first().waitFor({ timeout: 15_000 });
 
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-    .analyze();
-
-  // Audit : toutes les violations (info) — fixées par priorité ensuite.
-  console.log(
-    "[A11Y] /publier-besoin:",
-    results.violations.map((v) => `${v.impact}:${v.id}(${v.nodes.length})`).join(" · ") ||
-      "aucune violation",
-  );
-
-  const critical = results.violations.filter((v) => v.impact === "critical");
-  expect(
-    critical,
-    `Violations critiques axe : ${critical.map((v) => v.id).join(", ")}`,
-  ).toEqual([]);
+  await auditA11y(page, "/publier-besoin");
 });
