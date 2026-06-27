@@ -1,0 +1,41 @@
+name: Nightly Prod Smoke
+
+# Filet de validation contre la PROD réelle (non mocké), séparé du CI per-PR.
+# Pourquoi séparé : ces specs dépendent de Railway/Vercel en ligne — on ne
+# veut PAS rougir les PRs des contributeurs si un service externe a un hoquet.
+# Tourne chaque nuit + déclenchable à la main (workflow_dispatch) après un
+# déploiement pour valider.
+#
+# Couvre :
+#   - F5 : la garde d'autorisation backend des endpoints /admin rejette
+#     bien les requêtes non/mal authentifiées (e2e/admin-authz-prod.spec.ts).
+#   - Santé des pages publiques : aucune 500 / crash serveur (e2e/smoke.spec.ts).
+# Les deux sont NON-DESTRUCTEURS (lecture seule, aucun compte/donnée créé).
+
+on:
+  schedule:
+    - cron: '23 7 * * *' # 07:23 UTC ≈ 03:23 ET, hors pointe
+  workflow_dispatch: {}
+
+jobs:
+  prod-smoke:
+    name: Prod smoke (F5 authz + pages publiques)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    env:
+      # Pointe Playwright sur la prod → (1) webServer désactivé (pas de dev
+      # server local), (2) les chemins relatifs de smoke.spec.ts résolvent
+      # vers la prod Vercel.
+      PLAYWRIGHT_BASE_URL: https://workonapp.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+      - name: Run prod smoke (admin authz + public pages)
+        run: npx playwright test e2e/admin-authz-prod.spec.ts e2e/smoke.spec.ts --project=chromium
