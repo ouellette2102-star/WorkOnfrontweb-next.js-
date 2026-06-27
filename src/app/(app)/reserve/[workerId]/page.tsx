@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BookingRecapCard } from "@/components/mission/booking-recap-card";
+import { PriceBreakdownCard } from "@/components/mission/price-breakdown-card";
 import { cn } from "@/lib/utils";
 
 const DAY_LABELS_SHORT = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"] as const;
@@ -384,6 +385,11 @@ export default function ReservePage() {
               durationMinutes={duration}
               scheduledDate={scheduledDate}
             />
+
+            {/* Full cost breakdown BEFORE the Stripe redirect — no surprise on
+                the WorkOn fee + Quebec taxes (same /payments/preview source the
+                checkout charges from). */}
+            <PriceBreakdownCard priceDollars={priceNumber} testId="reserve-pay-breakdown" />
 
             <section className="rounded-[28px] border border-workon-border bg-white p-5 shadow-sm">
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
