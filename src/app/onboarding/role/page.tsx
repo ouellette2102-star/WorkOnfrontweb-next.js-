@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { apiFetch } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
+import { HardHat, Briefcase } from "lucide-react";
 
 export default function OnboardingRolePage() {
   const { isLoading: authLoading, isAuthenticated, user } = useAuth();
@@ -75,7 +76,7 @@ export default function OnboardingRolePage() {
             className="group relative overflow-hidden rounded-3xl border-2 border-workon-border bg-workon-bg/70 p-8 text-left backdrop-blur transition-all hover:border-blue-500 hover:bg-workon-bg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="relative z-10">
-              <div className="mb-4 text-6xl">👷</div>
+              <HardHat className="mb-4 h-12 w-12 text-blue-500" />
               <h2 className="mb-3 text-2xl font-bold text-workon-ink">
                 Je suis Travailleur
               </h2>
@@ -94,7 +95,7 @@ export default function OnboardingRolePage() {
             className="group relative overflow-hidden rounded-3xl border-2 border-workon-border bg-workon-bg/70 p-8 text-left backdrop-blur transition-all hover:border-green-500 hover:bg-workon-bg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="relative z-10">
-              <div className="mb-4 text-6xl">💼</div>
+              <Briefcase className="mb-4 h-12 w-12 text-green-500" />
               <h2 className="mb-3 text-2xl font-bold text-workon-ink">
                 Je suis Client entreprise
               </h2>

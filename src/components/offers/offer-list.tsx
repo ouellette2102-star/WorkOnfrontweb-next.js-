@@ -98,7 +98,7 @@ export function OfferList({ missionId, isEmployer }: Props) {
                     {offer.worker?.firstName} {offer.worker?.lastName}
                   </p>
                   {offer.worker?.city && (
-                    <p className="text-xs text-white/40">📍 {offer.worker.city}</p>
+                    <p className="text-xs text-white/40">{offer.worker.city}</p>
                   )}
                 </div>
               </div>

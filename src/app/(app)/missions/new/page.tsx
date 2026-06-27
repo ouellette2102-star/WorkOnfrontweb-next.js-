@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
+import { trackEvent } from "@/lib/analytics";
 import { useAuth } from "@/contexts/auth-context";
 import { useConsent } from "@/components/consent-provider";
 import { isConsentRequiredError } from "@/lib/api-consent-handler";
@@ -202,7 +203,11 @@ export default function NewMissionPage() {
   // Submit mutation
   const createMission = useMutation({
     mutationFn: createMissionRequest,
-    onSuccess: (mission) => {
+    onSuccess: (mission, variables) => {
+      // F3 funnel analytics — fire here, on the live page. (#278 wired this
+      // event into the unused CreateMissionForm component, where it never
+      // ran.) `variables` is the validated MissionFormData → low-card category.
+      trackEvent("mission_created", { category: variables.category });
       // QA report C8 / Sprint 2: pass `?created=1` so the detail page
       // can render a celebration banner (with share link) on first
       // arrival rather than relying on a toast that disappears in 4s.
@@ -424,7 +429,7 @@ export default function NewMissionPage() {
                       : "bg-white text-workon-ink border-workon-border hover:border-workon-primary"
                   }`}
                 >
-                  <span aria-hidden="true">{option.icon}</span>
+                  <option.icon className="h-4 w-4" aria-hidden="true" />
                   {option.label}
                 </button>
               ))}

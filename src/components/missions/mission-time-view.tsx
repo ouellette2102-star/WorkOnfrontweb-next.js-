@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAccessToken } from "@/lib/auth";
+import { MapPin, LogOut } from "lucide-react";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { getMissionTimeLogs } from "@/lib/mission-time-logs-api";
@@ -85,13 +86,13 @@ export function MissionTimeView({ mission }: MissionTimeViewProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
       <h3 className="mb-3 text-sm font-semibold text-white">
-        ⏱️ Temps enregistré
+        Temps enregistré
       </h3>
 
       {/* Statut actuel */}
       {isCurrentlyWorking && (
         <div className="mb-3 rounded-xl bg-green-500/20 p-2 text-xs text-green-300">
-          🟢 Le travailleur est actuellement sur place
+          Le travailleur est actuellement sur place
         </div>
       )}
 
@@ -120,7 +121,7 @@ export function MissionTimeView({ mission }: MissionTimeViewProps) {
               className="flex items-start gap-3 rounded-lg bg-white/5 p-3"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm">
-                {log.type === MissionTimeLogType.CHECK_IN ? "📍" : "🚪"}
+                {log.type === MissionTimeLogType.CHECK_IN ? <MapPin className="h-4 w-4 text-white/70" /> : <LogOut className="h-4 w-4 text-white/70" />}
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-white">

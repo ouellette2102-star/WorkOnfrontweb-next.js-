@@ -66,7 +66,6 @@ export function ReviewForm({
   if (success) {
     return (
       <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-6 text-center">
-        <div className="mb-3 text-4xl">🎉</div>
         <h3 className="mb-2 text-xl font-bold text-green-400">Merci pour votre avis !</h3>
         <p className="text-white/70">Votre feedback aide la communauté WorkOn.</p>
       </div>

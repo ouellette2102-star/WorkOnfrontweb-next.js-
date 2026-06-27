@@ -1,3 +1,15 @@
+import type { LucideIcon } from "lucide-react";
+import {
+  Sparkles,
+  Snowflake,
+  Package,
+  Wrench,
+  Leaf,
+  Paintbrush,
+  Truck,
+  Shapes,
+} from "lucide-react";
+
 export const MISSION_CATEGORY_VALUES = [
   "cleaning",
   "snow_removal",
@@ -12,15 +24,15 @@ export const MISSION_CATEGORY_VALUES = [
 export type MissionCategory = (typeof MISSION_CATEGORY_VALUES)[number];
 
 export const MISSION_CATEGORY_OPTIONS = [
-  { value: "cleaning", label: "Ménage / entretien", icon: "🧹" },
-  { value: "snow_removal", label: "Déneigement", icon: "❄️" },
-  { value: "moving", label: "Déménagement", icon: "📦" },
-  { value: "handyman", label: "Petits travaux", icon: "🔧" },
-  { value: "gardening", label: "Jardinage", icon: "🌿" },
-  { value: "painting", label: "Peinture", icon: "🎨" },
-  { value: "delivery", label: "Livraison", icon: "🚚" },
-  { value: "other", label: "Autre", icon: "✨" },
-] satisfies readonly { value: MissionCategory; label: string; icon: string }[];
+  { value: "cleaning", label: "Ménage / entretien", icon: Sparkles },
+  { value: "snow_removal", label: "Déneigement", icon: Snowflake },
+  { value: "moving", label: "Déménagement", icon: Package },
+  { value: "handyman", label: "Petits travaux", icon: Wrench },
+  { value: "gardening", label: "Jardinage", icon: Leaf },
+  { value: "painting", label: "Peinture", icon: Paintbrush },
+  { value: "delivery", label: "Livraison", icon: Truck },
+  { value: "other", label: "Autre", icon: Shapes },
+] satisfies readonly { value: MissionCategory; label: string; icon: LucideIcon }[];
 
 export function isMissionCategory(value: string): value is MissionCategory {
   return (MISSION_CATEGORY_VALUES as readonly string[]).includes(value);

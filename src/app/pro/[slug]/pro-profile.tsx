@@ -151,7 +151,7 @@ export function ProProfile({ pro }: { pro: ProData }) {
                 {categoryLabel}
               </p>
               {pro.city && (
-                <p className="text-gray-400 mt-1">📍 {pro.city}</p>
+                <p className="text-gray-400 mt-1">{pro.city}</p>
               )}
               {pro.serviceRadiusKm && (
                 <p className="text-gray-500 text-sm">
@@ -184,10 +184,16 @@ export function ProProfile({ pro }: { pro: ProData }) {
           </div>
 
           {/* CTA in hero */}
-          <div className="mt-8 text-center">
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <a
+              href={`/reserve/${pro.id}`}
+              className="inline-block bg-workon-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-workon-primary-hover transition-colors text-lg"
+            >
+              Réserver ce pro
+            </a>
             <a
               href="#demande"
-              className="inline-block bg-workon-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-workon-primary-hover transition-colors text-lg"
+              className="inline-block border-2 border-workon-primary text-workon-primary font-semibold px-8 py-3 rounded-lg hover:bg-workon-primary/5 transition-colors text-lg"
             >
               Demander une soumission
             </a>

@@ -282,7 +282,8 @@ export default function SettingsPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { mode } = useMode();
-  const isWorker = user?.role === "worker";
+  // Acting-as: the Pro/Client mode selects the view, not the locked role.
+  const isWorker = mode === "pro";
 
   const { data: preferences, isLoading } = useQuery({
     queryKey: ["notification-preferences"],

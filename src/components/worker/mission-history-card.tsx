@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { frCA } from "date-fns/locale";
 import { MissionPhotosModal } from "@/components/worker/mission-photos-modal";
+import { ClipboardList } from "lucide-react";
 
 export function MissionHistoryCard() {
   const { isLoading: authLoading } = useAuth();
@@ -114,7 +115,7 @@ export function MissionHistoryCard() {
           Historique des Missions
         </h2>
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <span className="mb-2 text-4xl">📋</span>
+          <ClipboardList className="mb-2 h-10 w-10 text-workon-gray/40" />
           <p className="text-workon-gray">Aucune mission complétée pour le moment</p>
         </div>
       </div>
@@ -138,28 +139,28 @@ export function MissionHistoryCard() {
                 <div className="mb-2 flex items-center gap-2">
                   <h4 className="font-semibold text-workon-ink">{mission.title}</h4>
                   <span className="rounded-full bg-workon-primary/10 px-2 py-0.5 text-xs font-semibold text-workon-primary">
-                    ✅ Complétée
+                    Complétée
                   </span>
                 </div>
 
                 <div className="flex flex-wrap gap-4 text-sm text-workon-gray">
-                  {mission.city && <span>📍 {mission.city}</span>}
+                  {mission.city && <span>{mission.city}</span>}
 
                   {mission.completedAt && (
                     <span>
-                      📅 {format(new Date(mission.completedAt), "PP", { locale: frCA })}
+                      {format(new Date(mission.completedAt), "PP", { locale: frCA })}
                     </span>
                   )}
 
                   {durations[mission.id] > 0 && (
                     <span className="font-semibold">
-                      ⏱️ {formatDuration(durations[mission.id])}
+                      {formatDuration(durations[mission.id])}
                     </span>
                   )}
 
                   {mission.hourlyRate && durations[mission.id] > 0 && (
                     <span className="font-semibold text-[#2D8B55]">
-                      💰 {calculateEarnings(mission).toFixed(2)} $
+                      {calculateEarnings(mission).toFixed(2)} $
                     </span>
                   )}
                 </div>
@@ -172,7 +173,7 @@ export function MissionHistoryCard() {
                   className="border-workon-border text-workon-ink hover:bg-workon-bg"
                   size="sm"
                 >
-                  📸 Photos
+                  Photos
                 </Button>
               </div>
             </div>

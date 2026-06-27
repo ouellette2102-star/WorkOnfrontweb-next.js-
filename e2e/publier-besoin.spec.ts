@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/console";
 
 /**
  * F1 — /publier-besoin : preuve happy-path bout-en-bout, RÉSEAU MOCKÉ.
@@ -15,6 +15,7 @@ import { test, expect } from "@playwright/test";
  */
 test("publier-besoin : soumission valide → écran de confirmation", async ({
   page,
+  consoleErrors,
 }) => {
   // Le serveur dev en CI compile la route à froid → laisser de la marge.
   test.setTimeout(120_000);
@@ -72,4 +73,6 @@ test("publier-besoin : soumission valide → écran de confirmation", async ({
     clientPhone: "514-555-0100",
     source: "landing_public",
   });
+
+  expect(consoleErrors).toEqual([]);
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Wrench } from "lucide-react";
 import {
   DEFAULT_REMOTE_CONFIG,
   parseRemoteConfig,
@@ -39,8 +40,8 @@ export function MaintenanceGate({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-workon-bg px-6 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-workon-primary-subtle text-3xl">
-        🔧
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-workon-primary-subtle text-workon-primary">
+        <Wrench className="h-7 w-7" />
       </div>
       <h1 className="font-heading text-2xl font-bold text-workon-ink">
         Maintenance en cours

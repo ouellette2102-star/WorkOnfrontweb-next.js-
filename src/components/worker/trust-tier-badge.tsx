@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
  *            "À vérifier" pill — used on the user's OWN profile so they
  *            see they haven't completed phone OTP yet. Never surface
  *            BASIC publicly (stigmatizes unverified users).
- * VERIFIED → ✓ Vérifié       (terracotta)
- * TRUSTED  → 🛡 De confiance (green)
- * PREMIUM  → 👑 Top Performer (gold)
+ * VERIFIED → Vérifié      (bleu)
+ * TRUSTED  → De confiance (vert)
+ * PREMIUM  → Top Performer (marine) — rouge réservé à l'action
  */
 
 export type TrustTier = "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
@@ -29,7 +29,7 @@ const TIER_CONFIG: Record<
   VERIFIED: {
     icon: CheckCircle2,
     label: "Vérifié",
-    className: "bg-workon-accent text-white",
+    className: "bg-workon-gold text-white",
   },
   TRUSTED: {
     icon: ShieldCheck,
@@ -39,7 +39,7 @@ const TIER_CONFIG: Record<
   PREMIUM: {
     icon: Crown,
     label: "Top Performer",
-    className: "bg-gradient-to-r from-[#D4922A] to-[#B8771F] text-white",
+    className: "bg-workon-ink text-white",
   },
 };
 

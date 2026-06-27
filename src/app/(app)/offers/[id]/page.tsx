@@ -13,7 +13,6 @@ import {
   XCircle,
   User,
   MapPin,
-  Calendar,
   DollarSign,
 } from "lucide-react";
 import Link from "next/link";
@@ -141,7 +140,7 @@ export default function OfferDetailPage() {
             <div className="mt-2 flex flex-wrap gap-3 text-xs text-workon-muted">
               {offer.mission.category && (
                 <span className="flex items-center gap-1">
-                  🏷️ {offer.mission.category}
+                  {offer.mission.category}
                 </span>
               )}
               {offer.mission.city && (

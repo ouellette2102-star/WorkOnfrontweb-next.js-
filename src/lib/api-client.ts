@@ -324,11 +324,66 @@ export interface InvoicePreview {
 export interface ContractResponse {
   id: string;
   missionId: string | null;
+  employerId: string | null;
+  workerId: string | null;
   localMissionId: string | null;
+  localEmployerId: string | null;
+  localWorkerId: string | null;
   status: "DRAFT" | "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED" | "CANCELLED";
-  terms: string | null;
+  amount: number;
+  hourlyRate: number | null;
+  startAt: string | null;
+  endAt: string | null;
+  signedByWorker: boolean;
+  signedByEmployer: boolean;
+  terms?: string | null;
   createdAt: string;
   updatedAt: string;
+  mission?: {
+    id: string;
+    title: string;
+  } | null;
+  employer?: {
+    id: string;
+    clerkId: string;
+  } | null;
+  worker?: {
+    id: string;
+    clerkId: string;
+  } | null;
+  localMission?: {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    status: string;
+    price: number;
+    city: string;
+    address: string | null;
+    durationMinutes: number | null;
+    materialProvided: boolean | null;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  localEmployer?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    city: string | null;
+    pictureUrl: string | null;
+    businessName: string | null;
+  } | null;
+  localWorker?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    city: string | null;
+    pictureUrl: string | null;
+    jobTitle: string | null;
+    hourlyRate: number | null;
+    ratingAverage: number | null;
+    reviewCount: number;
+  } | null;
 }
 
 export interface DisputeResponse {
@@ -685,6 +740,9 @@ export const api = {
   getMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}`),
 
   acceptMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/accept`, { method: "POST" }),
+  /** Client reserves a specific worker for their own open mission (open -> assigned + PENDING contract). */
+  reserveWorker: (missionId: string, workerId: string) =>
+    apiFetch<MissionResponse>(`/missions-local/${missionId}/reserve`, { method: "POST", body: JSON.stringify({ workerId }) }),
   startMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/start`, { method: "POST" }),
   completeMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/complete`, { method: "POST" }),
   cancelMission: (id: string) => apiFetch<MissionResponse>(`/missions-local/${id}/cancel`, { method: "POST" }),
@@ -1363,12 +1421,14 @@ export const api = {
   // legacy `ProfileResponse` shape that the consuming hook expects, so
   // no caller code has to change.
   //
-  // Known limitation: PATCH `/users/me` does NOT accept the `role`
-  // field (validation rejects it: "property role should not exist").
-  // Role updates therefore silently no-op here. This matches the
-  // pre-fix behavior (the old `/profile/me` 404 also dropped role
-  // updates) and is documented so the next PR that adds role updates
-  // can target the correct backend endpoint when it ships.
+  // Note on roles: the backend `role` (set at signup) is immutable here —
+  // PATCH `/users/me` silently ignores a `role` field. That is BY DESIGN
+  // under the dual-capability model: a single account can both hire and
+  // work, so the Pro/Client experience is chosen at runtime via the
+  // `mode-context` "acting-as" toggle (localStorage), NOT by mutating the
+  // role. Backend mission actions now authorize on ownership/capability,
+  // not a locked role (see missions-local.service), so the locked role no
+  // longer blocks acting as a client.
   fetchProfile: async () => {
     const raw = await apiFetch<unknown>("/users/me");
     const u = parseResponse(userMeSchema, raw, "GET /users/me");

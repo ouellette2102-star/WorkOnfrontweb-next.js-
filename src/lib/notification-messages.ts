@@ -13,7 +13,6 @@ export type StatusChangeInfo = {
     label: string;
     href: string;
   };
-  icon: string;
   variant: "info" | "success" | "warning" | "error";
 };
 
@@ -42,7 +41,6 @@ export function getMissionStatusMessage(
           title: "Mission réservée !",
           message: `Vous avez réservé ${title}. Préparez-vous pour le jour J.`,
           action: { label: "Voir la mission", href: `/missions/${missionId}` },
-          icon: "🎯",
           variant: "success",
         };
 
@@ -51,7 +49,6 @@ export function getMissionStatusMessage(
           title: "Mission en cours",
           message: `${title} est maintenant en cours. Bon travail !`,
           action: { label: "Ouvrir le chat", href: `/missions/${missionId}/chat` },
-          icon: "🚀",
           variant: "info",
         };
 
@@ -60,7 +57,6 @@ export function getMissionStatusMessage(
           title: "Mission terminée !",
           message: `${title} est complétée. Le paiement sera bientôt traité.`,
           action: { label: "Voir les détails", href: `/missions/${missionId}` },
-          icon: "✅",
           variant: "success",
         };
 
@@ -69,7 +65,6 @@ export function getMissionStatusMessage(
           title: "Mission annulée",
           message: `${title} a été annulée par le client.`,
           action: { label: "Voir d'autres missions", href: "/missions/available" },
-          icon: "❌",
           variant: "warning",
         };
 
@@ -77,7 +72,6 @@ export function getMissionStatusMessage(
         return {
           title: "Statut mis à jour",
           message: `${title} : ${fromStatus ?? "?"} → ${toStatus}`,
-          icon: "📋",
           variant: "info",
         };
     }
@@ -90,7 +84,6 @@ export function getMissionStatusMessage(
         title: "Un worker a réservé !",
         message: `${title} vient d'être réservée. Contactez-le pour confirmer.`,
         action: { label: "Ouvrir le chat", href: `/missions/${missionId}/chat` },
-        icon: "🙋",
         variant: "success",
       };
 
@@ -99,7 +92,6 @@ export function getMissionStatusMessage(
         title: "Travail en cours",
         message: `Le worker a commencé ${title}.`,
         action: { label: "Suivre la mission", href: `/missions/${missionId}` },
-        icon: "⚡",
         variant: "info",
       };
 
@@ -108,7 +100,6 @@ export function getMissionStatusMessage(
         title: "Mission terminée !",
         message: `${title} est complétée. Procédez au paiement et laissez un avis.`,
         action: { label: "Payer & évaluer", href: `/missions/${missionId}/pay` },
-        icon: "🎉",
         variant: "success",
       };
 
@@ -116,7 +107,6 @@ export function getMissionStatusMessage(
       return {
         title: "Mission annulée",
         message: `${title} a été annulée.`,
-        icon: "🚫",
         variant: "warning",
       };
 
@@ -124,7 +114,6 @@ export function getMissionStatusMessage(
       return {
         title: "Statut mis à jour",
         message: `${title} : ${fromStatus ?? "?"} → ${toStatus}`,
-        icon: "📋",
         variant: "info",
       };
   }
@@ -143,31 +132,31 @@ export function getNotificationShortMessage(
 
   switch (type) {
     case NotificationType.NEW_MESSAGE:
-      return `💬 Nouveau message sur "${title}"`;
+      return `Nouveau message sur "${title}"`;
 
     case NotificationType.MISSION_STATUS_CHANGED:
       if (statusAfter === MissionStatus.COMPLETED) {
-        return `✅ "${title}" est terminée — laissez un avis`;
+        return `"${title}" est terminée — laissez un avis`;
       }
       if (statusAfter === MissionStatus.RESERVED) {
-        return `🎯 "${title}" a été réservée`;
+        return `"${title}" a été réservée`;
       }
       if (statusAfter === MissionStatus.IN_PROGRESS) {
-        return `🚀 "${title}" est en cours`;
+        return `"${title}" est en cours`;
       }
       if (statusAfter === MissionStatus.CANCELLED) {
-        return `❌ "${title}" a été annulée`;
+        return `"${title}" a été annulée`;
       }
-      return `📋 "${title}" : ${statusBefore ?? "?"} → ${statusAfter ?? "?"}`;
+      return `"${title}" : ${statusBefore ?? "?"} → ${statusAfter ?? "?"}`;
 
     case NotificationType.MISSION_TIME_EVENT:
       if (statusBefore === "CHECK_IN") {
-        return `⏰ Le worker s'est enregistré sur "${title}"`;
+        return `Le worker s'est enregistré sur "${title}"`;
       }
       if (statusBefore === "CHECK_OUT") {
-        return `⏱️ Le worker a terminé sur "${title}"`;
+        return `Le worker a terminé sur "${title}"`;
       }
-      return `⏰ Événement temps sur "${title}"`;
+      return `Événement temps sur "${title}"`;
 
     default:
       return "Nouvelle notification";
@@ -190,6 +179,3 @@ export function getVariantStyles(variant: StatusChangeInfo["variant"]): string {
       return "bg-blue-500/10 border-blue-500/20 text-blue-400";
   }
 }
-
-
-

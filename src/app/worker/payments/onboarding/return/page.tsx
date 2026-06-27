@@ -6,6 +6,7 @@ import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { getOnboardingStatus } from "@/lib/stripe-api";
 import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
 
 export default function StripeOnboardingReturnPage() {
   const router = useRouter();
@@ -54,7 +55,6 @@ export default function StripeOnboardingReturnPage() {
       <div className="max-w-md rounded-3xl border border-workon-border bg-workon-bg/70 p-8 text-center backdrop-blur">
         {isOnboarded ? (
           <>
-            <div className="mb-4 text-6xl">🎉</div>
             <h1 className="mb-3 text-3xl font-bold text-workon-ink">
               Onboarding complété !
             </h1>
@@ -71,7 +71,7 @@ export default function StripeOnboardingReturnPage() {
           </>
         ) : (
           <>
-            <div className="mb-4 text-6xl">⚠️</div>
+            <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-workon-accent" />
             <h1 className="mb-3 text-3xl font-bold text-workon-ink">
               Onboarding incomplet
             </h1>

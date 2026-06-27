@@ -193,7 +193,7 @@ export default async function WorkerProfilePage({ params }: { params: Promise<{ 
                   {worker.firstName} {worker.lastName[0]}.
                 </h1>
                 {worker.city && (
-                  <p className="text-workon-gray text-sm mt-0.5">📍 {worker.city}</p>
+                  <p className="text-workon-gray text-sm mt-0.5">{worker.city}</p>
                 )}
               </div>
               {isVerified && (

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { MessageCircle } from "lucide-react";
 import type { Message } from "@/types/mission-chat";
 import { MessageBubble } from "./message-bubble";
 
@@ -19,7 +20,7 @@ export function MessageList({ messages, currentUserId }: MessageListProps) {
     return (
       <div className="flex h-full items-center justify-center p-12 text-center">
         <div>
-          <div className="mb-4 text-5xl">💬</div>
+          <MessageCircle className="mx-auto mb-4 h-12 w-12 text-white/30" />
           <p className="text-white/70">
             Aucun message pour l&apos;instant. Commencez la conversation !
           </p>
