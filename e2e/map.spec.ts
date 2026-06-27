@@ -63,6 +63,17 @@ async function setupAuth(page: Page, context: BrowserContext) {
       localStorage.setItem("cookie-consent", "accepted");
     } catch {}
   }, USER);
+
+  // Mocke l'appel best-effort device-registration (POST /devices) — sinon il
+  // tape le backend absent. Mock CIBLÉ (pas un catch-all : un catch-all 200 {}
+  // casse les calls shell qui attendent une vraie shape).
+  await page.route("**/api/workon/devices", (r) =>
+    r.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ id: "dev_e2e", deviceId: "e2e", platform: "web" }),
+    }),
+  );
   await page.route("**/api/auth/me", (r) =>
     r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(USER) }),
   );

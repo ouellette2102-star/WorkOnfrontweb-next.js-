@@ -3,14 +3,21 @@ import AxeBuilder from "@axe-core/playwright";
 
 /**
  * Audit a11y runtime (axe-core) réutilisable sur une page déjà rendue.
- * Logue TOUTES les violations (`[A11Y] <label>: …`) pour l'audit, et
- * échoue uniquement sur les violations `critical` (vrais bloquants) — les
- * `serious`/`moderate` sont surfacés sans bloquer le lancement gelé.
+ * Logue TOUTES les violations, et ÉCHOUE sur toute violation `critical` ou
+ * `serious` dont l'id n'est PAS dans `baseline` (dette a11y connue, tolérée).
  *
- * WCAG 2.0 A/AA + 2.1 AA. Appeler après que le contenu principal de la page
- * est visible.
+ * → Page à 0 violation (baseline vide) = garde TOUT : reverter un fix de
+ *   contraste/aria réintroduit une violation `serious` → la CI échoue.
+ * → Page avec dette connue = tolère ses ids baselinés mais échoue sur toute
+ *   NOUVELLE violation (nouveau type, ou `critical`).
+ *
+ * WCAG 2.0 A/AA + 2.1 AA. Appeler après que le contenu principal est visible.
  */
-export async function auditA11y(page: Page, label: string): Promise<void> {
+export async function auditA11y(
+  page: Page,
+  label: string,
+  baseline: string[] = [],
+): Promise<void> {
   const res = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
     .analyze();
@@ -19,9 +26,15 @@ export async function auditA11y(page: Page, label: string): Promise<void> {
     res.violations.map((v) => `${v.impact}:${v.id}(${v.nodes.length})`).join(" · ") ||
       "aucune violation",
   );
-  const critical = res.violations.filter((v) => v.impact === "critical");
+  const blocking = res.violations.filter(
+    (v) =>
+      (v.impact === "critical" || v.impact === "serious") &&
+      !baseline.includes(v.id),
+  );
   expect(
-    critical,
-    `Violations a11y critiques (${label}) : ${critical.map((v) => v.id).join(", ")}`,
+    blocking,
+    `Violations a11y bloquantes (${label}) : ${blocking
+      .map((v) => `${v.impact}:${v.id}`)
+      .join(", ")} — hors baseline [${baseline.join(", ")}]`,
   ).toEqual([]);
 }
