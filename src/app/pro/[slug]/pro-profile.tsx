@@ -25,6 +25,8 @@ interface ProData {
   completionScore: number | null;
   slug: string;
   verified: boolean;
+  ratingAverage: number | null;
+  reviewCount: number;
   memberSince: string;
   demandCount: number;
   gallery: GalleryItem[];
@@ -150,6 +152,21 @@ export function ProProfile({ pro }: { pro: ProData }) {
               <p className="text-workon-accent font-medium text-lg">
                 {categoryLabel}
               </p>
+              {/* Reputation under the name — the booking decision point.
+                  A new pro reads "Nouveau pro", never a misleading 0★. */}
+              {pro.reviewCount > 0 && pro.ratingAverage !== null ? (
+                <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A1A2E]">
+                  <span className="text-amber-400">★</span>
+                  {pro.ratingAverage.toFixed(1)}
+                  <span className="font-normal text-gray-400">
+                    ({pro.reviewCount} avis)
+                  </span>
+                </p>
+              ) : (
+                <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-workon-accent">
+                  <span>★</span> Nouveau pro
+                </p>
+              )}
               {pro.city && (
                 <p className="text-gray-400 mt-1">{pro.city}</p>
               )}

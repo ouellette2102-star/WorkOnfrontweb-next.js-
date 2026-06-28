@@ -38,6 +38,8 @@ interface ProData {
   completionScore: number | null;
   slug: string;
   verified: boolean;
+  ratingAverage: number | null;
+  reviewCount: number;
   memberSince: string;
   demandCount: number;
   gallery: GalleryItem[];
@@ -160,6 +162,18 @@ export default async function ProPage({
           geoRadius: `${pro.serviceRadiusKm} km`,
         }
       : undefined,
+    // Rich-snippet stars in Google search results — only emitted once
+    // there's a real review, so we never publish a fabricated rating.
+    aggregateRating:
+      pro.reviewCount > 0 && pro.ratingAverage !== null
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: pro.ratingAverage.toFixed(1),
+            reviewCount: pro.reviewCount,
+            bestRating: "5",
+            worstRating: "1",
+          }
+        : undefined,
   };
 
   return (

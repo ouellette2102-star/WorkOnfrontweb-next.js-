@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { MarketingHeader } from "@/components/navigation/marketing-header";
 import { getProsList, type ProListItem } from "@/lib/public-api";
-import { ShieldCheck, MapPin, Search } from "lucide-react";
+import { ShieldCheck, MapPin, Search, Star } from "lucide-react";
 
 /**
  * /pros — Browsable list of pros (clients can discover and book).
@@ -108,6 +108,22 @@ function ProCard({ pro }: { pro: ProListItem }) {
           </p>
         ) : null}
         <div className="flex items-center gap-3 text-xs text-workon-gray">
+          {/* Reputation at the point of choice. A new pro shows "Nouveau"
+              rather than an empty/0★ that would read as "badly rated". */}
+          {pro.reviewCount > 0 && pro.ratingAverage !== null ? (
+            <span className="inline-flex items-center gap-1 font-medium text-workon-ink">
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+              {pro.ratingAverage.toFixed(1)}
+              <span className="font-normal text-workon-gray">
+                ({pro.reviewCount})
+              </span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-workon-accent">
+              <Star className="h-3 w-3" />
+              Nouveau
+            </span>
+          )}
           {pro.city && (
             <span className="inline-flex items-center gap-1">
               <MapPin className="h-3 w-3" />
