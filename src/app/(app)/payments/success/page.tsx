@@ -5,7 +5,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, ArrowRight, AlertTriangle, RefreshCw, XCircle } from "lucide-react";
-import { api } from "@/lib/api-client";
+import { api, type InvoiceResponse } from "@/lib/api-client";
 import { trackEvent } from "@/lib/analytics";
 
 type Status = "loading" | "confirmed" | "pending" | "failed" | "no-session";
@@ -13,15 +13,35 @@ type Status = "loading" | "confirmed" | "pending" | "failed" | "no-session";
 // ~30s total: 1.5s, 2s, 2.5s, 3s, 4s, 5s, 6s, 6s, 6s, 6s
 const POLL_DELAYS_MS = [1500, 2000, 2500, 3000, 4000, 5000, 6000, 6000, 6000, 6000];
 
+function formatAmount(value: number, currency: string): string {
+  return new Intl.NumberFormat("fr-CA", { style: "currency", currency }).format(
+    value,
+  );
+}
+
 function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const invoiceId = searchParams.get("invoice_id");
 
   const [status, setStatus] = useState<Status>("loading");
+  const [invoice, setInvoice] = useState<InvoiceResponse | null>(null);
+  const [downloading, setDownloading] = useState(false);
   const cancelledRef = useRef(false);
   const retryKeyRef = useRef(0);
   const trackedRef = useRef(false);
+
+  const handleDownloadPdf = async () => {
+    if (!invoiceId) return;
+    setDownloading(true);
+    try {
+      await api.downloadInvoicePdf(invoiceId);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Téléchargement échoué");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const poll = useCallback(async () => {
     if (!sessionId) {
@@ -40,6 +60,7 @@ function SuccessContent() {
         if (invoiceId) {
           const inv = await api.getInvoice(invoiceId);
           if (inv.status === "PAID") {
+            setInvoice(inv);
             setStatus("confirmed");
             return;
           }
@@ -126,9 +147,45 @@ function SuccessContent() {
               <h1 className="mb-2 text-2xl font-bold text-workon-ink">
                 Paiement confirmé !
               </h1>
-              <p className="mb-6 text-base text-workon-muted">
-                Ton paiement a été reçu. Tu peux consulter ton reçu en tout temps.
-              </p>
+              {invoice ? (
+                <>
+                  <p className="mb-4 text-base text-workon-muted">
+                    Facture{" "}
+                    <span className="font-mono">
+                      {invoice.invoiceNumber ?? ""}
+                    </span>{" "}
+                    — ton reçu arrive aussi par courriel.
+                  </p>
+                  <div className="mb-6 rounded-2xl border border-workon-border bg-workon-bg p-4 text-left text-sm">
+                    <div className="flex justify-between py-1">
+                      <span className="text-workon-muted">Sous-total</span>
+                      <span className="text-workon-ink">
+                        {formatAmount(invoice.subtotal, invoice.currency)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-workon-muted">Frais + taxes</span>
+                      <span className="text-workon-ink">
+                        {formatAmount(
+                          invoice.platformFee + invoice.taxes,
+                          invoice.currency,
+                        )}
+                      </span>
+                    </div>
+                    <div className="mt-1 flex justify-between border-t border-workon-border pt-2 text-base font-bold">
+                      <span className="text-workon-ink">Total payé</span>
+                      <span className="text-green-600">
+                        {formatAmount(invoice.total, invoice.currency)}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="mb-6 text-base text-workon-muted">
+                  Ton paiement a été reçu. Tu peux consulter ton reçu en tout
+                  temps.
+                </p>
+              )}
             </>
           )}
 
@@ -185,8 +242,20 @@ function SuccessContent() {
                 </Button>
               )}
 
+              {status === "confirmed" && invoiceId && (
+                <Button
+                  onClick={handleDownloadPdf}
+                  disabled={downloading}
+                  className="w-full"
+                >
+                  {downloading
+                    ? "Génération…"
+                    : "Télécharger la facture (PDF)"}
+                </Button>
+              )}
+
               {(status === "confirmed" || status === "pending") && (
-                <Button asChild className="w-full">
+                <Button asChild className="w-full" variant="secondary">
                   <Link href="/receipts" className="inline-flex items-center justify-center gap-2">
                     Voir mes reçus
                     <ArrowRight className="h-4 w-4" />
