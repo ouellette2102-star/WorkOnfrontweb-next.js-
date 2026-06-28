@@ -250,7 +250,11 @@ export default function SwipePage() {
       </header>
 
       {!current ? (
-        <EmptySwipeState hasAnyMatch={hasAnyMatch} matchCount={matchCount} />
+        <EmptySwipeState
+          hasAnyMatch={hasAnyMatch}
+          matchCount={matchCount}
+          coldStart={(candidates?.length ?? 0) === 0}
+        />
       ) : (
         <>
           <section className="workon-premium-card rounded-[24px] p-4">
@@ -736,9 +740,11 @@ function StackPreview({ candidate }: { candidate: SwipeCandidate }) {
 function EmptySwipeState({
   hasAnyMatch,
   matchCount,
+  coldStart,
 }: {
   hasAnyMatch: boolean;
   matchCount: number;
+  coldStart: boolean;
 }) {
   return (
     <div className="rounded-[28px] border border-workon-border bg-white p-8 text-center shadow-card">
@@ -746,11 +752,14 @@ function EmptySwipeState({
         <Heart className="h-8 w-8" />
       </div>
       <h3 className="mt-4 font-heading text-xl font-bold text-workon-ink">
-        Tous les profils sont parcourus.
+        {coldStart
+          ? "Aucun pro disponible près de toi pour l'instant"
+          : "Tous les profils sont parcourus."}
       </h3>
       <p className="mt-2 text-sm leading-relaxed text-workon-muted">
-        Reviens plus tard : la pile se met à jour avec les nouvelles missions,
-        clients et pros admissibles.
+        {coldStart
+          ? "La communauté grandit vite — reviens bientôt, de nouveaux pros et missions arrivent près de chez toi."
+          : "Reviens plus tard : la pile se met à jour avec les nouvelles missions, clients et pros admissibles."}
       </p>
       {hasAnyMatch ? (
         <Link
