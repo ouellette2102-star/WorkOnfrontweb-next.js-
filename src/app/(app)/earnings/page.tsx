@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -578,6 +578,18 @@ function PaymentFallbackRow({ payment }: { payment: WorkerPayment }) {
   const StatusIcon = status.icon;
   const currency = payment.currency || "CAD";
 
+  const [downloadingStatement, setDownloadingStatement] = useState(false);
+  const handleDownloadStatement = async () => {
+    setDownloadingStatement(true);
+    try {
+      await api.downloadWorkerStatementPdf(payment.id);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Téléchargement échoué");
+    } finally {
+      setDownloadingStatement(false);
+    }
+  };
+
   return (
     <article className="rounded-2xl border border-workon-border bg-white p-4 transition hover:border-workon-primary/30 hover:shadow-sm">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -613,6 +625,21 @@ function PaymentFallbackRow({ payment }: { payment: WorkerPayment }) {
           <PaymentFact label="Net" value={formatCAD(payment.netAmountCents, currency)} highlight />
         </div>
       </div>
+
+      {payment.invoiceNumber && (
+        <div className="mt-3 border-t border-workon-border pt-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadStatement}
+            disabled={downloadingStatement}
+            className="text-workon-ink"
+          >
+            <FileText className="h-4 w-4" />
+            {downloadingStatement ? "Génération…" : "Télécharger le relevé (PDF)"}
+          </Button>
+        </div>
+      )}
     </article>
   );
 }
