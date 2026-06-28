@@ -4,32 +4,52 @@
   /* ============================================================
    * WorkOn brand palette — Convergence (Emergent → Next.js)
    * ============================================================
-   * Identité RedPhone (2026-06-17) :
+   * Identité RedPhone — alignée sur le LOGO officiel (2026-06-28) :
    *   Background: #F7F8FB (clair froid)
    *   Text/Ink:  #0E1B2A (marine profond)
-   *   Primary:   #C42417 (rouge RedPhone — action/CTA)
-   *   Accent:    #C42417 (rouge — le pin, les accents)
-   *   Dark/navy: #0B1B2E (panneaux sombres) + halo bleu #2E7DFF (confiance)
+   *   Primary:   #FF4D1C (rouge-orangé du combiné/pin du logo — action/CTA/urgence)
+   *   Accent:    #FF4D1C (le pin rouge = 2e « O »)
+   *   Dark/navy: #0B1B2E (le smartphone) + halo bleu #2E7DFF (la lueur = confiance)
    *   Gray:      #5A6B7E (gris froid)  ·  Border: #E5E9F0
    *   Vert #22C55E = succès/vérifié UNIQUEMENT.
    *
-   * Font stack: system-ui sans-serif (Cabinet Grotesk/Manrope
-   * served via next/font in layout.tsx).
+   * Le rouge n'est PAS un hex isolé : c'est une échelle sémantique d'urgence
+   * (--red-1…--red-12 ci-dessous). --red-9 = LE rouge d'action (= le logo) ;
+   * --red-11 recycle l'ancien crimson #C42417 comme rouge-texte accessible.
+   * Règle : le rouge = action/urgence UNIQUEMENT (rare = réflexe). Le reste =
+   * marine + surfaces froides. Voir WORKON_DESIGN_STRATEGY_URGENCE_2026-06-28.
+   *
+   * Font stack: Bricolage Grotesque (display) + Manrope (corps), via next/font.
    */
   --background: #F7F8FB;
   --foreground: #0E1B2A;
 
-  --workon-primary: #C42417;
-  --workon-primary-hover: #A81E12;
-  --workon-primary-subtle: rgba(196, 36, 23, 0.08);
-  --workon-primary-ring: rgba(196, 36, 23, 0.22);
+  /* ── RedPhone : échelle d'urgence sémantique 12 paliers (modèle Radix) ── */
+  --red-1:  #FFF6F3;  /* halo d'urgence très subtil (fond de zone) */
+  --red-2:  #FFEAE3;
+  --red-3:  #FFD8CB;  /* surface de badge urgence */
+  --red-4:  #FFC2AF;
+  --red-5:  #FFA88E;
+  --red-6:  #FF8A68;
+  --red-7:  #FF6E45;
+  --red-8:  #FF5A2E;
+  --red-9:  #FF4D1C;  /* LE rouge — CTA, téléphone, action (= le logo) */
+  --red-10: #E63D12;  /* hover/pressed */
+  --red-11: #C42417;  /* rouge-texte accessible sur clair (ancien primary) */
+  --red-12: #7A1610;  /* rouge profond */
+
+  --workon-primary: var(--red-9);
+  --workon-primary-hover: var(--red-10);
+  --workon-primary-subtle: rgba(255, 77, 28, 0.08);
+  --workon-primary-ring: rgba(255, 77, 28, 0.22);
 
   --workon-forest-deep: #0A1726;
   --workon-forest: #122B45;
   --workon-graphite: #0E1B2A;
   --workon-copper: #D62E22;
   --workon-copper-hover: #B5241A;
-  --workon-gold: #2E7DFF;
+  --workon-gold: #2E7DFF; /* @deprecated misnomer — c'est le bleu halo, voir --workon-halo */
+  --workon-halo: #2E7DFF; /* la lueur bleue du logo = confiance/premium */
   --workon-stone: #5A6B7E;
   --workon-stone-subtle: #CBD4E0;
   --workon-surface: #FFFFFF;
@@ -38,10 +58,10 @@
   --workon-surface-dark-soft: #14304A;
   --workon-line: rgba(14, 27, 42, 0.10);
 
-  --workon-accent: #C42417;
-  --workon-accent-hover: #A81E12;
-  --workon-accent-subtle: rgba(196, 36, 23, 0.08);
-  --workon-accent-ring: rgba(196, 36, 23, 0.22);
+  --workon-accent: var(--red-9);
+  --workon-accent-hover: var(--red-10);
+  --workon-accent-subtle: rgba(255, 77, 28, 0.08);
+  --workon-accent-ring: rgba(255, 77, 28, 0.22);
 
   --workon-ink: #0E1B2A;
   --workon-bg: #F7F8FB;
@@ -84,6 +104,43 @@
   --duration-fast: 150ms;
   --duration-standard: 300ms;
   --duration-slow: 500ms;
+
+  /* ============================================================
+   * Échelles systémiques — tuer les valeurs arbitraires
+   * (text-[11px], rounded-[28px], px hardcodés). Rythme fixe =
+   * signature « top-tier ». Réfère via var() ou bg-[var(--…)].
+   * ============================================================ */
+  --text-xs: 0.6875rem;   /* 11px — labels, méta */
+  --text-sm: 0.8125rem;   /* 13px — corps secondaire */
+  --text-base: 0.9375rem; /* 15px — corps */
+  --text-lg: 1.125rem;    /* 18px — sous-titres */
+  --text-xl: 1.5rem;      /* 24px — titres carte */
+  --text-2xl: 2rem;       /* 32px — titres écran */
+  --text-display: 2.9rem; /* hero */
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;   /* cartes app */
+  --radius-pill: 999px;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+}
+
+/* Accessibilité : respecter prefers-reduced-motion globalement —
+ * collapse les durées tokenisées pour que toute transition/animation
+ * qui les consomme devienne instantanée. (Vague 1, moteur mouvement.) */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-standard: 0ms;
+    --duration-slow: 0ms;
+  }
 }
 
 @theme inline {
