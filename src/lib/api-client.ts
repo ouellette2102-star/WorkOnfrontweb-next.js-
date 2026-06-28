@@ -324,11 +324,66 @@ export interface InvoicePreview {
 export interface ContractResponse {
   id: string;
   missionId: string | null;
+  employerId: string | null;
+  workerId: string | null;
   localMissionId: string | null;
+  localEmployerId: string | null;
+  localWorkerId: string | null;
   status: "DRAFT" | "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED" | "CANCELLED";
-  terms: string | null;
+  amount: number;
+  hourlyRate: number | null;
+  startAt: string | null;
+  endAt: string | null;
+  signedByWorker: boolean;
+  signedByEmployer: boolean;
+  terms?: string | null;
   createdAt: string;
   updatedAt: string;
+  mission?: {
+    id: string;
+    title: string;
+  } | null;
+  employer?: {
+    id: string;
+    clerkId: string;
+  } | null;
+  worker?: {
+    id: string;
+    clerkId: string;
+  } | null;
+  localMission?: {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    status: string;
+    price: number;
+    city: string;
+    address: string | null;
+    durationMinutes: number | null;
+    materialProvided: boolean | null;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  localEmployer?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    city: string | null;
+    pictureUrl: string | null;
+    businessName: string | null;
+  } | null;
+  localWorker?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    city: string | null;
+    pictureUrl: string | null;
+    jobTitle: string | null;
+    hourlyRate: number | null;
+    ratingAverage: number | null;
+    reviewCount: number;
+  } | null;
 }
 
 export interface DisputeResponse {
@@ -1004,8 +1059,11 @@ export const api = {
     apiFetch<ContractResponse>(`/contracts/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
 
   // Disputes
-  createDispute: (data: { localMissionId?: string; missionId?: string; reason: string; description: string }) =>
-    apiFetch<DisputeResponse>("/disputes", { method: "POST", body: JSON.stringify(data) }),
+  createDispute: (data: { localMissionId?: string; missionId?: string; reason: string; description?: string }) => {
+    const { description, ...payload } = data;
+    void description;
+    return apiFetch<DisputeResponse>("/disputes", { method: "POST", body: JSON.stringify(payload) });
+  },
   getDispute: (id: string) => apiFetch<DisputeResponse>(`/disputes/${id}`),
   getDisputeForMission: (missionId: string) => apiFetch<DisputeResponse>(`/disputes/mission/${missionId}`),
   /**

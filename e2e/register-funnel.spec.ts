@@ -109,9 +109,14 @@ test("inscription worker : 3 étapes → écran « profil prêt »", async ({
   // Contrat de payload — aligné sur RegisterDto backend.
   expect(registerPayload).toMatchObject({
     email: "alex.e2e@workon.test",
+    password: "Test1234!", // load-bearing : une régression qui le drop échoue
     role: "worker",
     firstName: "Alex",
     lastName: "Tremblay",
     city: "Montréal",
   });
+  // Le mot de passe doit avoir une vraie longueur (≥ 8, RegisterDto).
+  expect(
+    String((registerPayload as { password?: string }).password ?? "").length,
+  ).toBeGreaterThanOrEqual(8);
 });

@@ -13,7 +13,6 @@ import {
   XCircle,
   User,
   MapPin,
-  Calendar,
   DollarSign,
 } from "lucide-react";
 import Link from "next/link";

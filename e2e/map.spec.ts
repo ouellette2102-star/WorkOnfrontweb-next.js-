@@ -28,23 +28,35 @@ const PNG_1X1 = Buffer.from(
   "base64",
 );
 
-function pin(id: string, lat: number, lng: number) {
+// Shape alignée sur MissionMapItem (le composant DÉRIVE displayLat/Lng depuis
+// latitude/longitude — cf. mission-map.tsx). `extra` injecte boostedUntil /
+// urgentUntil pour exercer la branche « pin prioritaire » (isBoosted).
+function pin(
+  id: string,
+  lat: number,
+  lng: number,
+  extra: Record<string, unknown> = {},
+) {
   return {
     id,
     title: `Mission ${id}`,
     category: "painting",
     latitude: lat,
     longitude: lng,
-    displayLat: lat,
-    displayLng: lng,
     status: "open",
     price: 120,
     city: "Montréal",
     createdAt: "2026-06-01T00:00:00.000Z",
-    boosted: false,
+    ...extra,
   };
 }
-const MISSIONS = [pin("m1", 45.5017, -73.5673), pin("m2", 45.515, -73.56)];
+const MISSIONS = [
+  pin("m1", 45.5017, -73.5673),
+  pin("m2", 45.515, -73.56),
+  // Pin prioritaire : boostedUntil futur → isBoosted() vrai → classe
+  // `is-priority` (branche que toHaveCount seul ne couvrait pas).
+  pin("m3", 45.53, -73.55, { boostedUntil: "2030-01-01T00:00:00.000Z" }),
+];
 
 async function setupAuth(page: Page, context: BrowserContext) {
   const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
@@ -63,6 +75,17 @@ async function setupAuth(page: Page, context: BrowserContext) {
       localStorage.setItem("cookie-consent", "accepted");
     } catch {}
   }, USER);
+
+  // Mocke l'appel best-effort device-registration (POST /devices) — sinon il
+  // tape le backend absent. Mock CIBLÉ (pas un catch-all : un catch-all 200 {}
+  // casse les calls shell qui attendent une vraie shape).
+  await page.route("**/api/workon/devices", (r) =>
+    r.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ id: "dev_e2e", deviceId: "e2e", platform: "web" }),
+    }),
+  );
   await page.route("**/api/auth/me", (r) =>
     r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(USER) }),
   );
@@ -116,6 +139,8 @@ test("carte : /map monte et affiche les pins missions sans erreur console", asyn
   await expect(page.locator(".leaflet-marker-icon")).toHaveCount(MISSIONS.length, {
     timeout: 15_000,
   });
+  // Le pin boosté exerce la branche prioritaire (classe `is-priority`).
+  await expect(page.locator(".mission-pin-marker.is-priority")).toHaveCount(1);
 
   await auditA11y(page, "/map");
 

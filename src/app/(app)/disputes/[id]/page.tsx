@@ -50,9 +50,9 @@ const STATUS_CONFIG: Record<
 };
 
 const EVIDENCE_TYPES = [
-  { value: "text", label: "Note / Texte" },
-  { value: "photo", label: "Photo" },
-  { value: "document", label: "Document" },
+  { value: "OTHER", label: "Note / Texte" },
+  { value: "PHOTO", label: "Photo" },
+  { value: "DOCUMENT", label: "Document" },
 ];
 
 type EvidenceItem = {
@@ -352,7 +352,7 @@ function AddEvidenceForm({
   const [type, setType] = useState(EVIDENCE_TYPES[0].value);
   const [content, setContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const requiresFile = type === "photo" || type === "document";
+  const requiresFile = type === "PHOTO" || type === "DOCUMENT";
 
   const textSubmit = useMutation({
     mutationFn: () =>
@@ -425,7 +425,7 @@ function AddEvidenceForm({
       {requiresFile && (
         <div>
           <label className="mb-1 block text-xs font-medium text-workon-muted">
-            {type === "photo" ? "Photo (JPEG/PNG/WebP)" : "Document (PDF, image)"}
+            {type === "PHOTO" ? "Photo (JPEG/PNG/WebP)" : "Document (PDF, image)"}
           </label>
           {file ? (
             <div
@@ -466,7 +466,7 @@ function AddEvidenceForm({
                 type="file"
                 className="sr-only"
                 accept={
-                  type === "photo"
+                  type === "PHOTO"
                     ? "image/jpeg,image/png,image/webp,image/gif"
                     : "image/jpeg,image/png,image/webp,image/gif,application/pdf"
                 }

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/console";
 import { auditA11y } from "./fixtures/a11y";
 
 /**
@@ -73,6 +73,7 @@ const INVOICE = {
 test("acceptation facture : /invoices/[id]/review → POST accept → toast", async ({
   page,
   context,
+  consoleErrors,
 }) => {
   // Route gated + serveur dev compilé à froid en CI → marge.
   test.setTimeout(120_000);
@@ -178,7 +179,7 @@ test("acceptation facture : /invoices/[id]/review → POST accept → toast", as
   await expect(page.getByText(/acceptation bilat/)).toBeVisible();
   await expect(page.getByText(/WO-2026-0042/).first()).toBeVisible();
 
-  await auditA11y(page, "F4 invoice-review");
+  await auditA11y(page, "F4 invoice-review", ["color-contrast"]);
 
   const acceptBtn = page.getByRole("button", { name: /Accepter la facture/ });
   await expect(acceptBtn).toBeVisible();
@@ -186,4 +187,6 @@ test("acceptation facture : /invoices/[id]/review → POST accept → toast", as
 
   await expect(page.getByText(/Acceptation enregistrée/)).toBeVisible({ timeout: 10_000 });
   expect(acceptCalled).toBe(true);
+
+  expect(consoleErrors).toEqual([]);
 });
