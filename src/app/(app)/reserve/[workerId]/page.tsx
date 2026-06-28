@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BookingRecapCard } from "@/components/mission/booking-recap-card";
-import { PriceBreakdownCard } from "@/components/mission/price-breakdown-card";
+import { ConfirmAndPayDialog } from "@/components/payments/confirm-and-pay-dialog";
 import { cn } from "@/lib/utils";
 
 const DAY_LABELS_SHORT = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"] as const;
@@ -53,6 +53,7 @@ export default function ReservePage() {
   const [duration, setDuration] = useState(60);
   const [price, setPrice] = useState("");
   const [sendingDirect, setSendingDirect] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const { data: worker, isLoading } = useQuery({
     queryKey: ["worker", workerId],
@@ -74,7 +75,10 @@ export default function ReservePage() {
     setSendingDirect(false);
   }
 
-  async function handleBooking() {
+  // Validate first, then either open the "confirm & pay" invoice modal (a price
+  // was set → the client must accept the exact total before any Stripe redirect)
+  // or send the reservation directly (no price → nothing to charge yet).
+  function startBooking() {
     if (!scheduledDate) {
       toast.error("Veuillez sélectionner une date.");
       return;
@@ -84,6 +88,17 @@ export default function ReservePage() {
       return;
     }
 
+    if ((Number(price) || 0) > 0) {
+      setShowConfirm(true);
+    } else {
+      void submitBooking().catch(() => {});
+    }
+  }
+
+  // The money action: create the mission, reserve the pro, and (if a price was
+  // set) start Stripe checkout. Rethrows so the confirm dialog can re-enable its
+  // button on failure; on success the browser is redirected to Stripe.
+  async function submitBooking() {
     const numPrice = Number(price) || 0;
     setLoading(true);
     try {
@@ -139,6 +154,8 @@ export default function ReservePage() {
       } else {
         toast.error(msg || "Erreur lors de la réservation.");
       }
+      // Surface the failure to the confirm dialog so it re-enables its button.
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -386,11 +403,6 @@ export default function ReservePage() {
               scheduledDate={scheduledDate}
             />
 
-            {/* Full cost breakdown BEFORE the Stripe redirect — no surprise on
-                the WorkOn fee + Quebec taxes (same /payments/preview source the
-                checkout charges from). */}
-            <PriceBreakdownCard priceDollars={priceNumber} testId="reserve-pay-breakdown" />
-
             <section className="rounded-[28px] border border-workon-border bg-white p-5 shadow-sm">
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-workon-stone">
                 Protections visibles
@@ -406,11 +418,12 @@ export default function ReservePage() {
             <section className="rounded-[28px] border border-workon-border bg-white p-4 shadow-sm">
               <Button
                 type="button"
-                onClick={handleBooking}
+                onClick={startBooking}
                 variant="premium"
                 size="hero"
                 className="h-12 w-full rounded-2xl px-4"
                 disabled={loading || !canSubmit}
+                data-testid="reserve-submit-button"
               >
                 {loading ? (
                   <>
@@ -420,7 +433,7 @@ export default function ReservePage() {
                 ) : (
                   <>
                     <CalendarDays className="h-4 w-4" />
-                    {priceNumber > 0 ? "Payer le dépôt" : "Envoyer la réservation"}
+                    {priceNumber > 0 ? "Réviser et payer" : "Envoyer la réservation"}
                   </>
                 )}
               </Button>
@@ -458,6 +471,16 @@ export default function ReservePage() {
           </aside>
         </div>
       </div>
+
+      <ConfirmAndPayDialog
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+        priceDollars={priceNumber}
+        title="Confirmer et payer"
+        subtitle={`Réservation de ${fullName}. Vérifie le total exact avant la redirection Stripe.`}
+        confirmLabel="Confirmer et payer"
+        onConfirm={submitBooking}
+      />
     </div>
   );
 }

@@ -38,7 +38,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MissionPhotos } from "@/components/mission/mission-photos";
 import { MissionTimeline } from "@/components/mission/mission-timeline";
-import { PriceBreakdownCard } from "@/components/mission/price-breakdown-card";
+import { ConfirmAndPayDialog } from "@/components/payments/confirm-and-pay-dialog";
 import { ShareMissionButton } from "@/components/mission/share-mission-button";
 import { BoostCheckoutModal } from "@/components/boosts/boost-checkout-modal";
 import { formatDistanceToNow } from "date-fns";
@@ -432,49 +432,41 @@ function InlineReviewForm({
 // ---------- Pay Mission Button ----------
 
 function PayMissionButton({ missionId, price }: { missionId: string; price: number }) {
-  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const handlePay = async () => {
-    setLoading(true);
+  // The dialog shows the authoritative breakdown and only redirects on confirm.
+  // Rethrow on failure so the dialog re-enables its button (toast already shown).
+  async function handleConfirm() {
     try {
       const result = await api.createCheckoutSession(missionId);
       window.location.href = result.checkoutUrl;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur lors du paiement");
-      setLoading(false);
+      throw err;
     }
-  };
+  }
 
   return (
-    <PriceBreakdownCard priceDollars={price} testId="mission-pay-breakdown">
-      {({ preview, loading: previewLoading }) => {
-        const totalLabel = preview
-          ? `${preview.total.toFixed(2)} $`
-          : price > 0
-            ? `${price.toFixed(2)} $`
-            : "prix à confirmer";
-        return (
-          <div className="space-y-3">
-            <div className="rounded-2xl border border-workon-primary/15 bg-workon-primary-subtle p-3 text-xs leading-relaxed text-workon-ink">
-              <strong>Paiement protégé.</strong> Le total est calculé avant Stripe; la trace reste liée au dossier de mission.
-            </div>
-            <Button
-              onClick={handlePay}
-              disabled={loading || previewLoading || price <= 0}
-              className="h-12 w-full rounded-2xl bg-workon-primary font-black text-white shadow-[0_12px_28px_rgba(19,64,33,0.22)] hover:bg-workon-primary-hover"
-              data-testid="mission-pay-button"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <DollarSign className="h-4 w-4 mr-2" />
-              )}
-              Payer la mission ({totalLabel})
-            </Button>
-          </div>
-        );
-      }}
-    </PriceBreakdownCard>
+    <>
+      <Button
+        onClick={() => setOpen(true)}
+        disabled={price <= 0}
+        className="h-12 w-full rounded-2xl bg-workon-primary font-black text-white shadow-[0_12px_28px_rgba(19,64,33,0.22)] hover:bg-workon-primary-hover"
+        data-testid="mission-pay-button"
+      >
+        <DollarSign className="h-4 w-4 mr-2" />
+        Payer la mission
+      </Button>
+      <ConfirmAndPayDialog
+        open={open}
+        onOpenChange={setOpen}
+        priceDollars={price}
+        title="Payer la mission"
+        subtitle="Le travailleur a terminé. Vérifie le total avant de libérer les fonds."
+        confirmLabel="Confirmer et payer"
+        onConfirm={handleConfirm}
+      />
+    </>
   );
 }
 
