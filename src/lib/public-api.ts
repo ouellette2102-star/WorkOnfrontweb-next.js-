@@ -257,6 +257,10 @@ export interface ProListItem {
   trustTier: "BASIC" | "VERIFIED" | "TRUSTED" | "PREMIUM";
   verified: boolean;
   completionScore: number | null;
+  /** Average review rating (1–5), or null until the first review lands. */
+  ratingAverage: number | null;
+  /** Number of reviews behind ratingAverage. 0 for a brand-new pro. */
+  reviewCount: number;
   memberSince: string;
 }
 
