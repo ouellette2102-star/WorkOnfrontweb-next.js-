@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getFeaturedWorkers } from "@/lib/public-api";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * Dynamic sitemap.
@@ -17,10 +18,7 @@ import { getFeaturedWorkers } from "@/lib/public-api";
 export const revalidate = 600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.NEXT_PUBLIC_APP_URL ??
-    "https://workonapp.vercel.app";
+  const baseUrl = SITE_URL;
 
   const now = new Date();
 

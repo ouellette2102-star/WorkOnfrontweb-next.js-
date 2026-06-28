@@ -135,7 +135,7 @@ export async function GET(req: NextRequest) {
               fontWeight: 500,
             }}
           >
-            workon.ca
+            workonapp.ca
           </div>
         </div>
       ),
@@ -344,7 +344,7 @@ export async function GET(req: NextRequest) {
               fontWeight: 500,
             }}
           >
-            <div>Réserver sur workon.ca</div>
+            <div>Réserver sur workonapp.ca</div>
             <div style={{ color: ACCENT_RED, fontWeight: 700 }}>
               Pro vérifié WorkOn
             </div>
