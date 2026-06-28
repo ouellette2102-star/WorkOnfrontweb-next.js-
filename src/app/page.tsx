@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HomeStructuredData } from "@/components/seo/home-structured-data";
 import {
   Phone,
   MapPin,
@@ -666,6 +667,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-workon-surface-dark text-white">
+      <HomeStructuredData />
       <SiteHeader />
       <Hero />
       <ProblemSection />

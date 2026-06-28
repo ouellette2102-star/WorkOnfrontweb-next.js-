@@ -4,6 +4,7 @@ import { Providers } from "@/components/providers";
 import { MaintenanceGate } from "@/components/remote-config/maintenance-gate";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "sonner";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -25,11 +26,9 @@ const bricolage = Bricolage_Grotesque({
   weight: ["500", "600", "700", "800"],
 });
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://workonapp.vercel.app";
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: "WorkOn — Une ligne directe vers le travail instantané",
   description:
     "Marketplace qui connecte clients et professionnels vérifiés. Réservez en 1 tap, paiement sécurisé par Stripe.",

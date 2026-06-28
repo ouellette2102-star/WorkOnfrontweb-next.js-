@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProProfile } from "./pro-profile";
+import { SITE_URL } from "@/lib/site";
 
 // Disable ISR/SSG for this route. We hit the cache-poisoning trap in
 // PR #224: notFound() pinned the 404 page in ISR for hours after the
@@ -114,12 +115,12 @@ export async function generateMetadata({
       title,
       description,
       type: "profile",
-      url: `https://workon.app/pro/${slug}`,
+      url: `${SITE_URL}/pro/${slug}`,
       images: pro.pictureUrl ? [{ url: pro.pictureUrl }] : [],
       siteName: "WorkOn",
     },
     alternates: {
-      canonical: `https://workon.app/pro/${slug}`,
+      canonical: `${SITE_URL}/pro/${slug}`,
     },
   };
 }
@@ -144,7 +145,7 @@ export default async function ProPage({
     "@type": "LocalBusiness",
     name: pro.fullName,
     description: pro.bio || `${categoryLabel} à ${pro.city || "Québec"}`,
-    url: `https://workon.app/pro/${slug}`,
+    url: `${SITE_URL}/pro/${slug}`,
     image: pro.pictureUrl || undefined,
     address: pro.city
       ? {
