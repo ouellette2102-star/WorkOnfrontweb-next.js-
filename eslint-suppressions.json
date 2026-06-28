@@ -9,11 +9,6 @@
       "count": 5
     }
   },
-  "src/app/(app)/disputes/page.tsx": {
-    "jsx-a11y/label-has-associated-control": {
-      "count": 3
-    }
-  },
   "src/app/(app)/express/page.tsx": {
     "jsx-a11y/label-has-associated-control": {
       "count": 4
