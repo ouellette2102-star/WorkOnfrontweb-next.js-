@@ -14,7 +14,6 @@ import {
 import { QC_COMBINED_TAX_PCT, formatCAD } from "@/lib/tax";
 
 const PLATFORM_FEE_PCT = 15;
-const DEPOSIT_PCT = 50;
 
 export function BookingRecapCard({
   workerName,
@@ -34,10 +33,13 @@ export function BookingRecapCard({
   const base = Math.max(0, priceCad);
   const platformFee = roundMoney(base * (PLATFORM_FEE_PCT / 100));
   const taxes = roundMoney(base * (QC_COMBINED_TAX_PCT / 100));
-  const totalClient = roundMoney(base + taxes);
-  const deposit = roundMoney(totalClient * (DEPOSIT_PCT / 100));
-  const balanceDue = roundMoney(totalClient - deposit);
-  const workerReceives = roundMoney(Math.max(0, base - platformFee));
+  // The client is charged the full amount up front via /payments/checkout:
+  // service + WorkOn fee (on top) + taxes on the service. This mirrors the live
+  // /payments/preview and the real Stripe charge — there is no partial deposit.
+  const totalClient = roundMoney(base + platformFee + taxes);
+  // The pro receives the full service price; the 15% fee is paid on top by the
+  // client, never deducted from the pro.
+  const workerReceives = base;
 
   const durationLabel =
     durationMinutes >= 60
@@ -61,7 +63,7 @@ export function BookingRecapCard({
               Contrat et paiement
             </p>
             <p className="mt-1 font-heading text-xl font-bold text-workon-ink">
-              {base > 0 ? "Dépôt protégé" : "Cadre prêt"}
+              {base > 0 ? "Paiement protégé" : "Cadre prêt"}
             </p>
           </div>
           <div className="rounded-2xl bg-workon-primary-subtle p-2 text-workon-primary">
@@ -108,22 +110,18 @@ export function BookingRecapCard({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-bold text-workon-primary">
-                  Dépôt maintenant ({DEPOSIT_PCT}%)
+                  Total à payer maintenant
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-workon-muted">
-                  Retenu par Stripe pendant la confirmation de la mission.
+                  Retenu par Stripe en escrow, libéré au pro à la fin de la mission.
                 </p>
               </div>
               <p className="font-heading text-2xl font-bold text-workon-primary">
-                {formatCAD(deposit)}
+                {formatCAD(totalClient)}
               </p>
             </div>
             <div className="mt-3 border-t border-workon-primary/20 pt-3 text-xs text-workon-muted">
               <div className="flex items-center justify-between gap-3">
-                <span>Solde à la complétion</span>
-                <span className="font-bold text-workon-ink">{formatCAD(balanceDue)}</span>
-              </div>
-              <div className="mt-1 flex items-center justify-between gap-3">
                 <span>Net pro estimé</span>
                 <span className="font-bold text-workon-ink">{formatCAD(workerReceives)}</span>
               </div>
@@ -136,9 +134,9 @@ export function BookingRecapCard({
             <div className="flex items-start gap-3">
               <WalletCards className="mt-0.5 h-5 w-5 shrink-0 text-workon-primary" />
               <div>
-                <p className="font-bold text-workon-ink">Aucun dépôt calculé pour le moment.</p>
+                <p className="font-bold text-workon-ink">Aucun montant calculé pour le moment.</p>
                 <p className="mt-1 text-sm leading-relaxed text-workon-muted">
-                  Entre un prix pour afficher le dépôt, les taxes et le total estimé avant de confirmer.
+                  Entre un prix pour afficher les frais, les taxes et le total à payer avant de confirmer.
                 </p>
               </div>
             </div>
@@ -182,7 +180,7 @@ export function BookingRecapCard({
 
       <div className="flex items-center gap-2 border-t border-workon-border bg-white px-5 py-4 text-[11px] font-semibold text-workon-muted">
         <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-workon-primary" />
-        En confirmant, tu autorises la création de la réservation et la redirection Stripe si un dépôt est requis.
+        En confirmant, tu autorises la création de la réservation et la redirection Stripe si un paiement est requis.
       </div>
     </div>
   );
