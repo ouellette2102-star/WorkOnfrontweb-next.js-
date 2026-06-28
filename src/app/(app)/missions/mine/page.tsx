@@ -166,7 +166,7 @@ export default function MyMissionsPage() {
             <ClipboardList className="h-6 w-6 text-workon-muted" />
           </div>
           <p className="text-sm text-workon-muted">{emptyMessages[tab]}</p>
-          {isEmployer && tab === "active" && (
+          {isEmployer ? (
             <Link href="/missions/new">
               <Button
                 variant="default"
@@ -174,6 +174,15 @@ export default function MyMissionsPage() {
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Créer une mission
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/missions">
+              <Button
+                variant="default"
+                className="mt-2 bg-workon-primary hover:bg-workon-primary-hover text-white rounded-xl"
+              >
+                Trouver une mission
               </Button>
             </Link>
           )}

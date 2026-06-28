@@ -752,13 +752,21 @@ function EmptySwipeState({
         Reviens plus tard : la pile se met à jour avec les nouvelles missions,
         clients et pros admissibles.
       </p>
-      {hasAnyMatch && (
+      {hasAnyMatch ? (
         <Link
           href="/matches"
           className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-3 text-sm font-bold text-white shadow-md shadow-workon-primary/20"
         >
           <Users className="h-4 w-4" />
           {matchCount > 0 ? `Voir ${matchCount} nouveau match` : "Voir mes matchs"}
+        </Link>
+      ) : (
+        <Link
+          href="/pros"
+          className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-workon-primary px-5 py-3 text-sm font-bold text-white shadow-md shadow-workon-primary/20"
+        >
+          <Users className="h-4 w-4" />
+          Parcourir tous les pros
         </Link>
       )}
     </div>
