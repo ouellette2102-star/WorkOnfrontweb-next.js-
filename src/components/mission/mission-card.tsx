@@ -249,7 +249,10 @@ export function MissionCard({
 
         <div className="mt-4 flex gap-3">
           {hasPhoto ? (
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-workon-bg">
+            <div
+              className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-workon-bg"
+              data-testid="mission-card-photo"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={mission.firstPhotoUrl!}
@@ -259,7 +262,10 @@ export function MissionCard({
               />
             </div>
           ) : (
-            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-workon-border bg-gradient-to-br from-workon-bg-cream to-workon-surface text-workon-primary">
+            <div
+              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-workon-border bg-gradient-to-br from-workon-bg-cream to-workon-surface text-workon-primary"
+              data-testid="mission-card-photo-fallback"
+            >
               <Icon className="h-9 w-9" strokeWidth={1.8} />
             </div>
           )}
@@ -328,7 +334,7 @@ export function MissionCard({
               data-testid="mission-card-social-proof"
             >
               <Users className="h-3.5 w-3.5" />
-              {mission.offersCount} offre{mission.offersCount > 1 ? "s" : ""}
+              {mission.offersCount} offre{mission.offersCount > 1 ? "s" : ""} reçue{mission.offersCount > 1 ? "s" : ""}
             </span>
           )}
         </div>
@@ -441,12 +447,11 @@ function formatCategoryLabel(value: string): string {
 }
 
 function formatPriceLabel(priceRange?: string, price?: number): string {
-  if (priceRange) {
-    const trimmed = priceRange.trim();
-    const dollarPrefix = trimmed.match(/^\$\s*(.+)$/);
-    if (dollarPrefix) return `${dollarPrefix[1]} $`;
-    return trimmed.replace(/\s*\$$/, " $");
-  }
+  // A priceRange (PublicMission shape) is already human-formatted by the
+  // source (e.g. "$80–$120") — pass it through untouched.
+  if (priceRange && priceRange.trim()) return priceRange.trim();
   if (price != null) return `${price} $`;
-  return "À préciser";
+  // Distinct from the duration placeholder ("À préciser") so an unknown
+  // budget reads clearly as "Budget —" in the stats grid.
+  return "—";
 }

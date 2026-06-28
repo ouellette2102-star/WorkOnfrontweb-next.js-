@@ -79,7 +79,7 @@ describe("<MissionCard />", () => {
       /Plombier pour fuite/,
     );
     expect(screen.getByTestId("mission-card-stats")).toHaveTextContent(
-      /180\$/,
+      /180\s*\$/,
     );
   });
 
