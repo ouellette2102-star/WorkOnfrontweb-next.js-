@@ -1059,8 +1059,11 @@ export const api = {
     apiFetch<ContractResponse>(`/contracts/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
 
   // Disputes
-  createDispute: (data: { localMissionId?: string; missionId?: string; reason: string; description: string }) =>
-    apiFetch<DisputeResponse>("/disputes", { method: "POST", body: JSON.stringify(data) }),
+  createDispute: (data: { localMissionId?: string; missionId?: string; reason: string; description?: string }) => {
+    const { description, ...payload } = data;
+    void description;
+    return apiFetch<DisputeResponse>("/disputes", { method: "POST", body: JSON.stringify(payload) });
+  },
   getDispute: (id: string) => apiFetch<DisputeResponse>(`/disputes/${id}`),
   getDisputeForMission: (missionId: string) => apiFetch<DisputeResponse>(`/disputes/mission/${missionId}`),
   /**
