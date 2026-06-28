@@ -74,6 +74,54 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Download a binary document (PDF) from the backend through the browser proxy.
+ * apiFetch can't be used (it JSON-parses the body); this fetches a Blob, preserves
+ * the server filename (Content-Disposition), and triggers the browser download.
+ */
+export async function downloadDocument(
+  path: string,
+  fallbackFilename: string,
+): Promise<void> {
+  const apiBaseUrl =
+    typeof window === "undefined" ? BACKEND_API_URL : BROWSER_API_PROXY_URL;
+  const headers = new Headers({ Accept: "application/pdf" });
+  const token = getAccessToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  let res = await fetch(`${apiBaseUrl}${path}`, { headers });
+  if (res.status === 401) {
+    const newToken = await refreshToken();
+    if (newToken) {
+      headers.set("Authorization", `Bearer ${newToken}`);
+      res = await fetch(`${apiBaseUrl}${path}`, { headers });
+    }
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}) as Record<string, unknown>);
+    const errorObj = (body as { error?: unknown })?.error ?? body;
+    const e = errorObj as { message?: string; code?: string };
+    throw new ApiError(
+      res.status,
+      e?.message || "Téléchargement échoué",
+      typeof e?.code === "string" ? e.code : undefined,
+    );
+  }
+
+  const blob = await res.blob();
+  const cd = res.headers.get("content-disposition");
+  const filename = cd?.match(/filename="?([^"]+)"?/)?.[1] || fallbackFilename;
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 // --- Types ---
 
 export interface MissionResponse {
@@ -994,6 +1042,13 @@ export const api = {
 
   // Invoices
   getInvoice: (id: string) => apiFetch<InvoiceResponse>(`/payments/invoice/${id}`),
+  downloadInvoicePdf: (id: string) =>
+    downloadDocument(`/payments/invoice/${id}/pdf`, `WorkOn-facture-${id}.pdf`),
+  downloadWorkerStatementPdf: (id: string) =>
+    downloadDocument(
+      `/payments/invoice/${id}/statement/pdf`,
+      `WorkOn-releve-${id}.pdf`,
+    ),
   getMyInvoices: () => apiFetch<InvoiceResponse[]>("/payments/invoices/mine"),
   previewInvoice: (priceCents: number) =>
     apiFetch<InvoicePreview>(`/payments/preview?priceCents=${priceCents}`),

@@ -5,6 +5,7 @@ import { api, type InvoiceResponse } from "@/lib/api-client";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useState } from "react";
 
 const statusConfig: Record<
   InvoiceResponse["status"],
@@ -37,6 +38,18 @@ export default function InvoiceDetailPage() {
     queryKey: ["invoice", invoiceId],
     queryFn: () => api.getInvoice(invoiceId),
   });
+
+  const [downloading, setDownloading] = useState(false);
+  const handleDownloadPdf = async () => {
+    setDownloading(true);
+    try {
+      await api.downloadInvoicePdf(invoiceId);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Téléchargement échoué");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -255,9 +268,10 @@ export default function InvoiceDetailPage() {
           <Button
             variant="outline"
             className="border-workon-border text-workon-ink hover:bg-workon-bg print:hidden"
-            onClick={() => window.print()}
+            onClick={handleDownloadPdf}
+            disabled={downloading}
           >
-            Télécharger PDF
+            {downloading ? "Génération…" : "Télécharger la facture (PDF)"}
           </Button>
         </div>
       </div>
