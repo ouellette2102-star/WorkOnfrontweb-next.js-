@@ -2,6 +2,7 @@ import type { ContractResponse } from "@/lib/api-client";
 
 export type ContractViewerRole = "employer" | "worker" | "unknown";
 export type ContractActionTone = "primary" | "secondary" | "quiet" | "danger";
+export type ContractSignatureKey = "client" | "worker";
 
 export const statusConfig: Record<
   ContractResponse["status"],
@@ -94,30 +95,85 @@ export function getMissionSummary(contract: ContractResponse) {
   };
 }
 
-export function getCounterparty(contract: ContractResponse, role: ContractViewerRole) {
-  if (role === "employer") {
-    return {
+export function getContractParties(contract: ContractResponse) {
+  return {
+    employer: {
+      label: "Client",
+      name: formatLocalPartyName(contract.localEmployer, "Client WorkOn"),
+      city: contract.localEmployer?.city ?? null,
+      detail: contract.localEmployer?.businessName ?? null,
+      avatarUrl: contract.localEmployer?.pictureUrl ?? null,
+    },
+    worker: {
       label: "Professionnel",
       name: formatLocalPartyName(contract.localWorker, "Pro WorkOn"),
       city: contract.localWorker?.city ?? null,
       detail: contract.localWorker?.jobTitle ?? null,
+      avatarUrl: contract.localWorker?.pictureUrl ?? null,
+      ratingAverage: contract.localWorker?.ratingAverage ?? null,
+      reviewCount: contract.localWorker?.reviewCount ?? 0,
+    },
+  };
+}
+
+export function getCounterparty(contract: ContractResponse, role: ContractViewerRole) {
+  const parties = getContractParties(contract);
+
+  if (role === "employer") {
+    return {
+      label: parties.worker.label,
+      name: parties.worker.name,
+      city: parties.worker.city,
+      detail: parties.worker.detail,
     };
   }
 
   if (role === "worker") {
     return {
-      label: "Client",
-      name: formatLocalPartyName(contract.localEmployer, "Client WorkOn"),
-      city: contract.localEmployer?.city ?? null,
-      detail: contract.localEmployer?.businessName ?? null,
+      label: parties.employer.label,
+      name: parties.employer.name,
+      city: parties.employer.city,
+      detail: parties.employer.detail,
     };
   }
 
   return {
     label: "Partie",
-    name: formatLocalPartyName(contract.localEmployer, "Participant WorkOn"),
-    city: contract.localEmployer?.city ?? null,
-    detail: contract.localEmployer?.businessName ?? null,
+    name: parties.employer.name,
+    city: parties.employer.city,
+    detail: parties.employer.detail,
+  };
+}
+
+export function getSignatureProgress(contract: ContractResponse) {
+  const steps: Array<{
+    key: ContractSignatureKey;
+    label: string;
+    signed: boolean;
+    pendingLabel: string;
+  }> = [
+    {
+      key: "client",
+      label: "Client",
+      signed: contract.signedByEmployer,
+      pendingLabel: contract.status === "DRAFT" ? "A envoyer" : "En attente",
+    },
+    {
+      key: "worker",
+      label: "Pro",
+      signed: contract.signedByWorker,
+      pendingLabel: contract.status === "PENDING" ? "Signature requise" : "En attente",
+    },
+  ];
+
+  const signedCount = steps.filter((step) => step.signed).length;
+
+  return {
+    steps,
+    signedCount,
+    totalCount: steps.length,
+    percent: Math.round((signedCount / steps.length) * 100),
+    label: `${signedCount}/${steps.length} signatures`,
   };
 }
 
@@ -213,6 +269,54 @@ export function getContractLinks(contract: ContractResponse) {
   };
 }
 
+export function getContractTimeframe(contract: ContractResponse) {
+  if (contract.startAt && contract.endAt) {
+    return `${formatDate(contract.startAt)} au ${formatDate(contract.endAt)}`;
+  }
+
+  if (contract.startAt) {
+    return `Debut ${formatDate(contract.startAt)}`;
+  }
+
+  if (contract.endAt) {
+    return `Fin ${formatDate(contract.endAt)}`;
+  }
+
+  return "Dates a confirmer";
+}
+
+export function getMaterialLabel(value: boolean | null | undefined) {
+  if (value === null || typeof value === "undefined") return "Materiel a confirmer";
+  return value ? "Materiel fourni" : "Materiel a apporter";
+}
+
+export function getContractSortTime(contract: ContractResponse) {
+  const time = new Date(contract.updatedAt).getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+export function getContractStatusRank(status: ContractResponse["status"]) {
+  const rank: Record<ContractResponse["status"], number> = {
+    PENDING: 0,
+    DRAFT: 1,
+    ACCEPTED: 2,
+    COMPLETED: 3,
+    REJECTED: 4,
+    CANCELLED: 5,
+  };
+
+  return rank[status];
+}
+
+export function getContractStatusGroup(
+  status: ContractResponse["status"],
+): "pending" | "active" | "completed" | "closed" {
+  if (status === "DRAFT" || status === "PENDING") return "pending";
+  if (status === "ACCEPTED") return "active";
+  if (status === "COMPLETED") return "completed";
+  return "closed";
+}
+
 export function formatCurrency(value: number | null | undefined) {
   return new Intl.NumberFormat("fr-CA", {
     style: "currency",
@@ -223,12 +327,14 @@ export function formatCurrency(value: number | null | undefined) {
 
 export function formatDate(value: string | null | undefined) {
   if (!value) return "Non defini";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date inconnue";
 
   return new Intl.DateTimeFormat("fr-CA", {
     day: "numeric",
     month: "short",
     year: "numeric",
-  }).format(new Date(value));
+  }).format(date);
 }
 
 export function formatDuration(minutes: number | null | undefined) {
@@ -238,6 +344,42 @@ export function formatDuration(minutes: number | null | undefined) {
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
   return rest ? `${hours} h ${rest} min` : `${hours} h`;
+}
+
+export function formatRelativeTime(value: string | null | undefined) {
+  if (!value) return "date inconnue";
+
+  const date = new Date(value);
+  const time = date.getTime();
+  if (Number.isNaN(time)) return "date inconnue";
+
+  const diffMs = Date.now() - time;
+  const diffMinutes = Math.round(diffMs / 60000);
+  const absMinutes = Math.abs(diffMinutes);
+
+  if (absMinutes < 60) {
+    return diffMinutes >= 0
+      ? `il y a ${Math.max(1, absMinutes)} min`
+      : `dans ${Math.max(1, absMinutes)} min`;
+  }
+
+  const diffHours = Math.round(diffMinutes / 60);
+  const absHours = Math.abs(diffHours);
+  if (absHours < 24) {
+    return diffHours >= 0
+      ? `il y a ${absHours} h`
+      : `dans ${absHours} h`;
+  }
+
+  const diffDays = Math.round(diffHours / 24);
+  const absDays = Math.abs(diffDays);
+  if (absDays < 30) {
+    return diffDays >= 0
+      ? `il y a ${absDays} j`
+      : `dans ${absDays} j`;
+  }
+
+  return formatDate(value);
 }
 
 function formatLocalPartyName(
