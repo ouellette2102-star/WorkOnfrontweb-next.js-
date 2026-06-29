@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ function SuccessContent() {
     try {
       await api.downloadInvoicePdf(invoiceId);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Téléchargement échoué");
+      toast.error(e instanceof Error ? e.message : "Téléchargement échoué");
     } finally {
       setDownloading(false);
     }

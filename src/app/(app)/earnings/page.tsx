@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -584,7 +585,7 @@ function PaymentFallbackRow({ payment }: { payment: WorkerPayment }) {
     try {
       await api.downloadWorkerStatementPdf(payment.id);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Téléchargement échoué");
+      toast.error(e instanceof Error ? e.message : "Téléchargement échoué");
     } finally {
       setDownloadingStatement(false);
     }

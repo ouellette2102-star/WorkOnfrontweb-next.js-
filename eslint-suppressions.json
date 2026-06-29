@@ -75,11 +75,6 @@
       "count": 4
     }
   },
-  "src/components/profile-header.tsx": {
-    "jsx-a11y/anchor-is-valid": {
-      "count": 1
-    }
-  },
   "src/components/profile/portfolio-uploader.tsx": {
     "jsx-a11y/click-events-have-key-events": {
       "count": 1

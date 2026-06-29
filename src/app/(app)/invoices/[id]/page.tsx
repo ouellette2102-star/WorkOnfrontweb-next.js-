@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api, type InvoiceResponse } from "@/lib/api-client";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,7 @@ export default function InvoiceDetailPage() {
     try {
       await api.downloadInvoicePdf(invoiceId);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Téléchargement échoué");
+      toast.error(e instanceof Error ? e.message : "Téléchargement échoué");
     } finally {
       setDownloading(false);
     }
