@@ -166,8 +166,8 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts
-      - name: Run F3 + F4 + F5 + map + contracts + invoices + receipts + trust center E2E
-        run: npx playwright test e2e/mission-create.spec.ts e2e/invoice-review.spec.ts e2e/admin-role-gate.spec.ts e2e/map.spec.ts e2e/contracts.spec.ts e2e/invoices.spec.ts e2e/receipts.spec.ts e2e/profile-verify.spec.ts --project=chromium
+      - name: Run F3 + F4 + F5 + map + contracts + invoices + receipts + profile + trust center E2E
+        run: npx playwright test e2e/mission-create.spec.ts e2e/invoice-review.spec.ts e2e/admin-role-gate.spec.ts e2e/map.spec.ts e2e/contracts.spec.ts e2e/invoices.spec.ts e2e/receipts.spec.ts e2e/profile-business-info.spec.ts e2e/profile-verify.spec.ts --project=chromium
 
   # A11y (axe) — BLOCKING. Vérification WCAG runtime sur une page P0 publique.
   # Échoue sur les violations `critical`, logue toutes les violations pour
