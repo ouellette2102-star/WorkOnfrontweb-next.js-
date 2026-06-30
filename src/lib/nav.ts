@@ -30,6 +30,7 @@ import {
   MessageCircle,
   Plus,
   Settings,
+  ShieldCheck,
   Star,
   User,
   Users,
@@ -84,6 +85,13 @@ export const HAMBURGER_ITEMS: NavItem[] = [
     href: "/profile",
     icon: User,
     intent: "Edit personal + worker card profile",
+  },
+  {
+    id: "trust-center",
+    label: "Centre de confiance",
+    href: "/profile/verify",
+    icon: ShieldCheck,
+    intent: "All: phone, identity, payment, and company trust signals",
   },
   // #11 — "Mes missions" lives in the hamburger from Phase 3 onward.
   // Worker label = "Mes affectations" (assigned work), Client label =

@@ -210,6 +210,15 @@ test("centre de confiance : SMS, OTP, identite et infos de cie", async ({
 
   await page.goto("/profile/verify");
 
+  await page.getByTestId("topbar-menu-button").click();
+  await expect(page.getByTestId("menu-trust-center")).toBeVisible();
+  await expect(page.getByTestId("menu-trust-center")).toHaveAttribute(
+    "href",
+    "/profile/verify",
+  );
+  await page.getByTestId("menu-trust-center").click();
+  await expect(page).toHaveURL(/\/profile\/verify$/);
+
   await expect(page.getByTestId("profile-verify-page")).toBeVisible({
     timeout: 15_000,
   });
