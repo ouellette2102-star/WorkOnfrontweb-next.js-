@@ -28,7 +28,12 @@ import {
 const MENU_GROUPS: Array<{ label: string; ids: string[] }> = [
   {
     label: "Compte",
-    ids: ["profile", "missions-mine-pro", "missions-mine-client"],
+    ids: [
+      "profile",
+      "trust-center",
+      "missions-mine-pro",
+      "missions-mine-client",
+    ],
   },
   {
     label: "Argent et paiements",
@@ -208,6 +213,7 @@ export function TopBar() {
               aria-controls={ACCOUNT_MENU_ID}
               aria-expanded={menuOpen}
               aria-haspopup="dialog"
+              data-testid="topbar-menu-button"
             >
               {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -329,6 +335,7 @@ export function TopBar() {
                         <Link
                           key={item.href}
                           href={item.href}
+                          data-testid={`menu-${item.id}`}
                           onClick={() => setMenuOpen(false)}
                           className={cn(
                             "flex items-center gap-3 border-b border-workon-border/70 px-3 py-3 transition-colors last:border-b-0",
