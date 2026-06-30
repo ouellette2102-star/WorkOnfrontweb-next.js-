@@ -1,7 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, Award, FileText } from "lucide-react";
+import { Star, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface ProfileHeaderProps {
@@ -59,13 +59,6 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
               <Award className="h-4 w-4" />
               <span>{user.completedMissions} missions</span>
             </div>
-            <a
-              href="#"
-              className="flex items-center gap-1 hover:text-workon-ink transition"
-            >
-              <FileText className="h-4 w-4" />
-              <span>CV PDF</span>
-            </a>
           </div>
 
           {user.bio && (
