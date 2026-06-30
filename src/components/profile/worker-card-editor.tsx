@@ -210,6 +210,7 @@ export function WorkerCardEditor() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <Field
+          id="workerJobTitle"
           label="Titre du métier"
           hint="Affiché sous ton nom. Ex: Paysagiste résidentiel"
           value={draft.jobTitle}
@@ -219,11 +220,13 @@ export function WorkerCardEditor() {
         <Field
           label="Catégorie principale"
           hint="Slug de catégorie. Ex: paysagement, menage, peinture"
+          id="workerCategory"
           value={draft.category}
           maxLength={60}
           onChange={(category) => setDraft({ ...draft, category })}
         />
         <NumberField
+          id="workerHourlyRate"
           label="Tarif horaire ($CAD)"
           hint="Affiché comme &quot;À partir de X $/h&quot;"
           value={draft.hourlyRate}
@@ -233,6 +236,7 @@ export function WorkerCardEditor() {
         <NumberField
           label="Rayon de service (km)"
           hint="Distance maximale autour de ta ville"
+          id="workerServiceRadiusKm"
           value={draft.serviceRadiusKm}
           placeholder="25"
           onChange={(serviceRadiusKm) =>
@@ -242,13 +246,14 @@ export function WorkerCardEditor() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-workon-ink">
+        <label htmlFor="workerBio" className="block text-sm font-medium text-workon-ink">
           Bio publique
         </label>
         <p className="text-xs text-workon-muted mb-1.5">
           Maximum 1000 caractères. Vu sur ta page profil.
         </p>
         <textarea
+          id="workerBio"
           value={draft.bio}
           rows={4}
           maxLength={1000}
@@ -385,12 +390,14 @@ export function WorkerCardEditor() {
 }
 
 function Field({
+  id,
   label,
   hint,
   value,
   maxLength,
   onChange,
 }: {
+  id: string;
   label: string;
   hint?: string;
   value: string;
@@ -399,9 +406,10 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-workon-ink">{label}</label>
+      <label htmlFor={id} className="block text-sm font-medium text-workon-ink">{label}</label>
       {hint && <p className="text-xs text-workon-muted mb-1.5">{hint}</p>}
       <input
+        id={id}
         type="text"
         value={value}
         maxLength={maxLength}
@@ -413,12 +421,14 @@ function Field({
 }
 
 function NumberField({
+  id,
   label,
   hint,
   value,
   placeholder,
   onChange,
 }: {
+  id: string;
   label: string;
   hint?: string;
   value: string;
@@ -427,9 +437,10 @@ function NumberField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-workon-ink">{label}</label>
+      <label htmlFor={id} className="block text-sm font-medium text-workon-ink">{label}</label>
       {hint && <p className="text-xs text-workon-muted mb-1.5">{hint}</p>}
       <input
+        id={id}
         type="number"
         min={0}
         value={value}
