@@ -1,5 +1,10 @@
 # 🎉 STRIPE CONNECT - RAPPORT FINAL D'IMPLÉMENTATION
 
+> ⚠️ **DOCUMENT HISTORIQUE (17 nov. 2025) — architecture supersédée.**
+> Le modèle décrit plus bas (destination charges, commission **12 %** déduite du worker) **n'est plus en vigueur**.
+> **Modèle actuel (2026-07) :** commission WorkOn **15 %**, facturée **EN SUS au client** ; le **worker reçoit 100 %** du prix de la mission (jamais déduit) ; libération par **escrow** (`releaseEscrow` transfère le sous-total).
+> Source de vérité : `src/components/mission/booking-recap-card.tsx`.
+
 **Date** : 17 novembre 2025  
 **Ingénieur** : Senior Full-Stack Engineer  
 **Projet** : WorkOn - Plateforme de mise en relation employeur/travailleur  
@@ -9,7 +14,7 @@
 
 ## 📊 RÉSUMÉ EXÉCUTIF
 
-L'intégration **Stripe Connect** complète a été implémentée avec succès dans WorkOnApp. Le système permet aux Workers de devenir des comptes Stripe Connect et de recevoir des paiements directement via destination charges, avec une commission de 12% prélevée par la plateforme.
+L'intégration **Stripe Connect** complète a été implémentée avec succès dans WorkOnApp. Le système permet aux Workers de devenir des comptes Stripe Connect et de recevoir des paiements. *(⚠️ Voir le bandeau en tête : le modèle « 12 % via destination charges » décrit ci-dessous est historique ; le modèle en vigueur est **15 % en sus** au client, worker **100 %**.)*
 
 ### Temps d'implémentation
 - **Analyse & Architecture** : 30 minutes

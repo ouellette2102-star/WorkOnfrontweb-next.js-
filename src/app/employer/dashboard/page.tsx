@@ -25,7 +25,7 @@ export default async function EmployerDashboardPage() {
             <div className="group cursor-pointer rounded-2xl border-2 border-workon-accent/30 bg-gradient-to-br from-workon-accent/10 to-workon-accent/5 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-workon-accent/60 hover:shadow-md">
               <div className="mb-2 text-3xl">&#x26A1;</div>
               <h3 className="text-base font-semibold text-workon-ink">
-                Express Dispatch
+                Demande express
               </h3>
               <p className="mt-0.5 text-xs text-workon-muted">
                 Besoin urgent
