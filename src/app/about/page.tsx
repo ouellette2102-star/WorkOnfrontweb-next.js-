@@ -22,7 +22,7 @@ export default function AboutPage() {
             À propos
           </p>
           <h1 className="font-heading text-[2.5rem] md:text-[3.5rem] font-bold leading-[1.08] tracking-tight text-workon-ink">
-            Le travail sur demande,
+            Le service sur demande,
             <br />
             <span className="text-workon-accent">structuré pour le Québec.</span>
           </h1>
@@ -45,7 +45,7 @@ export default function AboutPage() {
               Le Québec compte près de <strong>500&nbsp;000 travailleurs
               autonomes</strong>. Pourtant, la majorité d&apos;entre eux
               n&apos;ont pas d&apos;outil structuré pour trouver du travail
-              récurrent, et les entreprises qui cherchent un renfort ponctuel
+              récurrent, et les entreprises qui cherchent un professionnel ponctuel
               passent par des agences coûteuses ou des listes de contacts
               personnels.
             </p>
