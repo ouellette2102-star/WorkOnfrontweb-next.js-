@@ -28,8 +28,8 @@ const BUSINESS_CATEGORIES: Array<{ value: string; label: string }> = [
   { value: "paysagement", label: "Paysagement / entretien" },
   { value: "deneigement", label: "Déneigement" },
   { value: "demenagement", label: "Déménagement / manutention" },
-  { value: "evenementiel", label: "Événementiel / service" },
-  { value: "restauration", label: "Restauration" },
+  { value: "evenementiel", label: "Montage/démontage & nettoyage d'événement" },
+  { value: "restauration", label: "Services aux restaurants (entretien, hotte, réfrigération)" },
   { value: "autre", label: "Autre" },
 ];
 
