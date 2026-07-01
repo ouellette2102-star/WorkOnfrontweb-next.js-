@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "À propos — WorkOn",
   description:
-    "WorkOn connecte les entreprises québécoises et les travailleurs autonomes pour combler les besoins de main-d'œuvre temporaire. Plateforme conçue au Québec, conforme Loi 25.",
+    "WorkOn connecte les entreprises québécoises et les travailleurs autonomes pour des services définis : entretien, ménage commercial, déneigement, petits travaux. Plateforme conçue au Québec, conforme Loi 25.",
   alternates: { canonical: "/about" },
 };
 
@@ -27,8 +27,8 @@ export default function AboutPage() {
             <span className="text-workon-accent">structuré pour le Québec.</span>
           </h1>
           <p className="mt-8 text-lg md:text-xl text-workon-gray max-w-2xl leading-relaxed">
-            WorkOn relie les entreprises québécoises qui ont un besoin de
-            main-d&apos;œuvre temporaire aux travailleurs autonomes qualifiés,
+            WorkOn relie les entreprises québécoises qui ont un service à
+            faire réaliser aux travailleurs autonomes qualifiés,
             disponibles et vérifiés &mdash; sans agence, sans engagement, sans
             complexité administrative.
           </p>

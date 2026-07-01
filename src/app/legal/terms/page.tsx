@@ -221,7 +221,7 @@ export default function TermsPage() {
 
       <SubTitle>7.3 Commission de la plateforme</SubTitle>
       <P>
-        WorkOn per&ccedil;oit une commission de 10 &agrave; 15&nbsp;% sur les transactions effectu&eacute;es
+        WorkOn per&ccedil;oit une commission de 15&nbsp;% sur les transactions effectu&eacute;es
         via la plateforme. Le taux exact est clairement indiqu&eacute; avant la confirmation
         de chaque transaction. Cette commission couvre les co&ucirc;ts d&rsquo;exploitation de la
         plateforme, incluant le traitement des paiements, le support et la mise en

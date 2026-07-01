@@ -205,7 +205,7 @@ function Hero() {
                       <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-workon-gold/[0.16]">
                         <UtensilsCrossed className="h-3.5 w-3.5 text-[#7FB0FF]" />
                       </span>
-                      Aide-cuisine
+                      Dégraissage de hotte
                     </span>
                     <span className="text-[14px] font-bold text-white">110&nbsp;$</span>
                   </div>
@@ -286,7 +286,7 @@ function HowItWorks() {
   const steps = [
     { num: "01", icon: UserPlus, title: "Crée ton profil", desc: "Ton métier, ta zone, tes disponibilités. En 3 minutes, gratuit, sans carte de crédit." },
     { num: "02", icon: LayoutGrid, title: "Découvre les missions", desc: "Les demandes près de toi — en liste, sur la carte ou en swipe. Tu vois le besoin, le lieu et le budget." },
-    { num: "03", icon: Handshake, title: "Accepte et fais la job", desc: "Tu choisis tes contrats et ton prix. Tu pointes ton arrivée et ton départ directement dans l'app." },
+    { num: "03", icon: Handshake, title: "Accepte et fais la job", desc: "Tu choisis tes contrats et ton prix. Tu confirmes le début et la fin du mandat directement dans l'app." },
     { num: "04", icon: Wallet, title: "Reçois ton paiement", desc: "L'argent est retenu en sécurité (escrow) dès le départ, puis libéré à la fin. Tu gardes 100 %." },
   ];
   return (
@@ -380,7 +380,7 @@ function Differentiation() {
 function Sectors() {
   const cases = [
     { sector: "Ménage résidentiel", icon: Sparkles, tag: "Forte demande", desc: "Les propriétaires cherchent un service fiable chaque semaine. Capte ces demandes avant la concurrence." },
-    { sector: "Aide-restauration", icon: UtensilsCrossed, tag: "En ce moment", desc: "Plonge, aide-cuisine, service : les restos manquent de bras les soirs achalandés." },
+    { sector: "Services aux restaurants", icon: UtensilsCrossed, tag: "En ce moment", desc: "Dégraissage de hotte, ménage commercial de nuit, réparation d'équipement, réfrigération." },
     { sector: "Entretien & petits travaux", icon: Leaf, tag: "Toute l'année", desc: "Pelouse, lavage, déneigement l'hiver, homme à tout faire — chaque saison amène ses contrats." },
   ];
   return (
