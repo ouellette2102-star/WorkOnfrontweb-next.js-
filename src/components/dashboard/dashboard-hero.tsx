@@ -22,7 +22,7 @@ const HERO_COPY: Record<
   },
   employer: {
     message: "Tu es prêt à publier des missions pour trouver un pro.",
-    ctaLabel: "Express Dispatch",
+    ctaLabel: "Demande express",
     ctaHref: "/express",
   },
   client: {

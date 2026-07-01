@@ -356,8 +356,9 @@ http://localhost:3000
 3. **Cliquer** : "Payer la mission" (bouton à ajouter si manquant → aller sur `/missions/[id]/pay`)
 4. **Observer** : Résumé de paiement
    - Montant mission : 100 $
-   - Frais plateforme (12%) : 12 $
-   - Total à payer : 100 $ (WorkOn prélève les frais automatiquement)
+   - Commission WorkOn (15 %, en sus) : 15 $
+   - Total à payer par le client : 115 $
+   - Le worker reçoit 100 % du montant de la mission (100 $)
 5. **Cliquer** : "Procéder au paiement"
 6. **Stripe Elements** : Formulaire de carte apparaît
 7. **Entrer carte test** :
@@ -489,8 +490,8 @@ http://localhost:3000
 - [ ] Paiement carte test passe
 - [ ] Webhook reçu et traité
 - [ ] Payment DB créé avec bon statut
-- [ ] Worker reçoit paiement (88%)
-- [ ] WorkOn prélève frais (12%)
+- [ ] Worker reçoit 100 % du montant de la mission
+- [ ] WorkOn facture 15 % de commission en sus au client
 
 ### Sécurité & Performance
 - [ ] Routes protégées fonctionnent
