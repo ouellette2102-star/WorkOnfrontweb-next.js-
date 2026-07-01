@@ -21,7 +21,7 @@ const HERO_COPY: Record<
     ctaHref: "/missions/mine",
   },
   employer: {
-    message: "Tu es prêt à publier des missions pour trouver du renfort.",
+    message: "Tu es prêt à publier des missions pour trouver un pro.",
     ctaLabel: "Express Dispatch",
     ctaHref: "/express",
   },

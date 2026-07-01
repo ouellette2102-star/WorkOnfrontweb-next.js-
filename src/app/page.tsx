@@ -335,7 +335,7 @@ function Differentiation() {
           <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-[-0.02em] text-workon-ink md:text-[2.6rem]">
             Ni agence. Ni répertoire.
             <br />
-            <span className="text-workon-gray">Le travail sur demande, pour vrai.</span>
+            <span className="text-workon-gray">Le service sur demande, pour vrai.</span>
           </h2>
         </div>
         <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
@@ -571,7 +571,7 @@ function EmployerCTA() {
         <div className="flex flex-col items-center justify-between gap-8 rounded-3xl border border-[#1B3147] bg-[#0E2236] p-10 md:flex-row md:p-14">
           <div className="max-w-lg">
             <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7FB0FF]">Clients &amp; entreprises</p>
-            <h2 className="font-heading text-[1.9rem] font-bold text-white">Besoin de renfort qualifié&nbsp;?</h2>
+            <h2 className="font-heading text-[1.9rem] font-bold text-white">Besoin de pros qualifiés&nbsp;?</h2>
             <p className="mt-4 text-[17px] leading-relaxed text-[#9DB0C6]">
               Publie ton besoin gratuitement et reçois des travailleurs autonomes vérifiés
               près de chez toi. Zéro commission côté client pendant le lancement.
